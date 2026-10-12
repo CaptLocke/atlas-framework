@@ -18,7 +18,7 @@ Behavior (system/rules/sync.md "after each logical change set"):
 - Blocks the stop when (a) tracked files have uncommitted changes or there are
   untracked, non-ignored files (except .nova-tmp/ and user/inbox/drop/), or an
   unfinished rebase/merge, or (b) HEAD has commits origin/main doesn't (after
-  a quick `git fetch`).
+  the local `origin/main` tracking ref; no network call).
 - Loop safety: when `stop_hook_active` is true, or this would be the 3rd
   consecutive block (counter in .nova-tmp/sync_guard.json, per session), the
   stop is allowed: an open high-severity known issue `sync-push-failing` is
@@ -83,7 +83,8 @@ def problems(gs, proj):
     elif paths:
         out.append("%d uncommitted file(s): %s%s" % (len(paths), ", ".join(paths[:5]),
                                                      ", ..." if len(paths) > 5 else ""))
-    gs.git(proj, ["fetch", "--quiet", "origin", gs.BRANCH], timeout=FETCH_TIMEOUT)  # best effort
+    # No network call: commits ahead of the local origin/main tracking ref (updated by every
+    # successful push or pull) are unpushed by definition, so the check stays instant.
     n = gs.unpushed_count(proj)
     if n:
         out.append("%d commit(s) not pushed to origin/%s" % (n, gs.BRANCH))
