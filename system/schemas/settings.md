@@ -27,7 +27,12 @@ attestation:                           # required before any ingestion
   role: Product Manager
   recorded_on: 2026-10-12
   nova_version: 1.0.0
-  reconfirm_due: 2027-01-04            # first business day of next quarter
+  reconfirm_due: 2027-01-04            # first business day of next (fiscal) quarter
+company:                               # the user's employer; filled at setup steps 6–8
+  website: https://acme.com
+  email_domains: [acme.com, acme.io]   # all domains the company uses; mail from these is internal
+  fiscal_year_start_month: 1           # 1–12; default 1 (January). Quarters and the quarterly moments follow it
+  fiscal_year_label: end               # end | start: which calendar year names the fiscal year (only matters if start month ≠ 1)
 # Self-employed / multiple clients: statement reads "…work information from my business and my clients…", employer: the user's own business.
 # Overdue reconfirmation: a known issue reminds the user; ingest continues. Ingest pauses only if the user declines,
 # or after a change of employer/role until a new attestation is recorded.

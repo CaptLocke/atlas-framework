@@ -14,13 +14,18 @@ Nova explains, in plain words, that what it learns about your work will be kept 
 
 Nova will ask you to confirm again each quarter, and if you change jobs or roles.
 
-## 2. Getting to know you
+## 2. Sharing what you have
 
-A friendly interview about your role, your company, what you're responsible for, your goals, and how you like to work, communicate, and make decisions. Nova may also look up public information about your company and industry to fill in details, and checks them with you.
+Nova reads before it asks. In one message it asks for:
+- **your company's website**;
+- **your LinkedIn profile**, if you'd like (the easiest way: on your LinkedIn profile, click **More → Save to PDF**, then attach the file);
+- **any documents you have handy**, all optional: a few emails or memos you've written, something your company published, a brand guide or slide template, an org chart, strategy or planning documents, recent reports.
 
-## 3. Your examples
+Attach whatever you have and skip the rest. You can add more in any chat later.
 
-Nova asks for a few things that help it sound like you and look like your company: some emails or documents you've written, a brand guide or company slides, an org chart. Attach whatever you have; skip anything you don't.
+## 3. Checking what Nova learned
+
+Nova reads your material and looks up public information about your company (what it does, its customers, competitors, size, recent news), then shows you what it found, a short section at a time, so you can correct anything. After that it asks only what it still needs to know, usually who your manager and key people are, your current goals, and how you like to work and receive information. Every question has a default, and you can skip any of them.
 
 ## 4. Connecting your tools
 

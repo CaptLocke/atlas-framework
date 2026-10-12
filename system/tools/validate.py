@@ -976,6 +976,28 @@ def check_nova(c, path, data, template):
                      % (dv, mdv))
     if data.get("plan") is not None and data.get("plan") not in PLANS:
         rep.error(path, "plan must be one of %s" % ", ".join(PLANS))
+    comp = data.get("company")
+    if comp is not None:
+        if not isinstance(comp, dict):
+            rep.error(path, "company must be a mapping (website, email_domains, fiscal_year_start_month, fiscal_year_label)")
+        else:
+            web = comp.get("website")
+            if web is not None and not (isinstance(web, str) and re.match(r"^https?://[^\s/]+\.[^\s]+$", web)):
+                rep.error(path, "company.website must be a URL like https://acme.com")
+            doms = comp.get("email_domains")
+            if doms is not None:
+                if not isinstance(doms, list):
+                    rep.error(path, "company.email_domains must be a list, e.g. [acme.com]")
+                else:
+                    for d in doms:
+                        if not (isinstance(d, str) and re.match(r"^[a-z0-9-]+(\.[a-z0-9-]+)+$", d)):
+                            rep.error(path, "company.email_domains: %r is not a domain like acme.com" % (d,))
+            fm = comp.get("fiscal_year_start_month")
+            if fm is not None and not (isinstance(fm, int) and not isinstance(fm, bool) and 1 <= fm <= 12):
+                rep.error(path, "company.fiscal_year_start_month must be a whole number from 1 to 12")
+            fl = comp.get("fiscal_year_label")
+            if fl is not None and fl not in ("end", "start"):
+                rep.error(path, "company.fiscal_year_label must be end or start")
     att = data.get("attestation") if "attestation" in data else None
     if "attestation" not in data:
         rep.error(path, "missing 'attestation' (null until recorded)")

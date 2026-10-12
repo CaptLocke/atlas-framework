@@ -11,6 +11,7 @@ Operation names and risk tags: `system/connectors/README.md`. Write path: `syste
 - **Threads the user is part of** (inbox and sent) since the cursor. Email is where most commitments, decisions, and requests arrive; it feeds information capture, triage (commitments), email drafts (threads awaiting a reply), recall, and meeting prep.
 - **Sent mail** (`list_sent`): evidence that an `i_owe` commitment was delivered, new promises the user made in writing, and examples for learning the user's voice (`nova-write`).
 - **Threads that need a reply**: mark them for `email-drafts` (a question or request addressed to the user, no reply from the user yet, not automated).
+- **Internal vs external:** senders and recipients on `nova.yaml: company.email_domains` are colleagues (people linked to the employer); everyone else is external (link them to their own organization by domain).
 - Scope comes from `user/settings/sources.yaml` (`scope:`, e.g. "inbox and sent; skip folders: Archive/Newsletters"). Exclusions come only from `data-rules.yaml`.
 
 ## What to skip (noise)

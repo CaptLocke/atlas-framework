@@ -10,7 +10,7 @@ The profile is who the user is and how they want Nova to behave. It is core conf
 ## Files
 | File | Holds |
 |---|---|
-| `profile.md` | Name, role, company (`[[organizations/...]]`), industry, manager and key people (links), responsibilities, current goals (links), time zone, the user's own person record (`[[people/<slug>]]`, `relationship: self`) |
+| `profile.md` | Name, role, company (`[[organizations/...]]`) with a short company summary (what it does, industry, size, fiscal year; detail lives in the employer record, `organization.md` §Employer), manager and key people (links), responsibilities, current goals (links), time zone, the user's own person record (`[[people/<slug>]]`, `relationship: self`), public background (from LinkedIn, if shared) |
 | `working-style.md` | How they plan, focus, prioritize, and like work organized |
 | `communication-style.md` | How they like to receive information (length, format, numbers-first vs narrative), meeting habits |
 | `thinking-style.md` | How they reason and decide (data-led, intuitive, collaborative), what they want challenged |

@@ -1,6 +1,8 @@
 # Set up Nova
 
-Welcome! This guide gets you from nothing to a working Nova. You do **four short steps** yourself, then Nova takes over in conversation and does the rest with you.
+**Nova gives you a memory for your work, and an assistant that keeps it moving.** It remembers what was said, decided, and promised, with links back to where it came from. It keeps track of what you owe and what you're waiting on, prepares you for meetings, and drafts your routine writing in your own voice. While you're offline it brings in new email, meetings, and messages, so a short Daily Brief is waiting for you each morning. It never sends, shares, or deletes anything without asking you first.
+
+This guide gets you from nothing to a working Nova. You do **four short steps** yourself, then Nova takes over in conversation and does the rest with you.
 
 You don't need to be technical. Every step is one small action, with a picture of what you should see. If something on your screen looks different, each step has a note for that.
 

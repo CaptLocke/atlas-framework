@@ -11,6 +11,11 @@ attestation:
   recorded_on: 2026-10-12
   nova_version: "1.0.0"
   reconfirm_due: 2027-01-04
+company:
+  website: https://acme.com
+  email_domains: [acme.com]
+  fiscal_year_start_month: 2
+  fiscal_year_label: end
 deliverables_folder:
   connector: google-drive
   path: "Nova Deliverables"

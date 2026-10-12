@@ -13,7 +13,10 @@ updated: null                  # set by nova-setup when first written
 <!-- Name; own person record ([[people/<slug>]], relationship: self); time zone. -->
 
 ## Role and company
-<!-- Role and title; company ([[organizations/<slug>]]); industry; team. -->
+<!-- Role and title; company ([[organizations/<slug>]]); team; tenure and background (from LinkedIn, if shared). -->
+
+## Company
+<!-- 3–5 lines: what the company does and for whom, industry, size, fiscal year. Detail lives in the employer record. -->
 
 ## Manager and key people
 <!-- Links to person records, with how they relate to the user. -->

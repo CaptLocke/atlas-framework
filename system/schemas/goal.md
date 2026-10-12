@@ -12,7 +12,7 @@ An outcome the user or their organization is working toward.
 | Field | Type | Required | Values / notes |
 |---|---|---|---|
 | `horizon` | enum | no | quarter, half, year, multi_year |
-| `period` | text | no | e.g. `2026-Q4` |
+| `period` | text | no | e.g. `2026-Q4`; quarters follow the company's fiscal year (`nova.yaml: company`) |
 | `metric` | text | no | How progress is measured. |
 | `target` | text | no |  |
 | `current` | text | no | Latest measured value with date. |

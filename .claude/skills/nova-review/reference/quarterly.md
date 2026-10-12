@@ -4,7 +4,7 @@ skill: nova-review
 ---
 # Quarterly moments
 
-Period: the previous calendar quarter (`YYYY-Qn`), produced on the first run on or after the quarter's first business day (the `quarterly` job decides when). In chat, the user can run any of these on demand.
+Period: the previous quarter (`YYYY-Qn`, following the company's fiscal year per `system/jobs/quarterly.md`; calendar quarters when it starts in January), produced on the first run on or after the quarter's first business day (the `quarterly` job decides when). In chat, the user can run any of these on demand.
 
 ## Quarterly report (`user/work/reports/YYYY-Qn.md`, `type: report`)
 ```markdown

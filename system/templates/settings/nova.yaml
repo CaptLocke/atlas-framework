@@ -12,7 +12,12 @@ attestation: null                      # REQUIRED before any ingestion; recorded
 #  role: <role>
 #  recorded_on: YYYY-MM-DD
 #  nova_version: <version>
-#  reconfirm_due: YYYY-MM-DD           # first business day of next quarter
+#  reconfirm_due: YYYY-MM-DD           # first business day of next (fiscal) quarter
+company:                               # filled at setup steps 6–8
+  website: null                        # e.g. https://acme.com
+  email_domains: []                    # e.g. [acme.com]; mail from these is internal
+  fiscal_year_start_month: 1           # 1–12; January unless the user says otherwise
+  fiscal_year_label: end               # end | start (only matters if the start month isn't 1)
 deliverables_folder:                   # where finished files are saved
   connector: null                      # connector name from connectors.yaml, or null (download only)
   path: "Nova Deliverables"

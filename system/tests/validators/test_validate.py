@@ -145,6 +145,15 @@ class SeededUserErrors(TempRepo):
         self.assertError(r, "nova.yaml", "installed_version")
         self.assertError(r, "nova.yaml", "plan must be")
 
+    def test_nova_bad_company(self):
+        self.replace("user/settings/nova.yaml", "website: https://acme.com", "website: acme")
+        self.replace("user/settings/nova.yaml", "email_domains: [acme.com]", "email_domains: acme.com")
+        self.replace("user/settings/nova.yaml", "fiscal_year_start_month: 2", "fiscal_year_start_month: 13")
+        self.replace("user/settings/nova.yaml", "fiscal_year_label: end", "fiscal_year_label: middle")
+        r = run_validate(self.root, "--user")
+        for msg in ("company.website", "company.email_domains", "fiscal_year_start_month", "fiscal_year_label"):
+            self.assertError(r, "nova.yaml", msg)
+
     def test_unparseable_yaml(self):
         self.write("user/settings/sources.yaml", "ingest: [\n")
         self.assertError(run_validate(self.root, "--user"), "sources.yaml", "cannot parse YAML")

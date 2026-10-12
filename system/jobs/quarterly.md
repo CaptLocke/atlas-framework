@@ -11,7 +11,8 @@ Run the quarterly moments once per quarter: Reset Goals (retrospective on last q
 
 ## Runs when
 - Lean: `nightly-cycle`. Standard: `morning-cycle`. Full: `morning-brief`. It rides along in a daily routine and decides for itself whether to do anything.
-- **Period logic.** Let Q be the current calendar quarter (`YYYY-Qn`; Q1 = Jan–Mar) and B the first business day of Q (first Monday–Friday date; holidays ignored). Run when the run date is on or after B and `jobs.yaml: quarterly.period_done` is not Q. Otherwise exit early, cheaply.
+- **Period logic.** Quarters follow the company's fiscal year (`nova.yaml: company.fiscal_year_start_month`, default 1 = January; a missing `company` block means January). Q1 starts on the first day of the start month; each quarter is three months. Let Q be the current fiscal quarter, labelled `YYYY-Qn` where `YYYY` is the fiscal year: the calendar year it ends in when `fiscal_year_label: end` (default), or begins in when `start`. With a January start this is the calendar quarter. Let B be the first business day of Q (first Monday–Friday date; holidays ignored). Run when the run date is on or after B and `jobs.yaml: quarterly.period_done` is not Q. Otherwise exit early, cheaply.
+- In text the user reads, write fiscal quarters the way companies do ("FY2027 Q1") when the fiscal year doesn't start in January; file names and `period` fields keep `YYYY-Qn`.
 - The run in quarter Q reviews the **previous quarter** (Q−1) and prepares Q.
 - Modifiers: `when`. `target` and `mode` are ignored.
 
@@ -27,7 +28,7 @@ Period check above. If `monthly` is due in the same run and hasn't run yet, it r
 
 ## Steps
 1. **Reset Goals** (`nova-review`, quarterly mode): retrospective on each Q−1 goal (evidence, outcome). Where evidence is clear, set status `achieved` or `missed` with an Updates line (`records_write`); otherwise ask. Draft candidate goals for Q as `status: draft` records and add a question asking the user to confirm, change, or import their Q goals.
-2. **Role Refresh** (`nova-review`): prepare short questions about changes to role, manager, team, priorities, tools, and company context in `user/inbox/questions.md` (`profile` kind). Add a `setup` question asking the user to re-confirm the attestation; the re-confirmation itself, and a new `reconfirm_due`, are recorded only in chat.
+2. **Role Refresh** (`nova-review`): prepare short questions about changes to role, manager, team, priorities, tools, and company context in `user/inbox/questions.md` (`profile` kind). Include company context from the employer record (anything in the company profile that may have changed: size, products, structure, recent news; refresh `## Recent news` by `web_research`). Add a `setup` question asking the user to re-confirm the attestation; the re-confirmation itself, and a new `reconfirm_due`, are recorded only in chat.
 3. **Performance Review** (`nova-review`): a ready-made record of Q−1 accomplishments, decisions, and impact with citations, for self-reviews and 1:1s.
 4. Write `user/work/reports/<Q−1>.md` (reset + role refresh, `type: report`) and `user/work/reports/<Q−1>-performance.md` (`type: performance`), each with `date` and `sources`.
 5. Republish every dashboard whose contract (`system/dashboards/*.contract.md`) lists `quarterly` in `republished_by`. Set `jobs.yaml: quarterly.period_done` to Q. Commit.

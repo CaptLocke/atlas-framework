@@ -21,7 +21,7 @@ types:
       relationship: [self, manager, report, peer, stakeholder, customer, vendor, partner, external, other]
   organization:
     folder: organizations
-    fields: [domain, kind, relationship_status, industry]
+    fields: [domain, kind, relationship_status, industry, website, size, headquarters]
     enums:
       status: [active, inactive]
       kind: [employer, customer, prospect, vendor, partner, regulator, investor, team, other]
