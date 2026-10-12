@@ -3,7 +3,7 @@ type: skill-reference
 skill: nova-setup
 also_used_by: [nova-settings, nova-update]
 ---
-# Rhythms, environments, and routines (step 10)
+# Rhythms, the routine environment, and routines (step 10)
 
 `nova-settings` uses the same procedures to change schedules later, and `nova-update` to change routine models.
 
@@ -24,39 +24,35 @@ Say: heavier profiles use more of their Claude allowance; they can switch any ti
 4. If the user turned a moment off, leave the job in the routine: jobs read `rhythms.yaml` and skip themselves. Only remove jobs if the user asks.
 5. Validate (`python3 system/tools/validate.py --all`), commit.
 
-## 3. Environments (`NOVA_CONTEXT`)
-Nova's safety checks use `NOVA_CONTEXT` to tell chats from automatic runs. If it's missing in a chat, they treat the chat like an unattended run (fail closed), which blocks everything that needs the user's OK. Two cloud environments are needed:
+## 3. The routine environment (`NOVA_CONTEXT=routine`)
+Nova's safety checks tell automatic runs from chats by one marker: `NOVA_CONTEXT=routine`. A session with the marker is treated as unattended (no sending, sharing, deleting, or settings changes, even with an approval record). **Everything without it is a chat**, so chats (Cowork or any other chat surface) need no environment; locked actions there still need a single-use approval record quoting the user's yes.
+
+So Nova needs exactly one cloud environment:
 
 | Name | Variable | Used by | Set up at |
 |---|---|---|---|
-| `Nova chat` | `NOVA_CONTEXT=chat` | Chats in the Nova project | Start of setup (checked before step 5) |
-| `Nova routines` | `NOVA_CONTEXT=routine` | Every Nova routine | Step 10 |
+| `Nova routine` | `NOVA_CONTEXT=routine` | Every Nova routine, no exceptions | Step 10 (and whenever a routine is created later) |
 
-If this session has a tool to create or edit cloud environments, create the needed one (default network access; never put secrets in variables). Otherwise give the user the steps one at a time.
-
-**Chat environment (start of setup, when `echo $NOVA_CONTEXT` isn't `chat`):**
+If this session has a tool to create or edit cloud environments, create it (default network access; never put secrets in variables). Otherwise give the user the steps one at a time:
 ```
-1. In Claude, open Settings and look for "Environments" (it may be under "Claude Code", "Cloud", or a project's settings).
-2. Create a new environment (or edit the one your Nova project uses). Name it: Nova chat
-3. Under "Environment variables", add exactly one line:
-   NOVA_CONTEXT=chat
-4. Save, and make sure your Nova project's chats use "Nova chat" (look for an environment picker in the project or chat settings).
-5. Start a NEW chat in your Nova project and say: continue setup
-   (Settings like this only apply to new chats, not this one.)
-```
-"If it looks different: look for wherever you can add environment variables for cloud sessions and choose which one your Nova chats use; the name and the line above are all that matter."
-
-Check in the new chat: `echo $NOVA_CONTEXT` prints `chat`. If the user can't set it up, continue setup in **degraded mode**: Nova can still save setup and files, but it can't send, share, or delete even with their OK, and it can't change safety settings after setup, until this is fixed. Record a known issue in `user/.state/health.yaml` (`id: env-chat-missing`, `severity: high`, `fix`: the steps above) and tell the user plainly which things won't work yet.
-
-**Routine environment (step 10):**
-```
-1. In Claude, open Settings → Environments (same place as before).
-2. Create a new environment. Name it: Nova routines
-3. Under "Environment variables", add exactly one line:
+1. In Claude, open Settings and look for "Environments" (it may be under "Claude Code", "Cloud", or "Routines").
+2. Create a new environment. Name it: Nova routine
+3. Under "Environment variables" (or similar), add exactly one line:
    NOVA_CONTEXT=routine
-4. Save. Each Nova routine will use this environment.
+4. Save. Every Nova automation will use this environment.
 ```
-If routines end up without it, nothing unsafe happens (a missing value is treated as a routine), so this is lower risk; still set it for clarity.
+"If it looks different: look for wherever you can add environment variables for cloud runs. The name and the line above are all that matter. Capitals and the underscore matter in NOVA_CONTEXT; the value is routine in lower case, with no spaces or quotes."
+
+**Why it matters:** a routine without the marker is treated as a chat by the safety hooks. Nova's routine instructions still keep it to drafts and queued requests, but the hooks aren't guarding it. So every run records the `NOVA_CONTEXT` it saw in its run report (`nova_context`); a run that doesn't see `routine` raises the high-severity known issue `routine-env-missing` naming the routine, and the weekly health check (`nova-health`, via `maintenance`) looks for unmarked runs too.
+
+**Fixing `routine-env-missing`** (offer this in the next chat):
+```
+1. In Claude, open Routines (it may be under "Claude Code") and open the routine named "Nova · <routine name>".
+2. Find its Environment setting and choose: Nova routine
+   (If there's no "Nova routine" environment, create it first with the steps above.)
+3. Save. Then press "Run now" (if you see it) so I can check it worked.
+```
+After the test run, read its run report: `nova_context: routine` means fixed; close the known issue.
 
 ## 4. Creating routines
 For each routine in `routines.yaml`:
@@ -66,7 +62,7 @@ For each routine in `routines.yaml`:
 | Name | `Nova · <routine name>` (e.g. `Nova · nightly-cycle`) |
 | Prompt | The thin pointer from `system/jobs/README.md`, with the routine name filled in |
 | Repository | The user's Nova repo only |
-| Environment | `Nova routines` |
+| Environment | `Nova routine` (always; a routine without it isn't guarded by the safety hooks) |
 | Branch pushes | Allow pushing to `main` if the option exists |
 | Connectors | Only connectors in `connectors.yaml` that the routine's jobs use (usually all mapped ones except `web`-only tools it doesn't need); never extra ones |
 | Model | `system/manifest.yaml: models.<role>` for the routine's `model` role; if a routine mixes fast and strongest jobs, strongest |
@@ -85,7 +81,7 @@ In Claude, open Routines → New routine → Cloud.
 
 Name:        Nova · nightly-cycle
 Repository:  maya-chen/nova
-Environment: Nova routines
+Environment: Nova routine
 Model:       claude-opus-5-5
 Schedule:    Every day at 8:07 PM (your time zone)
 Connectors:  Gmail, Google Calendar, Google Drive   (turn off any others)
@@ -97,9 +93,9 @@ Run the Nova routine `nightly-cycle`: look it up in user/settings/routines.yaml 
 Translate cron to plain words for the user ("Every Friday at 2:07 PM", "Weekdays every hour from 9:07 AM to 4:07 PM"). Values in the example are fictional; fill in the user's. When the user says it's done, set `routine_id: "manual:<routine name>"` (so health checks know it exists but can't be edited from chat) and commit.
 
 ## 5. After creating
-- Offer to start one routine once now ("run now") to confirm it works, ideally `upkeep` (cheap). Its run report confirms `available_in_routines` for connectors (`nova-connectors`).
+- Start one routine once now ("run now"; if Claude can't, ask the user to press it), ideally `upkeep` (cheap). When it finishes, pull and read its run report: it must show `nova_context: routine`, which confirms the routine is attached to the "Nova routine" environment. Anything else: walk the user through the fix in §3 and test again. The run report also confirms `available_in_routines` for connectors (`nova-connectors`).
 - Tell the user: routines run whether their computer is on or off; if GitHub access lapses for 3 days, the platform turns routines off and Nova will tell them how to turn them back on.
 
 ## 6. Changing later
 - Job list or modifiers: settings edit only (`routines.yaml`).
-- Schedule, model, connectors, or a new/removed routine: also update the platform routine (same tool or copy-paste path). Removing a platform routine counts as deleting (`destructive`, approval); prefer turning it off.
+- Schedule, model, connectors, or a new/removed routine: also update the platform routine (same tool or copy-paste path). Every new routine uses the "Nova routine" environment (§3, §4) and gets a test run as in §5. Removing a platform routine counts as deleting (`destructive`, approval); prefer turning it off.

@@ -19,7 +19,7 @@ All paths are relative to `user/extensions/` (the registry `path`). Outlines: `s
 
 ## routine
 - **Path:** none (routines live in `user/settings/routines.yaml`); registry `path: null`, `description` says which jobs it runs.
-- **Wiring:** add `{ name, schedule, model, routine_id: null, jobs }` to `routines.yaml`; create the platform routine with the thin-pointer prompt (`.claude/skills/nova-setup/reference/automations.md` §4); store `routine_id`.
+- **Wiring:** add `{ name, schedule, model, routine_id: null, jobs }` to `routines.yaml`; create the platform routine with the thin-pointer prompt in the "Nova routine" environment (`NOVA_CONTEXT=routine`; `.claude/skills/nova-setup/reference/automations.md` §3–§5, including the test run that must report `nova_context: routine`); store `routine_id`.
 - **Rules:** schedule minutes off the hour; at least hourly spacing; mention plan usage impact.
 
 ## trigger

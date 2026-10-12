@@ -4,7 +4,7 @@ Welcome! This guide gets you from nothing to a working Nova. You do **four short
 
 You don't need to be technical. Every step is one small action, with a picture of what you should see. If something on your screen looks different, each step has a note for that.
 
-**Total time:** about 20 to 25 minutes for the four steps below, then 30 to 45 minutes chatting with Nova. You can stop at any point and pick up where you left off.
+**Total time:** about 20 minutes for the four steps below, then 30 to 45 minutes chatting with Nova. You can stop at any point and pick up where you left off.
 
 ---
 
@@ -36,7 +36,7 @@ Nova keeps everything it learns about your work in a **private GitHub repository
 | [1. Create a free GitHub account](01-github-account.md) | Sign up and turn on two-factor authentication | 5 to 10 min |
 | [2. Create your Nova](02-create-your-nova.md) | Make your own private copy of Nova | 2 to 3 min |
 | [3. Connect GitHub to Claude](03-connect-github.md) | Let Claude open your Nova, and nothing else | 3 to 5 min |
-| [4. Create the Nova Project in Claude](04-create-the-nova-project.md) | Make a "Nova" Project, paste a short note, set up the chat environment, say "Set up Nova" | 5 to 10 min |
+| [4. Create the Nova Project in Claude](04-create-the-nova-project.md) | Make a "Nova" Project, paste a short note, say "Set up Nova" | 5 min |
 
 Then: [What happens next](05-what-happens-next.md) (Nova guides you from here).
 

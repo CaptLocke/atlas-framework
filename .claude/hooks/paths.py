@@ -137,7 +137,7 @@ def check(rels, tool_name, proj, ctx):
         nova.STATE.locked = True
         if ctx != "chat":
             nova.block("%s can only change in a chat, after the user explicitly confirms (N6). This is a "
-                       "routine (NOVA_CONTEXT is not 'chat'): queue the proposed change in "
+                       "routine (NOVA_CONTEXT=routine): queue the proposed change in "
                        "user/inbox/approvals.md instead." % files)
         rec, why = nova.approval_matches(proj, tool_name, {"governance_settings"}, targets=set(existing))
         if rec is None:

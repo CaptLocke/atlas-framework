@@ -24,15 +24,16 @@ Capture these during the end-to-end setup run (build plan §6), on both macOS an
 | `claude-projects-sidebar.png` | 04 | Where "Projects" is in the sidebar | Mac + Windows |
 | `claude-new-project.png` | 04 | Create-project form with the name "Nova" | Once |
 | `claude-project-instructions.png` | 04 | Project instructions with the stub pasted | Once |
-| `claude-environment-nova-chat.png` | 04 | Cloud environment "Nova chat" with `NOVA_CONTEXT=chat`, and where the Project selects it | Mac + Windows |
 | `claude-first-chat.png` | 04 | New chat in the Nova Project with "Set up Nova" typed | Once |
 | `nova-welcome.png` | 05 | Nova's first reply (welcome + permission question) | Once |
+| `claude-environment-nova-routine.png` | troubleshooting (and Nova's step-10 walkthrough) | Cloud environment "Nova routine" with `NOVA_CONTEXT=routine`, and where a routine selects its environment | Mac + Windows |
 | `github-change-visibility.png` | troubleshooting | Repo Settings → Danger Zone → "Change visibility" | Once |
 | `github-app-configure.png` | troubleshooting | GitHub Settings → Applications → Claude → Configure, repository access | Once |
 
 ## Also verify during the run
 Every button label and menu path in `docs/setup/` and `system/guide/troubleshooting.md` is unverified, especially:
-- the cloud environment settings (where they live, how a variable is added, how a Project's chats are tied to an environment);
+- the cloud environment settings (where they live, how a variable is added, how a routine is tied to an environment);
+- the Routines screen (where it lives, the Environment setting on a routine, "Run now");
 - Settings → Connectors in the desktop app.
 
 Replace the hedged wording ("look for…", "If it looks different") with the confirmed labels, but keep one "if it looks different" note per step.

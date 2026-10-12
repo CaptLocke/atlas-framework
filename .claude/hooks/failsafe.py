@@ -10,8 +10,8 @@ which would let the call through.
 Decision:
 1. Upstream product repo (origin = system/manifest.yaml upstream, default
    CaptLocke/nova): allow (maintainers develop Nova here).
-2. NOVA_CONTEXT is not exactly 'chat' (routine or unknown): block.
-3. Chat: allow only clearly harmless calls (MCP tools whose names start with a
+2. Routine (NOVA_CONTEXT=routine, case-insensitive): block.
+3. Chat (anything else, including missing): allow only clearly harmless calls (MCP tools whose names start with a
    read verb and contain no risky word; file writes under user/ outside the
    governance files; shell commands with no risky word). Block everything else.
 """
@@ -96,7 +96,8 @@ def fail_safe(hook, exc, raw=None):
         if _upstream(proj):
             os._exit(0)
         detail = "%s: %s" % (type(exc).__name__, exc)
-        if os.environ.get("NOVA_CONTEXT", "").strip() == "chat" and _harmless(payload, proj):
+        routine = os.environ.get("NOVA_CONTEXT", "").strip().lower() == "routine"
+        if not routine and _harmless(payload, proj):
             sys.stderr.write("Nova guard (%s) warning: hook failed (%s); allowed because this is a chat and "
                              "the call looks harmless. Record a known issue for nova-health.\n" % (hook, detail))
             sys.stderr.flush()

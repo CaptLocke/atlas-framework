@@ -65,7 +65,7 @@ Nova-Reason: regression baseline" && git rev-parse HEAD && echo "$S"
 ```
 
 ### 2. Run Nova on it
-Start a **new** Claude Code session with the scratch folder as its working directory, `NOVA_CONTEXT=routine` set (so the hooks treat it as an unattended routine), no connectors attached, and the model under test (`system/manifest.yaml: models.strongest` unless you're testing another). Send exactly:
+Start a **new** Claude Code session with the scratch folder as its working directory, `NOVA_CONTEXT=routine` set (so the hooks treat it as an unattended routine; without it they'd treat the session as a chat), no connectors attached, and the model under test (`system/manifest.yaml: models.strongest` unless you're testing another). Send exactly:
 
 ```text
 Run the Nova routine `regression`: look it up in user/settings/routines.yaml and run its jobs in order.
@@ -106,6 +106,7 @@ In the scratch folder:
 7. `grep -rIil -e 'saasweekly' -e 'SaaS Weekly' user/knowledge user/inbox user/work` → empty (E10-X1).
 8. `ls user/inbox/drop/` → only `.gitkeep` (G-H1).
 9. `diff <(sed -n '/## Morning Thoughts/,$p' user/journal/2026/10/2026-10-14.md) <(sed -n '/## Morning Thoughts/,$p' <repo>/system/tests/regression/inputs/07-journal-morning-thoughts.md)` → no differences (E07-J1).
+10. `grep -rh '^nova_context:' user/logs/runs/` → `nova_context: routine`. Anything else means the session wasn't marked as a routine: the run is invalid (the hooks weren't guarding it); fix the setup and rerun.
 
 Then read the created and changed records (`git diff --name-status <baseline>`) and judge every remaining item.
 

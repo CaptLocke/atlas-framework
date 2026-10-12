@@ -61,16 +61,21 @@ Claude answers like an ordinary chat, doesn't mention Nova, or doesn't know anyt
 
 ---
 
-## Nova says the chat environment isn't set up
+## Nova says an automation isn't using its routine environment
 
-Nova checks at the start of each chat that it's running in the **Nova chat** environment. If it isn't, Nova can't do anything that needs your approval, so it stops and tells you.
+Nova's automations run in the cloud in an **environment** (a small behind-the-scenes workspace) called **Nova routine**, which has one setting: `NOVA_CONTEXT` set to `routine`. That setting tells Nova's safety checks that nobody is there to approve things. If an automation runs without it, Nova notices, keeps that run to drafts only, and tells you in your next chat. Your chats don't need this setting.
 
-1. **Follow Nova's instructions in the chat.** It walks you through the setting one step at a time.
-2. **Or do it yourself:** see [Set up the Nova chat environment](04-create-the-nova-project.md#set-up-the-nova-chat-environment). You need an environment named **Nova chat** with the variable **`NOVA_CONTEXT`** set to **`chat`**, and the Nova Project's chats set to use it.
-3. **Check the spelling.** The name must be exactly `NOVA_CONTEXT` (capitals, with an underscore) and the value exactly `chat` (lower case, no spaces or quotes).
-4. **Start a new chat** in the Nova Project. The setting only takes effect in chats started after it's saved. Then say **"Continue setting up Nova"** (or **"Start Nova"** if setup is finished).
+1. **Say "Fix my automation environment"** in a chat in the Nova Project. Nova fixes it for you where it can, or walks you through it one step at a time.
+2. **Or do it yourself:**
+   1. In the Claude desktop app, open **Routines** (it may be in the sidebar, or under a **Claude Code** section).
+   2. Open the automation Nova named (they're called **Nova · …**, for example **Nova · nightly-cycle**).
+   3. Find its **Environment** setting and choose **Nova routine**. Save.
+3. **If there's no "Nova routine" environment:** open **Settings** and look for **Environments** (or **Cloud environments**). Create one named **Nova routine** and add one variable: name `NOVA_CONTEXT` (capitals, with an underscore), value `routine` (lower case, no spaces or quotes). Save, then go back to step 2.
+   ![The environment settings, with an environment named "Nova routine" and the variable NOVA_CONTEXT set to routine](images/claude-environment-nova-routine.png)
 
-> **If it looks different:** the environment settings may be labeled **Environments**, **Cloud environments**, or similar, and may sit under a **Claude Code** or **Code** section of Settings. If you can't find them at all, tell Nova: it will help, or draft an issue report.
+4. **Tell Nova "Done"**. Nova runs the automation once as a test and checks it used the right environment.
+
+> **If it looks different:** these settings may be labeled differently, or sit under **Claude Code**, **Code**, or **Routines** in Settings. If you can't find them, tell Nova: it will help, or draft an issue report.
 
 ---
 

@@ -71,7 +71,7 @@ This is a procedural guard: it forces every locked action through an explicit, l
 | N12 | Every change is attributed and logged (commit trailers + activity log). |
 | N13 | Updates create a rollback point and restore automatically on failure. |
 
-Hooks in `.claude/hooks/` enforce N1–N6, N8, N10, N12 deterministically. Context: `NOVA_CONTEXT=chat` in chats, `routine` in routines; **missing means routine** (fail closed). If a hook blocks something you believe the user wants, explain and offer the approval path; never try to work around a hook.
+Hooks in `.claude/hooks/` enforce N1–N6, N8, N10, N12 deterministically. Context: **routines are marked, everything else is a chat.** Nova's routines run in a cloud environment named "Nova routine" that sets `NOVA_CONTEXT=routine`; the hooks treat that session as unattended. Any session without that marker (Cowork or any other chat surface) is a chat; chats need no environment setup. This stays safe because (1) every locked action in a chat still needs a single-use approval record quoting the user's confirmation, so an unmarked session can't send, share, delete, or change governance without an explicit, recorded yes; (2) the audit in Checks below compares every locked action to its approval; and (3) every routine run records the `NOVA_CONTEXT` it observed in its run report, a run that finds no `routine` marker still behaves as a routine by instruction and raises the high-severity known issue `routine-env-missing`, and `nova-health` checks recent run reports for unmarked routine runs. If a hook blocks something you believe the user wants, explain and offer the approval path; never try to work around a hook.
 
 ## Housekeeping (not destructive)
 Removing processed files from `user/inbox/drop/`, regenerating files in `user/knowledge/_index/`, and cleaning `.nova-tmp/` are housekeeping: no approval needed, and hooks allow them.
@@ -93,4 +93,5 @@ Only via `nova-settings` in chat: state the exact change, get explicit confirmat
 ## Checks
 - Every locked action in the activity log has an approval entry and a matching user confirmation.
 - No routine run contains a locked action.
+- Every routine run report records `nova_context: routine`; any other value is a `routine-env-missing` known issue.
 - Governance files only change in commits with `Nova-Actor: chat` or `Nova-Actor: setup`.

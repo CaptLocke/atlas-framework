@@ -40,13 +40,26 @@ class ActionsRoutine(HookTestCase):
         self.assertBlocked(self.run_hook("actions", SEND, {}, context="routine"))
         self.assertTrue(os.path.exists(self.path(".nova-tmp/approval.json")))
 
-    def test_missing_context_is_routine(self):
+    def test_routine_marker_is_case_insensitive(self):
         self.approval(SEND, "send_communication")
-        self.assertBlocked(self.run_hook("actions", SEND, {}, context=None), "routine")
+        for marker in ("ROUTINE", " Routine ", "routine\n"):
+            self.assertBlocked(self.run_hook("actions", SEND, {}, context=marker), "routine")
+        self.assertTrue(os.path.exists(self.path(".nova-tmp/approval.json")))
 
-    def test_unknown_context_value_is_routine(self):
-        self.approval(SEND, "send_communication")
-        self.assertBlocked(self.run_hook("actions", SEND, {}, context="Chat-ish"))
+    def test_missing_or_other_context_is_chat(self):
+        # missing, empty, 'chat' and other values all mean chat: a locked
+        # action still needs (and consumes) an approval record
+        for ctx in (None, "", "chat", "Chat-ish", "nightly"):
+            r = self.run_hook("actions", SEND, {}, context=ctx)
+            self.assertBlocked(r, "approval")
+            self.assertNotIn("routine", r.stderr.split("approval")[0])
+            self.approval(SEND, "send_communication")
+            self.assertAllowed(self.run_hook("actions", SEND, {}, context=ctx))
+            self.assertFalse(os.path.exists(self.path(".nova-tmp/approval.json")))
+
+    def test_security_blocked_without_context(self):
+        self.approval("mcp__bank__make_payment", "send_communication")
+        self.assertBlocked(self.run_hook("actions", "mcp__bank__make_payment", {}, context=None), "N4")
 
     def test_read_allowed_in_routine(self):
         self.assertAllowed(self.run_hook("actions", "mcp__outlook__list_messages", {}, context="routine"))
@@ -290,6 +303,24 @@ class ImportFailure(HookTestCase):
         self.assertIn("warning", r.stderr)
         self.assertAllowed(self.run_hook("paths", "Write", {"file_path": self.path("user/work/a.md")}, "chat"))
         self.assertAllowed(self.bash("git", "ls -la", "chat"))
+
+    def test_broken_module_missing_context_is_chat(self):
+        self.break_module("shell")
+        self.write("user/settings/governance.yaml", "x: 1\n")
+        # harmless calls allowed with a warning
+        self.assertAllowed(self.run_hook("actions", "mcp__mail__list_messages", {}, None))
+        self.assertAllowed(self.run_hook("paths", "Write", {"file_path": self.path("user/work/a.md")}, None))
+        # anything that looks locked is blocked
+        for r in (self.run_hook("actions", "mcp__mail__send_message", {}, None),
+                  self.run_hook("actions", "mcp__drive__share_file", {}, ""),
+                  self.run_hook("actions", "mcp__bank__make_payment", {}, None),
+                  self.run_hook("paths", "Write", {"file_path": self.path("user/settings/governance.yaml")}, None),
+                  self.run_hook("paths", "Write", {"file_path": self.path("system/kernel.md")}, None),
+                  self.bash("actions", "rm -rf user/knowledge", None),
+                  self.bash("git", "git push --force origin main", None)):
+            self.assertBlocked(r, "could not run")
+        # routine marker blocks even harmless calls
+        self.assertBlocked(self.run_hook("actions", "mcp__mail__list_messages", {}, "ROUTINE"))
 
     def test_broken_context_and_failsafe(self):
         self.break_module("context")

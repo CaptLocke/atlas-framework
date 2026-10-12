@@ -57,8 +57,13 @@ class HistoryRewrite(HookTestCase):
 
     def test_purge_lock_not_valid_in_routine(self):
         self.purge_lock()
-        self.assertBlocked(self.bash("git", "git push --force origin main", "routine"), "chat")
-        self.assertBlocked(self.bash("git", "git push --force origin main", None))
+        self.assertBlocked(self.bash("git", "git push --force origin main", "routine"), "routine")
+        self.assertBlocked(self.bash("git", "git push --force origin main", "ROUTINE"))
+
+    def test_purge_lock_counts_without_context(self):
+        self.purge_lock()
+        self.assertAllowed(self.bash("git", "git push --force origin main", None))
+        self.assertAllowed(self.bash("git", "git push --force origin main", ""))
 
     def test_expired_purge_lock(self):
         self.purge_lock(minutes=-1)
@@ -156,10 +161,14 @@ class CommitTrailers(HookTestCase):
 
     def test_routine_cannot_claim_chat(self):
         cmd = "git commit -m 'x' -m '%s'" % TRAILERS
-        r = self.bash("git", cmd, None)
-        self.assertBlocked(r, "NOVA_CONTEXT")
-        self.assertIn("nova-setup", r.stderr)
-        self.assertIn("Nova chat environment", r.stderr)
+        r = self.bash("git", cmd, "routine")
+        self.assertBlocked(r, "NOVA_CONTEXT=routine")
+        self.assertIn("routine:<routine-name>", r.stderr)
+        self.assertNotIn("NOVA_CONTEXT=chat", r.stderr)
+        self.assertBlocked(self.bash("git", cmd, "Routine"))
+        # missing or empty context is a chat: committing as chat is fine
+        self.assertAllowed(self.bash("git", cmd, None))
+        self.assertAllowed(self.bash("git", cmd, ""))
         self.assertBlocked(self.bash("git", "git commit -m 'x' -m 'Nova-Actor: robot\nNova-Reason: y'", "chat"),
                            "not valid")
 

@@ -246,7 +246,7 @@ def guard_locked(tool_name, risks, proj, ctx, what):
     cls = LOCKED_CLASS[max(risks, key=lambda r: SEVERITY[r])]
     if ctx != "chat":
         nova.block(
-            "%s is a locked action (%s) and this is a routine (NOVA_CONTEXT is not 'chat'). "
+            "%s is a locked action (%s) and this is a routine (NOVA_CONTEXT=routine). "
             "Routines never send, share or delete. Prepare a draft if useful and queue the action "
             "in user/inbox/approvals.md for the user (system/rules/governance.md)." % (what, cls))
     rec, why = nova.approval_matches(proj, tool_name, classes)

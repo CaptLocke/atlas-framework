@@ -33,7 +33,9 @@ Nova only reads your tools. It **never sends, shares, or deletes anything withou
 
 ## 5. Choosing your automations
 
-Nova suggests an **automation profile** that fits your Claude plan (Lean, Standard, or Full) and explains what will run and when. You choose, and you can adjust times or turn things off. Nova then sets up the automations so they run in the cloud, even when your computer is off. They get their own second environment, called something like **Nova automations**, with `NOVA_CONTEXT` set to `routine`. That tells Nova's safety checks that nobody is there to approve things, so automations can only prepare drafts and queue requests for you, never send, share, or delete. Nova creates it with you, the same way as the chat environment. If Claude can't create them directly, Nova shows you exactly what to copy and paste.
+Nova suggests an **automation profile** that fits your Claude plan (Lean, Standard, or Full) and explains what will run and when. You choose, and you can adjust times or turn things off. Nova then sets up the automations so they run in the cloud, even when your computer is off. To do that, Nova creates a cloud **environment** (a small behind-the-scenes workspace) called **Nova routine**, with one setting in it: `NOVA_CONTEXT` set to `routine`. Every automation uses it. It tells Nova's safety checks that nobody is there to approve things, so automations can only prepare drafts and queue requests for you, never send, share, or delete. Your chats don't need anything like this.
+
+This is the part where you may need to follow a few clicks. If Claude can't create the environment or the automations itself, Nova shows you exactly what to click and what to copy and paste, one step at a time. The labels in your Claude app may differ a little (for example **Environments** may sit under **Claude Code** or **Routines** in Settings); Nova tells you what to look for. At the end, Nova runs one automation once as a test and checks it used the right environment.
 
 ## 6. Your dashboards
 

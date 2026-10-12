@@ -1,6 +1,6 @@
 ---
 name: nova-health
-description: "Keep Nova healthy with little or no effort from the user: tidy the knowledge (stale, orphaned, duplicate, broken, unprocessed, expired items), check the system (failed runs, connections, hooks, validation, unmodified system files, extensions, repo size, attestation, GitHub), smoke-test the platform features Nova depends on, audit that every locked action was approved, fix what's clear, and bring only real decisions to the user. Use for the `maintenance` and `monthly` jobs, after updates, and when the user says \"run a health check\", \"is everything working?\", \"why didn't my brief arrive?\", \"clean up my knowledge\"."
+description: "Keep Nova healthy with little or no effort from the user: tidy the knowledge (stale, orphaned, duplicate, broken, unprocessed, expired items), check the system (failed runs, connections, hooks, routine environment, validation, unmodified system files, extensions, repo size, attestation, GitHub), smoke-test the platform features Nova depends on, audit that every locked action was approved, fix what's clear, and bring only real decisions to the user. Use for the `maintenance` and `monthly` jobs, after updates, and when the user says \"run a health check\", \"is everything working?\", \"why didn't my brief arrive?\", \"clean up my knowledge\"."
 ---
 # Health
 
@@ -10,7 +10,7 @@ Nova maintains itself. Clear problems are fixed automatically and logged; ambigu
 ## When to use
 | Mode | Invoked by | Scope |
 |---|---|---|
-| **Maintenance** | `maintenance` job (upkeep routine) | Index rebuild, link repair, obvious dedupes, journal/inbox sweep, expiries |
+| **Maintenance** | `maintenance` job (upkeep routine) | Routine-environment check, index rebuild, link repair, obvious dedupes, journal/inbox sweep, expiries |
 | **User health check** | `monthly` job (when `moments.user_health_check` is on); chat on request | The user half: `reference/user-health.md` |
 | **System health check** | `monthly` job (when `moments.system_health_check` is on); `nova-update` after each update; chat on request | The system half, smoke test, audits: `reference/system-health.md` |
 | **Quick check** | Chat: "is everything working?", "why didn't X run?" | Known issues + latest run reports + targeted checks for the question |
@@ -23,6 +23,7 @@ Nova maintains itself. Clear problems are fixed automatically and logged; ambigu
 
 ## Procedure
 ### 1. Maintenance (fast, mechanical)
+0. **Routine environment:** run the "Routine environment" check from `reference/system-health.md` over the last 8 days of run reports (any routine run without `nova_context: routine` → known issue `routine-env-missing` naming the routine).
 1. **Rebuild indexes** from records (`system/schemas/formats.md` §5): every `_index/<folder>.md` for system and registered user types, `hot.md`, `people-map.md`, `archive.md`.
 2. **Repair links:** for each `[[id]]` that doesn't resolve, fix it when the target is clear (renamed alias, superseded → follow `superseded_by`, merged duplicate); otherwise leave it and list it for the user health check.
 3. **Obvious dedupes** per `system/rules/knowledge.md` (same email; same domain; same full name + same org): merge (`merge_supersede`) only clear cases; ambiguous → `user/inbox/questions.md`.
@@ -38,6 +39,7 @@ Follow `reference/system-health.md`:
 1. **Runs:** failures and partial runs in run reports since the last check; routines that missed expected runs (a routine silent for more than twice its interval, or 72h for daily ones, likely turned off by the platform).
 2. **Connectors:** auth errors in run reports; each mapped connector present in the session; `tool_fingerprint` drift; unmapped connectors → re-map via `nova-connectors` (chat) or a known issue (routine).
 3. **Hooks present:** `.claude/settings.json` registers the PreToolUse hooks; hook scripts exist.
+3a. **Routine environment:** every routine run report since the last check has `nova_context: routine`; otherwise a high-severity `routine-env-missing` issue per routine, with the fix (attach it to the "Nova routine" environment).
 4. **Validation:** `python3 system/tools/validate.py --all`; fix data errors that have one obvious fix; list the rest.
 5. **System files unmodified** vs the release tag `v<installed_version>`, or, until such a tag exists upstream, vs `nova.yaml: installed_from_commit` (the template's starting commit); differences not made by update commits → in chat, `nova-update` repair (§E), which first offers to keep intentional edits as an extension; in a routine, record a known issue only and stop there.
 6. **Extensions:** `requires_nova` satisfied; overridden components unchanged since the extension was created or last confirmed; conflicts (two overrides of one component, governance conflicts) flagged.

@@ -55,6 +55,7 @@ last_user_check: 2026-10-01
 last_system_check: 2026-10-01
 known_issues:
   - { id: conn-outlook-auth, severity: high, since: 2026-10-10, summary: "Outlook connection expired", fix: "Reconnect Outlook in Settings → Connectors", status: open }
+  - { id: routine-env-missing, severity: high, since: 2026-10-12, routine: nightly-cycle, summary: "The nightly-cycle routine ran without NOVA_CONTEXT=routine", fix: "Attach the nightly-cycle routine to the 'Nova routine' environment (nova-setup, reference/automations.md §3)", status: open }
 smoke_test: { last_run: 2026-10-01, results: { repo_push: pass, connectors: pass, hooks: pass, artifact_republish: pass } }
 routine_availability:              # evidence from routine runs; applied to connectors.yaml in the next chat (N6)
   outlook: { available: true, observed: 2026-10-12, run: nightly-cycle-20261012-2007 }
@@ -77,7 +78,7 @@ Hooks consume (delete) it on the matching call. One record authorizes one call.
 {"by": "nova-update", "version_from": "1.0.0", "version_to": "1.1.0", "created": "…", "expires": "…"}
 {"by": "nova-memory", "targets": ["user/knowledge/people/jane-doe.md"], "user_confirmation": "yes, permanently erase", "created": "…", "expires": "…"}
 ```
-Update lock expires after 30 minutes; purge lock after 15. Purge locks can't be created when `NOVA_CONTEXT` isn't `chat`.
+Update lock expires after 30 minutes; purge lock after 15. Purge locks can only be created in a chat: the hooks refuse them in a session marked `NOVA_CONTEXT=routine`.
 
 ## 3. Inbox (`user/inbox/`)
 
@@ -146,6 +147,7 @@ routine: nightly-cycle
 started: 2026-10-12T20:07:03-07:00
 finished: 2026-10-12T20:31:40-07:00
 status: ok              # ok | partial | failed
+nova_context: routine   # the NOVA_CONTEXT value observed at the start of the run, verbatim ("unset" if missing); anything but routine means routine-env-missing
 ---
 | Job | Status | Items | Notes |
 |---|---|---|---|

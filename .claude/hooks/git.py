@@ -279,11 +279,9 @@ def check_trailers(message, ctx):
         nova.block("Nova-Actor %r is not valid; use chat, routine:<routine-name>, update or setup "
                    "(system/rules/sync.md)." % value)
     if ctx != "chat" and value == "chat":
-        nova.block("the commit says 'Nova-Actor: chat' but NOVA_CONTEXT is not 'chat' in this session. "
-                   "If this IS a chat with the user, the Nova chat environment isn't set up (NOVA_CONTEXT "
-                   "missing): tell the user and follow nova-setup's 'Nova chat environment' step to fix it; "
-                   "until then, setup work can commit with 'Nova-Actor: setup'. If this is a scheduled "
-                   "routine, use 'Nova-Actor: routine:<routine-name>'.")
+        nova.block("this session is marked as a routine (NOVA_CONTEXT=routine), so it cannot commit as "
+                   "'Nova-Actor: chat'. Use 'Nova-Actor: routine:<routine-name>' with the name of the "
+                   "routine being run (system/rules/sync.md).")
 
 
 # ------------------------------------------------------------------ N10
@@ -382,7 +380,7 @@ def main(payload, proj, ctx):
             if purge_ok is None:
                 ok, why = nova.valid_lock(proj, "purge")
                 if ok and ctx != "chat":
-                    ok, why = False, "a purge lock only counts in a chat (NOVA_CONTEXT=chat)"
+                    ok, why = False, "a purge lock never counts in a routine (NOVA_CONTEXT=routine)"
                 purge_ok, purge_why = ok, why
             if not purge_ok:
                 nova.STATE.locked = True

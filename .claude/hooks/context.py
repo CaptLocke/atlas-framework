@@ -18,8 +18,13 @@ https://code.claude.com/docs/en/tools-reference, checked 2026-10-12):
   unanchored JavaScript regexes ("mcp__.*").
 
 Policy (system/rules/governance.md):
-- NOVA_CONTEXT=chat means chat; anything else or missing means routine
-  (fail closed).
+- Routines are identified by a marker: NOVA_CONTEXT=routine (case-insensitive,
+  trimmed) means routine; anything else (missing, empty, "chat", other
+  values) means chat. Rationale: Claude Code routines run in cloud
+  environments that can set the variable reliably, while the chat surfaces
+  users work in (Cowork / desktop Project chats) can't. Chats are still
+  guarded: every locked action needs a single-use approval record, so
+  "unknown = chat" never lets a locked action through unconfirmed.
 - Every hook is a no-op in the upstream product repo: origin points to
   system/manifest.yaml: upstream (DEFAULT_UPSTREAM when the manifest is
   missing). A missing manifest does NOT switch the hooks off; owned paths
@@ -90,8 +95,9 @@ def allow(warning=None):
 
 # --------------------------------------------------------------- context
 def nova_context():
-    """'chat' only when NOVA_CONTEXT is exactly 'chat'; otherwise 'routine'."""
-    return "chat" if os.environ.get("NOVA_CONTEXT", "").strip() == "chat" else "routine"
+    """'routine' only when NOVA_CONTEXT is 'routine' (case-insensitive,
+    trimmed); otherwise 'chat' (routines carry the marker, chats can't)."""
+    return "routine" if os.environ.get("NOVA_CONTEXT", "").strip().lower() == "routine" else "chat"
 
 
 def project_dir(payload):

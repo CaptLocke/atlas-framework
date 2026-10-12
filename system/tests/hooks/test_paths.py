@@ -96,7 +96,9 @@ class GovernanceFiles(HookTestCase):
     def test_governance_blocked_in_routine(self):
         for name in ("governance", "data-rules", "connectors"):
             self.assertBlocked(self.gov_write("routine", name), "N6")
-        self.assertBlocked(self.gov_write(None))
+        self.assertBlocked(self.gov_write("ROUTINE"))
+        # missing context = chat: still blocked without a matching record
+        self.assertBlocked(self.gov_write(None), "governance_settings")
         self.assertBlocked(self.bash("paths", "echo 'send_communication: auto' >> user/settings/governance.yaml",
                                      "routine"))
 
@@ -165,7 +167,9 @@ class TransientRecords(HookTestCase):
         for rel in (".nova-tmp/approval.json", ".nova-tmp/purge.lock"):
             r = self.run_hook("paths", "Write", {"file_path": self.path(rel), "content": "{}"}, "routine")
             self.assertBlocked(r, "chat")
-        self.assertBlocked(self.bash("paths", "echo '{}' > .nova-tmp/approval.json", None))
+        self.assertBlocked(self.bash("paths", "echo '{}' > .nova-tmp/approval.json", "ROUTINE"))
+        # missing context = chat: records can be written
+        self.assertAllowed(self.bash("paths", "echo '{}' > .nova-tmp/approval.json", None))
 
     def test_chat_can_create_records_and_routine_update_lock(self):
         r = self.run_hook("paths", "Write", {"file_path": self.path(".nova-tmp/approval.json")}, "chat")
