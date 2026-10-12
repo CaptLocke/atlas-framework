@@ -3,7 +3,7 @@ name: Nova
 version: 1.0.0            # must match system/VERSION
 data_version: 1           # user data format version this release expects (see system/migrations/)
 min_plan: pro             # minimum Claude plan
-support_email: null       # MAINTAINER TODO: address for issue reports (nova-report-issue)
+support_email: nova.issue.report@gmail.com   # issue reports (nova-report-issue)
 upstream: CaptLocke/nova  # public repo releases are fetched from
 
 # The ONLY paths updates replace and N5 protects. Everything else is user-owned.
