@@ -33,11 +33,12 @@ Fix this before you go any further. It takes a minute and nothing is lost.
 
 ## Claude can't open my Nova
 
-Claude says it can't find, attach, or access your repository. Work through these in order; most people are fixed by the first or second.
+Claude says it can't find, attach, or access your repository. Work through these in order; most people are fixed by the first, second, or third.
 
-1. **Check the address in the Project instructions.** Open the Nova Project, open its instructions, and check the line `Attach my GitHub repository …`. It must be exactly your GitHub username, a slash, and the repository name (for example `maya-chen/nova`), with no spaces and no `https://github.com/` in front.
-2. **Check GitHub is connected in Claude.** Settings → **Connectors** → **GitHub** should say **Connected**. If it shows **Connect**, click it and authorize. (Details: [Step 3, Part B](03-connect-github.md#part-b-check-github-is-connected-in-claude-in-the-desktop-app).)
-3. **Check the Claude GitHub App can see your Nova repository.**
+1. **If your Claude account is through work, check the company setting.** Your company's Claude admin must turn on **unified chat and Cowork** in **Organization settings → Capabilities**. Without it, Claude can't open any GitHub repository from a chat, even when everything below is set up correctly. Ask your admin if you can't see Organization settings. (Details: [Step 3, Before you start](03-connect-github.md#before-you-start-is-your-claude-account-through-work).) After it's turned on, start a fresh chat in the Nova Project.
+2. **Check the address in the Project instructions.** Open the Nova Project, open its instructions, and check the line `Attach my GitHub repository …`. It must be exactly your GitHub username, a slash, and the repository name (for example `maya-chen/nova`), with no spaces and no `https://github.com/` in front.
+3. **Check GitHub is connected in Claude.** Settings → **Connectors** → **GitHub** should say **Connected**. If it shows **Connect**, click it and authorize. (Details: [Step 3, Part B](03-connect-github.md#part-b-check-github-is-connected-in-claude-in-the-desktop-app).)
+4. **Check the Claude GitHub App can see your Nova repository.**
    1. On GitHub, click your profile picture → **Settings** → **Applications** (under "Integrations" in the left-hand list).
    2. Next to **Claude**, click **Configure**.
    3. Under **Repository access**, make sure **Only select repositories** is chosen and your Nova is listed. If it isn't, add it with **Select repositories**.
@@ -45,8 +46,8 @@ Claude says it can't find, attach, or access your repository. Work through these
 
    ![GitHub settings for the Claude app, with Repository access showing your Nova repository selected](images/github-app-configure.png)
 
-4. **Reinstall the app if Claude isn't listed.** Go to [github.com/apps/claude/installations/select_target](https://github.com/apps/claude/installations/select_target) and follow [Step 3, Part A](03-connect-github.md#part-a-give-claude-access-to-your-nova-repository-in-your-browser) again.
-5. **Start a fresh chat** in the Nova Project and say **`Start Nova`**.
+5. **Reinstall the app if Claude isn't listed.** Go to [github.com/apps/claude/installations/select_target](https://github.com/apps/claude/installations/select_target) and follow [Step 3, Part A](03-connect-github.md#part-a-give-claude-access-to-your-nova-repository-in-your-browser) again.
+6. **Start a fresh chat** in the Nova Project and say **`Start Nova`**.
 
 ---
 
@@ -94,3 +95,5 @@ Pause here and ask your manager or IT team before continuing. Nova doesn't bring
 ## My company manages my GitHub or Claude account
 
 Company-managed accounts may block installing apps or creating private repositories, or may have their own rules about storing work information. Check with your IT team; they may need to approve the Claude GitHub App or recommend a different setup.
+
+If your Claude account is through work (a Team or Enterprise plan), your Claude admin must also turn on **unified chat and Cowork** in **Organization settings → Capabilities**. Without it, Claude can't open your Nova repository from a chat.

@@ -6,6 +6,18 @@ Claude needs permission to open your Nova. You'll give that permission to **only
 
 ---
 
+## Before you start: is your Claude account through work?
+
+If you use Claude through your company (a Team or Enterprise plan), your company's Claude admin must turn on one setting before Nova can open your repository:
+
+- **Organization settings → Capabilities → unified chat and Cowork** must be **on**.
+
+If you're the admin, turn it on there yourself. If you're not, send your admin this sentence: *"Please turn on unified chat and Cowork in Organization settings → Capabilities in Claude."* You can carry on with Part A and Part B while you wait. Nova just won't be able to open your repository until the setting is on.
+
+If you pay for Claude yourself (Pro or Max), skip this and go to Part A.
+
+---
+
 ## Part A: Give Claude access to your Nova repository (in your browser)
 
 1. **Open this link:** **[github.com/apps/claude/installations/select_target](https://github.com/apps/claude/installations/select_target)**
