@@ -1,0 +1,118 @@
+# Machine-readable schema summary used by system/tools/validate.py.
+# Human-readable specs (with guidance) live beside this file as <type>.md.
+# Keep the two in sync: this file is the source of truth for field names and enums.
+
+common:
+  required: [id, type, title, summary, status, created, updated]
+  optional: [aliases, links, sources, supersedes, superseded_by, provenance, sensitivity, archived]
+  enums:
+    provenance: [stated, observed, researched, inferred]
+    sensitivity: [normal, confidential, pii, phi, financial, legal_privileged, custom]
+  link_groups: [people, organizations, projects, goals, commitments, decisions, events, risks, questions, ideas, topics, playbooks, related]
+  id_pattern: '^[a-z]+/[a-z0-9][a-z0-9-]*$'   # <folder>/<slug>
+  date_fields: [created, updated]
+
+types:
+  person:
+    folder: people
+    fields: [emails, org, role, relationship, last_contact, cadence, phone, location, notes_private]
+    enums:
+      status: [active, inactive]
+      relationship: [self, manager, report, peer, stakeholder, customer, vendor, partner, external, other]
+  organization:
+    folder: organizations
+    fields: [domain, kind, relationship_status, industry]
+    enums:
+      status: [active, inactive]
+      kind: [employer, customer, prospect, vendor, partner, regulator, investor, team, other]
+  project:
+    folder: projects
+    fields: [owner, goal, start, target, health, insight, next_step, scale]
+    enums:
+      status: [proposed, active, paused, done, cancelled]
+      health: [on_track, at_risk, off_track, unknown]
+      scale: [task_group, project, initiative, program]
+  goal:
+    folder: goals
+    fields: [horizon, period, metric, target, current, owner, accomplishments]
+    enums:
+      status: [draft, active, achieved, missed, dropped]
+      horizon: [quarter, half, year, multi_year]
+  commitment:
+    folder: commitments
+    required: [direction, owner, counterparty, due]
+    fields: [direction, owner, counterparty, due, origin, priority, insight, next_step, completed_on]
+    enums:
+      status: [open, done, dropped, slipped]
+      direction: [i_owe, waiting_on]
+      priority: [high, medium, low]
+  decision:
+    folder: decisions
+    fields: [decided_on, deciders, rationale, alternatives, reversible, revisit_on]
+    enums:
+      status: [proposed, made, reversed, superseded]
+  event:
+    folder: events
+    fields: [kind, start, end, attendees, series, location, outcomes, prep]
+    enums:
+      status: [scheduled, held, cancelled]
+      kind: [meeting, one_on_one, deadline, milestone, occurrence]
+  risk:
+    folder: risks
+    fields: [likelihood, impact, owner, mitigation]
+    enums:
+      status: [potential, active, resolved]    # active = an issue
+      likelihood: [low, medium, high]
+      impact: [low, medium, high]
+  question:
+    folder: questions
+    fields: [asked_by, asked_on, answer, answered_on]
+    enums:
+      status: [open, answered, dropped]
+  idea:
+    folder: ideas
+    fields: [origin]
+    enums:
+      status: [seed, exploring, proposed, adopted, parked, dropped]
+  topic:
+    folder: topics
+    fields: [scope]
+    enums:
+      status: [active, dormant]
+  playbook:
+    folder: playbooks
+    fields: [trigger, steps, last_used, automatable]
+    enums:
+      status: [draft, active, retired]
+  source:
+    folder: sources
+    required: [kind, captured_on, retention]
+    fields: [kind, origin_uri, connector, captured_on, occurred_on, participants, retention, file_pointer]
+    enums:
+      status: [captured, processed]
+      kind: [email, meeting, message, doc, web, data, manual, journal, file, deliverable]
+      retention: [full, summary, pointer]
+
+autonomy_levels: [auto, propose, approve, never]
+locked_classes:
+  governance_settings: approve
+  send_communication: approve
+  share_expose: approve
+  destructive: approve
+  financial_legal_security: never
+
+data_rule_handling: [ignore, pointer, summary, full]
+
+connector_categories: [mail, calendar, meetings, messaging, files, crm, tasks, data, web, other]
+tool_risk: [read, write, draft, send, share, delete, security]
+
+registry_kinds: [skill, job, routine, trigger, type, dashboard, playbook]
+
+routine_modifiers:
+  when: [always, weekdays, weekends, sundays]
+  target: [today, tomorrow]
+  mode: [full, light]
+
+insight_status: [new, seen, acted, dismissed, expired]
+approval_status: [pending, approved, rejected, executed, expired]
+question_status: [open, answered, dismissed]

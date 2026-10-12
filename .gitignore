@@ -1,0 +1,7 @@
+# Nova: transient, single-use files (approval records, locks). Never committed.
+.nova-tmp/
+# OS and editor clutter
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
