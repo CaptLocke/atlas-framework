@@ -1,0 +1,37 @@
+# Nova automation profile: Lean
+# Suggested for: Claude Pro.
+# Approx. runs: ~1.3 per day (1 nightly run every day + 2 weekly runs).
+# One evening run prepares everything for the next morning. The first chat of
+# the day also runs a quick catch-up ingest if the last ingest is over 3 hours old.
+# Schedules are cron in the user's time zone (user/settings/nova.yaml: timezone),
+# minutes off the hour to avoid delayed starts. One schedule per routine.
+# nova-setup copies this file to user/settings/routines.yaml when the user picks it.
+profile: lean
+routines:
+  - name: nightly-cycle
+    schedule: "7 20 * * *"          # daily 20:07
+    model: strongest
+    routine_id: null
+    jobs:
+      - ingest
+      - triage
+      - intelligence
+      - { job: email-drafts, when: weekdays }
+      - { job: meeting-prep, target: tomorrow }
+      - monthly                      # acts only on/after the first business day of a month
+      - quarterly                    # acts only on/after the first business day of a quarter
+      - { job: daily-brief, target: tomorrow }
+  - name: weekly
+    schedule: "7 14 * * 5"          # Friday 14:07
+    model: strongest
+    routine_id: null
+    jobs:
+      - weekly-review
+      - status-updates
+  - name: upkeep
+    schedule: "7 3 * * 0"           # Sunday 3:07
+    model: strongest                 # mixes fast and strongest jobs
+    routine_id: null
+    jobs:
+      - maintenance
+      - update-check                 # acts only on Sundays

@@ -1,0 +1,1 @@
+- [[sources/2026-10-01-setup-interview]] | Nova setup interview | aliases: | processed | 2026-10-01 | Maya's answers during Nova setup about her role, manager, colleagues, and responsibilities.

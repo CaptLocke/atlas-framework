@@ -1,0 +1,4 @@
+# What Nova ingests. Copied to user/settings/sources.yaml by nova-setup; filled at step 9.
+# Format: system/schemas/settings.md.
+ingest: []                       # e.g. - { category: mail, connector: <name>, scope: "inbox and sent", lookback_days_initial: 14 }
+fallbacks: []                    # e.g. - { category: crm, method: forward, instructions: "..." }

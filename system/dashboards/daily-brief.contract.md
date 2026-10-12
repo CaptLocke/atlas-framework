@@ -1,0 +1,74 @@
+---
+type: dashboard-contract
+name: daily-brief
+template: daily-brief.html
+republished_by: [daily-brief]
+size_budget_kb: 120
+---
+# Dashboard: daily-brief
+
+## Purpose
+Today at a glance, readable in two minutes: top priorities, today's meetings with prep status, what is due or slipping, who the user is waiting on, what changed overnight, up to three insights, drafts ready to review, and anything that needs the user (approvals, questions). It is the page view of the brief file `user/work/briefs/YYYY-MM-DD.md`; the brief file and this page are built in the same step and must agree.
+
+Also republished by any chat that runs the morning catch-up (kernel §2.3), which adds `since_last_night`. After away mode it renders the catch-up brief (`brief.kind: "catch-up"`).
+
+## Data (JSON shape embedded in the page)
+Envelope: `meta` as in `system/dashboards/README.md`; `meta.as_of` = the brief's date (tomorrow when built with `target: tomorrow`).
+
+```json
+{
+  "meta": { "dashboard": "daily-brief", "schema_version": 1, "as_of": "2026-10-13", "…": "…" },
+  "brief": { "date": "2026-10-13", "kind": "daily", "path": "user/work/briefs/2026-10-13.md",
+             "headline": "A customer-heavy day: …", "away": null },
+  "since_last_night": [ { "text": "Sam confirmed the agenda ([[sources/2026-10-13-brightline-agenda-thread]])." } ],
+  "priorities": [ { "text": "Send pricing feedback to Jordan", "why": "Due today; Thursday's decision depends on it.",
+                    "ref": { "id": "commitments/send-pricing-feedback", "title": "Send pricing feedback to Jordan" } } ],
+  "today": [ { "id": "events/2026-10-13-brightline-renewal-call", "title": "Brightline renewal call", "kind": "meeting",
+               "start": "2026-10-13T10:00:00-07:00", "end": "2026-10-13T10:45:00-07:00", "all_day": false,
+               "location": "Zoom", "attendees": [ { "id": "people/sam-okafor", "title": "Sam Okafor" } ],
+               "prep": { "status": "ready", "path": "user/work/prep/2026-10-13-brightline-renewal-call.md",
+                         "summary": "Lead with the import fix date." } } ],
+  "due": [ { "id": "commitments/send-pricing-feedback", "title": "Send pricing feedback to Jordan", "direction": "i_owe",
+             "status": "open", "due": "2026-10-13", "priority": "high",
+             "counterparty": { "id": "people/jordan-lee", "title": "Jordan Lee" }, "next_step": "…" } ],
+  "waiting_on": [ { "id": "commitments/dana-msa-review", "title": "Dana reviews the enterprise MSA", "direction": "waiting_on",
+                    "status": "slipped", "due": "2026-10-07", "since": "2026-09-30",
+                    "counterparty": { "id": "people/dana-ruiz", "title": "Dana Ruiz" }, "next_step": "…" } ],
+  "changes": [ { "text": "Decision recorded: … ([[decisions/2026-10-12-enterprise-tier-pricing]])." } ],
+  "insights": [ { "id": "I-2026-10-12-03", "text": "…", "why": "…", "suggested_action": "…",
+                  "refs": [ { "id": "risks/onboarding-import-failures", "title": "Onboarding import failures" } ] } ],
+  "drafts": [ { "title": "Contract review: quick check-in", "to": "Dana Ruiz", "where": "Outlook drafts", "why": "…",
+                "ref": { "id": "commitments/dana-msa-review", "title": "…" } } ],
+  "approvals": [ { "id": "A-2026-10-12-01", "action": "Send follow-up to Dana Ruiz", "why": "…", "requested_on": "2026-10-12" } ],
+  "questions": [ { "id": "Q-2026-10-12-02", "kind": "profile", "text": "…" } ]
+}
+```
+Full example: `system/tests/dashboards/daily-brief.json`.
+
+| Field | Notes |
+|---|---|
+| `brief.kind` | `daily` or `catch-up`. For `catch-up`, `brief.away` = `{ "start", "end" }` and `since_last_night` holds the "while you were away" summary lines. |
+| `brief.headline` | One sentence summarizing the day, in the user's communication style. |
+| `prep.status` | `ready` (prep note exists), `planned` (meeting-prep will create one before the meeting), `none` (meaningful meeting without prep), `not_needed`. |
+| `due[].status` | `open` or `slipped`. |
+| `drafts[].where` | Plain words for where the draft is ("Outlook drafts"). Never the draft body. |
+
+## Sources (file → field)
+| Field | Source |
+|---|---|
+| `brief.*`, `priorities`, `changes`, `since_last_night` | The brief file `user/work/briefs/<as_of>.md` (or `-catch-up.md`) written by `nova-brief` in the same run; `priorities[].ref` and `[[…]]` mentions are the record IDs cited there |
+| `today[]` | Event records (`user/knowledge/events/`) with `start` on `as_of` and `status: scheduled`: `id, title, kind, start, end, location, attendees` (→ person refs); `prep.path` = event `prep`; `prep.summary` = first line of the prep note's suggested agenda |
+| `due[]` | Commitments, `direction: i_owe`, `status: open|slipped`, `due` ≤ `as_of` + `rhythms.yaml: triggers.deadline_approaching.days` (default 3): `id, title, direction, status, due, priority, counterparty, next_step` |
+| `waiting_on[]` | Commitments, `direction: waiting_on`, `status: open|slipped`; `since` = `created` |
+| `insights[]` | `user/inbox/insights.md`, status `new`, highest `score` first, max `rhythms.yaml: insights.brief_max` (default 3): heading ID, Insight, Why it matters, Suggested action, Links |
+| `drafts[]` | The `email-drafts` job's list for the brief (titles, recipients, reasons) from this run |
+| `approvals[]` | `user/inbox/approvals.md`, status `pending` |
+| `questions[]` | `user/inbox/questions.md`, status `open`, newest first |
+| `meta.notices` | `user/.state/health.yaml` open high-severity issues affecting ingestion; staleness found by the job's readiness check (`user/.state/jobs.yaml`) |
+
+## Rendering notes
+- Order on the page: since last night (if any), priorities (numbered: they are ranked), today, due and slipping, waiting on, insights, what changed, drafts, needs you.
+- Sorting: `priorities` in rank order (3 to 5 items); `today` by `start`, all-day items last; `due` overdue first, then by `due`, then priority; `waiting_on` slipped first, then by `due` (nulls last); `changes` most important first.
+- Caps (then `meta.truncated`): `today` 15, `due` 10, `waiting_on` 8, `changes` 10, `drafts` 8, `approvals` 5, `questions` 3, `since_last_night` 8. The brief file keeps the full lists.
+- Text limits: `headline` 200 characters, `why`/`next_step`/`summary` 240.
+- The page is typically under 15 KB of data; the budget only matters after long away periods (catch-up), where `changes` and `since_last_night` are truncated first.

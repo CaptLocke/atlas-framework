@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Project</title>
+<style id="nova-base">
+/* Nova dashboard base styles.
+   CANONICAL COPY. Every template in system/dashboards/*.html inlines this file
+   verbatim inside <style id="nova-base">. Edit this file, then run
+   `python3 system/tests/dashboards/render.py --sync` to copy it into the
+   templates, and `--check` to confirm they match.
+
+   Theming: nova-dashboards fills <style id="nova-theme"> with --brand-* values
+   from user/profile/design-system.md. Nothing here sets --brand-*, so an empty
+   theme block falls back to the neutral defaults below. */
+
+:root {
+  color-scheme: light dark;
+  --font-heading: var(--brand-font-heading, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif);
+  --font-body: var(--brand-font-body, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+  --font-id: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+
+  --bg: var(--brand-bg, #f4f6f8);
+  --surface: var(--brand-surface, #ffffff);
+  --surface-2: #eaeef2;
+  --ink: var(--brand-ink, #1a2632);
+  --ink-2: #4a5866;
+  --line: #d3dae1;
+  --accent: var(--brand-accent, #2b5a8a);
+  --accent-ink: var(--brand-accent-ink, #ffffff);
+  --accent-soft: #e2ebf5;
+  --star: var(--brand-highlight, #a86f12);
+  --ok: #2c7552;
+  --warn: #8f5500;
+  --danger: #b0281f;
+  --muted: #7a8794;
+
+  --radius: 6px;
+  --gutter: 16px;
+  --measure: 72ch;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: var(--brand-bg-dark, #10161d);
+    --surface: var(--brand-surface-dark, #17212b);
+    --surface-2: #1f2b37;
+    --ink: var(--brand-ink-dark, #e3e9ef);
+    --ink-2: #a5b2bf;
+    --line: #2c3a48;
+    --accent: var(--brand-accent-dark, #8eb5e3);
+    --accent-ink: var(--brand-accent-ink-dark, #0d1620);
+    --accent-soft: #1d3149;
+    --star: var(--brand-highlight-dark, #e2b45c);
+    --ok: #6cc49a;
+    --warn: #e5a94c;
+    --danger: #f08b80;
+    --muted: #7f8e9c;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: var(--brand-bg-dark, #10161d);
+  --surface: var(--brand-surface-dark, #17212b);
+  --surface-2: #1f2b37;
+  --ink: var(--brand-ink-dark, #e3e9ef);
+  --ink-2: #a5b2bf;
+  --line: #2c3a48;
+  --accent: var(--brand-accent-dark, #8eb5e3);
+  --accent-ink: var(--brand-accent-ink-dark, #0d1620);
+  --accent-soft: #1d3149;
+  --star: var(--brand-highlight-dark, #e2b45c);
+  --ok: #6cc49a;
+  --warn: #e5a94c;
+  --danger: #f08b80;
+  --muted: #7f8e9c;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; line-height: 1.2; margin: 0; }
+p { margin: 0; }
+a { color: var(--accent); text-underline-offset: 0.18em; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+button, input, select { font: inherit; color: inherit; }
+[hidden] { display: none !important; }
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---- Page frame ---- */
+.wrap { max-width: 72rem; margin: 0 auto; padding: 0 var(--gutter); }
+@media (min-width: 52rem) { :root { --gutter: 32px; } }
+
+.skip { position: absolute; left: -999px; top: 0; background: var(--accent); color: var(--accent-ink); padding: .5rem .75rem; z-index: 10; }
+.skip:focus { left: var(--gutter); top: .5rem; }
+
+/* Masthead: the one expressive element. */
+.mast { padding: 2.25rem 0 1.75rem; border-bottom: 1px solid var(--line); margin-bottom: 1.5rem; }
+.mast-who { display: flex; align-items: center; gap: .5rem; color: var(--ink-2); font-size: .9rem; margin-bottom: 1.1rem; }
+.mast-who svg { width: 1.1rem; height: 1.1rem; fill: var(--star); flex: none; }
+.mast h1 { font-size: clamp(2.1rem, 6vw, 3.4rem); letter-spacing: -0.015em; font-weight: 600; }
+.mast-sub { font-family: var(--font-heading); font-size: clamp(1.1rem, 2.6vw, 1.4rem); color: var(--ink-2); margin-top: .35rem; }
+.mast-lede { max-width: var(--measure); margin-top: 1rem; font-size: 1.05rem; }
+.mast-stats { display: flex; flex-wrap: wrap; gap: .5rem 1.75rem; margin: 1.25rem 0 0; padding: 0; list-style: none; }
+.mast-stats li { display: flex; align-items: baseline; gap: .4rem; color: var(--ink-2); font-size: .9rem; }
+.mast-stats b { font-family: var(--font-heading); font-size: 1.5rem; color: var(--ink); font-weight: 600; }
+.mast-nav { margin-top: 1.25rem; display: flex; flex-wrap: wrap; gap: .25rem 1rem; font-size: .9rem; }
+.mast-nav a[aria-current="page"] { color: var(--ink); text-decoration: none; font-weight: 600; }
+
+/* Notices (stale data, connection problems) */
+.notices { list-style: none; margin: 0 0 1.5rem; padding: 0; display: grid; gap: .5rem; }
+.notice { border-left: 3px solid var(--warn); background: var(--surface); padding: .6rem .9rem; border-radius: 0 var(--radius) var(--radius) 0; font-size: .95rem; }
+.notice[data-level="error"] { border-color: var(--danger); }
+.notice[data-level="info"] { border-color: var(--accent); }
+
+/* ---- Sections: heading in a margin column on wide screens ---- */
+.sec { padding: 1.25rem 0 1.75rem; border-top: 1px solid var(--line); }
+.sec:first-child { border-top: 0; padding-top: 0; }
+.sec-head { margin-bottom: .75rem; }
+.sec-head h2 { font-size: 1.3rem; display: flex; align-items: baseline; gap: .55rem; flex-wrap: wrap; }
+.count { font-family: var(--font-body); font-size: .85rem; font-weight: 600; color: var(--ink-2); background: var(--surface-2); border-radius: 999px; padding: 0 .55rem; line-height: 1.6; }
+.sec-note { color: var(--ink-2); font-size: .9rem; margin-top: .3rem; max-width: 40ch; }
+.sec-body { min-width: 0; }
+@media (min-width: 52rem) {
+  .sec { display: grid; grid-template-columns: 12.5rem minmax(0, 1fr); gap: 2rem; }
+  .sec-head { margin: 0; }
+  .sec-head > div { position: sticky; top: 1rem; }
+  .sec:first-child { padding-top: 0; }
+}
+
+/* ---- Item rows ---- */
+.items { list-style: none; margin: 0; padding: 0; background: var(--surface); border-radius: var(--radius); border: 1px solid var(--line); }
+.item { position: relative; display: flex; gap: .75rem 1.25rem; justify-content: space-between; padding: .85rem 1rem .85rem 1.25rem; border-top: 1px solid var(--line); }
+.item:first-child { border-top: 0; }
+.item::before { content: ""; position: absolute; left: 0; top: .8rem; bottom: .8rem; width: 3px; border-radius: 0 2px 2px 0; background: var(--tone, transparent); }
+.item[data-tone="danger"] { --tone: var(--danger); }
+.item[data-tone="warn"] { --tone: var(--warn); }
+.item[data-tone="ok"] { --tone: var(--ok); }
+.item[data-tone="accent"] { --tone: var(--accent); }
+.item[data-tone="muted"] { --tone: var(--muted); }
+.item-main { min-width: 0; flex: 1; display: grid; gap: .25rem; }
+.item-title { font-weight: 600; }
+.item-meta { display: flex; flex-wrap: wrap; gap: .15rem 1rem; color: var(--ink-2); font-size: .875rem; }
+.item-text { font-size: .95rem; max-width: var(--measure); }
+.item-insight { font-size: .9rem; color: var(--ink-2); max-width: var(--measure); }
+.item-insight b, .item-text b { color: var(--ink); font-weight: 600; }
+.item-aside { flex: none; text-align: right; font-size: .875rem; color: var(--ink-2); display: grid; gap: .25rem; align-content: start; justify-items: end; }
+@media (max-width: 34rem) {
+  .item { flex-direction: column; }
+  .item-aside { text-align: left; justify-items: start; display: flex; flex-wrap: wrap; gap: .4rem; }
+}
+
+/* Record IDs: always visible so the user can ask Nova about the record. */
+.rid { font-family: var(--font-id); font-size: .76rem; color: var(--ink-2); background: var(--surface-2); padding: .05em .4em; border-radius: 4px; -webkit-user-select: all; user-select: all; overflow-wrap: anywhere; justify-self: start; }
+a.rid { text-decoration: none; }
+a.rid:hover { color: var(--accent); }
+
+/* Chips: short status words. Color always paired with text. */
+.chip { display: inline-block; font-size: .78rem; font-weight: 600; line-height: 1.5; padding: 0 .5rem; border-radius: 999px; border: 1px solid currentColor; color: var(--ink-2); white-space: nowrap; }
+.chip[data-tone="danger"] { color: var(--danger); }
+.chip[data-tone="warn"] { color: var(--warn); }
+.chip[data-tone="ok"] { color: var(--ok); }
+.chip[data-tone="accent"] { color: var(--accent); }
+.chips { display: flex; flex-wrap: wrap; gap: .35rem; }
+
+.empty { color: var(--ink-2); font-style: italic; padding: .25rem 0; }
+.more { color: var(--ink-2); font-size: .875rem; margin-top: .6rem; }
+.error-box { background: var(--surface); border: 1px solid var(--danger); padding: 1rem; border-radius: var(--radius); }
+
+/* ---- Controls (filters, search, tabs) ---- */
+.controls { display: flex; flex-wrap: wrap; gap: .6rem 1rem; align-items: center; margin-bottom: .9rem; }
+.seg { display: inline-flex; flex-wrap: wrap; gap: .3rem; }
+.seg button { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: .25rem .8rem; cursor: pointer; font-size: .9rem; }
+.seg button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.seg button:hover { border-color: var(--accent); }
+.search { flex: 1 1 14rem; max-width: 24rem; }
+.search input { width: 100%; padding: .4rem .75rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+
+/* Key facts */
+.facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: .9rem 1.25rem; margin: 0; }
+.facts div { min-width: 0; }
+.facts dt { font-size: .8rem; color: var(--ink-2); }
+.facts dd { margin: 0; font-weight: 600; }
+
+/* Progress bar */
+.bar { height: .5rem; background: var(--surface-2); border-radius: 999px; overflow: hidden; }
+.bar > span { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+
+/* ---- Footer ---- */
+.foot { margin-top: 2.5rem; padding: 1.25rem 0 2.5rem; border-top: 1px solid var(--line); color: var(--ink-2); font-size: .875rem; display: flex; flex-wrap: wrap; justify-content: space-between; gap: .75rem; align-items: center; }
+.theme-btn { background: none; border: 1px solid var(--line); border-radius: 999px; padding: .2rem .75rem; cursor: pointer; font-size: .85rem; color: var(--ink-2); }
+
+/* ---- Print ---- */
+@media print {
+  :root, :root:not([data-theme="light"]), :root[data-theme="dark"] {
+    --bg: #ffffff; --surface: #ffffff; --surface-2: #f0f0f0; --ink: #000000; --ink-2: #333333;
+    --line: #bbbbbb; --accent: #000000; --star: #000000; --ok: #000000; --warn: #000000; --danger: #000000; --muted: #555555;
+  }
+  body { font-size: 11pt; }
+  .no-print, .controls, .theme-btn, .skip, .mast-nav { display: none !important; }
+  .items { border: 0; }
+  .item { break-inside: avoid; padding-left: .75rem; }
+  .sec { break-inside: auto; }
+  .sec-head > div { position: static; }
+  [hidden] { display: none !important; }
+  a { color: inherit; text-decoration: none; }
+}
+</style>
+<style id="nova-page">
+.overview { display: grid; gap: 1rem; }
+.overview .desc { display: grid; gap: .6rem; max-width: var(--measure); }
+.callout { border-left: 3px solid var(--accent); background: var(--surface); padding: .75rem 1rem; border-radius: 0 var(--radius) var(--radius) 0; display: grid; gap: .35rem; max-width: var(--measure); }
+.callout b { font-weight: 600; }
+.timeline { list-style: none; margin: 0; padding: 0 0 0 1rem; border-left: 2px solid var(--line); display: grid; gap: .8rem; }
+.timeline li { position: relative; display: grid; gap: .1rem; }
+.timeline li::before { content: ""; position: absolute; left: calc(-1rem - 5px); top: .45rem; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+.timeline time { font-size: .85rem; color: var(--ink-2); }
+.people { display: flex; flex-wrap: wrap; gap: .5rem .75rem; list-style: none; margin: 0; padding: 0; }
+.people li { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: .5rem .75rem; display: grid; gap: .15rem; font-size: .92rem; }
+.people .role { color: var(--ink-2); font-size: .82rem; }
+.why { border-left: 2px solid var(--line); padding-left: .75rem; font-size: .93rem; }
+</style>
+<style id="nova-theme">{{NOVA_THEME_CSS}}</style>
+</head>
+<body>
+<div id="app"></div>
+<script id="nova-data" type="application/json">{{NOVA_DATA}}</script>
+<script id="nova-base-js">
+/* Nova dashboard runtime.
+   CANONICAL COPY. Every template inlines this file verbatim inside
+   <script id="nova-base-js">. Edit here, then run
+   `python3 system/tests/dashboards/render.py --sync`.
+
+   Safety: dashboard data comes from emails, documents, and meetings, so it is
+   untrusted text. Everything is rendered with textContent / createElement,
+   never parsed as HTML markup. No network calls, no connectors. Browser storage is used
+   only for UI conveniences (theme, remembered filter) and is optional. */
+(function () {
+  "use strict";
+  var N = (window.Nova = {});
+  N.meta = {};
+
+  var LABELS = {
+    i_owe: "I owe", waiting_on: "Waiting on",
+    open: "Open", done: "Done", dropped: "Dropped", slipped: "Slipped",
+    high: "High", medium: "Medium", low: "Low",
+    on_track: "On track", at_risk: "At risk", off_track: "Off track", unknown: "Not assessed",
+    proposed: "Proposed", active: "Active", paused: "Paused", cancelled: "Cancelled",
+    made: "Made", reversed: "Reversed", superseded: "Superseded",
+    potential: "Potential", resolved: "Resolved",
+    draft: "Draft", achieved: "Achieved", missed: "Missed",
+    meeting: "Meeting", one_on_one: "1:1", deadline: "Deadline", milestone: "Milestone", occurrence: "Event",
+    ok: "OK", partial: "Partial", failed: "Failed", skipped_away: "Skipped (away)",
+    skipped_paused: "Skipped (paused)", early_exit: "Nothing new", never_run: "Not run yet",
+    pending: "Pending", approved: "Approved", rejected: "Rejected", executed: "Done", expired: "Expired",
+    confirmed: "Confirmed", stated: "You said this", observed: "Observed", researched: "Researched",
+    uploaded: "From your documents", inferred: "Inferred",
+    ready: "Prep ready", planned: "Prep coming", none: "No prep", not_needed: "No prep needed",
+    manager: "Manager", report: "Report", peer: "Peer", stakeholder: "Stakeholder", customer: "Customer",
+    vendor: "Vendor", partner: "Partner", external: "External", other: "Other",
+    task_group: "Task group", project: "Project", initiative: "Initiative", program: "Program",
+    quarter: "Quarter", half: "Half-year", year: "Year", multi_year: "Multi-year"
+  };
+  N.label = function (v) {
+    if (v == null) return "";
+    return LABELS[v] || String(v).replace(/_/g, " ").replace(/^./, function (c) { return c.toUpperCase(); });
+  };
+  N.tones = {
+    danger: ["slipped", "off_track", "failed", "high", "active_risk", "error", "missed"],
+    warn: ["at_risk", "partial", "medium", "pending", "potential", "proposed", "warn"],
+    ok: ["on_track", "ok", "done", "achieved", "made", "resolved", "confirmed", "stated", "ready", "executed"],
+    accent: ["early_exit", "open", "active", "planned"]
+  };
+  N.tone = function (v) {
+    for (var t in N.tones) if (N.tones[t].indexOf(v) !== -1) return t;
+    return null;
+  };
+
+  /* ---- DOM helpers ---- */
+  function add(el, c) {
+    if (c == null || c === false || c === "") return;
+    if (Array.isArray(c)) { for (var i = 0; i < c.length; i++) add(el, c[i]); return; }
+    el.appendChild(typeof c === "object" ? c : document.createTextNode(String(c)));
+  }
+  function h(tag, props) {
+    var el = document.createElement(tag);
+    if (props) {
+      for (var k in props) {
+        var v = props[k];
+        if (v == null || v === false) continue;
+        if (k === "class") el.className = v;
+        else if (k === "text") el.textContent = v;
+        else if (k.slice(0, 2) === "on") el.addEventListener(k.slice(2), v);
+        else el.setAttribute(k, v === true ? "" : v);
+      }
+    }
+    for (var i = 2; i < arguments.length; i++) add(el, arguments[i]);
+    return el;
+  }
+  N.h = h;
+  N.add = add;
+
+  /* ---- Browser storage (optional; never required) ---- */
+  N.store = {
+    get: function (k) { try { return window.localStorage.getItem("nova:" + k); } catch (e) { return null; } },
+    set: function (k, v) { try { window.localStorage.setItem("nova:" + k, v); } catch (e) { /* ignore */ } }
+  };
+
+  /* ---- Data ---- */
+  N.load = function () {
+    var node = document.getElementById("nova-data");
+    var raw = node ? node.textContent.trim() : "";
+    if (!raw || raw.indexOf("{{") === 0) return null;
+    try { return JSON.parse(raw); } catch (e) { return null; }
+  };
+  N.list = function (v) { return Array.isArray(v) ? v : []; };
+
+  /* ---- Dates. Date-only values are calendar days; datetimes carry an offset. ---- */
+  function dateOnly(s) { return typeof s === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s); }
+  function toDate(s) { return dateOnly(s) ? new Date(s + "T12:00:00Z") : new Date(s); }
+  function fmt(s, opts) {
+    if (!s) return "";
+    var d = toDate(s);
+    if (isNaN(d.getTime())) return String(s);
+    opts.timeZone = dateOnly(s) ? "UTC" : (N.meta.timezone || undefined);
+    try { return new Intl.DateTimeFormat(N.meta.locale || undefined, opts).format(d); }
+    catch (e) { return String(s); }
+  }
+  N.date = function (s) { return fmt(s, { month: "short", day: "numeric" }); };
+  N.dateY = function (s) { return fmt(s, { year: "numeric", month: "short", day: "numeric" }); };
+  N.weekday = function (s) { return fmt(s, { weekday: "short", month: "short", day: "numeric" }); };
+  N.dayName = function (s) { return fmt(s, { weekday: "long" }); };
+  N.longDate = function (s) { return fmt(s, { weekday: "long", year: "numeric", month: "long", day: "numeric" }); };
+  N.time = function (s) { return dateOnly(s) ? "" : fmt(s, { hour: "numeric", minute: "2-digit" }); };
+  N.dateTime = function (s) { return dateOnly(s) ? N.date(s) : fmt(s, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); };
+  N.dayKey = function (s) {
+    if (!s) return null;
+    if (dateOnly(s)) return s;
+    var d = new Date(s);
+    if (isNaN(d.getTime())) return null;
+    try {
+      return new Intl.DateTimeFormat("en-CA", { timeZone: N.meta.timezone || undefined, year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
+    } catch (e) { return s.slice(0, 10); }
+  };
+  N.daysFromToday = function (s) {
+    var k = N.dayKey(s), today = N.meta.as_of;
+    if (!k || !today) return null;
+    return Math.round((Date.parse(k + "T00:00:00Z") - Date.parse(today + "T00:00:00Z")) / 86400000);
+  };
+  N.rel = function (s) {
+    var n = N.daysFromToday(s);
+    if (n == null) return "";
+    if (n === 0) return "today";
+    if (n === 1) return "tomorrow";
+    if (n === -1) return "yesterday";
+    return n > 0 ? "in " + n + " days" : -n + " days ago";
+  };
+  N.due = function (s) {
+    if (!s) return "No date";
+    var n = N.daysFromToday(s);
+    if (n == null) return "Due " + N.date(s);
+    if (n < 0) return (n === -1 ? "1 day" : -n + " days") + " overdue";
+    if (n === 0) return "Due today";
+    if (n === 1) return "Due tomorrow";
+    return "Due " + N.date(s);
+  };
+
+  /* ---- Record references ---- */
+  var ID_RE = /\[\[([a-z]+\/[a-z0-9][a-z0-9-]*)\]\]/g;
+  N.rid = function (id) {
+    if (!id) return null;
+    var text = "[[" + id + "]]";
+    var base = N.meta.record_base_url;
+    if (base && /^https:\/\//.test(base) && /^[a-z]+\/[a-z0-9][a-z0-9-]*$/.test(id)) {
+      return h("a", { class: "rid", href: base + id + ".md", target: "_blank", rel: "noopener noreferrer", title: "Open the record file" }, text);
+    }
+    return h("code", { class: "rid", title: "Record ID: mention it in chat to ask Nova about it" }, text);
+  };
+  /* A file path in the user's repository (not a record), e.g. a prep note or profile file. */
+  N.path = function (p) { return p ? h("code", { class: "rid", title: "File in your Nova repository" }, p) : null; };
+  /* A ref is {id, title}. Renders the title followed by its ID. */
+  N.ref = function (r, opts) {
+    if (!r) return null;
+    if (typeof r === "string") return N.rid(r);
+    return h("span", { class: "ref" }, r.title || r.id, r.id && !(opts && opts.noId) ? [" ", N.rid(r.id)] : null);
+  };
+  N.refs = function (list) {
+    list = N.list(list);
+    var out = [];
+    list.forEach(function (r, i) { if (i) out.push(", "); out.push(N.ref(r)); });
+    return out;
+  };
+  N.name = function (r) { return r ? (typeof r === "string" ? r : r.title || r.id) : ""; };
+  /* Plain text with [[type/slug]] mentions styled as IDs. */
+  N.rich = function (text) {
+    if (text == null) return null;
+    text = String(text);
+    var out = [], last = 0, m;
+    ID_RE.lastIndex = 0;
+    while ((m = ID_RE.exec(text))) {
+      if (m.index > last) out.push(text.slice(last, m.index));
+      out.push(N.rid(m[1]));
+      last = m.index + m[0].length;
+    }
+    if (last < text.length) out.push(text.slice(last));
+    return out;
+  };
+
+  /* ---- Building blocks ---- */
+  N.chip = function (text, tone) { return text ? h("span", { class: "chip", "data-tone": tone || null }, text) : null; };
+  N.status = function (v) { return N.chip(N.label(v), N.tone(v)); };
+  N.empty = function (text) { return h("p", { class: "empty" }, text); };
+  N.more = function (key) {
+    var n = (N.meta.truncated || {})[key];
+    if (!n) return null;
+    return h("p", { class: "more" }, n + " more not shown here. Ask Nova in chat to see them.");
+  };
+  N.total = function (key, shown) { return shown + ((N.meta.truncated || {})[key] || 0); };
+
+  /* opts: {id, title, note, count, key, body} */
+  N.section = function (o) {
+    var hid = o.id + "-h";
+    return h("section", { class: "sec", id: o.id, "aria-labelledby": hid },
+      h("div", { class: "sec-head" }, h("div", null,
+        h("h2", { id: hid }, o.title, o.count != null ? h("span", { class: "count", "aria-label": o.count + " items" }, String(o.count)) : null),
+        o.note ? h("p", { class: "sec-note" }, o.note) : null)),
+      h("div", { class: "sec-body" }, o.body, o.key ? N.more(o.key) : null));
+  };
+
+  /* opts: {tone, title, id, meta:[...], text, insight, nextStep, aside:[...], attrs} */
+  N.item = function (o) {
+    var metas = N.list(o.meta).filter(function (x) { return x != null && x !== ""; })
+      .map(function (x) { return h("span", null, x); });
+    var props = { class: "item", "data-tone": o.tone || null };
+    if (o.attrs) for (var k in o.attrs) props[k] = o.attrs[k];
+    return h("li", props,
+      h("div", { class: "item-main" },
+        h("p", { class: "item-title" }, o.title),
+        o.text ? h("p", { class: "item-text" }, N.rich(o.text)) : null,
+        metas.length ? h("p", { class: "item-meta" }, metas) : null,
+        o.insight ? h("p", { class: "item-insight" }, N.rich(o.insight)) : null,
+        o.nextStep ? h("p", { class: "item-insight" }, h("b", null, "Next step: "), N.rich(o.nextStep)) : null,
+        o.extra || null,
+        o.id ? N.rid(o.id) : null),
+      o.aside && N.list(o.aside).some(Boolean) ? h("div", { class: "item-aside" }, o.aside) : null);
+  };
+  N.items = function (nodes, emptyText) {
+    nodes = N.list(nodes);
+    return nodes.length ? h("ul", { class: "items" }, nodes) : N.empty(emptyText || "Nothing here right now.");
+  };
+
+  /* Segmented filter. options: [{value, label}] ; remembers the choice per page. */
+  N.segmented = function (name, options, initial, onChange) {
+    var key = (N.meta.dashboard || "page") + ":" + name;
+    var saved = N.store.get(key);
+    var current = options.some(function (o) { return o.value === saved; }) ? saved : initial;
+    var buttons = options.map(function (o) {
+      return h("button", { type: "button", "data-value": o.value, "aria-pressed": String(o.value === current),
+        onclick: function () {
+          current = o.value; N.store.set(key, current);
+          buttons.forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-value") === current)); });
+          onChange(current);
+        } }, o.label);
+    });
+    var group = h("div", { class: "seg", role: "group", "aria-label": name }, buttons);
+    setTimeout(function () { onChange(current); }, 0);
+    return group;
+  };
+  N.search = function (label, onInput) {
+    var id = "q-" + Math.random().toString(36).slice(2, 8);
+    return h("div", { class: "search" },
+      h("label", { class: "visually-hidden", for: id }, label),
+      h("input", { id: id, type: "search", placeholder: label, autocomplete: "off",
+        oninput: function (e) { onInput(e.target.value.trim().toLowerCase()); } }));
+  };
+  N.bar = function (fraction, label) {
+    if (typeof fraction !== "number" || isNaN(fraction)) return null;
+    var pct = Math.max(0, Math.min(1, fraction)) * 100;
+    return h("div", { class: "bar", role: "img", "aria-label": label || Math.round(pct) + "% complete" },
+      h("span", { style: "width:" + pct.toFixed(1) + "%" }));
+  };
+  N.facts = function (pairs) {
+    var rows = pairs.filter(function (p) { return p && p[1] != null && p[1] !== "" && !(Array.isArray(p[1]) && !p[1].length); });
+    return rows.length ? h("dl", { class: "facts" }, rows.map(function (p) { return h("div", null, h("dt", null, p[0]), h("dd", null, p[1])); })) : null;
+  };
+
+  /* ---- Theme preference (auto / light / dark) ---- */
+  var THEMES = ["auto", "light", "dark"];
+  function applyTheme(t) {
+    if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+    else document.documentElement.removeAttribute("data-theme");
+  }
+  N.themeButton = function () {
+    var t = N.store.get("theme") || "auto";
+    if (THEMES.indexOf(t) === -1) t = "auto";
+    applyTheme(t);
+    var btn = h("button", { type: "button", class: "theme-btn" });
+    function label() { btn.textContent = "Theme: " + t; btn.setAttribute("aria-label", "Color theme: " + t + ". Activate to change."); }
+    btn.addEventListener("click", function () {
+      t = THEMES[(THEMES.indexOf(t) + 1) % THEMES.length];
+      N.store.set("theme", t); applyTheme(t); label();
+    });
+    label();
+    return btn;
+  };
+  applyTheme(N.store.get("theme") || "auto");
+
+  var STAR = "M12 1.5c.5 5.6 4.9 10 10.5 10.5-5.6.5-10 4.9-10.5 10.5C11.5 16.9 7.1 12.5 1.5 12 7.1 11.5 11.5 7.1 12 1.5z";
+  function star() {
+    var ns = "http://www.w3.org/2000/svg";
+    var svg = document.createElementNS(ns, "svg");
+    svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("aria-hidden", "true");
+    var p = document.createElementNS(ns, "path"); p.setAttribute("d", STAR); svg.appendChild(p);
+    return svg;
+  }
+
+  /* opts: {title, subtitle, lede, stats:[[value,label]]} */
+  N.masthead = function (o) {
+    var nav = N.list(N.meta.nav).filter(function (n) { return n && n.url && /^https:\/\//.test(n.url); });
+    return h("header", { class: "mast" },
+      h("p", { class: "mast-who" }, star(), N.meta.user_display_name ? "Nova for " + N.meta.user_display_name : "Nova"),
+      h("h1", null, o.title),
+      o.subtitle ? h("p", { class: "mast-sub" }, o.subtitle) : null,
+      o.lede ? h("p", { class: "mast-lede" }, N.rich(o.lede)) : null,
+      o.stats && o.stats.length ? h("ul", { class: "mast-stats" }, o.stats.map(function (s) {
+        return h("li", null, h("b", null, String(s[0])), s[1]);
+      })) : null,
+      nav.length ? h("nav", { class: "mast-nav", "aria-label": "Other Nova pages" }, nav.map(function (n) {
+        return h("a", { href: n.url, target: "_blank", rel: "noopener noreferrer", "aria-current": n.name === N.meta.dashboard ? "page" : null }, n.title || n.name);
+      })) : null);
+  };
+
+  N.footer = function () {
+    var at = N.meta.generated_at;
+    return h("footer", { class: "foot" },
+      h("p", null, "Updated " + (at ? N.dateY(at) + ", " + N.time(at) : "never") + " · Ask Nova in chat to change anything"),
+      h("p", { class: "chips" }, N.meta.nova_version ? h("span", null, "Nova " + N.meta.nova_version) : null, N.themeButton()));
+  };
+
+  /* Render a page. build(data, main) appends sections to main and may return masthead options. */
+  N.page = function (defaults, build) {
+    var data = N.load();
+    var app = document.getElementById("app");
+    N.meta = (data && data.meta) || {};
+    if (N.meta.locale) document.documentElement.setAttribute("lang", N.meta.locale);
+    if (N.meta.title) document.title = N.meta.title;
+    var main = h("main", { id: "main" });
+    var mastOpts = { title: N.meta.title || defaults.title };
+    if (!data) {
+      mastOpts.subtitle = "Waiting for data";
+      main.appendChild(N.empty("This page has no data yet. Ask Nova in chat to refresh it."));
+    } else {
+      try {
+        var extra = build(data, main) || {};
+        for (var k in extra) mastOpts[k] = extra[k];
+      } catch (e) {
+        main.appendChild(h("div", { class: "error-box", role: "alert" }, "Part of this page couldn't be displayed. Ask Nova in chat to refresh it."));
+        if (window.console) console.error(e);
+      }
+    }
+    var notices = N.list(N.meta.notices);
+    add(app, [
+      h("a", { class: "skip", href: "#main" }, "Skip to content"),
+      h("div", { class: "wrap" },
+        N.masthead(mastOpts),
+        notices.length ? h("ul", { class: "notices", "aria-label": "Notices" }, notices.map(function (n) {
+          return h("li", { class: "notice", "data-level": n.level || "warn" }, N.rich(n.text));
+        })) : null,
+        main,
+        N.footer())
+    ]);
+  };
+})();
+</script>
+<script id="nova-page-js">
+(function () {
+  var N = window.Nova, h = N.h, L = N.list;
+  var HEALTH_TONE = { off_track: "danger", at_risk: "warn", on_track: "ok" };
+
+  N.page({ title: "Project" }, function (d, main) {
+    var p = d.project || {};
+    main.appendChild(N.section({ id: "overview", title: "Overview",
+      body: h("div", { class: "overview" },
+        h("div", { class: "chips" }, N.status(p.health || "unknown"), N.status(p.status), p.scale ? N.chip(N.label(p.scale)) : null),
+        L(p.description).length ? h("div", { class: "desc" }, L(p.description).map(function (x) { return h("p", null, N.rich(x)); })) : null,
+        N.facts([["Owner", p.owner ? N.name(p.owner) : null], ["Serves goal", p.goal ? N.name(p.goal) : null], ["Started", p.start ? N.dateY(p.start) : null],
+          ["Target", p.target ? N.dateY(p.target) + (N.daysFromToday(p.target) >= 0 ? " (" + N.rel(p.target) + ")" : "") : null],
+          ["Organizations", L(p.organizations).map(N.name).join(", ")], ["Topics", L(p.topics).map(N.name).join(", ")]]),
+        p.insight || p.next_step ? h("div", { class: "callout" }, p.insight ? h("p", null, N.rich(p.insight)) : null,
+          p.next_step ? h("p", null, h("b", null, "Next step: "), N.rich(p.next_step)) : null) : null,
+        N.rid(p.id)) }));
+
+    var ppl = L(d.people);
+    if (ppl.length) {
+      main.appendChild(N.section({ id: "people", title: "People", count: N.total("people", ppl.length), key: "people",
+        body: h("ul", { class: "people" }, ppl.map(function (x) {
+          return h("li", null, h("span", null, x.title), h("span", { class: "role" }, [x.project_role || x.role, x.org ? N.name(x.org) : null].filter(Boolean).join(", ")), N.rid(x.id));
+        })) }));
+    }
+
+    var cs = L(d.commitments);
+    main.appendChild(N.section({ id: "commitments", title: "Open commitments", count: N.total("commitments", cs.length), key: "commitments",
+      body: N.items(cs.map(function (c) {
+        var late = c.status === "slipped" || (c.due && N.daysFromToday(c.due) < 0);
+        return N.item({ tone: late ? "danger" : (c.direction === "waiting_on" ? "muted" : "accent"), title: c.title, id: c.id,
+          meta: [N.label(c.direction), c.direction === "i_owe" ? (c.counterparty ? "For " + N.name(c.counterparty) : null) : (c.owner ? "From " + N.name(c.owner) : null)],
+          nextStep: c.next_step, aside: [h("span", null, N.due(c.due)), c.status === "slipped" ? N.status("slipped") : null] });
+      }), "No open commitments.") }));
+
+    var rs = L(d.risks);
+    main.appendChild(N.section({ id: "risks", title: "Risks and issues", count: N.total("risks", rs.length), key: "risks",
+      body: N.items(rs.map(function (r) {
+        return N.item({ tone: r.status === "active" ? "danger" : (r.status === "resolved" ? "ok" : "warn"), title: r.title, id: r.id, text: r.summary,
+          meta: [r.likelihood ? "Likelihood " + r.likelihood : null, r.impact ? "Impact " + r.impact : null, r.owner ? "Owner " + N.name(r.owner) : null],
+          extra: r.mitigation ? h("p", { class: "why" }, "Mitigation: ", N.rich(r.mitigation)) : null,
+          aside: [N.chip(r.status === "active" ? "Issue" : N.label(r.status), r.status === "active" ? "danger" : N.tone(r.status))] });
+      }), "No risks recorded.") }));
+
+    var ds = L(d.decisions);
+    main.appendChild(N.section({ id: "decisions", title: "Decisions", count: N.total("decisions", ds.length), key: "decisions",
+      body: N.items(ds.map(function (x) {
+        return N.item({ tone: x.status === "made" ? "accent" : "warn", title: x.title, id: x.id,
+          meta: [x.decided_on ? "Decided " + N.dateY(x.decided_on) : "Not decided yet"],
+          extra: h("p", { class: "why" }, "Why: ", x.rationale && x.rationale !== "unknown" ? N.rich(x.rationale) : "not recorded"),
+          aside: [x.status !== "made" ? N.status(x.status) : null] });
+      }), "No decisions recorded.") }));
+
+    var qs = L(d.questions), ideas = L(d.ideas);
+    if (qs.length || ideas.length) {
+      main.appendChild(N.section({ id: "open", title: "Questions and ideas", count: qs.length + ideas.length,
+        body: N.items(qs.map(function (q) {
+          return N.item({ tone: "accent", title: q.title, id: q.id, meta: [q.asked_on ? "Asked " + N.date(q.asked_on) : null], aside: [N.chip("Question")] });
+        }).concat(ideas.map(function (i) {
+          return N.item({ tone: "muted", title: i.title, id: i.id, aside: [N.chip("Idea: " + N.label(i.status).toLowerCase())] });
+        }))) }));
+    }
+
+    var ev = d.events || {};
+    var evs = L(ev.upcoming).concat(L(ev.recent));
+    if (evs.length) {
+      main.appendChild(N.section({ id: "events", title: "Meetings and milestones", count: evs.length,
+        body: N.items(evs.map(function (e) {
+          var future = N.daysFromToday(e.start) >= 0;
+          return N.item({ tone: future ? "accent" : "muted", title: e.title, id: e.id, meta: [N.label(e.kind), N.weekday(e.start) + (N.time(e.start) ? ", " + N.time(e.start) : "")],
+            text: L(e.outcomes).join("; "), aside: [future ? N.chip("Upcoming", "accent") : N.chip("Held")] });
+        })) }));
+    }
+
+    var ups = L(d.updates);
+    main.appendChild(N.section({ id: "history", title: "History", count: N.total("updates", ups.length), key: "updates", note: "Newest first, from the project's record.",
+      body: ups.length ? h("ol", { class: "timeline", reversed: true }, ups.map(function (u) {
+        return h("li", null, h("time", { datetime: u.date }, N.dateY(u.date)), h("p", null, N.rich(u.text)));
+      })) : N.empty("No history yet.") }));
+
+    var srcs = L(d.sources);
+    if (srcs.length) {
+      main.appendChild(N.section({ id: "sources", title: "Sources", count: N.total("sources", srcs.length), key: "sources", note: "Where this page's facts came from.",
+        body: N.items(srcs.map(function (s) {
+          return N.item({ title: s.title, id: s.id, meta: [N.label(s.kind), s.occurred_on ? N.dateY(s.occurred_on) : null] });
+        })) }));
+    }
+    return { title: p.title || "Project", subtitle: p.summary, stats: [[cs.length, "open commitments"], [rs.filter(function (r) { return r.status !== "resolved"; }).length, "open risks"], [ds.length, "decisions"]] };
+  });
+})();
+</script>
+</body>
+</html>

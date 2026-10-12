@@ -1,0 +1,11 @@
+dashboards:
+  daily-brief: { url: null, last_published: null }
+  work-board: { url: null, last_published: null }
+  goals: { url: null, last_published: null }
+  week-ahead: { url: null, last_published: null }
+  people: { url: null, last_published: null }
+  decisions-risks: { url: null, last_published: null }
+  control-center: { url: null, last_published: null }
+  about-you: { url: null, last_published: null }
+  nova-guide: { url: null, last_published: null }
+project_pages: {}

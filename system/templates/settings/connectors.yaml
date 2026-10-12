@@ -1,0 +1,4 @@
+# Connector map. Copied to user/settings/connectors.yaml by nova-setup; filled by nova-connectors (step 9).
+# PROTECTED (N6): changes only in chat with the user's explicit confirmation.
+# Entry format: system/schemas/settings.md; operations: system/connectors/README.md.
+connectors: []

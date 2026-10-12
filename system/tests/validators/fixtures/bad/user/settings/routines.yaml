@@ -1,0 +1,10 @@
+profile: turbo
+routines:
+  - name: nightly-cycle
+    schedule: "every night"
+    model: biggest
+    routine_id: null
+    jobs:
+      - ingest
+      - make-coffee
+      - { job: daily-brief, when: fortnightly, colour: blue }

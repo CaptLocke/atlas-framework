@@ -1,0 +1,7 @@
+# Setup progress (resume point). Copied to user/.state/setup.yaml when nova-setup starts.
+# Written only by Nova. Format: system/schemas/formats.md §1.
+started: null                    # YYYY-MM-DD, set when setup starts
+current_step: 5                  # steps 1-4 happen before the first Nova chat (accounts, repo, GitHub, Project)
+completed: [1, 2, 3, 4]
+skipped: []
+notes: {}

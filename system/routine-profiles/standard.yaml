@@ -1,0 +1,56 @@
+# Nova automation profile: Standard
+# Suggested for: Claude Max 5x.
+# Approx. runs: ~4.4 per day (5 on weekdays, 2 on weekend days, + weekly and upkeep).
+# A full morning cycle, ingest refreshes during the workday, and an evening cycle
+# that prepares tomorrow. The first chat of the day also runs a quick catch-up
+# ingest if the last ingest is over 3 hours old.
+# Schedules are cron in the user's time zone (user/settings/nova.yaml: timezone),
+# minutes off the hour to avoid delayed starts. One schedule per routine.
+# The daytime-ingest hours sit inside default work hours (08:00-18:00, Mon-Fri);
+# nova-setup adjusts them if rhythms.yaml work_hours differ.
+# nova-setup copies this file to user/settings/routines.yaml when the user picks it.
+profile: standard
+routines:
+  - name: morning-cycle
+    schedule: "7 5 * * *"           # daily 5:07
+    model: strongest
+    routine_id: null
+    jobs:
+      - ingest
+      - triage
+      - intelligence
+      - { job: email-drafts, when: weekdays }
+      - meeting-prep                 # next 24 hours
+      - monthly                      # acts only on/after the first business day of a month
+      - quarterly                    # acts only on/after the first business day of a quarter
+      - daily-brief                  # today's brief
+  - name: daytime-ingest
+    schedule: "7 10,13,16 * * 1-5"  # weekdays 10:07, 13:07, 16:07
+    model: strongest                 # triage needs judgment
+    routine_id: null
+    jobs:
+      - ingest
+      - { job: triage, mode: light }
+  - name: evening-cycle
+    schedule: "7 20 * * *"          # daily 20:07
+    model: strongest
+    routine_id: null
+    jobs:
+      - ingest
+      - triage
+      - { job: email-drafts, when: weekdays }
+      - { job: meeting-prep, target: tomorrow }
+  - name: weekly
+    schedule: "7 14 * * 5"          # Friday 14:07
+    model: strongest
+    routine_id: null
+    jobs:
+      - weekly-review
+      - status-updates
+  - name: upkeep
+    schedule: "7 3 * * 0"           # Sunday 3:07
+    model: strongest                 # mixes fast and strongest jobs
+    routine_id: null
+    jobs:
+      - maintenance
+      - update-check                 # acts only on Sundays

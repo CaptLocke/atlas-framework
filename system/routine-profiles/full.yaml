@@ -1,0 +1,79 @@
+# Nova automation profile: Full
+# Suggested for: Claude Max 20x (or a Team/Enterprise seat with a high allowance).
+# Approx. runs: ~23 per day (about 28 on weekdays, 10 on weekend days, + weekly).
+# Near-real-time: ingest hourly in work hours and every 4 hours outside them,
+# insights every 3 hours and triage + drafts every 2 hours in work hours.
+# Schedules are cron in the user's time zone (user/settings/nova.yaml: timezone),
+# minutes off the hour to avoid delayed starts. One schedule per routine.
+#
+# WORK HOURS: the hours below assume the default work hours in
+# user/settings/rhythms.yaml (Mon-Fri, 08:00-18:00). nova-setup (and nova-settings
+# when work hours change) rewrites the hour fields of ingest-work, intelligence,
+# triage-drafts, ingest-offhours, and ingest-weekend to match the user's hours.
+#
+# Off-hours ingest needs two routines because cron allows one schedule each:
+#   ingest-offhours  every day at 0:07, 4:07, 20:07 (nights, all week)
+#   ingest-weekend   weekends at 8:07, 12:07, 16:07 (daytime on Sat/Sun)
+# Together they give "every 4 hours outside work hours" with no overlap.
+# nova-setup copies this file to user/settings/routines.yaml when the user picks it.
+profile: full
+routines:
+  - name: ingest-work
+    schedule: "7 8-18 * * 1-5"      # weekdays hourly 8:07-18:07
+    model: fast                      # ingest only
+    routine_id: null
+    jobs:
+      - ingest
+  - name: ingest-offhours
+    schedule: "7 0,4,20 * * *"      # daily 0:07, 4:07, 20:07
+    model: fast                      # ingest only
+    routine_id: null
+    jobs:
+      - ingest
+  - name: ingest-weekend
+    schedule: "7 8,12,16 * * 0,6"   # Sat and Sun 8:07, 12:07, 16:07
+    model: fast                      # ingest only
+    routine_id: null
+    jobs:
+      - ingest
+  - name: intelligence
+    schedule: "37 8-18/3 * * 1-5"   # weekdays 8:37, 11:37, 14:37, 17:37
+    model: strongest
+    routine_id: null
+    jobs:
+      - intelligence
+  - name: triage-drafts
+    schedule: "22 8-18/2 * * 1-5"   # weekdays 8:22, 10:22, 12:22, 14:22, 16:22, 18:22
+    model: strongest
+    routine_id: null
+    jobs:
+      - triage
+      - email-drafts
+  - name: prep
+    schedule: "7 6,11 * * *"        # daily 6:07 and 11:07
+    model: strongest
+    routine_id: null
+    jobs:
+      - meeting-prep                 # next 24 hours
+  - name: morning-brief
+    schedule: "37 6 * * *"          # daily 6:37
+    model: strongest
+    routine_id: null
+    jobs:
+      - monthly                      # acts only on/after the first business day of a month
+      - quarterly                    # acts only on/after the first business day of a quarter
+      - daily-brief                  # today's brief
+  - name: weekly
+    schedule: "7 14 * * 5"          # Friday 14:07
+    model: strongest
+    routine_id: null
+    jobs:
+      - weekly-review
+      - status-updates
+  - name: upkeep
+    schedule: "7 3 * * *"           # daily 3:07
+    model: strongest                 # mixes fast and strongest jobs
+    routine_id: null
+    jobs:
+      - maintenance
+      - update-check                 # acts only on Sundays

@@ -1,0 +1,4 @@
+# Last-ingested position per source. Copied to user/.state/cursors.yaml by nova-setup.
+# Written only by Nova. Format: system/schemas/formats.md §1.
+# Key = <category>:<connector>[:<scope>]; a missing key means "first run" (use lookback_days_initial).
+cursors: {}

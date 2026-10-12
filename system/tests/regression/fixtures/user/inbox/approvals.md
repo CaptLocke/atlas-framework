@@ -1,0 +1,4 @@
+---
+type: inbox
+name: approvals
+---

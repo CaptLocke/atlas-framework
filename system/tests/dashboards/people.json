@@ -1,0 +1,39 @@
+{
+  "meta": {
+    "dashboard": "people",
+    "schema_version": 1,
+    "title": "People",
+    "generated_at": "2026-10-09T14:43:30-07:00",
+    "generated_by": "routine:weekly",
+    "as_of": "2026-10-09",
+    "timezone": "America/Los_Angeles",
+    "locale": "en-US",
+    "user_display_name": "Maya Chen",
+    "nova_version": "1.0.0",
+    "record_base_url": null,
+    "nav": [],
+    "notices": [],
+    "truncated": { "people": 23 }
+  },
+  "summary": { "quiet": 2, "i_owe": 4, "they_owe": 4 },
+  "people": [
+    { "id": "people/jordan-lee", "title": "Jordan Lee", "aliases": ["JL"], "role": "VP Product", "org": { "id": "organizations/acme", "title": "Acme" }, "relationship": "manager", "last_contact": "2026-10-08", "cadence": "weekly 1:1", "quiet": false, "quiet_reason": null,
+      "i_owe": [{ "id": "commitments/send-pricing-feedback", "title": "Send pricing feedback", "due": "2026-10-13" }, { "id": "commitments/draft-hiring-scorecard", "title": "Draft the PM hiring scorecard", "due": null }],
+      "they_owe": [], "next_touchpoint": { "id": "events/2026-10-13-one-on-one-jordan", "title": "1:1", "start": "2026-10-13T14:00:00-07:00" }, "insight": "Prefers numbers first; bring the per-seat comparison to the 1:1." },
+    { "id": "people/dana-ruiz", "title": "Dana Ruiz", "aliases": ["D. Ruiz"], "role": "Senior counsel", "org": { "id": "organizations/acme", "title": "Acme" }, "relationship": "stakeholder", "last_contact": "2026-09-30", "cadence": null, "quiet": true, "quiet_reason": "No reply in 9 days while she owes you the MSA review. She usually answers calls faster than email.",
+      "i_owe": [], "they_owe": [{ "id": "commitments/dana-msa-review", "title": "Review the enterprise MSA", "due": "2026-10-07" }], "next_touchpoint": { "id": "events/2026-10-15-enterprise-tier-review", "title": "Enterprise tier review", "start": "2026-10-15T13:00:00-07:00" }, "insight": null },
+    { "id": "people/sam-okafor", "title": "Sam Okafor", "aliases": [], "role": "Head of Operations", "org": { "id": "organizations/brightline-logistics", "title": "Brightline Logistics" }, "relationship": "customer", "last_contact": "2026-10-08", "cadence": "monthly", "quiet": false, "quiet_reason": null,
+      "i_owe": [{ "id": "commitments/intro-sam-to-support-lead", "title": "Introduce Sam to the new support lead", "due": "2026-10-20" }], "they_owe": [], "next_touchpoint": { "id": "events/2026-10-13-brightline-renewal-call", "title": "Renewal call", "start": "2026-10-13T10:00:00-07:00" }, "insight": "Raised the import bug twice; renewal decision due in November." },
+    { "id": "people/tomas-herrera", "title": "Tomás Herrera", "aliases": ["Tomas"], "role": "Engineering lead", "org": { "id": "organizations/acme", "title": "Acme" }, "relationship": "peer", "last_contact": "2026-10-09", "cadence": "daily standup", "quiet": false, "quiet_reason": null,
+      "i_owe": [], "they_owe": [{ "id": "commitments/tomas-import-estimate", "title": "Import fix estimate", "due": "2026-10-14" }], "next_touchpoint": null, "insight": null },
+    { "id": "people/priya-nair", "title": "Priya Nair", "aliases": [], "role": "Design lead", "org": { "id": "organizations/acme", "title": "Acme" }, "relationship": "peer", "last_contact": "2026-10-07", "cadence": "weekly", "quiet": false, "quiet_reason": null,
+      "i_owe": [{ "id": "commitments/review-q4-roadmap-draft", "title": "Review the Q4 roadmap draft", "due": "2026-10-15" }], "they_owe": [{ "id": "commitments/priya-design-review-slots", "title": "Design review slots", "due": null }], "next_touchpoint": null, "insight": null },
+    { "id": "people/rosa-alvarez", "title": "Rosa Alvarez", "aliases": [], "role": "Support director", "org": { "id": "organizations/acme", "title": "Acme" }, "relationship": "stakeholder", "last_contact": "2026-09-12", "cadence": "every two weeks", "quiet": true, "quiet_reason": "Four weeks since you last spoke, usually every two. You owe her the import fix timeline.",
+      "i_owe": [{ "id": "commitments/share-import-fix-timeline", "title": "Share import fix timeline", "due": "2026-10-10" }], "they_owe": [], "next_touchpoint": null, "insight": null },
+    { "id": "people/elena-petrova", "title": "Elena Petrova", "aliases": [], "role": "Account executive", "org": { "id": "organizations/acme", "title": "Acme" }, "relationship": "peer", "last_contact": "2026-10-08", "cadence": null, "quiet": false, "quiet_reason": null,
+      "i_owe": [], "they_owe": [{ "id": "commitments/elena-brightline-usage-report", "title": "Brightline usage report", "due": "2026-10-11" }], "next_touchpoint": null, "insight": null }
+  ],
+  "insights": [
+    { "id": "I-2026-10-09-01", "text": "Your stakeholder updates to Support have stopped since September.", "why": "Rosa usually hears from you every two weeks, and Support is fielding import complaints.", "suggested_action": "Send the import timeline with a short status note." }
+  ]
+}

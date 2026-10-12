@@ -1,0 +1,92 @@
+{
+  "meta": {
+    "dashboard": "control-center",
+    "schema_version": 1,
+    "title": "Control Center",
+    "generated_at": "2026-10-12T20:32:20-07:00",
+    "generated_by": "routine:nightly-cycle",
+    "as_of": "2026-10-12",
+    "timezone": "America/Los_Angeles",
+    "locale": "en-US",
+    "user_display_name": "Maya Chen",
+    "nova_version": "1.0.0",
+    "record_base_url": null,
+    "nav": [],
+    "notices": [],
+    "truncated": { "activity": 41 }
+  },
+  "status": { "overall": "attention", "headline": "One connection needs you; everything else ran on time." },
+  "profile": "lean",
+  "away": { "active": false, "start": null, "end": null },
+  "known_issues": [
+    { "id": "conn-outlook-auth", "severity": "high", "since": "2026-10-10", "summary": "Outlook connection expired", "fix": "In Claude, open Settings, then Connectors, and reconnect Outlook. Nova will catch up on mail automatically.", "status": "open" },
+    { "id": "drop-folder-large-file", "severity": "low", "since": "2026-10-11", "summary": "A 48 MB file in Nova Drop was too large to copy", "fix": "Nothing to do: Nova kept a pointer to it. Split it if you want the content read.", "status": "open" }
+  ],
+  "approvals": [
+    { "id": "A-2026-10-12-01", "action": "Send follow-up to Dana Ruiz", "why": "Her MSA review is six days overdue ([[commitments/dana-msa-review]]).", "prepared": "Outlook draft \"Contract review: quick check-in\"", "requested_by": "routine:nightly-cycle", "requested_on": "2026-10-12", "expires_on": "2026-10-26", "status": "pending" },
+    { "id": "A-2026-10-09-02", "action": "Put a focus block on your calendar Wednesday 9:30 to 11:30", "why": "Time to review the Q4 roadmap draft before it's due.", "prepared": null, "requested_by": "routine:weekly", "requested_on": "2026-10-09", "expires_on": "2026-10-23", "status": "pending" }
+  ],
+  "questions": [
+    { "id": "Q-2026-10-12-02", "kind": "profile", "text": "You shortened my last four drafts by about half. Should I default to shorter emails?", "proposed_change": "voice-personal.md: Keep emails under about 120 words", "asked": "2026-10-12" },
+    { "id": "Q-2026-10-11-01", "kind": "relationship", "text": "Is Elena Petrova on your team or in Sales?", "proposed_change": null, "asked": "2026-10-11" }
+  ],
+  "routines": [
+    { "name": "nightly-cycle", "title": "Nightly cycle", "schedule": "7 20 * * *", "schedule_text": "Every day at 8:07 PM", "model": "strongest", "enabled": true, "paused": false,
+      "jobs": ["ingest", "triage", "intelligence", "email-drafts (weekdays)", "meeting-prep (tomorrow)", "monthly", "quarterly", "daily-brief (tomorrow)"],
+      "last_run": { "started": "2026-10-12T20:07:03-07:00", "finished": "2026-10-12T20:31:40-07:00", "status": "partial", "report": "user/logs/runs/2026-10/nightly-cycle-20261012-2007.md", "summary": "Brief ready for Oct 13. Mail was skipped because Outlook is disconnected." },
+      "next_run": "2026-10-13T20:07:00-07:00" },
+    { "name": "weekly", "title": "Weekly review and status updates", "schedule": "7 14 * * 5", "schedule_text": "Fridays at 2:07 PM", "model": "strongest", "enabled": true, "paused": false,
+      "jobs": ["weekly-review", "status-updates"],
+      "last_run": { "started": "2026-10-09T14:07:00-07:00", "finished": "2026-10-09T14:44:10-07:00", "status": "ok", "report": "user/logs/runs/2026-10/weekly-20261009-1407.md", "summary": "Weekly review written; status update to Jordan drafted." },
+      "next_run": "2026-10-16T14:07:00-07:00" },
+    { "name": "upkeep", "title": "Upkeep", "schedule": "7 3 * * 0", "schedule_text": "Sundays at 3:07 AM", "model": "fast", "enabled": true, "paused": false,
+      "jobs": ["maintenance", "update-check"],
+      "last_run": { "started": "2026-10-11T03:07:00-07:00", "finished": "2026-10-11T03:19:12-07:00", "status": "ok", "report": "user/logs/runs/2026-10/upkeep-20261011-0307.md", "summary": "Indexes rebuilt; no update available." },
+      "next_run": "2026-10-18T03:07:00-07:00" }
+  ],
+  "jobs": [
+    { "name": "ingest", "title": "Bring in new information", "last_status": "partial", "last_success": "2026-10-09T20:09:12-07:00", "detail": "Calendar, Zoom and Nova Drop read; Outlook skipped", "paused": false },
+    { "name": "triage", "title": "Triage commitments", "last_status": "ok", "last_success": "2026-10-12T20:14:40-07:00", "detail": "22 reviewed, 2 closed, 1 slipped", "paused": false },
+    { "name": "intelligence", "title": "Look for insights", "last_status": "ok", "last_success": "2026-10-12T20:19:02-07:00", "detail": "3 new insights", "paused": false },
+    { "name": "email-drafts", "title": "Draft emails", "last_status": "ok", "last_success": "2026-10-12T20:22:30-07:00", "detail": "2 drafts", "paused": false },
+    { "name": "meeting-prep", "title": "Prepare for meetings", "last_status": "ok", "last_success": "2026-10-12T20:27:15-07:00", "detail": "2 prep notes", "paused": false },
+    { "name": "daily-brief", "title": "Daily brief", "last_status": "ok", "last_success": "2026-10-12T20:31:40-07:00", "detail": "Brief for Oct 13; 4 pages refreshed", "paused": false },
+    { "name": "weekly-review", "title": "Weekly review", "last_status": "ok", "last_success": "2026-10-09T14:31:00-07:00", "detail": null, "paused": false },
+    { "name": "status-updates", "title": "Status updates", "last_status": "ok", "last_success": "2026-10-09T14:44:10-07:00", "detail": null, "paused": false },
+    { "name": "monthly", "title": "Monthly check-in", "last_status": "early_exit", "last_success": "2026-10-01T20:30:00-07:00", "detail": "October done", "paused": false },
+    { "name": "quarterly", "title": "Quarterly check-in", "last_status": "early_exit", "last_success": "2026-10-01T20:31:00-07:00", "detail": "Q4 done", "paused": false },
+    { "name": "maintenance", "title": "Housekeeping", "last_status": "ok", "last_success": "2026-10-11T03:15:00-07:00", "detail": null, "paused": false },
+    { "name": "update-check", "title": "Check for updates", "last_status": "ok", "last_success": "2026-10-11T03:19:12-07:00", "detail": "Up to date", "paused": false }
+  ],
+  "connections": [
+    { "name": "Outlook", "connector": "outlook", "categories": ["mail", "calendar"], "status": "issue", "available_in_routines": true, "last_seen": "2026-10-09T20:07:00-07:00", "note": "Sign-in expired Oct 10. Reconnect it in Settings, then Connectors." },
+    { "name": "Zoom", "connector": "zoom", "categories": ["meetings"], "status": "ok", "available_in_routines": true, "last_seen": "2026-10-12T17:30:00-07:00", "note": null },
+    { "name": "Google Drive", "connector": "google-drive", "categories": ["files"], "status": "ok", "available_in_routines": true, "last_seen": "2026-10-12T20:07:00-07:00", "note": "Nova Drop and Nova Deliverables folders." },
+    { "name": "Slack", "connector": "slack", "categories": ["messaging"], "status": "unknown", "available_in_routines": null, "last_seen": null, "note": "Connected today; the next automation run will confirm it works unattended." },
+    { "name": "GitHub (your Nova repository)", "connector": "github", "categories": ["other"], "status": "ok", "available_in_routines": true, "last_seen": "2026-10-12T20:31:58-07:00", "note": null },
+    { "name": "CRM", "connector": null, "categories": ["crm"], "status": "fallback", "available_in_routines": null, "last_seen": null, "note": "No CRM connected. Forward deal updates to yourself with [nova] in the subject." }
+  ],
+  "runs": [
+    { "routine": "nightly-cycle", "started": "2026-10-12T20:07:03-07:00", "status": "partial", "duration_min": 25, "summary": "37 items in, 14 filed; 3 insights; 2 drafts; brief for Oct 13.", "report": "user/logs/runs/2026-10/nightly-cycle-20261012-2007.md" },
+    { "routine": "upkeep", "started": "2026-10-11T03:07:00-07:00", "status": "ok", "duration_min": 12, "summary": "Indexes rebuilt; 2 duplicate people merged; up to date.", "report": "user/logs/runs/2026-10/upkeep-20261011-0307.md" },
+    { "routine": "nightly-cycle", "started": "2026-10-11T20:07:00-07:00", "status": "partial", "duration_min": 19, "summary": "Mail skipped; brief for Oct 12.", "report": "user/logs/runs/2026-10/nightly-cycle-20261011-2007.md" }
+  ],
+  "activity": [
+    { "at": "2026-10-12T20:31:00-07:00", "actor": "routine:nightly-cycle", "action": "daily-brief", "summary": "Wrote the brief for Oct 13 and refreshed 4 pages" },
+    { "at": "2026-10-12T20:22:00-07:00", "actor": "routine:nightly-cycle", "action": "email-drafts", "summary": "Drafted 2 emails (not sent); queued 1 approval" },
+    { "at": "2026-10-12T20:14:00-07:00", "actor": "routine:nightly-cycle", "action": "triage", "summary": "Closed 2 commitments; marked [[commitments/share-import-fix-timeline]] as slipped" },
+    { "at": "2026-10-12T20:09:00-07:00", "actor": "routine:nightly-cycle", "action": "ingest", "summary": "Filed 14 sources, 3 commitments, 2 decisions" },
+    { "at": "2026-10-12T15:02:00-07:00", "actor": "chat", "action": "send_communication (approved)", "summary": "Sent hiring plan outline to Jordan Lee" },
+    { "at": "2026-10-12T09:40:00-07:00", "actor": "chat", "action": "capture", "summary": "Filed Morning Thoughts: 1 idea, 1 commitment" }
+  ],
+  "suspicious": [
+    { "at": "2026-10-12T20:10:00-07:00", "summary": "An email asked \"the assistant\" to forward the contract to an outside address. Ignored.", "source": "sources/2026-10-12-unknown-sender-contract" }
+  ],
+  "system": {
+    "installed_version": "1.0.0",
+    "data_version": 1,
+    "last_user_check": "2026-10-01",
+    "last_system_check": "2026-10-01",
+    "update": { "available": false, "latest_version": "1.0.0", "last_checked": "2026-10-11", "notes": null }
+  }
+}

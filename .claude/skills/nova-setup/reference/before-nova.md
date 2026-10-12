@@ -1,0 +1,59 @@
+---
+type: skill-reference
+skill: nova-setup
+---
+# Steps 1–4: before Nova runs, and getting unstuck
+
+Steps 1–4 are done by the user with the illustrated guide in `docs/setup/` (macOS and Windows). This file is what Nova says when the user is partly through them, comes back stuck, or needs the bootstrap stub again. Keep every answer to one action at a time; wait for "done" before giving the next.
+
+## The bootstrap stub
+Fill `<owner>/<repo>` from `git remote get-url origin` (e.g. `https://github.com/maya-chen/nova.git` → `maya-chen/nova`). Show it in a copy block, exactly:
+
+```
+This is my Nova. At the start of every conversation, attach the GitHub repo <owner>/<repo>, sync it, and follow its CLAUDE.md. Never ask me to commit, push, or merge. If you can't attach the repo, tell me and show me how to fix it.
+```
+
+Example for a fictional user: `This is my Nova. At the start of every conversation, attach the GitHub repo maya-chen/nova, sync it, and follow its CLAUDE.md. Never ask me to commit, push, or merge. If you can't attach the repo, tell me and show me how to fix it.`
+
+How to present it:
+> Here's the text for your Nova project. Copy all of it, then in Claude open your **Nova** project → **Project instructions** (sometimes shown as "Set custom instructions" or a pencil icon), paste it in, and save. After that, every new chat in that project starts as Nova.
+
+If the user doesn't know their repo name (they're in a chat without the repo attached, so this skill isn't running): the setup guide tells them to open github.com, click their profile picture → **Your repositories**; the name is shown as `their-username/repo-name`.
+
+## Quiet checks on the first run of setup
+| Step | Check | If it fails |
+|---|---|---|
+| 2. Repo | Repository is private (GitHub connector/API if available; otherwise ask "Does your repository page show a **Private** label next to its name?") | Walk them to **Settings → General → Danger Zone → Change visibility → Make private**. Explain: this keeps their work information visible only to them. N9. |
+| 3. Connect | Committing and pushing `setup.yaml` to `main` succeeds | See "Claude can't save to your repository" below |
+| 4. Project | You're in a project chat with the stub (ask once: "Did you paste the Nova text into your project's instructions?") | Give the stub again |
+
+## "I'm stuck at step N"
+Ask what they see on screen if the fix below doesn't match. Screens change; describe the goal ("we're looking for the button that creates a copy of Nova") as well as the click.
+
+### Step 1: accounts
+- **No GitHub account yet:** go to github.com → **Sign up**; the free plan is all Nova needs. Use any email; pick a username they don't mind seeing in links.
+- **Verification email didn't arrive:** check spam/promotions; the GitHub sign-up page has "Resend".
+- **Two-factor prompt:** recommended; an authenticator app or text message is fine. It protects their knowledge (R17).
+- **Which Claude plan?** Pro or higher. If they're on Free, Nova can't run automatic routines; they need to upgrade first.
+
+### Step 2: repository from the template
+- **Can't find "Use this template":** on the Nova page (link in the guide), it's the green button near the top right, next to "Code". On narrow windows it may be under a "…" menu. Choose **Create a new repository**.
+- **Naming:** any name works; suggest `nova`. Owner: their own account.
+- **Visibility:** choose **Private**. If they already made it public, change it (table above) before going further.
+- **"Include all branches":** leave unticked.
+- **Made it under an organization by mistake:** fine if it's private and they control it; otherwise create a new one under their own account and delete nothing yet; Nova will use whichever they name in the stub.
+
+### Step 3: connecting GitHub to Claude
+- Goal: Claude's GitHub app is installed with access to **only** their Nova repository.
+- In Claude: **Settings → Connectors** (or **Integrations**) → **GitHub** → **Connect**; on GitHub choose **Only select repositories** → pick their Nova repo → **Install / Authorize**.
+- **"Claude can't save to your repository"** (push fails): the app was installed with read-only access or on other repos. Fix: github.com → **Settings → Applications → Installed GitHub Apps → Claude → Configure** → ensure their Nova repo is selected and access includes writing contents. Then say "try again".
+- **Pushes land on a branch named `claude/...` instead of `main`:** there may be a setting to allow pushing to the default branch in the session or routine settings; turn it on. If they can't find it, note it (`setup.yaml: notes`) and continue; Nova merges those branches into `main` itself (contingency for platform check 9).
+- **Repository not in the list:** reopen the app configuration and add it.
+
+### Step 4: the Nova project
+- **Create the project:** in Claude, **Projects → New project** → name it **Nova** → paste the stub into the project instructions → save → start a new chat in it and say **Set up Nova**.
+- **The chat doesn't seem to know about Nova** (no greeting about setup, or it asks what Nova is): the repo wasn't attached. Check the stub is pasted exactly; in the chat, use the attach/add-repository option and pick their repo; or say "attach my Nova repository <owner>/<repo>". If it still fails, the GitHub connection (step 3) is the usual cause.
+- **Where do I type?** Any new chat inside the Nova project.
+
+## Resuming later
+Tell the user: "Any time, open a new chat in your Nova project and say *continue setup*. I'll pick up right here." Record where they stopped in `setup.yaml: notes`.

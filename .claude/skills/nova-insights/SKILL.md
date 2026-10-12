@@ -1,0 +1,74 @@
+---
+name: nova-insights
+description: "Notice what deserves attention\u2014risks, gaps (decisions without owners, unanswered questions), quiet people, cross-project patterns, contradictions, and opportunities\u2014score them against the user's goals, write them with reasoning and sources, and manage their lifecycle. Use when the intelligence job runs and in chat for \"what am I missing\", \"any risks I should know about\", \"what patterns do you see in\u2026\", \"connect the dots on\u2026\", \"dismiss that insight\", \"turn that into a risk\"."
+---
+# Insights
+
+## Purpose
+Surface the few things the user would want to know but hasn't noticed, each with a one-line reason and its sources, and keep volume matched to what the user actually finds useful.
+
+## When to use
+- **Job:** `intelligence` (after ingest and triage).
+- **Chat, exploration:** "What am I missing on Atlas?", "Any patterns in customer complaints this month?", "Connect the dots on churn", "What should I worry about this week?". For plain factual exploration ("what do we know about churn") `nova-recall` answers first and hands off here for patterns.
+- **Chat, lifecycle:** "That's not useful", "dismiss", "good catch, make that a risk", "tell me more about the import bug insight".
+- **Other skills:** `nova-brief` (marks shown insights `seen`), `nova-recall` (marks presented insights `seen`), `nova-review` (engagement for the automation review).
+
+## Inputs
+- Changes since `jobs.yaml: intelligence.last_success` (records updated, sources captured, activity log).
+- `_index/hot.md`; active goals; open risks, questions, decisions (`proposed`), projects; people records (`last_contact`, `cadence`, relationship).
+- `user/inbox/insights.md` (existing insights and their status histories, for novelty and engagement).
+- `rhythms.yaml: insights` (`brief_max`, `engagement: adaptive | fixed`); `health.yaml` engagement summary if present.
+- Detection and scoring guide: `reference/insight-kinds.md`.
+
+## Procedure
+
+### A. Generate (job or "what am I missing")
+1. **Paused/away.** If `intelligence` is paused, stop. During away, generate normally (they wait for the catch-up brief) but don't nudge.
+2. **Early exit.** Nothing changed since the last run and no date-driven checks are due (quiet people, approaching targets) → exit (`early_exit`).
+3. **Look** across the changed records and their neighborhoods (`system/rules/retrieval.md` L3) for each kind in `reference/insight-kinds.md`: risks, gaps, quiet people, patterns, connections, contradictions, opportunities, goal drift.
+4. **Ground** every candidate in at least one record or source; write the reasoning in one line. Drop candidates you can't cite.
+5. **Score** each: `score = goal_relevance × urgency × novelty` (each 0–1; rubric in the reference). Novelty is low when `insights.md` already holds the same insight (same links and gist) in the last 30 days in any status; a dismissed insight returns only if something material changed (say what).
+6. **Adapt volume** (if `engagement: adaptive`): compute engagement per kind from status histories over the last 60 days (acted, dismissed, expired-unseen). Lower the kind's effective score by its dismiss/expire rate and raise it by its act rate; never suppress `risk` kinds with high impact entirely. With `fixed`, skip this step.
+7. **Keep** candidates with adjusted score ≥ 0.4, at most ~10 per run (most runs produce 0–5). The brief later shows the top `brief_max`.
+8. **Write** each to `user/inbox/insights.md` (format `system/schemas/formats.md` §3; newest first): ID `I-YYYY-MM-DD-NN`, `new`, score; Insight, Why it matters, Sources, Links, Suggested action, Status history; plus a `- **Kind:** <kind>` line for engagement tracking.
+9. **Create records when warranted** (through `nova-capture`, `provenance: inferred`, sources = the evidence):
+   - A pattern or concern likely to cause harm → `risk` (`status: potential`, or `active` if already happening), with likelihood/impact.
+   - An important gap that needs an answer → `question`.
+   - An opportunity worth keeping → `idea` (`status: seed`).
+   Link the insight entry to the new record.
+10. **Project insight.** If an insight is the most important thing about an active project, update that project's `insight` (and `next_step` if the suggested action is better than triage's), with an Updates line.
+11. **Expire** entries `new` for more than 30 days (never seen) → `expired`.
+12. **Commit and log**; run-report row: candidates, kept, records created, by kind.
+
+### B. Exploration (chat)
+1. Retrieve broadly around the subject (recall procedure D), then look for the kinds above within that scope, plus timelines, recurring causes, and who keeps appearing.
+2. Answer as analysis: 2–5 findings, each with reasoning and citations, then what is uncertain and what data would settle it.
+3. Offer to keep anything useful: as an insight entry (status `acted` if the user takes it up), a risk/question/idea record, or a topic for the theme.
+
+### C. Lifecycle
+| Event | Status change |
+|---|---|
+| Shown in a published brief, in chat, or opened from a dashboard discussion | `new` → `seen` |
+| User acts on it, asks to turn it into a record, or the suggested action happens (evidence) | → `acted` |
+| User says it's wrong, not useful, or dismisses it | → `dismissed` (ask briefly why only if it helps tune: "wrong" vs "not now") |
+| `new` for 30 days without being seen | → `expired` |
+Append to Status history with the date (and "(brief)" / "(chat)" where useful). Never delete entries. "Stop suggesting X" from the user is a behavior preference: confirm and record it via `nova-settings` (`behavior_settings`), and treat that kind as suppressed meanwhile.
+
+## Outputs
+- `user/inbox/insights.md` entries and status updates.
+- New `risk`, `question`, `idea` records (via `nova-capture`); project `insight`/`next_step` updates.
+- Activity-log line; run-report row. In chat: findings with reasoning and citations.
+
+## Guardrails
+- Autonomy classes: `read`, `records_write` (insights, inferred records, project insight fields); `behavior_settings` for volume preferences (propose). See `system/rules/governance.md`.
+- Every insight has a reason and at least one source; inferences are labeled `inferred` and phrased as such ("likely", "may").
+- No insights about the user's personality, health, or protected attributes; nothing from `notes_private` is ever surfaced; pointer-only content can't support an insight beyond "a confidential item exists".
+- Quiet-people insights concern working relationships only, phrased neutrally ("no contact in 5 weeks; your cadence is biweekly").
+- Insights never trigger actions; suggested actions are offers.
+- Few where attention is scarce: the brief shows at most `brief_max`.
+
+## Done when
+- Each new entry has kind, score, reason, sources, links, a suggested action, and status `new`.
+- No duplicate of an insight from the last 30 days was written unless materially changed (and says what changed).
+- Records created from insights link back to their evidence.
+- Statuses reflect what the user saw, acted on, or dismissed; stale `new` entries are expired.
