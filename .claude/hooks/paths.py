@@ -17,9 +17,10 @@ What it enforces (system/rules/governance.md, system/schemas/formats.md s2):
   .nova-tmp/update.lock exists and is unexpired (any context).
 - N6: writes to user/settings/{governance,data-rules,connectors}.yaml are
   blocked in routines; in chats they need an approval record with action
-  governance_settings for this exact tool, consumed on use. Creating a
-  governance file that does not exist yet (nova-setup copying the defaults)
-  is allowed in chats without a record.
+  governance_settings for this exact tool whose target is the file's
+  repo-relative path, consumed on use. Creating a governance file that does
+  not exist yet (nova-setup copying the defaults) is allowed in any context
+  without a record; a leftover record naming that path is deleted.
 - Approval records and purge locks can't be created in routines (they are
   chat-only by definition); nothing writes inside .git/.
 Bash detection is pragmatic (see shell.py for what is and isn't detected).
@@ -27,9 +28,29 @@ Bash detection is pragmatic (see shell.py for what is and isn't detected).
 import os
 import sys
 
+# --- fail-safe entry: any error, even an import failure, ends in exit 0 or 2
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import context as nova  # noqa: E402
-import shell  # noqa: E402
+try:
+    from failsafe import fail_safe
+except BaseException as _fe:  # failsafe.py itself is broken: block
+    def fail_safe(hook, exc, raw=None, _fe=_fe):
+        try:
+            sys.stderr.write("Nova guard (%s): hook files are damaged (%s; %s); blocked.\n" % (hook, exc, _fe))
+        finally:
+            os._exit(2)
+
+
+def _raw_stdin():
+    mod = sys.modules.get("context")
+    return getattr(getattr(mod, "STATE", None), "raw", None)
+
+
+sys.excepthook = lambda _t, _e, _tb: fail_safe("paths", _e, _raw_stdin())
+try:
+    import context as nova  # noqa: E402
+    import shell  # noqa: E402
+except BaseException as _imp:  # includes SystemExit raised while importing
+    fail_safe("paths", _imp, _raw_stdin())
 
 FILE_TOOLS = {"Write", "Edit", "MultiEdit", "NotebookEdit"}
 
@@ -104,22 +125,27 @@ def check(rels, tool_name, proj, ctx):
                           "is" if len(set(owned_hits)) == 1 else "are", why))
 
     if gov_hits:
-        nova.STATE.locked = True
         files = ", ".join(sorted(set(gov_hits)))
+        affected = [g for g in nova.GOVERNANCE_FILES
+                    if any(nova.overlaps(h if h != "." else "", g) for h in gov_hits)]
+        existing = [g for g in affected if os.path.exists(os.path.join(proj, g))]
+        if not existing:
+            # First creation (nova-setup copying the defaults) is allowed in any
+            # context; never leave a record behind that names these paths.
+            nova.discard_stale_approval(proj, set(affected))
+            nova.allow()
+        nova.STATE.locked = True
         if ctx != "chat":
             nova.block("%s can only change in a chat, after the user explicitly confirms (N6). This is a "
                        "routine (NOVA_CONTEXT is not 'chat'): queue the proposed change in "
                        "user/inbox/approvals.md instead." % files)
-        affected = [g for g in nova.GOVERNANCE_FILES
-                    if any(nova.overlaps(h if h != "." else "", g) for h in gov_hits)]
-        if not any(os.path.exists(os.path.join(proj, g)) for g in affected):
-            nova.allow()  # first creation (nova-setup copies the defaults in a chat)
-        rec, why = nova.approval_matches(proj, tool_name, {"governance_settings"})
+        rec, why = nova.approval_matches(proj, tool_name, {"governance_settings"}, targets=set(existing))
         if rec is None:
             nova.block("%s is protected (N6) and needs an approval record: %s. Locked action: state the "
                        "exact change, get the user's explicit yes, then write .nova-tmp/approval.json with "
-                       "action 'governance_settings' and tool '%s' (system/schemas/formats.md section 2; "
-                       "system/rules/governance.md) and retry." % (files, why, tool_name))
+                       "action 'governance_settings', tool '%s' and target '%s' (system/schemas/formats.md "
+                       "section 2; system/rules/governance.md) and retry."
+                       % (files, why, tool_name, existing[0]))
         nova.consume_approval(proj)
     nova.allow()
 
@@ -144,4 +170,11 @@ def main(payload, proj, ctx):
 
 
 if __name__ == "__main__":
-    nova.run("paths", main)
+    try:
+        nova.run("paths", main)
+    except SystemExit as _exit:
+        if _exit.code in (0, 2, None):
+            raise
+        fail_safe("paths", RuntimeError("unexpected exit code %r" % (_exit.code,)), _raw_stdin())
+    except BaseException as _err:
+        fail_safe("paths", _err, _raw_stdin())

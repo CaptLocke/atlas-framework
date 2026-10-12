@@ -4,7 +4,7 @@ From here on, you just talk to Nova. It asks questions, explains what it's doing
 
 **Time:** 30 to 45 minutes in total, in one sitting or several.
 
-![Screenshot: Nova's first reply (welcome and the permission question)](images/nova-welcome.png)
+![Nova's first reply: a welcome, and a question asking you to confirm you're permitted to store work information](images/nova-welcome.png)
 
 ---
 
@@ -33,7 +33,7 @@ Nova only reads your tools. It **never sends, shares, or deletes anything withou
 
 ## 5. Choosing your automations
 
-Nova suggests an **automation profile** that fits your Claude plan (Lean, Standard, or Full) and explains what will run and when. You choose, and you can adjust times or turn things off. Nova then sets up the automations so they run in the cloud, even when your computer is off. If Claude can't create them directly, Nova shows you exactly what to copy and paste.
+Nova suggests an **automation profile** that fits your Claude plan (Lean, Standard, or Full) and explains what will run and when. You choose, and you can adjust times or turn things off. Nova then sets up the automations so they run in the cloud, even when your computer is off. They get their own second environment, called something like **Nova automations**, with `NOVA_CONTEXT` set to `routine`. That tells Nova's safety checks that nobody is there to approve things, so automations can only prepare drafts and queue requests for you, never send, share, or delete. Nova creates it with you, the same way as the chat environment. If Claude can't create them directly, Nova shows you exactly what to copy and paste.
 
 ## 6. Your dashboards
 

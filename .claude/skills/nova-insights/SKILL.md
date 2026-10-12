@@ -17,7 +17,7 @@ Surface the few things the user would want to know but hasn't noticed, each with
 - Changes since `jobs.yaml: intelligence.last_success` (records updated, sources captured, activity log).
 - `_index/hot.md`; active goals; open risks, questions, decisions (`proposed`), projects; people records (`last_contact`, `cadence`, relationship).
 - `user/inbox/insights.md` (existing insights and their status histories, for novelty and engagement).
-- `rhythms.yaml: insights` (`brief_max`, `engagement: adaptive | fixed`); `health.yaml` engagement summary if present.
+- `rhythms.yaml: insights` (`brief_max`, `engagement: adaptive | fixed`, `suppressed_kinds`); `health.yaml` engagement summary if present.
 - Detection and scoring guide: `reference/insight-kinds.md`.
 
 ## Procedure
@@ -25,7 +25,7 @@ Surface the few things the user would want to know but hasn't noticed, each with
 ### A. Generate (job or "what am I missing")
 1. **Paused/away.** If `intelligence` is paused, stop. During away, generate normally (they wait for the catch-up brief) but don't nudge.
 2. **Early exit.** Nothing changed since the last run and no date-driven checks are due (quiet people, approaching targets) → exit (`early_exit`).
-3. **Look** across the changed records and their neighborhoods (`system/rules/retrieval.md` L3) for each kind in `reference/insight-kinds.md`: risks, gaps, quiet people, patterns, connections, contradictions, opportunities, goal drift.
+3. **Look** across the changed records and their neighborhoods (`system/rules/retrieval.md` L3) for each kind in `reference/insight-kinds.md`, skipping every kind listed in `rhythms.yaml: insights.suppressed_kinds`: risks, gaps, quiet people, patterns, connections, contradictions, opportunities, goal drift.
 4. **Ground** every candidate in at least one record or source; write the reasoning in one line. Drop candidates you can't cite.
 5. **Score** each: `score = goal_relevance × urgency × novelty` (each 0–1; rubric in the reference). Novelty is low when `insights.md` already holds the same insight (same links and gist) in the last 30 days in any status; a dismissed insight returns only if something material changed (say what).
 6. **Adapt volume** (if `engagement: adaptive`): compute engagement per kind from status histories over the last 60 days (acted, dismissed, expired-unseen). Lower the kind's effective score by its dismiss/expire rate and raise it by its act rate; never suppress `risk` kinds with high impact entirely. With `fixed`, skip this step.
@@ -52,7 +52,7 @@ Surface the few things the user would want to know but hasn't noticed, each with
 | User acts on it, asks to turn it into a record, or the suggested action happens (evidence) | → `acted` |
 | User says it's wrong, not useful, or dismisses it | → `dismissed` (ask briefly why only if it helps tune: "wrong" vs "not now") |
 | `new` for 30 days without being seen | → `expired` |
-Append to Status history with the date (and "(brief)" / "(chat)" where useful). Never delete entries. "Stop suggesting X" from the user is a behavior preference: confirm and record it via `nova-settings` (`behavior_settings`), and treat that kind as suppressed meanwhile.
+Append to Status history with the date (and "(brief)" / "(chat)" where useful). Never delete entries. "Stop suggesting X" from the user: map X to an insight kind (e.g. "stop telling me who's gone quiet" → `quiet_person`), confirm in one line, and ask `nova-settings` to add it to `rhythms.yaml: insights.suppressed_kinds` (`behavior_settings`). Mark matching `new` entries `dismissed`. "Start suggesting X again" removes it the same way.
 
 ## Outputs
 - `user/inbox/insights.md` entries and status updates.
@@ -65,7 +65,7 @@ Append to Status history with the date (and "(brief)" / "(chat)" where useful). 
 - No insights about the user's personality, health, or protected attributes; nothing from `notes_private` is ever surfaced; pointer-only content can't support an insight beyond "a confidential item exists".
 - Quiet-people insights concern working relationships only, phrased neutrally ("no contact in 5 weeks; your cadence is biweekly").
 - Insights never trigger actions; suggested actions are offers.
-- Few where attention is scarce: the brief shows at most `brief_max`.
+- Few where attention is scarce: the brief shows at most `brief_max`. Kinds in `suppressed_kinds` are never generated, in jobs or in unprompted chat suggestions (an explicit user question about that kind is still answered).
 
 ## Done when
 - Each new entry has kind, score, reason, sources, links, a suggested action, and status `new`.

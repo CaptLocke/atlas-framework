@@ -1,6 +1,6 @@
 ---
 name: nova-away
-description: "Turn away mode on, off, or schedule it in advance, and pause or resume individual automations or moments, so Nova keeps filing everything quietly while the user is out and has a catch-up brief ready when they return. Use for \"I'm out from the 12th to the 20th\", \"I'm on vacation next week\", \"I'm back\", \"cancel my away\", \"pause the weekly review until November\", \"stop evening thoughts for now\", \"resume status updates\", \"what's paused?\"."
+description: "Turn away mode on, off, or schedule it in advance, and pause or resume individual automations or moments, so Nova keeps filing everything quietly while the user is out and has a catch-up brief ready when they return. Use for \"I'm out from the 12th to the 20th\", \"I'm on vacation next week\", \"I'm back\", \"cancel my away\", \"pause the weekly review until November\", \"resume status updates\", \"what's paused?\"."
 ---
 # Away mode and pausing
 
@@ -11,7 +11,7 @@ Make being away effortless: one sentence turns it on (now or scheduled), it ends
 - Away: "I'm out Monday to Friday", "I'm on leave from Nov 3 to Nov 28", "heads-down week, no briefs", "I'm back", "end away mode early", "move my away to start Tuesday", "am I set as away?".
 - Pausing: "pause email drafts", "stop the weekly review until the 1st", "turn off status updates for a while", "resume evening thoughts", "what have I paused?".
 - Kernel §2.6: at session start, if away is active, tell the user once and offer to end it.
-- Jobs don't call this skill; they read `rhythms.yaml` themselves (`system/jobs/<job>.md`, "Away and paused"). `daily-brief` clears away on the first run on or after `end` and produces the catch-up brief.
+- Jobs don't call this skill; they read `rhythms.yaml` themselves (`system/jobs/<job>.md`, "Away and paused"). **Catch-up rule (authoritative):** the catch-up brief is written by the first `daily-brief` run whose target date is after `away.end` (or after the user ends an open-ended away); that run also clears away.
 
 ## Inputs
 - The request (dates in the user's words, resolved in `nova.yaml: timezone`).
@@ -20,16 +20,16 @@ Make being away effortless: one sentence turns it on (now or scheduled), it ends
 
 ## Procedure
 ### Set or schedule away
-1. Resolve dates: `start` (default today) and `end` = the **last day away** (inclusive). "Next week" = Monday–Friday of next week. If no end is given, ask once ("When are you back?"); if they don't know, set `end: null` (open-ended) and say Nova will ask in each chat.
-2. Confirm in one line with what changes: "You're away Nov 12–20. I'll keep filing everything; I'll pause briefs, email drafts, status updates, meeting prep, and nudges, and hold approvals. A catch-up brief will be ready on Friday Nov 21. Sound right?" (The request is the confirmation for `behavior_settings`; confirm only if dates were inferred.)
-3. Write `rhythms.yaml: away` = `{ start, end, set_on: <today> }`. A future `start` schedules it; jobs treat away as active only when `start ≤ today ≤ end`.
+1. Resolve dates: `start` (default today) and `end` = the **last day away** (inclusive). "Next week" = Monday–Friday of next week. If no end is given, ask once ("When are you back?"); if they don't know, set `end: null`: open-ended away that lasts until the user says "I'm back". Say so, and that Nova will mention it once per chat.
+2. Confirm in one line with what changes: "You're away Nov 12–20. I'll keep filing everything; I'll pause briefs, email drafts, status updates, meeting prep, and nudges, and hold approvals. Your catch-up brief will be the first brief for a day after Nov 20 (Friday Nov 21). Sound right?" (The request is the confirmation for `behavior_settings`; confirm only if dates were inferred.)
+3. Write `rhythms.yaml: away` = `{ start, end, set_on: <today> }`. A future `start` schedules it; jobs treat away as active when `start ≤ today` and (`end` is null or `today ≤ end`).
 4. If an away block already exists and overlaps, replace it after saying so; if it's in the past, overwrite.
 5. Commit and log (`chat · behavior_settings · away 2026-11-12 → 2026-11-20 · commit <sha>`); republish the Control Center and Daily Brief so they show the away banner (`nova-dashboards`).
-6. Mention once: Nova doesn't write out-of-office replies; set one in their email tool if they want one. Pending approvals stay pending (they expire after 14 days; offer to handle urgent ones now).
+6. Mention once: Nova doesn't write out-of-office replies; set one in their email tool if they want one. Pending approvals and new insights don't expire while away (maintenance pauses expiry); the catch-up brief lists whatever is still pending. Offer to handle urgent approvals now.
 
 ### End away (early return or "I'm back")
-1. Set `away` fields to `null`.
-2. Produce the catch-up brief now with `nova-brief` (catch-up mode) at `user/work/briefs/YYYY-MM-DD-catch-up.md`: what happened, what changed, what needs them first, what can wait; readable in five minutes. Skip if one was already produced for this return.
+1. Set `away.end` to yesterday (keep `start`, so the catch-up covers the whole window). This applies to open-ended away too.
+2. Produce today's brief now with `nova-brief`. Under the catch-up rule it is the first daily-brief run whose target date is after `away.end`, so it is the catch-up brief (`user/work/briefs/YYYY-MM-DD-catch-up.md`: what happened, what changed, what needs them first, what can wait; readable in five minutes) and it clears away. Skip if a catch-up brief already exists for this return.
 3. Commit, log, republish dashboards. Offer to go through approvals and held items.
 
 ### Pause or resume a job or moment

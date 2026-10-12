@@ -12,7 +12,7 @@ Deliver new versions without ever risking the user's data. Only the paths in `sy
 - "Update Nova", "check for updates", "is there a new version?", "what's new in Nova?"
 - "Update Nova from this zip" with a release zip attached.
 - "Go back to the previous version", "undo the update".
-- `nova-health` finds system files modified outside an update → **repair** (reinstall the installed version's owned paths).
+- `nova-health` (in chat) finds system files modified outside an update → **repair** (reinstall the installed version's owned paths).
 - A release changes `manifest.models` → update routine models.
 
 ## Inputs
@@ -38,7 +38,7 @@ Follow these steps exactly (tactical §13.2); commands in `reference/procedure.m
 6. **Migrations:** compare `nova.yaml: data_version` with the new `manifest.data_version`. Run each pending `system/migrations/NNNN-*.md` with `from_data_version` ≥ the user's, in order, following its Transformation and Validation sections; after each, set `nova.yaml: data_version` to its `to_data_version` and commit (`Nova-Records:` lists changed paths). If user data_version is already ≥ the manifest's (after a rollback with additive migrations), run nothing.
 7. **Validate:** `python3 system/tools/validate.py --all` (schemas, links, settings, registry, extensions). Any error caused by the update is a failure (step 10).
 8. **Questions:** for migrations with `needs_user_input: true`, write each question to `user/inbox/questions.md` (kind `migration`) with the safe default that applies until answered. In chat, ask them now, one at a time.
-9. **Finish:** set `nova.yaml: installed_version`; release the lock (delete `.nova-tmp/update.lock`); commit and push; log (`update · Nova 1.0.0 → 1.1.0 · 2 migrations · commit <sha>`). Then:
+9. **Finish:** set `nova.yaml: installed_version` and remove `installed_from_commit` if present (from now on health checks compare against the `v<version>` tag); release the lock (delete `.nova-tmp/update.lock`); commit and push; log (`update · Nova 1.0.0 → 1.1.0 · 2 migrations · commit <sha>`). Then:
    - **What's new:** take the release's `CHANGELOG.md` "What's new" section; make sure the Nova Guide shows it (republish `nova-guide` with `nova-dashboards`). The next Daily Brief includes a one-paragraph "Nova was updated to 1.1: …" note, found from the `update` activity-log line since the previous brief (`nova-brief`); in chat, also say it now.
    - **Models:** if `manifest.models` changed, update each platform routine whose role maps to a changed model (procedure in `.claude/skills/nova-setup/reference/automations.md` §4). In a routine or if this session can't edit routines, queue a question with the copy-paste instructions.
    - **Extensions:** run the extension compatibility part of the `nova-health` system check (`requires_nova`, changed overridden components) and report conflicts.
@@ -54,8 +54,8 @@ Follow these steps exactly (tactical §13.2); commands in `reference/procedure.m
 3. Version must be newer than installed (or equal for a repair the user asked for). Classify and decide as in §A (the user's request counts as the yes in chat for `propose`).
 4. Apply with §B, using the extracted tree as the release. Remove the zip and extracted files afterwards.
 
-### E. Repair modified system files
-Called by `nova-health` when owned paths differ from the installed release outside update commits: fetch the installed version's tag, then §B steps 1–5 and 7 with `version_from = version_to = installed`, no migrations. Log `update · repaired system files (1.0.0)`.
+### E. Repair modified system files (chat only)
+Called by `nova-health` in a chat when owned paths differ from the baseline outside update commits (a routine only records a known issue). First show what changed and offer to keep intentional edits as a user extension (`nova-extend`, `overrides: <component>`). Then restore from the baseline: the installed version's tag `v<installed_version>`, or `nova.yaml: installed_from_commit` if no real update has happened yet or the tag doesn't exist upstream, following §B steps 1–5 and 7 with `version_from = version_to = installed`, no migrations. Log `update · repaired system files (1.0.0)`.
 
 ## Outputs
 - Owned paths replaced; migrated user files; `nova.yaml` `installed_version`, `data_version`; `user/.state/jobs.yaml` (`update-check`).

@@ -23,12 +23,12 @@ If `ingest` has not succeeded in the last 24 hours and is not earlier in this ro
 - Records and sources created or updated since `jobs.yaml: intelligence.last_success` (from `updated` dates and `hot.md`).
 - Active goals, open risks, open questions, active projects (indexes first, then records as needed per `system/rules/retrieval.md`).
 - `user/inbox/insights.md` (to avoid repeats) and engagement signals in `user/.state/health.yaml` (acted/dismissed by kind).
-- `rhythms.yaml: insights` (`brief_max`, `engagement`).
+- `rhythms.yaml: insights` (`brief_max`, `engagement`, `suppressed_kinds`).
 
 ## Steps
 1. Gather the change set. If it is empty, exit early.
 2. Invoke `nova-insights` (routine mode) over the change set and its L3 neighborhood: look for risks, gaps (missing owners, dates, decisions without rationale), patterns (repeated themes across sources), connections (same issue in two projects), and opportunities.
-3. Score each candidate 0–1 (relevance to goals × urgency × novelty). Drop candidates that repeat an existing `new`, `seen`, or recently `dismissed` insight. Adapt volume to engagement when `engagement: adaptive`.
+3. Score each candidate 0–1 (relevance to goals × urgency × novelty). Drop candidates of a kind listed in `suppressed_kinds` and candidates that repeat an existing `new`, `seen`, or recently `dismissed` insight. Adapt volume to engagement when `engagement: adaptive`.
 4. Append surviving insights to `user/inbox/insights.md` (newest first, format `system/schemas/formats.md` §3) with Why, Sources, Links, and a Suggested action.
 5. Where an insight is a concrete risk, open question, or idea, create or update the record (`records_write`) and link it from the insight.
 6. Commit.

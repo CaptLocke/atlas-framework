@@ -2,23 +2,25 @@
 
 Formats: `system/schemas/formats.md` §3 (drop) and §7 (outputs); `system/schemas/source.md`.
 
+`user/inbox/drop/` is git-ignored: a file there is a working copy, never committed. Only what the write path produces (Source, extracted records, and a library copy when allowed) enters the repo.
+
 ## Chat attachments
 1. **Save** the attached file to `user/inbox/drop/<original-name>` (keep the name; add `-2` if it exists).
-2. **Check data rules** before reading in depth: if the file's apparent category is `ignore`, stop, clear it from `drop/`, and tell the user it wasn't kept and why.
+2. **Check data rules** before reading in depth: if the file's apparent category is `ignore`, stop, delete it from `drop/`, and tell the user it wasn't kept and why.
 3. **Read** it (text, tables, slides). For large files, read the structure first, then the relevant parts.
 4. **Source:** `sources/YYYY-MM-DD-<file-slug>`, `kind: file`, `origin_uri: "chat upload: <name>"`, `retention` per data rules, summary and key excerpts in the body (if retention allows).
 5. **Extract** records through the write path (SKILL §1). If the user attached it for a task ("turn this into a one-pager"), do the extraction quietly and get on with the task.
 6. **Place the file:**
-   - Size ≤ 10 MB and handling `full` or `summary`, and the file is worth keeping as reference (contracts, brand guides, org charts, strategy docs, samples) → `git mv` it to `user/library/<YYYY>/<file-name>`; set `file_pointer: user/library/<YYYY>/<file-name>`.
-   - Otherwise → keep only the Source (pointer/summary) and clear the file from `drop/`; set `file_pointer: "not kept (size or data rules); original with the user"`.
-7. **Commit** and tell the user in one line what was filed and where the file went.
+   - Handling `full`, size ≤ 10 MB, and the file is worth keeping as reference (contracts, brand guides, org charts, strategy docs, samples) → `mv` it (plain move; `drop/` is untracked) to `user/library/<YYYY>/<file-name>`; set `file_pointer: user/library/<YYYY>/<file-name>`.
+   - Anything else (`summary`, `pointer`, larger than 10 MB, or not worth keeping) → the whole file is never kept: the Source holds only what its handling allows; delete the file from `drop/`; set `file_pointer: "not kept (size or data rules); original with the user"`.
+7. **Commit** the Source, records, and any library copy (never anything from `drop/`), then tell the user in one line what was filed and where the file went.
 
-Clearing a processed file from `user/inbox/drop/` is inbox housekeeping described in `formats.md` §3 (the Source keeps the pointer). It never applies to files anywhere else.
+Deleting a processed file from `user/inbox/drop/` is inbox housekeeping (`formats.md` §3): the folder is untracked and the Source keeps the pointer. It never applies to files anywhere else.
 
 ## Nova Drop folder (ingest)
 1. Read `nova.yaml: drop_folder` (connector, `folder_id`). If `connector: null`, skip (fallback: chat attachments).
 2. `files.list_folder` on the drop folder since cursor `files:<connector>:drop`; ignore the `Processed` subfolder.
-3. For each file: `files.read_file`, then the same steps as chat attachments 2–5. Do not copy the binary into the repo unless the library rule above allows it (then download and save to `user/library/`).
+3. For each file: `files.read_file`, then the same steps as chat attachments 2–5. Do not copy the binary into the repo unless the library rule above allows it (handling `full`, ≤ 10 MB; then download and save to `user/library/`).
 4. Source `origin_uri` / `file_pointer` = the file's link in the drive (after the move).
 5. `files.move` the file into `Nova Drop/Processed` (`drop_folder_housekeeping`, normally `auto`; if set to `propose`, queue an approvals entry in routines and leave the file, relying on the cursor to avoid re-processing).
 6. Commit; advance the cursor; count files in the run report.

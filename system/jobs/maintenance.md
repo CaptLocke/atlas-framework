@@ -15,7 +15,7 @@ Keep knowledge tidy with no user effort: rebuild all indexes, repair links, merg
 - Modifiers: `when`. `mode: light` = expiry and sweeps only, no full index rebuild.
 
 ## Away and paused
-Runs normally during away. Paused per `system/jobs/README.md`.
+Runs normally during away, except that expiry is paused (step 6). Paused per `system/jobs/README.md`.
 
 ## Readiness check
 None beyond sync. Maintenance does not read connectors.
@@ -30,7 +30,7 @@ None beyond sync. Maintenance does not read connectors.
 3. **Link repair:** fix links that point to a superseded record (point to the successor), to a renamed alias, or to a missing path when the intended target is unambiguous. Ambiguous broken links become a `questions.md` entry.
 4. **Obvious dedupes** (`merge_supersede`): same email (people), same domain (organizations), identical commitments from the same source. Follow the merge procedure in `system/rules/knowledge.md`. Anything less than obvious becomes a question, never a merge.
 5. **Journal sweep:** journal days with sections not in `processed` are left for the next `ingest` (check that the `journal` cursor will not skip them; move it back if it would). **Inbox sweep:** files lingering in `user/inbox/drop/` and open questions answered in a later chat are noted for ingest or closed.
-6. **Expiry:** approvals `pending` for more than 14 days → `expired`; insights `new` for more than 30 days → `expired`. Add a dated status-history line; never delete entries.
+6. **Expiry:** approvals `pending` for more than 14 days → `expired`; insights `new` for more than 30 days → `expired`. Add a dated status-history line; never delete entries. Away pauses the clock: while away is active (`system/jobs/README.md`), expire nothing; afterwards, extend each item's limit by the number of away days that fell after it was created (count from `away.start` to `away.end`, or to today for an open-ended away). If away has already been cleared, use the away period recorded in the catch-up brief (`user/work/briefs/*-catch-up.md`).
 7. Commit (one commit for indexes, one for record fixes, one for inbox).
 
 ## Outputs

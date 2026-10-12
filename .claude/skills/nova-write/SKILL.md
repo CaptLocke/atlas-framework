@@ -10,7 +10,7 @@ Output that starts at finished quality: correct, specific, in the user's voice (
 ## When to use
 - **Chat:** "Draft a reply to Priya", "Write my pricing feedback for Jordan", "Turn this into a one-pager", "Make a 5-slide deck for the board", "Put the vendor scores in a spreadsheet", "Send it" (approval path), "Make it shorter".
 - **Job:** `email-drafts` (replies the user owes, follow-ups for overdue `waiting_on`): `reference/email-drafts.md`.
-- **Other skills:** `nova-triage` (follow-up drafts), `nova-status-update` (email draft of an update), `nova-prep` (agenda drafts), `nova-report-issue` (issue email).
+- **Other skills:** `nova-triage` (in chat: follow-up drafts for overdue `waiting_on`, through the email-drafts procedure and its `follow-up draft created <date>` marker; in routines the `email-drafts` job does it), `nova-status-update` (email draft of an update), `nova-prep` (agenda drafts), `nova-report-issue` (issue email).
 
 ## Inputs
 - Retrieval (`system/rules/retrieval.md`, through L3): the recipient, the thread, related commitments, decisions, prior messages; L4 for exact wording of what's being replied to.

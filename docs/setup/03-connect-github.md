@@ -12,19 +12,19 @@ Claude needs permission to open your Nova. You'll give that permission to **only
 
 2. **Choose your personal account** (your username) from the list.
 
-   ![Screenshot: The Claude GitHub App "select account" screen](images/github-app-select-target.png)
+   ![GitHub asking where to install the Claude app, with your personal account listed](images/github-app-select-target.png)
 
 3. **Choose Only select repositories.** Don't choose "All repositories".
 
 4. **Click the Select repositories drop-down and pick your Nova** (for example `nova`).
 
-   ![Screenshot: "Only select repositories" chosen, with the nova repo picked](images/github-app-only-select.png)
+   ![Repository access set to "Only select repositories", with your nova repository picked](images/github-app-only-select.png)
 
 5. **Click Install** (or **Install & Authorize**). If GitHub asks for your password or a code from your phone, enter it.
 
 6. **If you're taken to a Claude page that asks you to sign in or authorize**, sign in with the same account you use in the Claude app and click **Authorize**.
 
-   ![Screenshot: The confirmation page after installing](images/github-app-installed.png)
+   ![The confirmation page after installing the Claude app on GitHub](images/github-app-installed.png)
 
 > **If it looks different:**
 > - **The page says Claude is already installed** and shows a **Configure** button: click **Configure**, scroll to **Repository access**, choose **Only select repositories**, make sure your Nova is in the list, and click **Save**.
@@ -41,11 +41,11 @@ Claude needs permission to open your Nova. You'll give that permission to **only
 2. **Open Settings.**
    - **Mac:** click **Claude** in the menu bar at the very top of the screen, then **Settings…** (or press **⌘ ,**). You can also click your name or initials at the bottom-left of the Claude window and choose **Settings**.
 
-     ![Screenshot: Claude desktop app on macOS: where Settings is](images/claude-settings-mac.png)
+     ![The Claude app on a Mac, with the Claude menu open and Settings highlighted](images/claude-settings-mac.png)
 
    - **Windows:** click your name or initials at the bottom-left of the Claude window and choose **Settings** (or press **Ctrl ,**).
 
-     ![Screenshot: Claude desktop app on Windows: where Settings is](images/claude-settings-windows.png)
+     ![The Claude app on Windows, with the menu at your name open and Settings highlighted](images/claude-settings-windows.png)
 
 3. **Click Connectors** in the Settings list.
 
@@ -53,7 +53,7 @@ Claude needs permission to open your Nova. You'll give that permission to **only
    - If it says **Connected** (or shows a tick), you're done.
    - If it shows **Connect**, click it and follow the prompts. Sign in to GitHub if asked, and click **Authorize**.
 
-   ![Screenshot: Settings, Connectors, with GitHub shown as connected](images/claude-connectors-github.png)
+   ![Claude Settings, Connectors page, with GitHub shown as connected](images/claude-connectors-github.png)
 
 > **If it looks different:**
 > - **No "Connectors" in Settings?** Look for **Integrations** or **Connected apps** instead; it's the same thing.

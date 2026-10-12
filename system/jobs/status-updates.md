@@ -11,13 +11,15 @@ Draft the week's status updates for the user's manager and stakeholders, in the 
 
 ## Runs when
 - All profiles: `weekly` routine, after `weekly-review`.
-- Audiences and day come from `rhythms.yaml: moments.status_updates` (`on`, `audiences`, `day`). `nova-settings` places this job in a routine that runs on `day`; the job itself drafts at most once per audience per ISO week.
+- Audiences and day come from `rhythms.yaml: moments.status_updates` (`enabled`, `audiences`, `day`, default `fri`). The job checks `day` itself: on any other weekday (run date in the user's time zone) it exits early, leaves `jobs.yaml: status-updates.last_status` unchanged, and notes "not the status day (<day>)" in the run report. It drafts at most once per audience per ISO week.
 - Modifiers: `when`. `target` and `mode` are ignored.
 
 ## Away and paused
-During away (run date within `away`), exit with `skipped_away`. If `status_updates.on` is false, the moment is paused, or the job is paused, exit with `skipped_paused`.
+During away (run date within away, `system/jobs/README.md`), exit with `skipped_away`. If the moment or the job is paused, exit with `skipped_paused`.
 
 ## Readiness check
+- `moments.status_updates.enabled` must be true; if false, exit early (`early_exit`) with a run-report note.
+- Today must be `moments.status_updates.day` (see Runs when).
 - `audiences` must list at least one person. If empty, exit early and add one `setup` question ("Who should I draft weekly updates for?") to `user/inbox/questions.md` if none is open.
 - If `weekly-review` hasn't run this week, proceed from records and note it.
 
@@ -38,7 +40,7 @@ During away (run date within `away`), exit with `skipped_away`. If `status_updat
 - Email drafts in the user's mail tool (never sent) and approval entries.
 
 ## Early exit
-No audiences, or every audience already has an up-to-date draft this week → `early_exit`.
+Not enabled, not the status day (`last_status` unchanged), no audiences, or every audience already has an up-to-date draft this week → early exit.
 
 ## Guardrails
 - Never send (`send_communication` locked). Never post to messaging tools; a post is also a send.

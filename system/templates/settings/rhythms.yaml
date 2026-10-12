@@ -1,4 +1,4 @@
-# Rhythms, triggers, away mode. Copied to user/settings/rhythms.yaml by nova-setup (step 10).
+# Rhythms, triggers, away mode. Copied to user/settings/rhythms.yaml by nova-setup at step 5; adjusted at step 10.
 # Format: system/schemas/settings.md. Triggers: system/triggers.md.
 work_hours: { days: [mon, tue, wed, thu, fri], start: "08:00", end: "18:00" }
 moments:

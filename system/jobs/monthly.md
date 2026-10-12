@@ -32,7 +32,7 @@ Period check above. If `maintenance` hasn't succeeded in the last 8 days, run it
 4. **Automation Review** (`nova-review`): what each job did last month (from run reports), what was used or ignored (insight and draft engagement), cost signals (items and duration), suggested schedule or profile changes. Compute the success indicators into `health.yaml: indicators` (`period: <P−1>`).
 5. Write `user/work/reports/<P−1>.md` (`type: report`, `date`, `sources`) with one section per moment run.
 6. Queue questions (profile proposals, ambiguous merges, records to archive, suggested routine changes) in `user/inbox/questions.md`; proposed settings changes go to `user/inbox/approvals.md` as `behavior_settings`.
-7. Republish dashboards whose contract lists `monthly` (typically Goals, Control Center, About You). Set `jobs.yaml: monthly.period_done` to P. Commit.
+7. Republish every dashboard whose contract (`system/dashboards/*.contract.md`) lists `monthly` in `republished_by`. Set `jobs.yaml: monthly.period_done` to P. Commit.
 
 ## Outputs
 - `user/work/reports/YYYY-MM.md` (the reviewed month).

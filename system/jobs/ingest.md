@@ -15,11 +15,12 @@ Bring in everything new since the last run (connected sources, the Nova Drop fol
 - Modifiers: `when` only. `target` and `mode` are ignored.
 
 ## Away and paused
-Runs normally during away (nothing is lost while the user is out). If `paused` contains `{ job: ingest }`, exit with `skipped_paused`. Per `system/jobs/README.md`.
+Runs normally during away (nothing is lost while the user is out). Questions it raises (ambiguous merges, unclear relationships, new-project questions, vague commitments) are still written to `user/inbox/questions.md` but are not surfaced until the catch-up brief. If `paused` contains `{ job: ingest }`, exit with `skipped_paused`. Per `system/jobs/README.md`.
 
 ## Readiness check
 - `user/settings/nova.yaml: attestation` must be present. If it is missing, ingest nothing: exit with `early_exit`, add a high-severity known issue to `user/.state/health.yaml` ("Nova can't bring in information until you confirm permission to store work data"), and stop.
 - If `attestation.reconfirm_due` is past, keep ingesting and add one `setup` question to `user/inbox/questions.md` asking the user to re-confirm (only if no open one exists).
+- `user/settings/governance.yaml` and `user/settings/data-rules.yaml` must exist. If either is missing, ingest nothing: exit with `early_exit` and add a high-severity known issue to `user/.state/health.yaml` naming the missing file and the fix ("say 'set up my data rules' / 'review my autonomy settings' in a Nova chat").
 - `user/settings/sources.yaml` and `connectors.yaml` must exist. Categories with no connector are skipped and noted.
 
 ## Inputs

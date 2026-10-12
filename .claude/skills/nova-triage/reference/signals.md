@@ -39,6 +39,7 @@ Never rank purely by due date. Top priorities in the brief are the top 3–5 by 
 Bad examples (too generic): "Follow up soon." "This is important." "Keep an eye on it."
 
 ## Follow-up draft guidance (overdue waiting_on)
+Drafted only by the `nova-write` email-drafts procedure (`nova-write/reference/email-drafts.md`), guarded by the commitment's Updates marker `follow-up draft created <date>`. Triage adds the approvals entry (once per commitment) and hands off.
 - Short (3–5 sentences), friendly, specific: what, when it was due, what the user needs, an easy next step.
 - Voice per `system/rules/writing.md` (internal → personal; customer → house unless the relationship is personal and informal).
 - Reply in the original thread when there is one.
@@ -47,7 +48,7 @@ Bad examples (too generic): "Follow up soon." "This is important." "Keep an eye 
 ## A-2026-10-12-01 · pending
 - **Action:** send_communication: send follow-up to Dana Ruiz
 - **Why:** Dana's MSA redlines are 6 days overdue ([[commitments/dana-msa-redlines]])
-- **Prepared:** Outlook draft "MSA redlines: quick check-in" (id AAMk…)
+- **Prepared:** Outlook draft "MSA redlines: quick check-in" (id AAMk…), filled in by email-drafts; until then "follow-up draft to be created by email-drafts"
 - **Requested by:** routine:nightly-cycle · 2026-10-12
 - **Status history:** pending 2026-10-12
 ```

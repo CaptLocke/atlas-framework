@@ -76,8 +76,8 @@ class HookTestCase(unittest.TestCase):
     def write_json(self, rel, data):
         self.write(rel, json.dumps(data))
 
-    def approval(self, tool, action, minutes=2, **extra):
-        rec = {"action": action, "tool": tool, "target": "test target",
+    def approval(self, tool, action, minutes=2, target="test target", **extra):
+        rec = {"action": action, "tool": tool, "target": target,
                "user_confirmation": "yes, do it", "created": iso(0), "expires": iso(minutes)}
         rec.update(extra)
         self.write_json(".nova-tmp/approval.json", rec)

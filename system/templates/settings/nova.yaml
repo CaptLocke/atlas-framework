@@ -1,4 +1,4 @@
-# Nova core settings. Copied to user/settings/nova.yaml by nova-setup (step 5).
+# Nova core settings. Copied to user/settings/nova.yaml by nova-setup at step 5 (attestation).
 # Format: system/schemas/settings.md. Placeholders (null) are filled during setup.
 user_display_name: null                # e.g. "Maya Chen"
 timezone: null                         # IANA, e.g. America/Los_Angeles

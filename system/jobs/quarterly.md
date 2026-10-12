@@ -30,7 +30,7 @@ Period check above. If `monthly` is due in the same run and hasn't run yet, it r
 2. **Role Refresh** (`nova-review`): prepare short questions about changes to role, manager, team, priorities, tools, and company context in `user/inbox/questions.md` (`profile` kind). Add a `setup` question asking the user to re-confirm the attestation; the re-confirmation itself, and a new `reconfirm_due`, are recorded only in chat.
 3. **Performance Review** (`nova-review`): a ready-made record of Q−1 accomplishments, decisions, and impact with citations, for self-reviews and 1:1s.
 4. Write `user/work/reports/<Q−1>.md` (reset + role refresh, `type: report`) and `user/work/reports/<Q−1>-performance.md` (`type: performance`), each with `date` and `sources`.
-5. Republish dashboards whose contract lists `quarterly` (typically Goals, About You). Set `jobs.yaml: quarterly.period_done` to Q. Commit.
+5. Republish every dashboard whose contract (`system/dashboards/*.contract.md`) lists `quarterly` in `republished_by`. Set `jobs.yaml: quarterly.period_done` to Q. Commit.
 
 ## Outputs
 - `user/work/reports/YYYY-Qn.md` and `user/work/reports/YYYY-Qn-performance.md` (the reviewed quarter).

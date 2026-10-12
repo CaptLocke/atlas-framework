@@ -30,7 +30,7 @@ If `triage` has not succeeded in the last 24 hours, run `triage` in `light` mode
 2. Invoke `nova-review` (weekly mode) to write the review (`type: review`, `date`, `sources`), every item citing its record.
 3. Accomplishments: append dated entries for real outcomes this week to the relevant goals' `accomplishments` and to `user/work/accomplishments.md` (running list), skipping entries already present (`records_write`).
 4. Suggested priorities for next week go in the review; any change to commitments' priority is left to `triage`.
-5. Invoke `nova-dashboards` to republish dashboards whose contract lists `weekly-review` (typically Goals, Week Ahead, People).
+5. Invoke `nova-dashboards` to republish every dashboard whose contract (`system/dashboards/*.contract.md`) lists `weekly-review` in `republished_by`.
 6. Commit.
 
 ## Outputs

@@ -7,7 +7,7 @@ skill: nova-setup
 Steps 1–4 are done by the user with the illustrated guide in `docs/setup/` (macOS and Windows). This file is what Nova says when the user is partly through them, comes back stuck, or needs the bootstrap stub again. Keep every answer to one action at a time; wait for "done" before giving the next.
 
 ## The bootstrap stub
-Use the canonical text in `system/templates/bootstrap-stub.md` (the setup guide uses the same text). Replace `YOUR-USERNAME/YOUR-REPO` with the user's repository, taken from `git remote get-url origin` (e.g. `https://github.com/maya-chen/nova.git` → `maya-chen/nova`), and show it in a copy block exactly as written there.
+The canonical text is `system/templates/bootstrap-stub.md`; use it exactly, replacing `YOUR-USERNAME/YOUR-REPO` with the user's `<owner>/<repo>` from `git remote get-url origin` (e.g. `https://github.com/maya-chen/nova.git` → `maya-chen/nova`). Show it in one copy block. Never paraphrase it here or anywhere else.
 
 How to present it:
 > Here's the text for your Nova project. Copy all of it, then in Claude open your **Nova** project → **Project instructions** (sometimes shown as "Set custom instructions" or a pencil icon), paste it in, and save. After that, every new chat in that project starts as Nova.
@@ -41,7 +41,7 @@ Ask what they see on screen if the fix below doesn't match. Screens change; desc
 - Goal: Claude's GitHub app is installed with access to **only** their Nova repository.
 - In Claude: **Settings → Connectors** (or **Integrations**) → **GitHub** → **Connect**; on GitHub choose **Only select repositories** → pick their Nova repo → **Install / Authorize**.
 - **"Claude can't save to your repository"** (push fails): the app was installed with read-only access or on other repos. Fix: github.com → **Settings → Applications → Installed GitHub Apps → Claude → Configure** → ensure their Nova repo is selected and access includes writing contents. Then say "try again".
-- **Pushes land on a branch named `claude/...` instead of `main`:** there may be a setting to allow pushing to the default branch in the session or routine settings; turn it on. If they can't find it, note it (`setup.yaml: notes`) and continue; Nova merges those branches into `main` itself (contingency for platform check 9).
+- **Pushes land on a branch named `claude/...` instead of `main`:** there may be a setting to allow pushing to the default branch in the session or routine settings; turn it on. If they can't find it, note it (`setup.yaml: notes`) and continue. If routines can't push to main, Nova will tell you; this is checked during testing.
 - **Repository not in the list:** reopen the app configuration and add it.
 
 ### Step 4: the Nova project

@@ -15,6 +15,15 @@ Claude answers like an ordinary chat, or says it can't open your Nova.
 2. Say **"Start Nova"**.
 3. If Claude says it can't attach your repository, follow **Reconnect GitHub** below.
 
+## Nova says the chat environment isn't set up
+Nova's chats need their own environment, so Nova's safety checks know you're there to approve things. Without it, Nova won't do anything that needs your approval.
+1. In the Claude desktop app, open **Settings** and look for **Environments** (or **Cloud environments**, possibly under a **Claude Code** section).
+2. Make sure there's an environment named **Nova chat** with the variable **`NOVA_CONTEXT`** set to **`chat`**.
+3. Make sure the Nova Project's chats use **Nova chat**.
+4. Start a new chat in the Nova Project and say **"Start Nova"**.
+
+If you can't find these settings, just ask Nova and it will walk you through them. Your automations use a separate environment with `NOVA_CONTEXT` set to `routine`. Leave that one as it is.
+
 ## Reconnect GitHub
 Nova lives in your private GitHub repository. If Claude loses access, chats can't open your Nova and automations stop running.
 1. In the Claude desktop app, open **Settings → Connectors**. If **GitHub** shows **Connect**, click it and authorize.

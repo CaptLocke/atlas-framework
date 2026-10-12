@@ -17,6 +17,12 @@ What it enforces (system/rules/governance.md, system/rules/sync.md):
   a commit that is already pushed. Sole exception: a valid
   .nova-tmp/purge.lock in a chat (the nova-memory purge procedure).
   Also blocks changing the `origin` remote (it decides the upstream bypass).
+- N8: deleting tags (`git tag -d`, push of :refs/tags/...) only under a valid
+  update lock or a purge lock in a chat; deleting branches on origin
+  (`git push --delete`, `git push origin :branch`, `git branch -d/-D` of a
+  branch that exists on origin) only under a purge lock in a chat.
+- N9: blocks `gh repo edit --visibility` and non-GET `gh api` calls touching
+  collaborators, invitations or visibility.
 - N12: `git commit` must carry `Nova-Actor:` and `Nova-Reason:` trailers
   (parsed from -m/--message, -F/--file and heredocs). When the message source
   can't be determined (editor, -C/-c, -F - without a heredoc) the commit is
@@ -30,9 +36,29 @@ import re
 import subprocess
 import sys
 
+# --- fail-safe entry: any error, even an import failure, ends in exit 0 or 2
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import context as nova  # noqa: E402
-import shell  # noqa: E402
+try:
+    from failsafe import fail_safe
+except BaseException as _fe:  # failsafe.py itself is broken: block
+    def fail_safe(hook, exc, raw=None, _fe=_fe):
+        try:
+            sys.stderr.write("Nova guard (%s): hook files are damaged (%s; %s); blocked.\n" % (hook, exc, _fe))
+        finally:
+            os._exit(2)
+
+
+def _raw_stdin():
+    mod = sys.modules.get("context")
+    return getattr(getattr(mod, "STATE", None), "raw", None)
+
+
+sys.excepthook = lambda _t, _e, _tb: fail_safe("git", _e, _raw_stdin())
+try:
+    import context as nova  # noqa: E402
+    import shell  # noqa: E402
+except BaseException as _imp:  # includes SystemExit raised while importing
+    fail_safe("git", _imp, _raw_stdin())
 
 # Patterns are assembled from parts so this file never contains a literal
 # secret-shaped string (it is committed into every Nova repo).
@@ -97,6 +123,51 @@ def rewrite_reason(sub, args, cwd):
         return "git gc --prune"
     elif sub == "commit" and "--amend" in args and head_is_pushed(cwd):
         return "commit --amend of a commit that is already pushed"
+    return None
+
+
+def ref_deletion(sub, args, cwd):
+    """(description, 'tag'|'branch') for commands that delete tags or
+    branches that exist on origin, else None."""
+    if sub == "tag" and any(a in ("-d", "--delete") or (re.match(r"^-[a-zA-Z]+$", a) and "d" in a)
+                            for a in args):
+        return "git tag -d (deleting tags)", "tag"
+    if sub == "push":
+        pos = positional(args)
+        refs = pos[1:] if len(pos) > 1 else pos
+        deleting = any(a in ("-d", "--delete") for a in args)
+        colon = [r for r in refs if r.startswith(":")]
+        if deleting or colon:
+            targets = colon or refs
+            kind = "tag" if targets and all("refs/tags/" in r or "--tags" in args for r in targets) else "branch"
+            return "git push deleting %s" % (" ".join(targets) or "refs"), kind
+    if sub == "branch":
+        deleting = any(a in ("-D", "-d", "--delete") or (re.match(r"^-[a-zA-Z]+$", a) and a[1:].lower().count("d"))
+                       for a in args)
+        if deleting:
+            names = [p for p in positional(args)]
+            on_origin = [n for n in names if git(["rev-parse", "--verify", "-q", "refs/remotes/origin/%s" % n],
+                                                 cwd)[0] == 0]
+            if on_origin:
+                return "git branch delete of %s (exists on origin)" % ", ".join(on_origin), "branch"
+    return None
+
+
+def gh_change(argv):
+    """Description when a gh command changes repo visibility or collaborators
+    (N9), else None."""
+    args = argv[1:]
+    if len(args) >= 2 and args[0] == "repo" and args[1] == "edit":
+        if any(a == "--visibility" or a.startswith("--visibility=") for a in args):
+            return "gh repo edit --visibility"
+    if args and args[0] == "api":
+        text = " ".join(args).lower()
+        if "collaborator" in text or "visibility" in text or "/invitations" in text:
+            method = shell.option_value(argv, "-X", "--method") or "GET"
+            writes = any(a in ("-f", "-F", "--field", "--raw-field", "--input") or
+                         a.startswith(("--field=", "--raw-field=", "--input=", "-f", "-F")) for a in args)
+            if method.upper() != "GET" or writes:
+                return "gh api changing collaborators or visibility"
     return None
 
 
@@ -208,8 +279,11 @@ def check_trailers(message, ctx):
         nova.block("Nova-Actor %r is not valid; use chat, routine:<routine-name>, update or setup "
                    "(system/rules/sync.md)." % value)
     if ctx != "chat" and value == "chat":
-        nova.block("this session is a routine (NOVA_CONTEXT is not 'chat') but the commit says "
-                   "'Nova-Actor: chat'. Use 'Nova-Actor: routine:<routine-name>' (or update/setup).")
+        nova.block("the commit says 'Nova-Actor: chat' but NOVA_CONTEXT is not 'chat' in this session. "
+                   "If this IS a chat with the user, the Nova chat environment isn't set up (NOVA_CONTEXT "
+                   "missing): tell the user and follow nova-setup's 'Nova chat environment' step to fix it; "
+                   "until then, setup work can commit with 'Nova-Actor: setup'. If this is a scheduled "
+                   "routine, use 'Nova-Actor: routine:<routine-name>'.")
 
 
 # ------------------------------------------------------------------ N10
@@ -262,7 +336,7 @@ def scan_for_secrets(cwd, include_worktree):
 # ------------------------------------------------------------------ main
 def main(payload, proj, ctx):
     command = (payload.get("tool_input") or {}).get("command")
-    if not isinstance(command, str) or "git" not in command:
+    if not isinstance(command, str) or not re.search(r"\bgit\b|\bgh\b", command):
         nova.allow()
     base = nova.session_cwd(payload, proj)
     bodies = shell.heredoc_bodies(command)
@@ -270,6 +344,13 @@ def main(payload, proj, ctx):
     staged_by_command = False
     warnings = []
     for seg in shell.segments(command, base):
+        if seg.name == "gh":
+            change = gh_change(seg.argv)
+            if change:
+                nova.STATE.locked = True
+                nova.block("%s is not allowed: the Nova repo stays private and no collaborators are added "
+                           "(N9). If the user wants this, they change it themselves in GitHub." % change)
+            continue
         if seg.name != "git":
             continue
         sub, args = shell.git_subcommand(seg.argv)
@@ -283,6 +364,19 @@ def main(payload, proj, ctx):
             nova.STATE.locked = True
             nova.block("%s is not allowed: the origin remote identifies this Nova repo and must not "
                        "change (N8/N9). If the repo moved, tell the user; nova-health can help." % identity)
+        deletion = ref_deletion(sub, args, cwd)
+        if deletion:
+            what, kind = deletion
+            ok_update, _ = nova.valid_lock(proj, "update")
+            ok_purge, _ = nova.valid_lock(proj, "purge")
+            ok_purge = ok_purge and ctx == "chat"
+            allowed = (kind == "tag" and (ok_update or ok_purge)) or (kind == "branch" and ok_purge)
+            if not allowed:
+                nova.STATE.locked = True
+                nova.block("%s deletes history references, which Nova never does (N8)%s." % (
+                    what, ": tags may only be removed by nova-update (update lock) or a confirmed purge "
+                          "(purge lock, chat)" if kind == "tag" else
+                    ": only a user-confirmed purge in a chat may delete branches that exist on origin"))
         reason = rewrite_reason(sub, args, cwd)
         if reason:
             if purge_ok is None:
@@ -319,4 +413,11 @@ def main(payload, proj, ctx):
 
 
 if __name__ == "__main__":
-    nova.run("git", main)
+    try:
+        nova.run("git", main)
+    except SystemExit as _exit:
+        if _exit.code in (0, 2, None):
+            raise
+        fail_safe("git", RuntimeError("unexpected exit code %r" % (_exit.code,)), _raw_stdin())
+    except BaseException as _err:
+        fail_safe("git", _err, _raw_stdin())

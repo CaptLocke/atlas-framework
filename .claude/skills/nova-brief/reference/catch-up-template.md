@@ -16,7 +16,7 @@ sources: ["..."]
 You were out 7 working days. 212 items came in; 41 were worth filing. Here is what matters.
 
 ## Needs you first
-- **Approve:** follow-up to Dana Ruiz about MSA redlines (now 14 days late; approval expires 10/28). A-2026-10-14-02 · [[commitments/dana-msa-redlines]]
+- **Approve:** follow-up to Dana Ruiz about MSA redlines (now 14 days late; approval pending since 10/14). A-2026-10-14-02 · [[commitments/dana-msa-redlines]]
 - **Overdue (yours):** SOC report to Acme, due 10/14. [[commitments/maya-soc-report-acme]]
 - **This week:** board pre-read due Thu 10/22. [[commitments/maya-board-preread]]
 - **New project needs an owner and date:** "Partner portal" came up in 3 threads. [[projects/partner-portal]]
@@ -41,6 +41,6 @@ You were out 7 working days. 212 items came in; 41 were worth filing. Here is wh
 
 ## Rules of thumb
 - "Needs you first" ≤ 6 items; everything else is grouped.
-- Flag approvals that expire within 3 days (the 14-day expiry still applies during away).
+- List every approval still pending from the away period; expiry is paused during away, so none lapsed while the user was out.
 - Don't list routine meetings that happened without outcomes.
 - End with an offer: "Want to start with the Dana follow-up?"

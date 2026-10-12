@@ -17,7 +17,7 @@ Keep the user's commitments honest and their priorities clear: nothing promised 
 - Recent evidence since `jobs.yaml: triage.last_success` (chat: since the last triage or 7 days): Sources captured in that window, `mail.list_sent`, `tasks.list_recent` (completed tasks), the user's statements in chat and journal.
 - Active goals and projects; `people-map.md` (who is the manager, key stakeholders).
 - Calendar for the next 14 days (events records) for due-date context.
-- `rhythms.yaml: triggers` (`deadline_approaching.days`, on/off), `away`, `paused`; `user/.state/triggers.yaml`.
+- `rhythms.yaml: triggers` (each trigger's `enabled`, `deadline_approaching.days`), `away` (`end: null` = open-ended), `paused`; `user/.state/triggers.yaml`.
 - Signal guide: `reference/signals.md`.
 
 ## Procedure
@@ -35,19 +35,26 @@ Keep the user's commitments honest and their priorities clear: nothing promised 
    - In `mode: light`: only for commitments created or changed in this run.
 9. **Triggers** (`system/triggers.md`; check and record in `user/.state/triggers.yaml`, key = due date):
    - `deadline_approaching`: open `i_owe` commitments and deadline events due within `days` (default 3) → mark for the brief's "Due soon"; the day before, mark as top-of-brief and Work Board (via `priority: high`).
-   - `commitment_overdue`: slipped items → flag for the brief. If `waiting_on`: ask `nova-write` to create a short follow-up email draft to the owner (`mail.create_draft`, `drafts_create`) in the right voice, and add an `approvals.md` entry (`send_communication`) pointing to the draft. Without a mail connector, put the follow-up text in the approvals entry for the user to send.
+   - `commitment_overdue`: slipped items → flag for the brief. If `waiting_on`, triage does **not** draft in routines:
+     1. Mark the commitment for follow-up (`next_step` says a follow-up is due).
+     2. Add an `approvals.md` entry (`send_communication`, "send follow-up to <owner>", linking the commitment) **only if** no `pending` entry already links that commitment; `Prepared:` says "follow-up draft to be created by email-drafts".
+     3. The draft itself is created only by the `nova-write` email-drafts procedure (`email-drafts` job, which runs after triage in every profile; on weekends or light runs, the next weekday run). In chat, triage calls that `nova-write` procedure directly.
+     4. Shared marker: before any follow-up draft is created, the commitment's `## Updates` is checked for a line `follow-up draft created <date>`; if present since the commitment last changed, no new draft is made. `nova-write` writes that line when it drafts.
+     Without a mail connector, `nova-write` puts the follow-up text in the approvals entry for the user to send.
    - During away: evaluate, set statuses, but do not create drafts or approvals and do not record the trigger as fired; the catch-up brief lists them and they fire on return.
 10. **Write** all record changes with Updates lines; update `_index/commitments.md`, `_index/projects.md`, `hot.md`. Commit (`nova(routine:<name>): triage …` with `Nova-Records`) and log one activity line.
-11. **Report.** Run-report row: reviewed, created, closed, dropped, slipped, follow-up drafts, questions raised. In chat: answer the user's question (grouped lists, cited), then the one or two things that need them.
+11. **Republish** with `nova-dashboards` every dashboard whose contract lists `triage` in `republished_by` and whose data changed: the Work Board, and project pages listed in `dashboards.yaml: project_pages` whose project's records changed in this run (`system/dashboards/project-page.contract.md`).
+12. **Report.** Run-report row: reviewed, created, closed, dropped, slipped, follow-up drafts, questions raised. In chat: answer the user's question (grouped lists, cited), then the one or two things that need them.
 
 ## Outputs
 - Commitment and project records (`status`, `priority`, `insight`, `next_step`, `health`, `completed_on`, Updates).
-- New commitments (via `nova-capture`), questions in `user/inbox/questions.md`, approvals in `user/inbox/approvals.md`, follow-up drafts in the user's mail tool.
+- New commitments (via `nova-capture`), questions in `user/inbox/questions.md`, follow-up approvals in `user/inbox/approvals.md` (drafts themselves come from `nova-write`).
+- Republished Work Board and project pages (`nova-dashboards`).
 - `user/.state/triggers.yaml` entries; index lines; activity-log line; run-report row.
 - Data the Work Board and brief read directly from records (no separate file).
 
 ## Guardrails
-- Autonomy classes: `records_write`, `merge_supersede` (ambiguous → propose), `drafts_create`, `external_read`; sending a follow-up is `send_communication` (locked, approve) and never happens here; `tasks_manage` (propose) if the user asks to mirror commitments into a task tool. See `system/rules/governance.md`.
+- Autonomy classes: `records_write`, `merge_supersede` (ambiguous → propose), `dashboards_refresh`, `external_read`; `drafts_create` only in chat via `nova-write`; sending a follow-up is `send_communication` (locked, approve) and never happens here; `tasks_manage` (propose) if the user asks to mirror commitments into a task tool. See `system/rules/governance.md`.
 - Close only on evidence (`system/rules/knowledge.md` § Commitments); never close on absence of news.
 - Never change `due` without evidence or the user's word.
 - Insights and next steps are specific and short; no generic advice ("follow up soon"). No more than one line each.
@@ -57,5 +64,6 @@ Keep the user's commitments honest and their priorities clear: nothing promised 
 - No open commitment is past due without `status: slipped`.
 - Every open/slipped commitment and every active project has a current `insight` and `next_step` (full mode).
 - Every closed commitment cites its evidence in Updates.
-- Every overdue `waiting_on` (not away) has a follow-up draft and an approvals entry, recorded once in `triggers.yaml`.
+- Every overdue `waiting_on` (not away) has exactly one pending approvals entry and is handed to the email-drafts procedure for its single follow-up draft (marker `follow-up draft created <date>`); the firing is recorded once in `triggers.yaml`.
+- Dashboards listing `triage` (Work Board, changed project pages) are republished.
 - Indexes and the run report reflect the changes; everything is committed.

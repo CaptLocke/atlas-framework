@@ -14,7 +14,7 @@ GitHub is where your private Nova will live. The account is free, and you won't 
 
 1. **Open your web browser** (Safari, Chrome, Edge, or any other) and go to **[github.com/signup](https://github.com/signup)**.
 
-   ![Screenshot: GitHub sign-up page with the email field](images/github-signup.png)
+   ![The GitHub sign-up page, with a box for your email address and a Continue button](images/github-signup.png)
 
 2. **Type your email address** and click **Continue**.
 
@@ -28,11 +28,11 @@ GitHub is where your private Nova will live. The account is free, and you won't 
 
 7. **Open your email.** GitHub has sent you a code. **Type the code** into the GitHub page.
 
-   ![Screenshot: The "enter the code we emailed you" screen](images/github-verify-email.png)
+   ![GitHub asking for the code it sent to your email](images/github-verify-email.png)
 
 8. **If GitHub asks a few questions about you or offers paid plans**, you can skip them. Look for **Skip personalization**, **Continue for free**, or **Free**. You never need a paid GitHub plan for Nova.
 
-   ![Screenshot: Choosing the Free plan (or the skip option)](images/github-free-plan.png)
+   ![GitHub offering plans, with the free option or "Skip personalization" to choose](images/github-free-plan.png)
 
 You now have a GitHub account. 
 
@@ -52,11 +52,11 @@ You'll need an **authenticator app** on your phone, such as Google Authenticator
 
 3. **Click Enable two-factor authentication.**
 
-   ![Screenshot: Settings, Password and authentication, with "Enable two-factor authentication" highlighted](images/github-2fa-settings.png)
+   ![GitHub settings, Password and authentication page, with the "Enable two-factor authentication" button](images/github-2fa-settings.png)
 
 4. **Open your authenticator app, add a new account, and scan the QR code** on the GitHub page with your phone's camera.
 
-   ![Screenshot: The QR-code screen for the authenticator app](images/github-2fa-qr.png)
+   ![GitHub showing a QR code to scan with your authenticator app, and a box for the 6-digit code](images/github-2fa-qr.png)
 
 5. **Type the 6-digit code** your app shows into GitHub, and click **Continue**.
 

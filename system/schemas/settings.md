@@ -18,6 +18,7 @@ timezone: America/Los_Angeles          # IANA
 locale: en-US                          # dates and numbers in output and dashboards
 repo: maya-chen/nova                   # owner/name of this repo
 installed_version: 1.0.0               # updated by nova-update
+installed_from_commit: null            # template commit the repo was created from; baseline for drift checks until the first real update
 data_version: 1                        # updated by migrations
 plan: pro                              # pro | max_5x | max_20x | team | enterprise (user-stated)
 attestation:                           # required before any ingestion

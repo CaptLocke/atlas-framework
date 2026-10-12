@@ -185,9 +185,130 @@ class UpstreamBypass(HookTestCase):
 
 
 class NoManifest(HookTestCase):
-    def test_missing_manifest_is_noop(self):
+    def test_missing_manifest_still_enforces(self):
         os.remove(self.path("system/manifest.yaml"))
+        self.assertBlocked(self.run_hook("actions", "mcp__x__send_message", {}, context="routine"))
+        self.assertBlocked(self.run_hook("paths", "Write", {"file_path": self.path("system/kernel.md")},
+                                         context="routine"), "owned")
+
+    def test_missing_manifest_upstream_fallback(self):
+        import subprocess
+        os.remove(self.path("system/manifest.yaml"))
+        subprocess.run(["git", "remote", "set-url", "origin", "https://github.com/CaptLocke/nova.git"],
+                       cwd=self.root, check=True)
         self.assertAllowed(self.run_hook("actions", "mcp__x__send_message", {}, context="routine"))
+
+
+class ReadNouns(HookTestCase):
+    """Read tools whose names contain send/share/delete nouns are reads."""
+
+    def test_read_verbs_with_risky_nouns(self):
+        for name in ("mcp__slack__slack_get_thread_replies", "mcp__slack__list_channel_posts",
+                     "mcp__drive__list_shared_drives", "mcp__drive__get_file_permissions",
+                     "mcp__mail__list_sent_messages", "mcp__docs__list_comments",
+                     "mcp__mail__search_deleted_items", "mcp__cal__list_events"):
+            self.assertAllowed(self.run_hook("actions", name, {}, context="routine"))
+
+    def test_read_verb_with_later_action_verb_is_risky(self):
+        for name in ("mcp__mail__get_and_send_report", "mcp__drive__list_then_delete_files",
+                     "mcp__drive__find_and_remove_duplicates"):
+            self.assertBlocked(self.run_hook("actions", name, {}, context="routine"))
+
+    def test_security_nouns_still_apply_to_reads(self):
+        self.assertBlocked(self.run_hook("actions", "mcp__vault__get_password", {}, context="chat"), "N4")
+        self.assertAllowed(self.run_hook("actions", "mcp__bank__list_payments", {}, context="routine"))
+
+
+class ConnectorPrefixes(HookTestCase):
+    def test_mixed_case_prefix_and_tool(self):
+        self.connectors("connectors:\n  - connector: Outlook\n    mcp_prefix: mcp__Outlook__\n"
+                        "    categories: [mail]\n    tool_risk:\n      Do_Thing: send\n      Frob: read\n")
+        self.assertBlocked(self.run_hook("actions", "mcp__outlook__do_thing", {}, context="routine"))
+        self.assertAllowed(self.run_hook("actions", "mcp__OUTLOOK__frob", {}, context="routine"))
+
+    def test_prefix_list_chat_and_routine(self):
+        self.connectors("connectors:\n  - connector: gmail\n    mcp_prefixes: [mcp__claude_ai_Gmail__, "
+                        "mcp__gmail-routine__]\n    categories: [mail]\n    tool_risk:\n"
+                        "      frobnicate: send\n      zap: read\n")
+        self.assertBlocked(self.run_hook("actions", "mcp__claude_ai_Gmail__frobnicate", {}, "routine"))
+        self.assertBlocked(self.run_hook("actions", "mcp__gmail-routine__frobnicate", {}, "routine"))
+        self.assertAllowed(self.run_hook("actions", "mcp__gmail-routine__zap", {}, "routine"))
+
+    def test_server_name_fallback(self):
+        self.connectors("connectors:\n  - connector: google-drive\n    mcp_prefix: mcp__gdrive__\n"
+                        "    categories: [files]\n    tool_risk:\n      frobnicate: share\n      zap: read\n")
+        self.assertBlocked(self.run_hook("actions", "mcp__Google_Drive__frobnicate", {}, "routine"))
+        self.assertAllowed(self.run_hook("actions", "mcp__Google_Drive__zap", {}, "routine"))
+
+
+class MissedSends(HookTestCase):
+    def test_comment_accept_decline_cancel(self):
+        for name in ("mcp__docs__add_comment", "mcp__docs__comment_on_file", "mcp__cal__accept_invitation",
+                     "mcp__cal__decline_event", "mcp__cal__rsvp", "mcp__cal__respond_to_event",
+                     "mcp__cal__cancel_meeting"):
+            self.assertBlocked(self.run_hook("actions", name, {}, context="routine"))
+
+    def test_message_create_forms(self):
+        for name in ("mcp__teams__chat_message_create", "mcp__teams__message_create",
+                     "mcp__slack__create_message", "mcp__forum__create_post", "mcp__mail__create_reply",
+                     "mcp__slack__chatPostMessage"):
+            self.assertBlocked(self.run_hook("actions", name, {}, context="routine"))
+        self.assertAllowed(self.run_hook("actions", "mcp__mail__create_reply_draft", {}, context="routine"))
+
+    def test_event_writes(self):
+        self.assertBlocked(self.run_hook("actions", "mcp__cal__create_event", {"title": "Focus"}, "routine"))
+        self.assertBlocked(self.run_hook("actions", "mcp__cal__update_event", {"attendees": ["a"]}, "routine"))
+        self.assertBlocked(self.run_hook("actions", "mcp__cal__quick_add_event", {}, "routine"))
+        self.connectors("connectors:\n  - connector: cal\n    mcp_prefix: mcp__cal__\n"
+                        "    categories: [calendar]\n    tool_risk:\n      create_event: write\n"
+                        "      update_event: write\n")
+        self.assertAllowed(self.run_hook("actions", "mcp__cal__create_event", {"title": "Focus"}, "routine"))
+        self.assertAllowed(self.run_hook("actions", "mcp__cal__create_event", {"attendees": []}, "routine"))
+        self.assertBlocked(self.run_hook("actions", "mcp__cal__create_event",
+                                         {"title": "Sync", "attendees": ["dana@acme.example"]}, "routine"))
+        self.assertBlocked(self.run_hook("actions", "mcp__cal__update_event",
+                                         {"guestEmails": ["dana@acme.example"]}, "routine"))
+
+
+class ImportFailure(HookTestCase):
+    """A broken hook module must never let a call through by crashing."""
+
+    def break_module(self, name):
+        self.write(".claude/hooks/%s.py" % name, "raise ImportError('simulated damage')\n")
+
+    def test_broken_shell_module(self):
+        self.break_module("shell")
+        for hook in ("actions", "paths", "git"):
+            r = self.bash(hook, "ls", "routine")
+            self.assertBlocked(r, "could not run")
+        self.assertBlocked(self.run_hook("actions", "mcp__mail__send_message", {}, "chat"))
+        self.assertBlocked(self.bash("git", "git push --force", "chat"))
+        self.assertBlocked(self.run_hook("paths", "Write", {"file_path": self.path("system/k.md")}, "chat"))
+        # clearly harmless calls in a chat are allowed with a warning
+        r = self.run_hook("actions", "mcp__mail__list_messages", {}, "chat")
+        self.assertAllowed(r)
+        self.assertIn("warning", r.stderr)
+        self.assertAllowed(self.run_hook("paths", "Write", {"file_path": self.path("user/work/a.md")}, "chat"))
+        self.assertAllowed(self.bash("git", "ls -la", "chat"))
+
+    def test_broken_context_and_failsafe(self):
+        self.break_module("context")
+        self.assertBlocked(self.run_hook("actions", "mcp__mail__list_messages", {}, "routine"))
+        self.break_module("failsafe")
+        r = self.run_hook("actions", "mcp__mail__list_messages", {}, "chat")
+        self.assertEqual(r.returncode, 2, r.stderr)
+
+    def test_broken_modules_in_upstream_repo_allow(self):
+        import subprocess
+        self.break_module("context")
+        subprocess.run(["git", "remote", "set-url", "origin", "git@github.com:CaptLocke/nova.git"],
+                       cwd=self.root, check=True)
+        self.assertAllowed(self.run_hook("actions", "mcp__mail__send_message", {}, "routine"))
+
+    def test_exit_codes_only_0_or_2(self):
+        self.write(".claude/hooks/shell.py", "import sys\nsys.exit(3)\n")
+        r = self.bash("paths", "ls", "chat")
+        self.assertIn(r.returncode, (0, 2))
 
 
 if __name__ == "__main__":

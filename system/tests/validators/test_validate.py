@@ -150,6 +150,51 @@ class SeededUserErrors(TempRepo):
         self.assertError(run_validate(self.root, "--user"), "sources.yaml", "cannot parse YAML")
 
 
+class SetupAndLeniency(TempRepo):
+    def test_protected_files_required_after_step5(self):
+        os.remove(self.path("user/settings/governance.yaml"))
+        os.remove(self.path("user/settings/data-rules.yaml"))
+        r = run_validate(self.root, "--user")
+        self.assertError(r, "user/settings/governance.yaml", "step 5")
+        self.assertError(r, "user/settings/data-rules.yaml", "step 5")
+
+    def test_step5_from_setup_state(self):
+        os.remove(self.path("user/settings/governance.yaml"))
+        self.replace("user/settings/nova.yaml", "attestation:\n", "attestation_pending:\n")
+        self.replace("user/settings/nova.yaml", "first_brief_delivered", "attestation: null\nfirst_brief_delivered")
+        self.write("user/.state/setup.yaml", "started: 2026-10-12\ncurrent_step: 5\ncompleted: [1, 2, 3, 4]\n")
+        r = run_validate(self.root, "--user")
+        self.assertNotIn("governance.yaml: missing", r.stdout)
+        self.write("user/.state/setup.yaml", "started: 2026-10-12\ncurrent_step: 6\ncompleted: [1, 2, 3, 4, 5]\n")
+        self.assertError(run_validate(self.root, "--user"), "user/settings/governance.yaml", "step 5")
+
+    def test_not_required_before_setup(self):
+        shutil.rmtree(self.path("user/settings"))
+        os.makedirs(self.path("user/settings"))
+        r = run_validate(self.root, "--user")
+        self.assertNotIn("step 5", r.stdout)
+
+    def test_open_ended_away_and_suppressed_kinds(self):
+        self.replace("user/settings/rhythms.yaml", "  start: null", "  start: 2026-10-20")
+        self.replace("user/settings/rhythms.yaml", "engagement: adaptive",
+                     "engagement: adaptive\n  suppressed_kinds: [quiet_person]")
+        r = run_validate(self.root, "--user")
+        self.assertEqual(self.errors(r), [], r.stdout)
+        self.replace("user/settings/rhythms.yaml", "suppressed_kinds: [quiet_person]", "suppressed_kinds: lots")
+        self.assertError(run_validate(self.root, "--user"), "rhythms.yaml", "suppressed_kinds")
+
+    def test_newer_data_version_is_a_warning(self):
+        self.replace("user/settings/nova.yaml", "data_version: 1", "data_version: 2")
+        r = run_validate(self.root, "--user")
+        self.assertEqual(r.returncode, 0, r.stdout)
+        self.assertIn("rollback", r.stdout)
+
+    def test_custom_profile(self):
+        self.replace("user/settings/routines.yaml", "profile: lean", "profile: custom")
+        r = run_validate(self.root, "--user")
+        self.assertEqual(r.returncode, 0, r.stdout)
+
+
 class BadFixtures(TempRepo):
     fixture = BAD
 

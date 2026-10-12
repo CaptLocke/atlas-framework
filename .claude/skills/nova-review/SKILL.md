@@ -29,21 +29,21 @@ The jobs own scheduling, period bookkeeping in `user/.state/jobs.yaml`, away/pau
 2. Write the sections in `reference/weekly.md`: **Wins · Decisions made · Commitments kept · Commitments slipped · Stalled projects · Aging waiting-on · People to reconnect with · Next week · Suggested priorities**. Every item cites its record. Lead with a 2–3 line summary.
 3. **Accomplishments:** pick the week's real accomplishments (delivered work, decisions driven, milestones, problems solved; not activity). For each, append a short dated entry to the relevant goal's `accomplishments` field (record update with an `## Updates` line) and a line to `user/work/accomplishments.md` (format in `reference/weekly.md`). Don't duplicate an entry already recorded.
 4. Suggested priorities (max 5) are ranked against active goals, then due dates; each with a one-line reason.
-5. Republish Goals, People, and Work Board (`nova-dashboards`); the next brief links the review.
+5. Republish the dashboards whose contracts list this job in `republished_by` (`system/dashboards/*.contract.md`) with `nova-dashboards`; the next brief links the review.
 
 ### Monthly report (previous calendar month)
 1. **Goal progress:** for each active goal: progress vs target (`current`), evidence for and against (accomplishments, linked projects' health, decisions), what needs attention; propose `current` updates the evidence supports (records_write) and status changes (`achieved`/`missed`) as questions.
 2. **User health check:** run `nova-health` (user mode); include its "Your knowledge" section.
 3. **System health check:** run `nova-health` (system mode, including smoke test and audits); include its "Nova's health" section.
 4. **Automation review:** per job and routine, what it did, what was used vs ignored, cost proxies, and suggested changes; compute the **success indicators** locally (`reference/indicators.md`), store them in `user/.state/health.yaml: indicators`, and show them in the report. Suggested setting changes are proposals: queue them in `user/inbox/approvals.md` (`behavior_settings`) or `questions.md`; never apply them here.
-5. Republish Goals, About You, and Control Center.
+5. Republish the dashboards whose contracts list this job in `republished_by` (`system/dashboards/*.contract.md`) with `nova-dashboards`.
 
 ### Quarterly (previous calendar quarter)
 Follow `reference/quarterly.md`:
 1. **Goal reset prep:** retrospective per goal (achieved / partly / missed, why, evidence); draft next-quarter goals as `goals/*` records with `status: draft` (from carry-overs, the user's stated plans, manager expectations in records); ask the user to confirm, edit, or import goals (questions in routines; conversation in chat). Only the user activates goals.
 2. **Role refresh:** questions on role, manager, team, priorities, tools, company context; differences found in records are proposed, not assumed. **Attestation:** ask the user to re-confirm the permission statement; in chat, on a clear yes, update `nova.yaml: attestation` (`recorded_on`, `nova_version`, `reconfirm_due` = first business day of next quarter). A change of employer or role requires a **new** attestation (new `employer`, `role`, statement re-affirmed) before any data from the new employer is ingested; until then, pause `ingest` for new-employer sources and say so. In a routine, queue it as a `setup`-kind question; never record an attestation without the user's words in chat.
 3. **Performance review pack:** `YYYY-Qn-performance.md`: accomplishments by goal, key decisions and their outcomes, impact (metrics, deliverables, people helped), recognition received, challenges and what was learned, suggested talking points for the self-review or 1:1. Written in the user's personal voice, with a sources list at the end (not inline in the pack's body if the user wants to paste it; keep citations in a closing "Evidence" section).
-4. Republish Goals and About You.
+4. Republish the dashboards whose contracts list this job in `republished_by` (`system/dashboards/*.contract.md`) with `nova-dashboards`.
 
 ### In chat
 Produce the requested review on demand for the period the user names (default: this week / last month / last quarter). Present the summary and the "needs you" items in the conversation; write the file as well. Ask quarterly questions conversationally, one at a time.

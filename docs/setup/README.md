@@ -4,7 +4,7 @@ Welcome! This guide gets you from nothing to a working Nova. You do **four short
 
 You don't need to be technical. Every step is one small action, with a picture of what you should see. If something on your screen looks different, each step has a note for that.
 
-**Total time:** about 20 minutes for the four steps below, then 30 to 45 minutes chatting with Nova. You can stop at any point and pick up where you left off.
+**Total time:** about 20 to 25 minutes for the four steps below, then 30 to 45 minutes chatting with Nova. You can stop at any point and pick up where you left off.
 
 ---
 
@@ -36,7 +36,7 @@ Nova keeps everything it learns about your work in a **private GitHub repository
 | [1. Create a free GitHub account](01-github-account.md) | Sign up and turn on two-factor authentication | 5 to 10 min |
 | [2. Create your Nova](02-create-your-nova.md) | Make your own private copy of Nova | 2 to 3 min |
 | [3. Connect GitHub to Claude](03-connect-github.md) | Let Claude open your Nova, and nothing else | 3 to 5 min |
-| [4. Create the Nova Project in Claude](04-create-the-nova-project.md) | Make a "Nova" Project, paste a short note, say "Set up Nova" | 5 min |
+| [4. Create the Nova Project in Claude](04-create-the-nova-project.md) | Make a "Nova" Project, paste a short note, set up the chat environment, say "Set up Nova" | 5 to 10 min |
 
 Then: [What happens next](05-what-happens-next.md) (Nova guides you from here).
 
@@ -50,36 +50,3 @@ Stuck? See [Troubleshooting](troubleshooting.md).
 - **Template:** the original Nova that you copy to make your own. Your copy is completely separate; nobody else can see it.
 - **Project:** a workspace inside the Claude app. You'll make one called "Nova" and have all your Nova chats there.
 - **Connector:** a link between Claude and one of your tools, such as your email or calendar. Nova helps you set these up later.
-
----
-
-## Maintainer TODO: screenshots to capture (G-2)
-
-Capture these during the end-to-end setup run, on both macOS and Windows where marked. Save them in `docs/setup/images/` with exactly these names. Blur or crop any personal details (email addresses, usernames, avatars).
-
-| File | Page | What it shows | Mac + Windows? |
-|---|---|---|---|
-| `github-signup.png` | 1 | GitHub sign-up page with the email field | Once (browser) |
-| `github-verify-email.png` | 1 | The "enter the code we emailed you" screen | Once |
-| `github-free-plan.png` | 1 | Choosing the Free plan (or the skip/continue option) | Once |
-| `github-2fa-settings.png` | 1 | Settings → Password and authentication, with "Enable two-factor authentication" highlighted | Once |
-| `github-2fa-qr.png` | 1 | The QR-code screen for the authenticator app | Once |
-| `nova-template-page.png` | 2 | The Nova template page with the green "Use this template" button highlighted | Once |
-| `use-template-menu.png` | 2 | The menu open, "Create a new repository" highlighted | Once |
-| `create-repo-form.png` | 2 | The form: name `nova`, **Private** selected and circled | Once |
-| `new-repo-created.png` | 2 | The new private repo, with the "Private" label next to its name circled | Once |
-| `github-app-select-target.png` | 3 | The Claude GitHub App "select account" screen | Once |
-| `github-app-only-select.png` | 3 | "Only select repositories" chosen, with the `nova` repo picked | Once |
-| `github-app-installed.png` | 3 | The confirmation page after installing | Once |
-| `claude-settings-mac.png` | 3 | Claude desktop app on macOS: where Settings is | Mac |
-| `claude-settings-windows.png` | 3 | Claude desktop app on Windows: where Settings is | Windows |
-| `claude-connectors-github.png` | 3 | Settings → Connectors with GitHub shown as connected | Mac + Windows |
-| `claude-projects-sidebar.png` | 4 | Where "Projects" is in the Claude app sidebar | Mac + Windows |
-| `claude-new-project.png` | 4 | The "create project" form with the name "Nova" | Once |
-| `claude-project-instructions.png` | 4 | Where to add the Project's instructions, with the note pasted in | Once |
-| `claude-first-chat.png` | 4 | A new chat inside the Nova Project with "Set up Nova" typed | Once |
-| `nova-welcome.png` | 5 | Nova's first reply (welcome and the permission question) | Once |
-| `github-change-visibility.png` | Troubleshooting | Repo Settings → Danger Zone → "Change visibility" | Once |
-| `github-app-configure.png` | Troubleshooting | GitHub Settings → Applications → Claude → Configure, showing repository access | Once |
-
-Also confirm every button label and menu path in these pages against the current GitHub and Claude app, and update the wording where it has changed.

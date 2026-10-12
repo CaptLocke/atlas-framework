@@ -25,31 +25,38 @@ Say: heavier profiles use more of their Claude allowance; they can switch any ti
 5. Validate (`python3 system/tools/validate.py --all`), commit.
 
 ## 3. Environments (`NOVA_CONTEXT`)
-Hooks use `NOVA_CONTEXT` to tell chats from automatic runs; if it's missing they assume an automatic run and block approvals, so chats can't send even with permission (fail closed).
+Nova's safety checks use `NOVA_CONTEXT` to tell chats from automatic runs. If it's missing in a chat, they treat the chat like an unattended run (fail closed), which blocks everything that needs the user's OK. Two cloud environments are needed:
 
-Two cloud environments are needed:
-| Name | Variable | Used by |
-|---|---|---|
-| `Nova chat` | `NOVA_CONTEXT=chat` | Chats in the Nova project |
-| `Nova routines` | `NOVA_CONTEXT=routine` | Every Nova routine |
+| Name | Variable | Used by | Set up at |
+|---|---|---|---|
+| `Nova chat` | `NOVA_CONTEXT=chat` | Chats in the Nova project | Start of setup (checked before step 5) |
+| `Nova routines` | `NOVA_CONTEXT=routine` | Every Nova routine | Step 10 |
 
-If this session has a tool to create or edit cloud environments, create both (network access default; no secrets in variables). Otherwise give the user these steps, one at a time:
+If this session has a tool to create or edit cloud environments, create the needed one (default network access; never put secrets in variables). Otherwise give the user the steps one at a time.
 
+**Chat environment (start of setup, when `echo $NOVA_CONTEXT` isn't `chat`):**
 ```
-1. In Claude, open Settings, then find "Environments" (it may be under "Claude Code" or "Cloud").
-2. Click "New environment". Name it: Nova chat
-3. Under "Environment variables", add one line:
+1. In Claude, open Settings and look for "Environments" (it may be under "Claude Code", "Cloud", or a project's settings).
+2. Create a new environment (or edit the one your Nova project uses). Name it: Nova chat
+3. Under "Environment variables", add exactly one line:
    NOVA_CONTEXT=chat
-4. Save.
-5. Click "New environment" again. Name it: Nova routines
-6. Add the line:
-   NOVA_CONTEXT=routine
-7. Save.
-8. Make "Nova chat" the environment for your Nova project's chats (if there's an environment picker in the chat or project settings, choose "Nova chat").
+4. Save, and make sure your Nova project's chats use "Nova chat" (look for an environment picker in the project or chat settings).
+5. Start a NEW chat in your Nova project and say: continue setup
+   (Settings like this only apply to new chats, not this one.)
 ```
-"If it looks different: look for wherever you can add environment variables for cloud sessions; the two names and lines above are all that matter."
+"If it looks different: look for wherever you can add environment variables for cloud sessions and choose which one your Nova chats use; the name and the line above are all that matter."
 
-Check: in the next chat, the environment variable reads `chat` (`echo $NOVA_CONTEXT`). If it can't be set, note it in `setup.yaml: notes` and add a known issue: Nova still works, but anything that needs approval (sending, sharing, deleting) is handed to the user to do themselves.
+Check in the new chat: `echo $NOVA_CONTEXT` prints `chat`. If the user can't set it up, continue setup in **degraded mode**: Nova can still save setup and files, but it can't send, share, or delete even with their OK, and it can't change safety settings after setup, until this is fixed. Record a known issue in `user/.state/health.yaml` (`id: env-chat-missing`, `severity: high`, `fix`: the steps above) and tell the user plainly which things won't work yet.
+
+**Routine environment (step 10):**
+```
+1. In Claude, open Settings → Environments (same place as before).
+2. Create a new environment. Name it: Nova routines
+3. Under "Environment variables", add exactly one line:
+   NOVA_CONTEXT=routine
+4. Save. Each Nova routine will use this environment.
+```
+If routines end up without it, nothing unsafe happens (a missing value is treated as a routine), so this is lower risk; still set it for clarity.
 
 ## 4. Creating routines
 For each routine in `routines.yaml`:

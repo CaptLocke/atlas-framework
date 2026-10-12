@@ -1,4 +1,4 @@
-# Dashboard URLs. Copied to user/settings/dashboards.yaml by nova-setup; filled at step 11.
+# Dashboard URLs. Copied to user/settings/dashboards.yaml by nova-setup at step 5; filled at step 11.
 # Format: system/schemas/settings.md.
 dashboards:
   daily-brief: { url: null, last_published: null }

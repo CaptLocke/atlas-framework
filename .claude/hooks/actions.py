@@ -31,9 +31,29 @@ import os
 import re
 import sys
 
+# --- fail-safe entry: any error, even an import failure, ends in exit 0 or 2
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import context as nova  # noqa: E402
-import shell  # noqa: E402
+try:
+    from failsafe import fail_safe
+except BaseException as _fe:  # failsafe.py itself is broken: block
+    def fail_safe(hook, exc, raw=None, _fe=_fe):
+        try:
+            sys.stderr.write("Nova guard (%s): hook files are damaged (%s; %s); blocked.\n" % (hook, exc, _fe))
+        finally:
+            os._exit(2)
+
+
+def _raw_stdin():
+    mod = sys.modules.get("context")
+    return getattr(getattr(mod, "STATE", None), "raw", None)
+
+
+sys.excepthook = lambda _t, _e, _tb: fail_safe("actions", _e, _raw_stdin())
+try:
+    import context as nova  # noqa: E402
+    import shell  # noqa: E402
+except BaseException as _imp:  # includes SystemExit raised while importing
+    fail_safe("actions", _imp, _raw_stdin())
 
 SEVERITY = {"read": 0, "draft": 1, "write": 2, "send": 3, "share": 4, "delete": 5, "security": 9}
 LOCKED_CLASS = {"send": "send_communication", "share": "share_expose", "delete": "destructive"}
@@ -41,9 +61,10 @@ LOCKED_CLASS = {"send": "send_communication", "share": "share_expose", "delete":
 # system/connectors/README.md "Risk classification rules" (plus a few
 # obvious synonyms). Matched against whole name tokens and simple inflections.
 WORDS = {
-    "send": ["send", "reply", "forward", "post", "publish", "invite", "respond", "rsvp", "broadcast", "notify"],
+    "send": ["send", "reply", "forward", "post", "publish", "invite", "respond", "rsvp", "broadcast", "notify",
+             "comment", "accept", "decline"],
     "share": ["share", "permission", "grant", "invite", "unshare"],
-    "delete": ["delete", "trash", "remove", "purge", "destroy", "erase", "wipe"],
+    "delete": ["delete", "trash", "remove", "purge", "destroy", "erase", "wipe", "cancel"],
     "security": ["pay", "purchase", "charge", "sign", "password", "credential", "token", "2fa", "mfa",
                  "buy", "checkout", "otp", "secret", "apikey"],
     "write": ["create", "update", "edit", "move", "label", "set", "add", "modify", "rename", "upload",
@@ -55,7 +76,30 @@ WORDS = {
 }
 IRREGULAR = {"sent": "send", "replies": "reply", "paid": "pay", "bought": "buy", "removal": "remove",
              "deletion": "delete", "permissions": "permission", "credentials": "credential",
-             "tokens": "token", "signature": "sign", "esign": "sign", "esignature": "sign"}
+             "tokens": "token", "signature": "sign", "esign": "sign", "esignature": "sign",
+             "cancelled": "cancel", "canceled": "cancel", "cancellation": "cancel"}
+
+# Leading read verbs: a name that starts with one of these (after any vendor
+# prefix such as "slack_") only reads, unless a later word is an unambiguous
+# action verb. Then send/share/delete *nouns* ("replies", "posts", "shared",
+# "permissions") don't make it risky: get_thread_replies, list_shared_drives.
+READ_VERBS = {"get", "list", "search", "read", "fetch", "find", "query", "describe", "count", "show", "view",
+              "lookup", "retrieve", "browse", "inspect", "preview", "check"}
+# Unambiguous action verbs (base form only; "reply", "post", "share",
+# "comment", "invite" are also nouns and are excluded on purpose).
+ACTION_VERBS = {"send", "forward", "publish", "respond", "grant", "delete", "trash", "remove", "purge",
+                "destroy", "erase", "wipe", "create", "update", "edit", "move", "set", "add", "modify", "rename",
+                "upload", "write", "insert", "patch", "put", "mark", "apply", "assign", "cancel", "accept",
+                "decline", "rsvp", "unshare", "archive", "make", "new", "reschedule", "pay", "purchase",
+                "charge", "sign", "buy", "transfer"}
+CREATE_VERBS = {"create", "new", "add", "insert", "make", "compose", "write", "start"}
+MESSAGE_NOUNS = {"message", "messages", "msg", "msgs", "post", "posts", "reply", "replies", "comment",
+                 "comments", "chat", "chats", "thread", "threads", "mail", "email", "emails"}
+EVENT_NOUNS = {"event", "events", "meeting", "meetings", "appointment", "appointments", "invite", "invites",
+               "invitation", "invitations"}
+EVENT_WRITE_VERBS = {"create", "update", "edit", "modify", "move", "patch", "put", "add", "insert", "reschedule",
+                     "set", "quick", "new", "make", "change"}
+ATTENDEE_KEYS = ("attendee", "invitee", "guest", "participant")
 
 
 def inflections(word):
@@ -97,16 +141,34 @@ for _w in ("payment", "payout", "transfer", "wire", "refund", "invoice", "subscr
     FINANCIAL_NOUNS |= inflections(_w)
 
 
+def read_only_name(toks):
+    """True when the first verb in the name is a read verb and no later word
+    is an unambiguous action verb."""
+    for i, t in enumerate(toks):
+        if t in READ_VERBS:
+            return not any(x in ACTION_VERBS for x in toks[i + 1:])
+        if t in ACTION_VERBS:
+            return False
+    return False
+
+
 def name_risks(bare):
+    """(risks, event_write): risk kinds from the name, and whether it writes a
+    calendar event (a send unless tagged write and sent without attendees)."""
     toks = tokens(bare)
     risks = set()
     for t in toks:
         risks |= TOKEN_RISK.get(t, set())
-    starts_with_read = bool(toks) and "read" in TOKEN_RISK.get(toks[0], set())
-    if not starts_with_read and any(t in FINANCIAL_NOUNS for t in toks):
+    reading = read_only_name(toks)
+    if reading:
+        risks -= {"send", "share", "delete", "write", "draft"}
+    if not reading and any(t in FINANCIAL_NOUNS for t in toks):
         risks.add("security")
     if "archive" in toks and "permanently" in toks:
         risks.add("delete")
+    # creating a message/post/reply/comment publishes it: chat_message_create
+    if not reading and any(t in CREATE_VERBS for t in toks) and any(t in MESSAGE_NOUNS for t in toks):
+        risks.add("send")
     # Drafting a reply/forward is a draft, not a send ("create_reply_draft"),
     # unless the name also says send/post/publish ("send_draft").
     if "draft" in risks:
@@ -114,36 +176,65 @@ def name_risks(bare):
                             for t in toks)
         if not explicit_send:
             risks.discard("send")
-    return risks
+    event_write = (not reading and any(t in EVENT_NOUNS for t in toks)
+                   and any(t in EVENT_WRITE_VERBS for t in toks) and "delete" not in risks)
+    return risks, event_write
+
+
+def has_attendees(tool_input):
+    if not isinstance(tool_input, dict):
+        return False
+    for k, v in tool_input.items():
+        if any(a in str(k).lower() for a in ATTENDEE_KEYS) and v not in (None, "", [], {}):
+            return True
+    return False
+
+
+def _norm(name):
+    return re.sub(r"[\s_-]+", "", str(name)).lower()
 
 
 def lookup_tag(tool_name, proj):
-    """(tag or None, mapped: bool, warning or None) from connectors.yaml."""
+    """(tag or None, mapped: bool, warning or None) from connectors.yaml.
+
+    Matches mcp_prefix / mcp_prefixes case-insensitively (chats and routines
+    may expose a connector under different prefixes), then falls back to the
+    MCP server name compared with the connector name (case, '-', '_' and
+    spaces ignored). Tool names in tool_risk are compared case-insensitively."""
     path = os.path.join(proj, "user", "settings", "connectors.yaml")
     if not os.path.exists(path):
         return None, False, None
     try:
         data = nova.load_yaml(path, proj) or {}
+        conns = data.get("connectors") or []
     except Exception as e:  # malformed: fall back to name patterns, treat unmapped
         return None, False, "user/settings/connectors.yaml could not be read (%s)" % e
     server, bare = split_tool(tool_name)
-    for c in (data.get("connectors") or []):
+    lname = tool_name.lower()
+    for c in conns if isinstance(conns, list) else []:
         if not isinstance(c, dict):
             continue
         risks = c.get("tool_risk") or {}
         if not isinstance(risks, dict):
             continue
-        prefix = str(c.get("mcp_prefix") or "")
-        candidates = []
-        if prefix and tool_name.startswith(prefix):
-            candidates.append(tool_name[len(prefix):])
-        if tool_name in risks:
-            candidates.append(tool_name)
-        if not prefix and server and str(c.get("connector", "")).lower() == server.lower():
-            candidates.append(bare)
+        lrisks = {str(k).lower(): v for k, v in risks.items()}
+        prefixes = []
+        if c.get("mcp_prefix"):
+            prefixes.append(str(c["mcp_prefix"]))
+        extra = c.get("mcp_prefixes")
+        if isinstance(extra, list):
+            prefixes += [str(p) for p in extra if p]
+        elif isinstance(extra, str) and extra:
+            prefixes.append(extra)
+        candidates = [lname]
+        for p in prefixes:
+            if lname.startswith(p.lower()):
+                candidates.append(lname[len(p):])
+        if server and _norm(c.get("connector", "")) == _norm(server):
+            candidates.append(bare.lower())
         for cand in candidates:
-            if cand in risks:
-                return str(risks[cand]).strip().lower(), True, None
+            if cand in lrisks:
+                return str(lrisks[cand]).strip().lower(), True, None
     return None, False, None
 
 
@@ -173,10 +264,15 @@ def guard_locked(tool_name, risks, proj, ctx, what):
 def handle_mcp(payload, proj, ctx):
     tool_name = payload.get("tool_name") or ""
     server, bare = split_tool(tool_name)
-    risks = name_risks(bare)
+    risks, event_write = name_risks(bare)
     tag, mapped, warning = lookup_tag(tool_name, proj)
     if tag:
         risks.add(tag if tag in SEVERITY else "delete")  # unknown tag value: treat as risky
+    if event_write:
+        # creating/changing an event with attendees sends invitations; only a
+        # tool tagged 'write' called without attendees manages the own calendar
+        if not (tag == "write" and not has_attendees(payload.get("tool_input"))):
+            risks.add("send")
     if "security" in risks:
         nova.STATE.locked = True
         nova.block(
@@ -186,7 +282,7 @@ def handle_mcp(payload, proj, ctx):
     locked = [r for r in risks if r in LOCKED_CLASS]
     if locked:
         guard_locked(tool_name, locked, proj, ctx, "Calling %s" % tool_name)
-    if not risks and not mapped:
+    if not risks and not mapped and not read_only_name(tokens(bare)):
         msg = ("%s is not mapped in user/settings/connectors.yaml and its name doesn't show what it does, "
                "so it is treated as risky until mapped (run nova-connectors in a chat)." % tool_name)
         if warning:
@@ -242,4 +338,11 @@ def main(payload, proj, ctx):
 
 
 if __name__ == "__main__":
-    nova.run("actions", main)
+    try:
+        nova.run("actions", main)
+    except SystemExit as _exit:
+        if _exit.code in (0, 2, None):
+            raise
+        fail_safe("actions", RuntimeError("unexpected exit code %r" % (_exit.code,)), _raw_stdin())
+    except BaseException as _err:
+        fail_safe("actions", _err, _raw_stdin())

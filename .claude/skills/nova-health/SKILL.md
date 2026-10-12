@@ -27,7 +27,7 @@ Nova maintains itself. Clear problems are fixed automatically and logged; ambigu
 2. **Repair links:** for each `[[id]]` that doesn't resolve, fix it when the target is clear (renamed alias, superseded → follow `superseded_by`, merged duplicate); otherwise leave it and list it for the user health check.
 3. **Obvious dedupes** per `system/rules/knowledge.md` (same email; same domain; same full name + same org): merge (`merge_supersede`) only clear cases; ambiguous → `user/inbox/questions.md`.
 4. **Sweep:** journal days with unprocessed sections (`processed` missing a section that has text) and files left in `user/inbox/drop/` → process with `nova-capture` (or leave for `ingest` if it runs next in the same routine).
-5. **Expire:** approvals pending over 14 days → `expired`; insights `new` and unseen over 30 days → `expired`; answered/dismissed questions older than 90 days stay (history). Record each status change in the entry's status history.
+5. **Expire** (skip entirely while away is active; away time doesn't count toward expiry): approvals pending over 14 days → `expired`; insights `new` and unseen over 30 days → `expired`; answered/dismissed questions older than 90 days stay (history). Record each status change in the entry's status history.
 6. Commit; add counts to the run report (indexes rebuilt, links fixed, merges, items expired).
 
 ### 2. User health check
@@ -39,7 +39,7 @@ Follow `reference/system-health.md`:
 2. **Connectors:** auth errors in run reports; each mapped connector present in the session; `tool_fingerprint` drift; unmapped connectors → re-map via `nova-connectors` (chat) or a known issue (routine).
 3. **Hooks present:** `.claude/settings.json` registers the PreToolUse hooks; hook scripts exist.
 4. **Validation:** `python3 system/tools/validate.py --all`; fix data errors that have one obvious fix; list the rest.
-5. **System files unmodified** vs the release tag `v<installed_version>`; differences not made by update commits → `nova-update` repair (§E).
+5. **System files unmodified** vs the release tag `v<installed_version>`, or, until such a tag exists upstream, vs `nova.yaml: installed_from_commit` (the template's starting commit); differences not made by update commits → in chat, `nova-update` repair (§E), which first offers to keep intentional edits as an extension; in a routine, record a known issue only and stop there.
 6. **Extensions:** `requires_nova` satisfied; overridden components unchanged since the extension was created or last confirmed; conflicts (two overrides of one component, governance conflicts) flagged.
 7. **Repo size** and growth; record and index sizes.
 8. **Attestation due:** `nova.yaml: attestation.reconfirm_due` reached → known issue and a quarterly-style re-confirmation question (`nova-review` role refresh handles it in chat).
@@ -65,7 +65,7 @@ If a problem persists after the available fix (e.g., a job fails three runs in a
 
 ## Guardrails
 - Governance: `system/rules/governance.md`. Classes touched: `read`, `records_write`, `merge_supersede` (clear cases only; ambiguous always proposed), `archive` (only records the user agreed to, or per auto rules in the reference), `external_read` (read-only probes), `dashboards_refresh`. Never `destructive`: health checks never delete records, files, events, or messages; deletion suggestions go to the user.
-- System-file restore goes through `nova-update` (update lock, N5). Connector map changes go through `nova-connectors` (N6, chat only).
+- System-file restore is chat-only and goes through `nova-update` (update lock, N5); routines only record a known issue. Connector map changes go through `nova-connectors` (N6, chat only).
 - Profile changes are proposals unless `profile_update: auto`.
 - Never edit journal text or user-authored notes (`user_content_edit`); only the `processed` field.
 - Audits report; they never "fix" history (N8). An unapproved locked action is a high-severity known issue told to the user.

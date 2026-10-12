@@ -73,6 +73,52 @@ class HistoryRewrite(HookTestCase):
         self.assertAllowed(self.bash("git", "git remote add upstream https://github.com/CaptLocke/nova", "routine"))
 
 
+class RefDeletion(HookTestCase):
+    def test_tag_delete_needs_update_or_purge_lock(self):
+        sh(["git", "tag", "pre-update-1.0.0"], self.root)
+        cmd = "git tag -d pre-update-1.0.0"
+        self.assertBlocked(self.bash("git", cmd, "routine"), "N8")
+        self.assertBlocked(self.bash("git", "git push origin :refs/tags/pre-update-1.0.0", "chat"), "N8")
+        self.update_lock()
+        self.assertAllowed(self.bash("git", cmd, "routine"))
+        self.assertAllowed(self.bash("git", "git push origin --delete refs/tags/pre-update-1.0.0", "routine"))
+        os.remove(self.path(".nova-tmp/update.lock"))
+        self.purge_lock()
+        self.assertAllowed(self.bash("git", cmd, "chat"))
+        self.assertBlocked(self.bash("git", cmd, "routine"))
+
+    def test_remote_branch_deletion_blocked(self):
+        for cmd in ("git push origin --delete claude/old-work", "git push origin :claude/old-work",
+                    "git push -d origin feature"):
+            self.assertBlocked(self.bash("git", cmd, "chat"), "N8")
+        self.update_lock()
+        self.assertBlocked(self.bash("git", "git push origin --delete claude/old-work", "chat"))
+
+    def test_branch_delete_only_blocked_when_on_origin(self):
+        sh(["git", "branch", "local-only"], self.root)
+        sh(["git", "branch", "shared"], self.root)
+        sh(["git", "update-ref", "refs/remotes/origin/shared", "HEAD"], self.root)
+        self.assertAllowed(self.bash("git", "git branch -D local-only", "routine"))
+        self.assertBlocked(self.bash("git", "git branch -D shared", "routine"), "origin")
+        self.assertBlocked(self.bash("git", "git branch -d shared", "chat"))
+        self.purge_lock()
+        self.assertAllowed(self.bash("git", "git branch -D shared", "chat"))
+
+
+class RepoVisibility(HookTestCase):
+    def test_visibility_and_collaborators_blocked(self):
+        for cmd in ("gh repo edit --visibility public", "gh repo edit owner/nova --visibility=public",
+                    "gh api -X PUT repos/maya-chen/nova/collaborators/someone",
+                    "gh api repos/maya-chen/nova -f visibility=public",
+                    "gh api --method PATCH repos/maya-chen/nova -F private=false -F visibility=public"):
+            self.assertBlocked(self.bash("git", cmd, "chat"), "N9")
+
+    def test_reads_allowed(self):
+        for cmd in ("gh repo view", "gh api repos/maya-chen/nova/collaborators",
+                    "gh repo edit --description 'Nova'"):
+            self.assertAllowed(self.bash("git", cmd, "routine"))
+
+
 class CommitTrailers(HookTestCase):
     def setUp(self):
         super().setUp()
@@ -103,9 +149,17 @@ class CommitTrailers(HookTestCase):
         self.write("msg.txt", "nova(chat): x\n")
         self.assertBlocked(self.bash("git", "git commit --file=msg.txt", "chat"))
 
+    def test_setup_commit_allowed_in_any_context(self):
+        cmd = "git commit -m 'nova(setup): step 5' -m 'Nova-Actor: setup\nNova-Reason: setup step 5'"
+        for ctx in ("chat", "routine", None):
+            self.assertAllowed(self.bash("git", cmd, ctx))
+
     def test_routine_cannot_claim_chat(self):
         cmd = "git commit -m 'x' -m '%s'" % TRAILERS
-        self.assertBlocked(self.bash("git", cmd, "routine"), "routine")
+        r = self.bash("git", cmd, None)
+        self.assertBlocked(r, "NOVA_CONTEXT")
+        self.assertIn("nova-setup", r.stderr)
+        self.assertIn("Nova chat environment", r.stderr)
         self.assertBlocked(self.bash("git", "git commit -m 'x' -m 'Nova-Actor: robot\nNova-Reason: y'", "chat"),
                            "not valid")
 

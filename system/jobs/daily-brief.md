@@ -16,7 +16,8 @@ Have the Daily Brief ready before the workday starts and the dashboards fresh: t
 ## Away and paused
 Let T be the target date.
 - **T within away:** exit with `skipped_away`.
-- **Away set and T after `away.end`:** write the catch-up brief instead of a normal brief (steps below), then clear `away` in `rhythms.yaml` (`start`, `end`, `set_on` to null) and commit. This happens once, on the first run on or after the end of away.
+- **T within an open-ended away** (`away.start <= T`, `away.end: null`): exit with `skipped_away`; the user ends it in chat (`nova-away`), which sets `end`.
+- **Catch-up:** the first daily-brief run whose target date is after `away.end` (or, for an open-ended away, after the user ends it) writes the catch-up brief instead of a normal brief (steps below), then clears `away` in `rhythms.yaml` (`start`, `end`, `set_on` to null) and commits. This happens once.
 - **Paused** (`{ job: daily-brief }` or moment `daily_brief` paused/off): exit with `skipped_paused`. A catch-up brief is still written when away ends.
 
 ## Readiness check
@@ -37,7 +38,7 @@ If `jobs.yaml: daily-brief.last_target` already equals T, refresh the existing b
 1. Invoke `nova-brief` for date T. Normal brief sections follow the skill; items cite their records (`system/rules/writing.md`); triggers' brief items (`deadline_approaching`, `commitment_overdue`, `key_meeting_upcoming`) are placed as `system/triggers.md` says.
 2. Catch-up brief (after away): invoke `nova-brief` in catch-up mode for the whole away period: what happened, what changed, what needs the user first, what can wait, held approvals and insights, and drafts to consider now. Readable in five minutes.
 3. Write the file (`type: brief`, `date: T`, `sources`). On the first brief ever, set `nova.yaml: first_brief_delivered` to T.
-4. Invoke `nova-dashboards` to republish every dashboard whose contract (`system/dashboards/<name>.contract.md: republished_by`) lists `daily-brief` and whose data changed; always the Daily Brief. Record `last_published` in `user/settings/dashboards.yaml`.
+4. Invoke `nova-dashboards` to republish every dashboard whose contract (`system/dashboards/<name>.contract.md: republished_by`) lists `daily-brief` and whose data changed. Record `last_published` in `user/settings/dashboards.yaml`.
 5. Set `jobs.yaml: daily-brief.last_target` to T. Commit.
 
 ## Outputs
@@ -51,7 +52,7 @@ Never skipped for lack of news: an empty day still gets a short brief ("Nothing 
 ## Guardrails
 - The brief and dashboards are views. Nothing in them is sent or shared; dashboards stay private, page-only, without connector grants (unattended republish).
 - If a dashboard can't be republished unattended, keep the brief file, record a known issue with the fix, and continue.
-- Clearing `away` after its end date completes the user's own instruction; it is not a behavior change.
+- Clearing `away` after the catch-up brief completes the user's own instruction; it is not a behavior change.
 
 ## Run report
 Row: `daily-brief | <status> | brief for <T> (or catch-up <start>–<end>) | republished <n> dashboards; stale: <jobs>`.

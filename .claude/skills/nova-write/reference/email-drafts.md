@@ -1,6 +1,6 @@
 # Email drafts (job mode) and voice learning
 
-Used by the `email-drafts` job and by `nova-triage` follow-ups. Fictional examples.
+Used by the `email-drafts` job, and by `nova-triage` in chat. This is the **only** procedure that creates follow-up drafts. Fictional examples.
 
 ## Which threads get a reply draft
 Draft when all are true:
@@ -12,7 +12,12 @@ Skip: FYIs, threads the user is likely to handle in a meeting today (note that i
 Cap: ~10 drafts per run, highest priority first (manager, customers, items tied to goals or commitments).
 
 ## Follow-ups for overdue waiting_on
-From `nova-triage` (`commitment_overdue`): 3–5 sentences, friendly, specific (what, when it was due, why it matters now, an easy next step). Reply in the original thread when there is one. Add an approvals entry (`send_communication`) pointing to the draft.
+Candidates: `waiting_on` commitments with `status: slipped` (marked by `nova-triage`, `commitment_overdue`).
+1. **Marker check:** if the commitment's `## Updates` has a line `follow-up draft created <date>` since the commitment last changed (new due date, owner reply), skip it.
+2. Draft 3–5 sentences, friendly, specific (what, when it was due, why it matters now, an easy next step). Reply in the original thread when there is one.
+3. Append to the commitment's Updates: `- <date>: follow-up draft created <date> (draft id …)`.
+4. Approvals: if a `pending` entry already links this commitment (triage usually adds it), update its `Prepared:` line with the draft; otherwise add one (`send_communication`). Never two pending entries for one commitment.
+5. No mail connector: put the text in the approvals entry's `Prepared:` line instead and still write the marker.
 
 ## Draft quality
 - Voice per `system/rules/writing.md`; reply in the thread's language and register.
@@ -21,7 +26,7 @@ From `nova-triage` (`commitment_overdue`): 3–5 sentences, friendly, specific (
 
 ## Recording drafts (for the brief and idempotency)
 For each draft created (`system/jobs/email-drafts.md`):
-- Reply drafts: append `reply draft created (draft id …)` to the thread Source's `## Updates`. Follow-ups: append `follow-up draft created (draft id …)` to the commitment's Updates. These lines are the marker that prevents a second draft.
+- Reply drafts: append `reply draft created (draft id …)` to the thread Source's `## Updates`. Follow-ups: append `follow-up draft created <date> (draft id …)` to the commitment's Updates (the shared marker with `nova-triage`). These lines are the marker that prevents a second draft.
 - List the draft in the run report (recipient and subject only, no content), e.g. `- Dana Ruiz · "MSA redlines: quick check-in" · follow-up · [[commitments/dana-msa-redlines]]`.
 - `nova-brief` reads drafts from run reports (and chat activity) since the last brief for "Drafts ready to review".
 

@@ -12,11 +12,11 @@ You'll make your own private copy of Nova from the Nova template. Your copy is c
 
 3. **Click the green Use this template button** near the top right of the page.
 
-   ![Screenshot: The Nova template page with the green "Use this template" button highlighted](images/nova-template-page.png)
+   ![The Nova template page on GitHub, with the green "Use this template" button near the top right](images/nova-template-page.png)
 
 4. **Click Create a new repository** in the small menu that opens.
 
-   ![Screenshot: The menu open, "Create a new repository" highlighted](images/use-template-menu.png)
+   ![The small menu under "Use this template", with "Create a new repository" at the top](images/use-template-menu.png)
 
 5. **Check the Owner.** It should show your GitHub username. If you belong to any organizations on GitHub, make sure your **personal** username is selected.
 
@@ -26,7 +26,7 @@ You'll make your own private copy of Nova from the Nova template. Your copy is c
 
 8. **Choose Private.** This is the most important choice in the whole setup.
 
-   ![Screenshot: The form with name "nova" and **Private** selected and circled](images/create-repo-form.png)
+   ![The new repository form: owner is your username, name is "nova", and Private is selected](images/create-repo-form.png)
 
    > ⚠️ **Make sure "Private" is selected, not "Public".** A public repository can be seen by anyone on the internet. Your Nova will hold information about your work, so it must be private. If you choose Public by mistake, see [Troubleshooting: my repository is public](troubleshooting.md#my-repository-is-public-by-mistake).
 
@@ -36,7 +36,7 @@ You'll make your own private copy of Nova from the Nova template. Your copy is c
 
 11. **Check for the word "Private"** in a small label next to the repository name at the top of the page.
 
-    ![Screenshot: The new private repo, with the "Private" label next to its name circled](images/new-repo-created.png)
+    ![Your new repository, with the word "Private" in a small label next to its name](images/new-repo-created.png)
 
 You now have your own Nova. You'll see a list of files and folders; you don't need to open or change any of them. Nova looks after them.
 

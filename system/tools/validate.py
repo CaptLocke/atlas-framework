@@ -831,6 +831,12 @@ def check_rhythms(c, path, data, template):
             rep.error(path, "insights.brief_max must be a whole number")
         if "engagement" in ins and ins["engagement"] not in ("adaptive", "fixed"):
             rep.error(path, "insights.engagement must be adaptive or fixed")
+        sk = ins.get("suppressed_kinds")
+        if sk is not None and not (isinstance(sk, list) and all(isinstance(x, str) for x in sk)):
+            rep.error(path, "insights.suppressed_kinds must be a list of insight kinds")
+        for k in ins:
+            if k not in ("brief_max", "engagement", "suppressed_kinds"):
+                rep.warn(path, "insights: unknown key %r" % k)
     away = data.get("away")
     if away is not None:
         if not isinstance(away, dict):
@@ -841,6 +847,9 @@ def check_rhythms(c, path, data, template):
                 if v is not None and not is_date(v):
                     rep.error(path, "away.%s must be YYYY-MM-DD or null" % k)
             s, e = away.get("start"), away.get("end")
+            # end: null while start is set means open-ended away (until the user is back)
+            if e is not None and s is None:
+                rep.error(path, "away.end is set but away.start is null")
             if is_date(s) and is_date(e) and str(e) < str(s):
                 rep.error(path, "away.end is before away.start")
     paused = data.get("paused") or []
@@ -957,6 +966,14 @@ def check_nova(c, path, data, template):
     dv = data.get("data_version")
     if dv is not None and not (isinstance(dv, int) and dv >= 0):
         rep.error(path, "data_version must be a whole number")
+    mdv = c.load_manifest().get("data_version")
+    if isinstance(dv, int) and isinstance(mdv, int) and not template:
+        if dv > mdv:
+            rep.warn(path, "data_version %d is newer than this release expects (%d); usual after a rollback "
+                           "(nova-update handles it)" % (dv, mdv))
+        elif dv < mdv:
+            rep.warn(path, "data_version %d is older than this release expects (%d); migrations are pending"
+                     % (dv, mdv))
     if data.get("plan") is not None and data.get("plan") not in PLANS:
         rep.error(path, "plan must be one of %s" % ", ".join(PLANS))
     att = data.get("attestation") if "attestation" in data else None
@@ -1149,6 +1166,29 @@ def check_record(c, path):
             rep.warn(path, "body link [[%s]] does not exist" % target)
 
 
+def setup_step5_done(c):
+    """True once setup step 5 is complete: user/.state/setup.yaml lists 5 as
+    completed, or nova.yaml has an attestation recorded."""
+    sp = c.p("user", ".state", "setup.yaml")
+    if os.path.exists(sp):
+        try:
+            with open(sp, encoding="utf-8") as f:
+                st = yaml.safe_load(f) or {}
+            if 5 in (st.get("completed") or []) or "5" in [str(x) for x in (st.get("completed") or [])]:
+                return True
+        except (OSError, yaml.YAMLError, AttributeError):
+            pass
+    np = c.p("user", "settings", "nova.yaml")
+    if os.path.exists(np):
+        try:
+            with open(np, encoding="utf-8") as f:
+                nv = yaml.safe_load(f) or {}
+            return bool(isinstance(nv, dict) and nv.get("attestation"))
+        except (OSError, yaml.YAMLError):
+            return False
+    return False
+
+
 def check_user(c):
     rep = c.rep
     sdir = c.p("user", "settings")
@@ -1158,6 +1198,12 @@ def check_user(c):
                        "for missing files)")
     for f in present:
         check_settings_file(c, os.path.join(sdir, f))
+    if setup_step5_done(c):
+        for f in ("governance.yaml", "data-rules.yaml"):
+            if f not in present:
+                rep.error(os.path.join(sdir, f), "missing: setup step 5 is complete (attestation recorded), so "
+                                                 "this protected settings file must exist (copy it from "
+                                                 "system/templates/settings/)")
     reg = c.p("user", "extensions", "registry.yaml")
     if os.path.exists(reg):
         check_registry(c, reg)

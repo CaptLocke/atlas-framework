@@ -15,10 +15,11 @@ Formats: `system/schemas/settings.md`. Classes and locked levels: `system/rules/
 | "Treat board materials as summaries" | `data-rules.yaml · custom[]` (`name`, plain-language `match`, `handling`) | `governance_settings` 🔒 | none |
 | "Don't read #random", "ignore emails from newsletter.example.com", "skip my Personal calendar" | `data-rules.yaml · exclusions[]` (`messaging: channel:#random`, `mail: from:*@newsletter.example.com`, `calendar: series:Personal`) | `governance_settings` 🔒 | offer archive/forget of past items (`nova-memory`) |
 | "Turn off Evening Thoughts / the weekly review / status updates" | `rhythms.yaml · moments.<moment>` | `behavior_settings` | none (jobs skip themselves) |
-| "Status updates to Jordan and Priya on Thursdays" | `rhythms.yaml · moments.status_updates` (`audiences`, `day`) | `behavior_settings` | if day changes the weekly routine's day, update schedule |
+| "Status updates to Jordan and Priya on Thursdays" | `rhythms.yaml · moments.status_updates` (`audiences`, `day`) | `behavior_settings` | the job checks `day` itself; ensure a routine runs `status-updates` on that weekday, adding a small `status-updates` routine if none does |
 | "My hours are 9 to 5, Mon–Thu" | `rhythms.yaml · work_hours` | `behavior_settings` | re-derive work-hour schedules; update platform routines |
-| "Don't create people automatically", "deadline reminders 5 days ahead" | `rhythms.yaml · triggers.<trigger>` (`on`/`off` or `{ on, days }`) | `behavior_settings` | none |
+| "Don't create people automatically", "deadline reminders 5 days ahead" | `rhythms.yaml · triggers.<trigger>` (`on`/`off` or `{ enabled, days }`) | `behavior_settings` | none |
 | "Only one insight in the brief", "stop adapting insight volume" | `rhythms.yaml · insights` (`brief_max`, `engagement: adaptive|fixed`) | `behavior_settings` | none |
+| "Stop suggesting ideas", "fewer people insights", "no more pattern insights" | `rhythms.yaml · insights.suppressed_kinds` (add the insight kind, e.g. `[idea]`; remove to bring it back) | `behavior_settings` | none; "fewer" (not none) → lower `brief_max` or keep adaptive, and say which |
 | "Pause/resume the weekly review", "I'm away" | `rhythms.yaml · away / paused` | `behavior_settings` | hand to `nova-away` |
 | "Switch me to Standard" | `routines.yaml · profile` + rebuild `routines` | `behavior_settings` | reconcile platform routines; carry over user jobs |
 | "Run the nightly at 9 pm", "weekly review on Thursday afternoon" | `routines.yaml · routines[].schedule` | `behavior_settings` | update platform routine schedule |

@@ -111,21 +111,49 @@ class GovernanceFiles(HookTestCase):
 
     def test_governance_in_chat_needs_record(self):
         self.assertBlocked(self.gov_write("chat"), "governance_settings")
-        self.approval("Edit", "governance_settings")
+        self.approval("Edit", "governance_settings", target="user/settings/governance.yaml")
         self.assertAllowed(self.gov_write("chat"))
         self.assertFalse(os.path.exists(self.path(".nova-tmp/approval.json")))
         self.assertBlocked(self.gov_write("chat"))
 
     def test_governance_record_wrong_tool_or_action(self):
-        self.approval("Write", "governance_settings")
+        t = "user/settings/governance.yaml"
+        self.approval("Write", "governance_settings", target=t)
         self.assertBlocked(self.gov_write("chat"))
-        self.approval("Edit", "send_communication")
+        self.approval("Edit", "send_communication", target=t)
         self.assertBlocked(self.gov_write("chat"))
 
-    def test_first_creation_in_chat_allowed(self):
+    def test_governance_record_target_must_match(self):
+        self.approval("Edit", "governance_settings", target="user/settings/data-rules.yaml")
+        self.assertBlocked(self.gov_write("chat"), "target")
+        self.approval("Edit", "governance_settings", target="test target")
+        self.assertBlocked(self.gov_write("chat"), "target")
+        # absolute and ./-prefixed targets are normalized
+        self.approval("Edit", "governance_settings", target=self.path("user/settings/governance.yaml"))
+        self.assertAllowed(self.gov_write("chat"))
+        self.approval("Edit", "governance_settings", target="./user/settings/../settings/governance.yaml")
+        self.assertAllowed(self.gov_write("chat"))
+
+    def test_first_creation_allowed_in_any_context(self):
+        for ctx in ("chat", "routine", None):
+            os.remove(self.path("user/settings/governance.yaml"))
+            self.assertAllowed(self.gov_write(ctx, tool="Write"))
+            self.write("user/settings/governance.yaml", "x: 1\n")
+        os.remove(self.path("user/settings/data-rules.yaml"))
+        self.assertAllowed(self.bash("paths", "cp system/templates/settings/data-rules.yaml user/settings/",
+                                     None))
+
+    def test_first_creation_does_not_consume_unrelated_record(self):
         os.remove(self.path("user/settings/governance.yaml"))
+        self.approval("Write", "send_communication", target="user/inbox/approvals.md")
         self.assertAllowed(self.gov_write("chat", tool="Write"))
-        self.assertBlocked(self.gov_write("routine", tool="Write"))
+        self.assertTrue(os.path.exists(self.path(".nova-tmp/approval.json")))
+
+    def test_first_creation_removes_stale_record_for_that_path(self):
+        os.remove(self.path("user/settings/governance.yaml"))
+        self.approval("Write", "governance_settings", target="user/settings/governance.yaml")
+        self.assertAllowed(self.gov_write("routine", tool="Write"))
+        self.assertFalse(os.path.exists(self.path(".nova-tmp/approval.json")))
 
     def test_other_settings_not_protected(self):
         r = self.run_hook("paths", "Write", {"file_path": self.path("user/settings/rhythms.yaml")}, "routine")

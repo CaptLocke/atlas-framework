@@ -1,4 +1,4 @@
-# Autonomy settings. Copied to user/settings/governance.yaml by nova-setup.
+# Autonomy settings. Copied to user/settings/governance.yaml by nova-setup at step 5.
 # PROTECTED (N6): changes only in chat with the user's explicit confirmation.
 # Levels: auto | propose | approve | never. Locked classes cannot be changed.
 # Format and override scope grammar: system/schemas/settings.md; meaning: system/rules/governance.md.

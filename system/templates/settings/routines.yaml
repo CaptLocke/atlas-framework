@@ -1,4 +1,4 @@
-# Routines. Placeholder: at setup step 10, nova-setup replaces this file with a copy
+# Routines. Copied to user/settings/routines.yaml by nova-setup at step 5 as a placeholder. At setup step 10, nova-setup replaces it with a copy
 # of the chosen profile from system/routine-profiles/ (lean.yaml, standard.yaml, full.yaml),
 # adjusting cron hours to the user's work hours, then fills routine_id as routines are created.
 # Format: system/schemas/settings.md.

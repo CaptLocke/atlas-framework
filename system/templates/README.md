@@ -4,7 +4,7 @@ version: 1.0.0
 ---
 # Templates
 
-Starter files for the user half. `nova-setup` copies each template to its destination in `user/` at the setup step shown (steps: tactical §16 and `.claude/skills/nova-setup/`). Templates are system-owned and replaced on update; the copies in `user/` belong to the user and are never overwritten by updates (only migrations change them).
+Starter files for the user half. `nova-setup` copies every template to its destination in `user/` at setup step 5 (steps: tactical §16 and `.claude/skills/nova-setup/`); later steps fill them in. Templates are system-owned and replaced on update; the copies in `user/` belong to the user and are never overwritten by updates (only migrations change them).
 
 **Copy rules**
 - Copy only when the destination does not exist. Never overwrite a user file; if a destination exists (resumed or repeated setup), keep it and fill in missing keys only.
@@ -12,34 +12,30 @@ Starter files for the user half. `nova-setup` copies each template to its destin
 - Commit each step's files together (`Nova-Actor: setup`).
 - Formats: settings `system/schemas/settings.md`; profile `system/schemas/profile.md`; inbox, state, logs, registry `system/schemas/formats.md`.
 
-| Template | Destination | Copied at setup step | Filled by |
+**Step 5 (attestation) copies every template below**, so a complete, valid `user/` exists before anything else happens: all settings (including the default `governance.yaml` and conservative `data-rules.yaml`), the profile starters, the inbox, state, and log starters, and the extensions registry. Nothing is ingested until the attestation in `nova.yaml` is recorded at the same step. Later steps fill or adjust the copies; they never re-copy.
+
+| Template | Destination | Filled or adjusted at (tactical §16) | Later maintained by |
 |---|---|---|---|
-| `state/setup.yaml` | `user/.state/setup.yaml` | 5 (first thing setup writes) | `nova-setup` after every step |
-| `state/cursors.yaml` | `user/.state/cursors.yaml` | 5 | `ingest` |
-| `state/jobs.yaml` | `user/.state/jobs.yaml` | 5 | every job |
-| `state/triggers.yaml` | `user/.state/triggers.yaml` | 5 | jobs and chats that fire triggers |
-| `state/health.yaml` | `user/.state/health.yaml` | 5 | `nova-health`, `monthly` |
-| `inbox/approvals.md` | `user/inbox/approvals.md` | 5 | jobs and chats (governance) |
-| `inbox/insights.md` | `user/inbox/insights.md` | 5 | `intelligence` |
-| `inbox/questions.md` | `user/inbox/questions.md` | 5 | all skills and jobs |
-| `logs/README.md` | `user/logs/README.md` | 5 | (static) |
-| `extensions/registry.yaml` | `user/extensions/registry.yaml` | 5 | `nova-extend` |
-| `settings/nova.yaml` | `user/settings/nova.yaml` | 5 (attestation recorded here; nothing is ingested before it) | `nova-setup` (5, 9, 12), `nova-update` |
-| `settings/governance.yaml` | `user/settings/governance.yaml` | 5 | `nova-settings` (chat only, N6) |
-| `profile/profile.md` | `user/profile/profile.md` | 6 | interview (6), research (7) |
-| `profile/working-style.md` | `user/profile/working-style.md` | 6 | interview |
-| `profile/communication-style.md` | `user/profile/communication-style.md` | 6 | interview |
-| `profile/thinking-style.md` | `user/profile/thinking-style.md` | 6 | interview |
-| `profile/preferences.md` | `user/profile/preferences.md` | 6 | interview |
-| `profile/voice-personal.md` | `user/profile/voice-personal.md` | 8 | uploads, sent mail (9), edits over time |
-| `profile/voice-house.md` | `user/profile/voice-house.md` | 8 | research (7), uploads |
-| `profile/design-system.md` | `user/profile/design-system.md` | 8 | brand guides, website research |
-| `settings/connectors.yaml` | `user/settings/connectors.yaml` | 9 | `nova-connectors` |
+| `state/setup.yaml` | `user/.state/setup.yaml` | after every step | `nova-setup` |
+| `state/cursors.yaml` | `user/.state/cursors.yaml` | 12 (first pass) | `ingest` |
+| `state/jobs.yaml` | `user/.state/jobs.yaml` | 12 | every job |
+| `state/triggers.yaml` | `user/.state/triggers.yaml` | 12 | jobs and chats that fire triggers |
+| `state/health.yaml` | `user/.state/health.yaml` | 10–12 (smoke test, known issues) | `nova-health`, `monthly` |
+| `inbox/approvals.md` | `user/inbox/approvals.md` | as needed | jobs and chats (governance) |
+| `inbox/insights.md` | `user/inbox/insights.md` | 12 | `intelligence` |
+| `inbox/questions.md` | `user/inbox/questions.md` | as needed | all skills and jobs |
+| `logs/README.md` | `user/logs/README.md` | (static) | — |
+| `extensions/registry.yaml` | `user/extensions/registry.yaml` | (empty at setup) | `nova-extend` |
+| `settings/nova.yaml` | `user/settings/nova.yaml` | 5 (identity, versions, attestation); 9–10 (deliverables and drop folders) | `daily-brief` (`first_brief_delivered`), `nova-update` |
+| `settings/governance.yaml` | `user/settings/governance.yaml` | defaults kept; adjusted only if the user asks | `nova-settings` (chat only, N6) |
+| `settings/data-rules.yaml` | `user/settings/data-rules.yaml` | 9 (reviewed and adjusted with the user) | `nova-settings` (chat only, N6), `nova-memory` (exclusions) |
+| `settings/connectors.yaml` | `user/settings/connectors.yaml` | 9 | `nova-connectors` (chat only, N6) |
 | `settings/sources.yaml` | `user/settings/sources.yaml` | 9 | `nova-connectors`, `nova-settings` |
-| `settings/data-rules.yaml` | `user/settings/data-rules.yaml` | 9 (conservative defaults; user may adjust) | `nova-settings` (chat only, N6) |
-| `settings/rhythms.yaml` | `user/settings/rhythms.yaml` | 10 | `nova-setup`, `nova-settings`, `nova-away` |
-| `settings/routines.yaml` | `user/settings/routines.yaml` | 10: replaced by a copy of the chosen `system/routine-profiles/<profile>.yaml`, cron hours adjusted to `rhythms.yaml: work_hours` | `nova-setup`, `nova-settings` |
+| `settings/rhythms.yaml` | `user/settings/rhythms.yaml` | 10 (moments, work hours) | `nova-settings`, `nova-away` |
+| `settings/routines.yaml` | `user/settings/routines.yaml` | 10: replaced by a copy of the chosen `system/routine-profiles/<profile>.yaml`, cron hours adjusted to `rhythms.yaml: work_hours`; `routine_id`s filled as routines are created | `nova-settings` |
 | `settings/dashboards.yaml` | `user/settings/dashboards.yaml` | 11 | `nova-dashboards` |
+| `profile/profile.md`, `working-style.md`, `communication-style.md`, `thinking-style.md`, `preferences.md` | `user/profile/` | 6 (interview), 7 (research) | proposals via `questions.md` |
+| `profile/voice-personal.md`, `voice-house.md`, `design-system.md` | `user/profile/` | 7 (research), 8 (uploads); personal voice also from sent mail after 9 | refined from the user's edits |
 
 **Placeholders set at step 5:** `nova.yaml: installed_version` from `system/VERSION`, `data_version` from `system/manifest.yaml: data_version`, `timezone`, `repo`, `user_display_name`, `plan`, and `attestation` (with `reconfirm_due` = first business day of next quarter). `deliverables_folder` and `drop_folder` are filled at steps 9–10; `first_brief_delivered` by the first `daily-brief`.
 

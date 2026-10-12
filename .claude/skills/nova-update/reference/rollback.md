@@ -19,10 +19,11 @@ Chat only; the user's request plus a one-line confirmation is enough (`updates_m
 8. Validate, release the lock, push, log (`update · rolled back 1.1.0 → 1.0.0 at user request · commit <sha>`), republish Nova Guide and Control Center.
 9. Ask whether to stay on X (pause automatic update checks) or let the next check reinstall the newer version.
 
-## Repair (system files modified outside an update)
-- Triggered by `nova-health` (owned paths differ from release tag `v<installed>` with changes not made by `Nova-Actor: update` commits).
-- Fetch `refs/tags/v<installed>` from upstream (or ask for the zip of that version if upstream is unreachable), take the update lock, make owned paths match it exactly, validate, release the lock, commit (`Nova-Actor: update`, reason "repair: restore system files to 1.0.0"), push.
-- If the modification looks intentional (the user or a helper edited a skill), don't silently discard it: before repairing, offer to turn it into a user extension with `nova-extend` (`overrides: <component>`), then repair.
+## Repair (system files modified outside an update; chat only)
+- Triggered by `nova-health` in a chat (owned paths differ from the baseline with changes not made by `Nova-Actor: update` commits). In a routine, health records a known issue and nothing is restored.
+- Baseline: `refs/tags/v<installed>` from upstream; before the first real update (or if that tag doesn't exist upstream), `nova.yaml: installed_from_commit`, the template's starting commit, which is already in the repo (no fetch needed). If upstream is unreachable and no `installed_from_commit` exists, ask for the zip of that version.
+- First, always: show what changed and offer to keep intentional edits (the user or a helper edited a skill) as a user extension with `nova-extend` (`overrides: <component>`); never silently discard them.
+- Then restore from the baseline: take the update lock and make owned paths match it exactly, validate, release the lock, commit (`Nova-Actor: update`, reason "repair: restore system files to 1.0.0"), push.
 
 ## Data version ahead of the system
 After a rollback over additive migrations, `nova.yaml: data_version` can exceed `manifest.data_version`. Updates then run only migrations with `from_data_version` ≥ the user's value; validators should accept extra optional fields. Never lower `data_version` without running a reverse step.

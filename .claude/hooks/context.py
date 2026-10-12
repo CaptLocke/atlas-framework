@@ -20,8 +20,10 @@ https://code.claude.com/docs/en/tools-reference, checked 2026-10-12):
 Policy (system/rules/governance.md):
 - NOVA_CONTEXT=chat means chat; anything else or missing means routine
   (fail closed).
-- Every hook is a no-op in the upstream product repo (origin points to
-  system/manifest.yaml: upstream) or when system/manifest.yaml is missing.
+- Every hook is a no-op in the upstream product repo: origin points to
+  system/manifest.yaml: upstream (DEFAULT_UPSTREAM when the manifest is
+  missing). A missing manifest does NOT switch the hooks off; owned paths
+  then fall back to DEFAULT_OWNED_PATHS.
 - Internal errors fail closed in routine context and for locked actions;
   otherwise the call is allowed with a warning on stderr.
 """
@@ -44,6 +46,9 @@ GOVERNANCE_FILES = (
 # Maximum lifetimes (minutes) from system/schemas/formats.md section 2, plus
 # one minute of clock slack. A record claiming to live longer is invalid.
 MAX_MINUTES = {"approval": 2 + 1, "update": 30 + 1, "purge": 15 + 1}
+DEFAULT_UPSTREAM = "CaptLocke/nova"
+DEFAULT_OWNED_PATHS = ["CLAUDE.md", "README.md", "LICENSE", "CHANGELOG.md", ".gitignore", "docs/", ".claude/",
+                       "system/"]
 
 _CACHE = {}
 
@@ -53,6 +58,7 @@ class State:
     hook = "nova"
     context = "routine"
     locked = False      # set once the call is known to be a locked action
+    raw = None          # raw stdin text (for failsafe.py)
 
 
 STATE = State()
@@ -130,18 +136,15 @@ def repo_slug(url):
 def is_upstream(proj):
     """True when hooks must not enforce anything (maintainers' upstream repo).
 
-    No-op when system/manifest.yaml is missing, or when origin points to the
-    repo named in manifest 'upstream'. Cached in-process only.
+    True when origin points to the repo named in manifest 'upstream'
+    (DEFAULT_UPSTREAM if the manifest or field is missing). Cached in-process.
     """
     key = ("upstream", proj)
     if key in _CACHE:
         return _CACHE[key]
     text = _manifest_text(proj)
-    if text is None:
-        _CACHE[key] = True
-        return True
-    m = re.search(r"^upstream:\s*[\"']?([^\s\"'#]+)", text, re.M)
-    upstream = m.group(1).strip().lower() if m else ""
+    m = re.search(r"^upstream:\s*[\"']?([^\s\"'#]+)", text, re.M) if text else None
+    upstream = (m.group(1) if m else DEFAULT_UPSTREAM).strip().lower()
     result = False
     if upstream:
         try:
@@ -169,7 +172,11 @@ def load_yaml(path, proj):
 def owned_paths(proj):
     key = ("owned", proj)
     if key not in _CACHE:
-        data = load_yaml(os.path.join(proj, "system", "manifest.yaml"), proj) or {}
+        mpath = os.path.join(proj, "system", "manifest.yaml")
+        if not os.path.exists(mpath):
+            _CACHE[key] = list(DEFAULT_OWNED_PATHS)
+            return _CACHE[key]
+        data = load_yaml(mpath, proj) or {}
         paths = data.get("owned_paths") or []
         if not isinstance(paths, list) or not paths:
             raise ValueError("system/manifest.yaml has no owned_paths list")
@@ -267,9 +274,23 @@ def valid_lock(proj, kind):
     return check_expiry(data, kind, rel)
 
 
-def approval_matches(proj, tool, actions):
+def norm_target(proj, value):
+    """Repo-relative POSIX form of a record's 'target' when it is a path."""
+    if not isinstance(value, str) or not value.strip():
+        return ""
+    v = value.strip()
+    if os.path.isabs(v):
+        rel = rel_to_project(v, proj, proj)
+        return rel if rel is not None else v
+    v = os.path.normpath(v).replace(os.sep, "/")
+    return v[2:] if v.startswith("./") else v
+
+
+def approval_matches(proj, tool, actions, targets=None):
     """(record, reason). record is the approval dict when it is present,
-    unexpired, names exactly this tool and one of the allowed actions."""
+    unexpired, names exactly this tool and one of the allowed actions, and -
+    when 'targets' (repo-relative paths) is given - a target equal to one of
+    them."""
     data, err = read_record(proj, APPROVAL)
     if data is None:
         return None, err
@@ -283,7 +304,22 @@ def approval_matches(proj, tool, actions):
             APPROVAL, data.get("action"), " or ".join(sorted(actions)))
     if not str(data.get("user_confirmation", "")).strip():
         return None, "%s has no user_confirmation quote" % APPROVAL
+    if targets is not None:
+        t = norm_target(proj, data.get("target"))
+        if t not in targets:
+            return None, "%s target %r does not match the file being changed (%s); set target to the " \
+                         "repo-relative path" % (APPROVAL, data.get("target"), ", ".join(sorted(targets)))
     return data, ""
+
+
+def discard_stale_approval(proj, targets):
+    """Delete an approval record whose target is one of 'targets'."""
+    data, _ = read_record(proj, APPROVAL)
+    if data is not None and norm_target(proj, data.get("target")) in targets:
+        try:
+            consume_approval(proj)
+        except OSError:
+            pass
 
 
 def consume_approval(proj):
@@ -301,6 +337,7 @@ def run(hook_name, handler):
     STATE.context = nova_context()
     try:
         raw = sys.stdin.read()
+        STATE.raw = raw
         payload = json.loads(raw) if raw.strip() else {}
         if not isinstance(payload, dict):
             raise ValueError("hook input is not a JSON object")

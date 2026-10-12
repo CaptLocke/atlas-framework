@@ -10,7 +10,7 @@ A **Project** is a workspace in Claude. You'll make one called "Nova" and give i
 
 1. **In the Claude desktop app, click Projects** in the left-hand sidebar.
 
-   ![Screenshot: Where "Projects" is in the Claude app sidebar](images/claude-projects-sidebar.png)
+   ![The Claude app sidebar, with Projects near the top](images/claude-projects-sidebar.png)
 
 2. **Click Create project** (or **New project**).
 
@@ -18,7 +18,7 @@ A **Project** is a workspace in Claude. You'll make one called "Nova" and give i
 
 4. **Click Create project.**
 
-   ![Screenshot: The "create project" form with the name "Nova"](images/claude-new-project.png)
+   ![The create project form in Claude, with the name "Nova" typed in](images/claude-new-project.png)
 
 > **If it looks different:** if you don't see Projects in the sidebar, the sidebar may be collapsed. Click the sidebar icon at the top-left of the window to open it. On a narrow window, Projects may be under a menu (☰).
 
@@ -55,9 +55,33 @@ A **Project** is a workspace in Claude. You'll make one called "Nova" and give i
 
 5. **Click Save.**
 
-   ![Screenshot: Where to add the Project's instructions, with the note pasted in](images/claude-project-instructions.png)
+   ![The Nova Project page, with the instructions box open and the note pasted in](images/claude-project-instructions.png)
 
 > **Don't worry about getting it perfect.** During setup, Nova shows you a ready-made copy of these instructions with your Nova's address already filled in. If anything differs, Nova will ask you to paste its version in place of this one.
+
+---
+
+## Set up the Nova chat environment
+
+Nova's chats run in a cloud **environment**, a small workspace Claude uses behind the scenes. You'll give the Nova chats their own environment with one setting in it. **Why:** this setting tells Nova's safety checks that you're present in the chat to approve things. Without it, Nova plays safe and won't do anything that needs your approval, including parts of setup.
+
+1. **Open Claude's settings for cloud environments.** In the Claude desktop app, open **Settings** (as in [Step 3, Part B](03-connect-github.md#part-b-check-github-is-connected-in-claude-in-the-desktop-app)) and look for **Environments** or **Cloud environments**. It may be under a section such as **Claude Code** or **Code**.
+
+2. **Create a new environment** (look for **New environment** or **Add environment**) and name it **`Nova chat`**.
+
+3. **Add an environment variable.** Look for **Environment variables** (or **Variables**) and add one:
+   - **Name:** `NOVA_CONTEXT`
+   - **Value:** `chat`
+
+   Type both exactly as shown, in capitals and lower case as written.
+
+4. **Save** the environment.
+
+5. **Make sure the Nova Project's chats use it.** Open the Nova Project and look for an **Environment** setting (in the Project's settings, or a selector near the message box when you start a chat). Choose **Nova chat**.
+
+![The environment settings, with a new environment named "Nova chat" and the variable NOVA_CONTEXT set to chat](images/claude-environment-nova-chat.png)
+
+> **If it looks different, or you can't find it:** don't worry, skip this section and carry on. In your first chat, Nova checks automatically whether the environment is set up. If it isn't, Nova walks you through it step by step, then asks you to start a new chat so the setting takes effect.
 
 ---
 
@@ -71,11 +95,12 @@ A **Project** is a workspace in Claude. You'll make one called "Nova" and give i
    Set up Nova
    ```
 
-   ![Screenshot: A new chat inside the Nova Project with "Set up Nova" typed](images/claude-first-chat.png)
+   ![A new chat inside the Nova Project, with "Set up Nova" typed in the message box](images/claude-first-chat.png)
 
 3. **Wait a moment.** The first time, Claude opens your Nova and gets ready, which can take up to a minute. Nova then greets you and starts setting things up with you.
 
 > **If it looks different:**
+> - **Nova says the chat environment isn't set up:** follow its instructions, or see [Troubleshooting](troubleshooting.md#nova-says-the-chat-environment-isnt-set-up).
 > - **Claude says it can't find or attach the repository:** check the address you typed in the instructions (step 4 above), then see [Troubleshooting: Claude can't open my Nova](troubleshooting.md#claude-cant-open-my-nova).
 > - **Claude answers like an ordinary chat and doesn't mention Nova:** type **`Start Nova`** and send it. See [Troubleshooting](troubleshooting.md#claude-doesnt-seem-to-follow-the-project-instructions).
 > - **Claude asks permission to use a tool** (for example GitHub): click **Allow** (or **Always allow** for this Project).

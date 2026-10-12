@@ -31,13 +31,13 @@ If `ingest` has not succeeded in the last 24 hours and is not earlier in this ro
 4. Prioritize (full mode only): set `priority` against active goals, deadlines, and who is waiting; set a one-line `insight` and `next_step`.
 5. Dedupe obvious duplicate commitments (`merge_supersede`); ambiguous ones become questions.
 6. Evaluate triggers: `commitment_overdue` (set `status: slipped`; flag for the brief; for `waiting_on`, create a follow-up draft via `nova-write` and a pending approval entry to send it) and `deadline_approaching` (due within `days`, default 3: mark for the next brief's "Due soon"; the day before, mark for the top). Fire once per key.
-7. If commitments changed and this routine does not run `daily-brief` later, republish the Work Board through `nova-dashboards` (`dashboards_refresh`).
+7. If commitments changed and this routine does not run `daily-brief` later, republish (`nova-dashboards`, `dashboards_refresh`) every dashboard whose contract (`system/dashboards/*.contract.md`) lists `triage` in `republished_by`.
 
 ## Outputs
 - Updated commitment records (and new ones), index lines, `user/.state/triggers.yaml`.
 - Follow-up drafts in the user's mail tool and entries in `user/inbox/approvals.md` for sending them.
 - Questions in `user/inbox/questions.md` (vague commitments, ambiguous duplicates).
-- Work Board republished when no brief follows.
+- Dashboards listing `triage` in `republished_by`, republished when no brief follows.
 
 ## Early exit
 In light mode: no commitments created or changed since the last triage and none crossing a due/overdue threshold today → `early_exit`. In full mode: no open commitments and nothing new since last run → `early_exit`.

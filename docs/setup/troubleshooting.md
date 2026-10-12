@@ -23,7 +23,7 @@ Fix this before you go any further. It takes a minute and nothing is lost.
 4. **Click Change visibility**, then **Change to private** (or **Make private**).
 5. **Confirm** by following GitHub's prompts. It may ask you to type the repository name and your password or a phone code.
 
-   ![Screenshot: Repo Settings, Danger Zone, "Change visibility"](images/github-change-visibility.png)
+   ![Repository settings, Danger Zone, with the "Change visibility" button](images/github-change-visibility.png)
 
 6. **Check** that the label next to your repository name now says **Private**.
 
@@ -43,7 +43,7 @@ Claude says it can't find, attach, or access your repository. Work through these
    3. Under **Repository access**, make sure **Only select repositories** is chosen and your Nova is listed. If it isn't, add it with **Select repositories**.
    4. Click **Save**.
 
-   ![Screenshot: GitHub Settings, Applications, Claude, Configure, showing repository access](images/github-app-configure.png)
+   ![GitHub settings for the Claude app, with Repository access showing your Nova repository selected](images/github-app-configure.png)
 
 4. **Reinstall the app if Claude isn't listed.** Go to [github.com/apps/claude/installations/select_target](https://github.com/apps/claude/installations/select_target) and follow [Step 3, Part A](03-connect-github.md#part-a-give-claude-access-to-your-nova-repository-in-your-browser) again.
 5. **Start a fresh chat** in the Nova Project and say **`Start Nova`**.
@@ -58,6 +58,19 @@ Claude answers like an ordinary chat, doesn't mention Nova, or doesn't know anyt
 2. **Say `Start Nova`** and send it. This tells Claude to open your Nova from the beginning.
 3. **Check the instructions were saved.** Open the Project's instructions and make sure the text from [Step 4](04-create-the-nova-project.md#add-the-instructions) is there, with your address filled in.
 4. If it still doesn't work, see [Claude can't open my Nova](#claude-cant-open-my-nova) above.
+
+---
+
+## Nova says the chat environment isn't set up
+
+Nova checks at the start of each chat that it's running in the **Nova chat** environment. If it isn't, Nova can't do anything that needs your approval, so it stops and tells you.
+
+1. **Follow Nova's instructions in the chat.** It walks you through the setting one step at a time.
+2. **Or do it yourself:** see [Set up the Nova chat environment](04-create-the-nova-project.md#set-up-the-nova-chat-environment). You need an environment named **Nova chat** with the variable **`NOVA_CONTEXT`** set to **`chat`**, and the Nova Project's chats set to use it.
+3. **Check the spelling.** The name must be exactly `NOVA_CONTEXT` (capitals, with an underscore) and the value exactly `chat` (lower case, no spaces or quotes).
+4. **Start a new chat** in the Nova Project. The setting only takes effect in chats started after it's saved. Then say **"Continue setting up Nova"** (or **"Start Nova"** if setup is finished).
+
+> **If it looks different:** the environment settings may be labeled **Environments**, **Cloud environments**, or similar, and may sit under a **Claude Code** or **Code** section of Settings. If you can't find them at all, tell Nova: it will help, or draft an issue report.
 
 ---
 
