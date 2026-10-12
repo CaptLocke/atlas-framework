@@ -8,15 +8,19 @@ name: sync
 Every session that changes files in the repo.
 
 ## The rule
+**The GitHub repo is the only source of truth.** Read Nova files only from the clone of the user's repo attached to this session, save every change there, and push it to `origin/main`. Never read or write Nova files anywhere else: not in folders on the user's computer (even if a copy of the repo is connected as a local folder), not in Claude Project knowledge, not in uploads. If you notice another copy, ignore it and tell the user once that Nova only uses the GitHub repo.
+
 The user never sees or manages git. Pull at the start, commit and push after each logical change set, resolve conflicts yourself, and never rewrite history (N8; sole exception: purge).
 
 ## Procedure
 | Moment | Action |
 |---|---|
-| Session start | `git pull --rebase` on `main` |
+| Session start | `git pull --rebase` on `main` (the `SessionStart` hook does this automatically; if it reports a failure, retry before reading or writing Nova files) |
+| Before acting on a new request in a long chat (last pull > 15 minutes ago) | `git pull --rebase`, so routine runs made meanwhile are included |
 | After each logical change set (a filed input, a job, a settings change, a deliverable) | `git add -A`, `git commit` with trailers (below), `git pull --rebase`, `git push origin HEAD:main` |
 | Conflict during rebase | Resolve (below), `git rebase --continue`, push |
 | Push rejected or network/auth failure | Keep working; retry after the next change set; if it still fails at the end of the session or run, record a known issue in `user/.state/health.yaml` and tell the user in one line with the fix (usually: reconnect GitHub) |
+| End of every turn | Nothing uncommitted and nothing unpushed. The `Stop` hook enforces this: a turn can't end with unsaved changes; after repeated push failures it records a `sync-push-failing` known issue and warns the user |
 
 ## Commit messages
 ```
