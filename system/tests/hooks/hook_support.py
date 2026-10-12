@@ -112,6 +112,20 @@ class HookTestCase(unittest.TestCase):
                            cwd=self.root, timeout=60)
         return r
 
+    def run_event(self, hook, event, extra=None, context="chat"):
+        """Run a non-tool hook (SessionStart, Stop) with its event payload."""
+        env = dict(os.environ)
+        env["CLAUDE_PROJECT_DIR"] = self.root
+        env.pop("NOVA_CONTEXT", None)
+        if context is not None:
+            env["NOVA_CONTEXT"] = context
+        payload = {"session_id": "test", "transcript_path": "/dev/null", "cwd": self.root,
+                   "permission_mode": "default", "hook_event_name": event}
+        payload.update(extra or {})
+        return subprocess.run(["python3", os.path.join(self.root, ".claude", "hooks", hook + ".py")],
+                              input=json.dumps(payload), capture_output=True, text=True, env=env,
+                              cwd=self.root, timeout=90)
+
     def bash(self, hook, command, context="chat", cwd=None):
         return self.run_hook(hook, "Bash", {"command": command, "description": "test"}, context, cwd)
 
