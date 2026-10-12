@@ -11,7 +11,7 @@ Where information came from. Every fact in Nova traces to a source.
 ## Fields (in addition to `_common.md`)
 | Field | Type | Required | Values / notes |
 |---|---|---|---|
-| `kind` | enum | yes | email, meeting, message, doc, web, data, manual, journal, file, deliverable |
+| `kind` | enum | yes | email, meeting, message, doc, web, data (query results), record (CRM/task items), manual, journal, file, deliverable |
 | `origin_uri` | text | no | Permalink, doc URL, thread ID, or path. |
 | `connector` | text | no | Connector that provided it. |
 | `captured_on` | date | yes |  |
@@ -19,6 +19,7 @@ Where information came from. Every fact in Nova traces to a source.
 | `participants` | list of IDs | no |  |
 | `retention` | enum | yes | full, summary, pointer, per data rules |
 | `file_pointer` | text | no | For deliverables and drops: location in the user's cloud drive. |
+| `flags` | list | no | `suspicious` when the content contained instruction-like text aimed at an assistant (N7). |
 
 ## Status vocabulary
 captured, processed

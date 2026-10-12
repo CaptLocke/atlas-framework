@@ -2,6 +2,8 @@
 type: skill-reference
 skill: nova-dashboards
 ---
+
+> **Contracts govern.** `system/dashboards/README.md` and each `<name>.contract.md` define placeholders, theme tokens, truncation, and titles; where this file differs, they win.
 # Rendering and publishing detail
 
 ## The nine dashboards (and who usually refreshes them)
@@ -34,13 +36,13 @@ Map `user/profile/design-system.md` to the template's theme tokens (the contract
 
 ## Size budget
 - Budget = contract `size_budget_kb` for the whole HTML file.
-- Measure after embedding. Trim in this order unless the contract says otherwise: drop closed/old items beyond the contract's window → cap list lengths (keep highest priority, soonest due, most recent) → shorten summaries to one line → drop optional sections. Record `"truncated": {"shown": n, "total": m}` if the contract has that field.
+- Measure after embedding. Trim in this order unless the contract says otherwise: drop closed/old items beyond the contract's window → cap list lengths (keep highest priority, soonest due, most recent) → shorten summaries to one line → drop optional sections. Record truncation exactly as the contract specifies (`meta.truncated`: list name → number of items left out; see `system/dashboards/README.md`).
 
 ## Publishing rules (so routines can republish unattended)
 - **Private:** never public, never shared with anyone.
 - **Page-only:** a single self-contained HTML file; no extra published files, no uploaded assets.
 - **No grants:** no connector access, no live data, no runtime capabilities; everything the page shows is embedded at render time.
-- Same title on every republish (e.g. "Nova · Work Board"), so the user recognizes it.
+- Same title on every republish (the template's title, e.g. "Work Board"), so the user recognizes it.
 - Publishing a new page is done in chat (setup or recovery); republishing an existing URL is allowed in routines.
 - Use whatever artifact publishing tool the session provides; publish the rendered file from `.nova-tmp/dashboards/`.
 

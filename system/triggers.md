@@ -14,7 +14,7 @@ Triggers are conditions Nova checks every time it runs; they are not scheduled. 
 | `new_key_person` | `ingest`, chat | A person without a record appears in ≥3 sources within 14 days, or in a decision, commitment, or 1:1 | person ID | Create and link the person; if relationship is unclear, add a `relationship` question |
 | `deadline_approaching` | `triage`, chat | Open commitment (`i_owe`) or deadline event due within `days` (default 3) | due date | Add to the next brief's "Due soon"; the day before, raise to the top of the brief and the Work Board |
 | `key_meeting_upcoming` | `meeting-prep`, chat | A `one_on_one` event, or a meeting with external attendees or ≥1 linked open commitment/decision, within the next 24h | event start | Create a prep note (`nova-prep`) and link it in the brief |
-| `commitment_overdue` | `triage`, chat | Open commitment past due | due date | Set `status: slipped`; flag in the brief; if `waiting_on`, create a follow-up email draft (`nova-write`) and an approval entry |
+| `commitment_overdue` | `triage`, chat | Open commitment past due (either direction; `waiting_on` items approaching their date are surfaced by triage's aging rules, not `deadline_approaching`) | due date | Set `status: slipped` (triage owns this); flag in the brief; if `waiting_on`, create a follow-up email draft (`nova-write`) and an approval entry |
 
 ## User trigger format (`user/extensions/triggers/<name>.md`)
 ```markdown

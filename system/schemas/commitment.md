@@ -28,4 +28,4 @@ open, done, dropped, slipped (past due and still open; triage sets it)
 Typically links to: people, projects, events, goals.
 
 ## Capture guidance
-Record **explicit** promises automatically ("I'll send it Friday", "Dana will review by Tuesday"). Vague intentions ("we should look into that") become questions or are listed in the brief for confirmation, not commitments. Close only on evidence (sent email, delivered file, user says so).
+Record **explicit** promises automatically ("I'll send it Friday", "Dana will review by Tuesday"). Vague intentions ("we should look into that") become questions or are listed in the brief for confirmation, not commitments. Close only on evidence (sent email, delivered file, user says so). Promises between two other people (the user is neither owner nor counterparty) are not commitments: note them on the related project or person, or create a question if the user needs to track it.

@@ -93,7 +93,7 @@ folder: user/knowledge/<folder>/
 ```markdown
 ---
 type: migration
-id: NNNN
+id: "NNNN"          # quoted, so 0001 stays a string
 from_data_version: N
 to_data_version: N+1
 additive: true | false

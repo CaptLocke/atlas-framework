@@ -17,6 +17,7 @@ Operations marked † are required for a connector to count as covering the cate
 | | `read_item`† | Full message/thread | read |
 | | `search` | Query messages | read |
 | | `list_sent` | Sent messages since a time (voice learning, commitment evidence) | read |
+| | `list_drafts` | Existing drafts (avoid duplicates) | read |
 | | `create_draft` | Draft a message/reply | draft |
 | | `update_draft` | Change a draft | draft |
 | | `send` | Send/reply/forward | send |
@@ -25,6 +26,7 @@ Operations marked † are required for a connector to count as covering the cate
 | **calendar** | `list_range`† | Events in a date range | read |
 | | `read_item` | Event details | read |
 | | `create_event` | Create an event (own calendar) | write (with attendees: send) |
+| | `update_event` | Change an event | write (with attendees: send) |
 | | `respond` | Accept/decline/propose | send |
 | | `delete` | Remove an event | delete |
 | **meetings** | `list_recent`† | Recordings/transcripts since a time | read |
@@ -60,7 +62,7 @@ Operations marked † are required for a connector to count as covering the cate
 | | `fetch` | Read a page | read |
 | **other** | (recorded as found) | | classify each tool |
 
-**Risk classification rules for unknown tools:** names containing `send|reply|forward|post|publish|invite|respond` → `send`; `share|permission|grant|invite` → `share`; `delete|trash|remove|purge|archive_permanently` → `delete`; `pay|purchase|charge|sign|password|credential|token|2fa|mfa` → `security`; `create|update|edit|move|label|set` → `write`; `draft` → `draft`; otherwise `read` only if it clearly reads. When ambiguous, choose the riskier tag. Hooks apply the name patterns regardless of tags.
+**Risk classification rules for unknown tools:** names containing `send|reply|forward|post|publish|invite|respond` → `send`; `share|permission|grant|invite` → `share`; `delete|trash|remove|purge|archive_permanently` → `delete`; `pay|purchase|charge|sign|password|credential|token|2fa|mfa` → `security`; `create|update|edit|move|label|set` → `write`; `draft` → `draft`; otherwise `read` only if it clearly reads. When ambiguous, choose the riskier tag. A general "run SQL" tool that can modify data is tagged `write` even when mapped to `data.query` (Nova sends read-only SELECT statements only). Hooks apply the name patterns regardless of tags.
 
 ## Mapping procedure (summary; full procedure in `nova-connectors`)
 1. List connectors and their tools available in this session.

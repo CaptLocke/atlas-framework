@@ -7,13 +7,7 @@ skill: nova-setup
 Steps 1–4 are done by the user with the illustrated guide in `docs/setup/` (macOS and Windows). This file is what Nova says when the user is partly through them, comes back stuck, or needs the bootstrap stub again. Keep every answer to one action at a time; wait for "done" before giving the next.
 
 ## The bootstrap stub
-Fill `<owner>/<repo>` from `git remote get-url origin` (e.g. `https://github.com/maya-chen/nova.git` → `maya-chen/nova`). Show it in a copy block, exactly:
-
-```
-This is my Nova. At the start of every conversation, attach the GitHub repo <owner>/<repo>, sync it, and follow its CLAUDE.md. Never ask me to commit, push, or merge. If you can't attach the repo, tell me and show me how to fix it.
-```
-
-Example for a fictional user: `This is my Nova. At the start of every conversation, attach the GitHub repo maya-chen/nova, sync it, and follow its CLAUDE.md. Never ask me to commit, push, or merge. If you can't attach the repo, tell me and show me how to fix it.`
+Use the canonical text in `system/templates/bootstrap-stub.md` (the setup guide uses the same text). Replace `YOUR-USERNAME/YOUR-REPO` with the user's repository, taken from `git remote get-url origin` (e.g. `https://github.com/maya-chen/nova.git` → `maya-chen/nova`), and show it in a copy block exactly as written there.
 
 How to present it:
 > Here's the text for your Nova project. Copy all of it, then in Claude open your **Nova** project → **Project instructions** (sometimes shown as "Set custom instructions" or a pencil icon), paste it in, and save. After that, every new chat in that project starts as Nova.

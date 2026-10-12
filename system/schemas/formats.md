@@ -31,7 +31,7 @@ jobs:
   quarterly: { last_success: "…", last_status: ok, period_done: "2026-Q4" }
   update-check: { last_success: "…", last_status: ok, last_checked_version: "1.0.0" }
 ```
-`last_status`: `ok | partial | failed | skipped_away | skipped_paused | early_exit`.
+`last_status`: `ok | partial | failed | skipped_away | skipped_paused | early_exit`. A job skipped by a routine's `when` modifier leaves `jobs.yaml` unchanged (noted only in the run report). `update-check` also records `last_checked` (timestamp) and `latest_seen_version`.
 
 ### triggers.yaml
 ```yaml
@@ -56,6 +56,9 @@ last_system_check: 2026-10-01
 known_issues:
   - { id: conn-outlook-auth, severity: high, since: 2026-10-10, summary: "Outlook connection expired", fix: "Reconnect Outlook in Settings → Connectors", status: open }
 smoke_test: { last_run: 2026-10-01, results: { repo_push: pass, connectors: pass, hooks: pass, artifact_republish: pass } }
+routine_availability:              # evidence from routine runs; applied to connectors.yaml in the next chat (N6)
+  outlook: { available: true, observed: 2026-10-12, run: nightly-cycle-20261012-2007 }
+insight_engagement: { period: 2026-09, by_kind: { risk: { acted: 3, dismissed: 1, expired: 0 }, pattern: { acted: 1, dismissed: 4, expired: 2 } } }   # written by monthly
 indicators: { period: 2026-09, time_to_first_brief_hours: 14, cited_answer_share: 0.82, auto_commitments: 41, manual_commitments: 6, automation_success_rate: 0.97, user_action_issues: 1, corrections: 3, active_weeks: 4 }
 ```
 
@@ -107,11 +110,15 @@ name: insights
 - **Suggested action:** Raise at Thursday's product sync.
 - **Status history:** new 2026-10-12
 ```
-Statuses: `new | seen | acted | dismissed | expired` (expire after 30 days unseen). `score` 0–1 = relevance to goals × urgency × novelty. Engagement signals (acted/dismissed counts by insight kind) are summarized in `health.yaml` and used by `nova-insights` to adapt volume.
+Each entry also has a `- **Kind:** <kind>` line (kinds defined in `.claude/skills/nova-insights/reference/insight-kinds.md`). Statuses: `new | seen | acted | dismissed | expired`. An insight is `seen` once it is included in a published brief or shown in chat; unseen insights expire after 30 days. `score` 0–1 = relevance to goals × urgency × novelty. Engagement signals (acted/dismissed counts by insight kind) are summarized in `health.yaml` and used by `nova-insights` to adapt volume.
 
 ### questions.md
 Nova's questions for the user (profile proposals, migration questions, unclear relationships, vague commitments).
 ```markdown
+---
+type: inbox
+name: questions
+---
 ## Q-2026-10-12-02 · open · profile
 - **Question:** You shortened my last 4 drafts by about half. Should I default to shorter emails?
 - **Proposed change:** voice-personal.md: "Keep emails under ~120 words" [observed · proposed]
@@ -120,7 +127,7 @@ Nova's questions for the user (profile proposals, migration questions, unclear r
 Kinds: `profile | migration | relationship | commitment | setup | other`. Statuses: `open | answered | dismissed`.
 
 ### drop/
-Files attached in chat land here, then are filed by `nova-capture` and removed from `drop/` (the source record keeps a pointer; the file itself moves to `user/library/` only if data rules and size allow, max 10 MB).
+Files attached in chat land here, then are filed by `nova-capture` and removed from `drop/` (the source record keeps a pointer; the file itself moves to `user/library/YYYY/<file>` only if its data-rule handling is `full` and it is 10 MB or less). Removing processed files from `drop/` is housekeeping, not a destructive action (hooks allow it).
 
 ## 4. Logs (`user/logs/`)
 
@@ -186,16 +193,17 @@ source: "[[sources/2026-10-12-journal]]"
 | Daily Brief | `user/work/briefs/YYYY-MM-DD.md` |
 | Catch-up brief (after away) | `user/work/briefs/YYYY-MM-DD-catch-up.md` |
 | Meeting prep note | `user/work/prep/YYYY-MM-DD-<event-slug>.md` |
+| Person / topic / deal prep note | `user/work/prep/YYYY-MM-DD-<subject-slug>.md` (frontmatter `subject:` with the record ID) |
 | Weekly Review | `user/work/reviews/YYYY-Www.md` (ISO week) |
 | Status update draft | `user/work/status/YYYY-MM-DD-<audience-slug>.md` |
-| Monthly report (goal progress, health, automation review, indicators) | `user/work/reports/YYYY-MM.md` |
-| Quarterly report (reset, role refresh) | `user/work/reports/YYYY-Qn.md` |
+| Monthly report (goal progress, health, automation review, indicators) | `user/work/reports/YYYY-MM.md`, named for the **month reviewed** (the November run writes `2026-10.md` and sets `period_done: 2026-11`) |
+| Quarterly report (reset, role refresh) | `user/work/reports/YYYY-Qn.md`, named for the **quarter reviewed** |
 | Performance review pack | `user/work/reports/YYYY-Qn-performance.md` |
-| Accomplishments | Appended to the relevant goal's `accomplishments` field and `user/work/accomplishments.md` (running list) |
+| Accomplishments | Appended to the relevant goal's `accomplishments` field and `user/work/accomplishments.md` (running list; line format in `.claude/skills/nova-review/reference/weekly.md`) |
 | Deliverable working files | `user/work/deliverables/<YYYY-MM-DD-slug>/` (markdown/data used to build it; the finished binary goes to the deliverables folder, §9.6a) |
 | Project page data | rendered on request; no file |
 
-Each output has frontmatter `type: <brief|prep|review|status|report|performance>`, `date`, and `sources`.
+Each output has frontmatter `type: <brief|prep|review|status|report|performance>`, `date`, and `sources`, plus as relevant: `generated` (timestamp), `window_start`/`window_end`, `period`, `kind: catch-up`, `audience`, `subject`. Section structure: Daily Brief and catch-up brief per `.claude/skills/nova-brief/reference/`; reviews and reports per `.claude/skills/nova-review/reference/`; prep notes per `.claude/skills/nova-prep/reference/templates.md`.
 
 ## 8. Extensions registry (`user/extensions/registry.yaml`)
 ```yaml
@@ -208,7 +216,10 @@ extensions:
     created: 2026-10-20
     description: "Sales deals with stage and value."
 ```
-User types use the schema outline in `system/guide/authoring.md` and get their own folder under `user/knowledge/` (named in the type file's frontmatter `folder:`).
+- `kind: routine` entries have `path: null` (the routine lives in `user/settings/routines.yaml`).
+- `kind: playbook` entries point to a `type: playbook-extension` file that links to a knowledge playbook record.
+- User types use the schema outline in `system/guide/authoring.md`, get their own folder under `user/knowledge/` (frontmatter `folder:`), and declare machine-readable `fields:` and `enums:` in their frontmatter so the validator can check their records.
+- Removed extensions move to `user/extensions/_retired/` (not deleted) and leave the registry.
 
 ## 9. Manifest (`system/manifest.yaml`)
 Fields: `name`, `version`, `data_version`, `min_plan`, `support_email`, `upstream`, `owned_paths` (list), `models` (`fast`, `strongest`), `profiles`.

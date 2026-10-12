@@ -87,10 +87,11 @@ types:
   source:
     folder: sources
     required: [kind, captured_on, retention]
-    fields: [kind, origin_uri, connector, captured_on, occurred_on, participants, retention, file_pointer]
+    fields: [kind, origin_uri, connector, captured_on, occurred_on, participants, retention, file_pointer, flags]
     enums:
       status: [captured, processed]
-      kind: [email, meeting, message, doc, web, data, manual, journal, file, deliverable]
+      kind: [email, meeting, message, doc, web, data, record, manual, journal, file, deliverable]
+      flags: [suspicious]
       retention: [full, summary, pointer]
 
 autonomy_levels: [auto, propose, approve, never]

@@ -15,6 +15,7 @@ All settings are YAML in `user/settings/`. Defaults ship in `system/templates/se
 ```yaml
 user_display_name: Maya Chen
 timezone: America/Los_Angeles          # IANA
+locale: en-US                          # dates and numbers in output and dashboards
 repo: maya-chen/nova                   # owner/name of this repo
 installed_version: 1.0.0               # updated by nova-update
 data_version: 1                        # updated by migrations
@@ -26,6 +27,9 @@ attestation:                           # required before any ingestion
   recorded_on: 2026-10-12
   nova_version: 1.0.0
   reconfirm_due: 2027-01-04            # first business day of next quarter
+# Self-employed / multiple clients: statement reads "…work information from my business and my clients…", employer: the user's own business.
+# Overdue reconfirmation: a known issue reminds the user; ingest continues. Ingest pauses only if the user declines,
+# or after a change of employer/role until a new attestation is recorded.
 deliverables_folder:                   # where finished files are saved (C13)
   connector: google-drive              # connector name from connectors.yaml, or null (download only)
   path: "Nova Deliverables"
@@ -34,6 +38,7 @@ drop_folder:
   connector: google-drive              # or null if no cloud drive
   path: "Nova Drop"
   folder_id: null
+  move_supported: true                 # false → Nova remembers processed file IDs in cursors instead of moving files
 first_brief_delivered: 2026-10-13
 ```
 
@@ -123,7 +128,8 @@ connectors:
     id_format: "opaque string"
     link_format: "https://outlook.office.com/mail/id/{id}"
     limits: "50 items per page"
-    available_in_routines: true        # true | false | unknown
+    available_in_routines: true        # true | false | unknown; routines record evidence in .state/health.yaml (routine_availability), applied here in the next chat
+    covered: { mail: full, calendar: full }   # optional: full | partial per category (partial = some † operations missing)
     mapped_on: 2026-10-12
     tool_fingerprint: 3f9a…            # hash of the tool list; health check re-maps when it changes
 ```
@@ -172,15 +178,15 @@ insights:
   brief_max: 3
   engagement: adaptive                  # adaptive | fixed
 away:                                   # set by nova-away; null when not away
-  start: null                           # YYYY-MM-DD
-  end: null
+  start: null                           # YYYY-MM-DD, first day away
+  end: null                             # YYYY-MM-DD, LAST day away (inclusive); the user is back the next day
   set_on: null
 paused: []                              # e.g. [{ job: weekly-review, until: 2026-11-01 }, { moment: evening_thoughts, until: null }]
 ```
 
 ## routines.yaml
 ```yaml
-profile: lean                           # lean | standard | full | custom
+profile: lean                           # lean | standard | full | custom (custom = user-edited)
 routines:
   - name: nightly-cycle
     schedule: "7 20 * * *"              # cron in nova.yaml timezone; one schedule per routine
@@ -211,4 +217,6 @@ dashboards:
   about-you: { url: null, last_published: null }
   nova-guide: { url: null, last_published: null }
 project_pages: {}                       # project ID → url, created on request
+# User dashboards from extensions are additional keys named after the extension.
 ```
+`dashboards.yaml` URLs and `last_published` dates are bookkeeping written under `dashboards_refresh` (auto), so routines can update them; choosing which dashboards exist is `behavior_settings`.
