@@ -789,7 +789,7 @@ def _connector_names(c):
 
 
 def _on(v):
-    return isinstance(v, bool) or (isinstance(v, dict) and isinstance(v.get("on", v.get(True)), bool))
+    return isinstance(v, bool) or (isinstance(v, dict) and isinstance(v.get("enabled", v.get("on", v.get(True))), bool))
 
 
 def check_rhythms(c, path, data, template):

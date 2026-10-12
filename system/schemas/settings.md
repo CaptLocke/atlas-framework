@@ -160,7 +160,7 @@ moments:
   evening_thoughts: on
   daily_brief: on
   weekly_review: on
-  status_updates: { on: true, audiences: ["[[people/jordan-lee]]"], day: fri }
+  status_updates: { enabled: true, audiences: ["[[people/jordan-lee]]"], day: fri }
   goal_progress: on
   user_health_check: on
   system_health_check: on
@@ -171,15 +171,16 @@ moments:
 triggers:                               # built-ins from system/triggers.md; user triggers too
   new_project: on
   new_key_person: on
-  deadline_approaching: { on: true, days: 3 }
+  deadline_approaching: { enabled: true, days: 3 }
   key_meeting_upcoming: on
   commitment_overdue: on
 insights:
   brief_max: 3
   engagement: adaptive                  # adaptive | fixed
+  suppressed_kinds: []                  # insight kinds the user turned off, e.g. [idea] ("stop suggesting ideas in the brief")
 away:                                   # set by nova-away; null when not away
   start: null                           # YYYY-MM-DD, first day away
-  end: null                             # YYYY-MM-DD, LAST day away (inclusive); the user is back the next day
+  end: null                             # YYYY-MM-DD, LAST day away (inclusive); null while away = away until the user says they're back
   set_on: null
 paused: []                              # e.g. [{ job: weekly-review, until: 2026-11-01 }, { moment: evening_thoughts, until: null }]
 ```

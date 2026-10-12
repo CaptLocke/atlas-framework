@@ -200,7 +200,7 @@ source: "[[sources/2026-10-12-journal]]"
 | Quarterly report (reset, role refresh) | `user/work/reports/YYYY-Qn.md`, named for the **quarter reviewed** |
 | Performance review pack | `user/work/reports/YYYY-Qn-performance.md` |
 | Accomplishments | Appended to the relevant goal's `accomplishments` field and `user/work/accomplishments.md` (running list; line format in `.claude/skills/nova-review/reference/weekly.md`) |
-| Deliverable working files | `user/work/deliverables/<YYYY-MM-DD-slug>/` (markdown/data used to build it; the finished binary goes to the deliverables folder, §9.6a) |
+| Deliverable working files | `user/work/deliverables/<YYYY-MM-DD-slug>/` (markdown/data used to build it; the finished binary goes to the deliverables folder per `.claude/skills/nova-write/reference/deliverables.md`) |
 | Project page data | rendered on request; no file |
 
 Each output has frontmatter `type: <brief|prep|review|status|report|performance>`, `date`, and `sources`, plus as relevant: `generated` (timestamp), `window_start`/`window_end`, `period`, `kind: catch-up`, `audience`, `subject`. Section structure: Daily Brief and catch-up brief per `.claude/skills/nova-brief/reference/`; reviews and reports per `.claude/skills/nova-review/reference/`; prep notes per `.claude/skills/nova-prep/reference/templates.md`.

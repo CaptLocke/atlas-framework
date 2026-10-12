@@ -24,7 +24,7 @@ All paths are relative to `user/extensions/` (the registry `path`). Outlines: `s
 
 ## trigger
 - **Path:** `triggers/<name>.md` in the user trigger format of `system/triggers.md` (frontmatter `type: trigger`, `name`, `evaluated_by`, `default`; sections Condition, Key, Action).
-- **Wiring:** add `<name>: on` (or `{ on: true, <param>: … }`) under `rhythms.yaml: triggers`. Fire-once via `user/.state/triggers.yaml`.
+- **Wiring:** add `<name>: on` (or `{ enabled: true, <param>: … }`) under `rhythms.yaml: triggers`. Fire-once via `user/.state/triggers.yaml`.
 - **Rules:** `evaluated_by` lists existing jobs (and `chat`); the action calls an existing skill or job; actions that would send/share/delete become drafts + approval entries.
 
 ## type
