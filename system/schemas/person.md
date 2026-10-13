@@ -22,7 +22,7 @@ Anyone the user works with or about, including the user themself (`relationship:
 | `notes_private` | text | no | Never shown on dashboards. |
 
 ## Relationships
-One value per person: their relationship **to the user**, not their importance. "Internal" means their email domain is in `nova.yaml: company.email_domains`, or they are known to work at the user's employer.
+One value per person: their relationship **to the user**, not their importance. "Internal" means their email domain is in `atlas.yaml: company.email_domains`, or they are known to work at the user's employer.
 
 | Value | Who | Examples |
 |---|---|---|
@@ -36,7 +36,7 @@ One value per person: their relationship **to the user**, not their importance. 
 | `prospect` | Someone at an organization the employer is trying to sell to that isn't a customer yet (`kind: prospect`). | Leads, evaluators in a trial or pilot, buying committee members before signature |
 | `vendor` | Someone at a company the employer buys from (`kind: vendor`). | Suppliers, agencies, consultants, account reps for tools the company pays for |
 | `partner` | Someone at an organization in a two-way business relationship with the employer (`kind: partner`). | Resellers, integration and technology partners, alliance and co-marketing partners |
-| `external` | Anyone else outside the company with a work reason to be in Nova. | Investors who aren't on the board, regulators, auditors, recruiters, journalists, industry contacts |
+| `external` | Anyone else outside the company with a work reason to be in Atlas. | Investors who aren't on the board, regulators, auditors, recruiters, journalists, industry contacts |
 | `other` | Nothing above fits yet. Setting it adds a `relationship` question to `user/inbox/questions.md`. | — |
 
 **How to choose (first match wins):**

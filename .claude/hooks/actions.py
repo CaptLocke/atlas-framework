@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Nova hook: locked external actions, N1-N4 (build plan H-3).
+"""Atlas hook: locked external actions, N1-N4 (build plan H-3).
 
 Registered in .claude/settings.json as a PreToolUse hook for MCP tools
 (matcher "mcp__.*") and shell commands (matcher "Bash|Monitor").
@@ -17,7 +17,7 @@ What it enforces (system/rules/governance.md):
   loosen a guard.
 - security (financial/legal/security, N4): always blocked.
 - send / share / delete (N1-N3): blocked in routines; in chats allowed only
-  with an unexpired .nova-tmp/approval.json naming exactly this tool and a
+  with an unexpired .atlas-tmp/approval.json naming exactly this tool and a
   matching action, which is consumed (deleted) on use.
 - Unmapped tools whose names match no pattern: blocked in routines, the user
   is asked in chats ("risky until mapped").
@@ -38,7 +38,7 @@ try:
 except BaseException as _fe:  # failsafe.py itself is broken: block
     def fail_safe(hook, exc, raw=None, _fe=_fe):
         try:
-            sys.stderr.write("Nova guard (%s): hook files are damaged (%s; %s); blocked.\n" % (hook, exc, _fe))
+            sys.stderr.write("Atlas guard (%s): hook files are damaged (%s; %s); blocked.\n" % (hook, exc, _fe))
         finally:
             os._exit(2)
 
@@ -50,7 +50,7 @@ def _raw_stdin():
 
 sys.excepthook = lambda _t, _e, _tb: fail_safe("actions", _e, _raw_stdin())
 try:
-    import context as nova  # noqa: E402
+    import context as atlas  # noqa: E402
     import shell  # noqa: E402
 except BaseException as _imp:  # includes SystemExit raised while importing
     fail_safe("actions", _imp, _raw_stdin())
@@ -205,7 +205,7 @@ def lookup_tag(tool_name, proj):
     if not os.path.exists(path):
         return None, False, None
     try:
-        data = nova.load_yaml(path, proj) or {}
+        data = atlas.load_yaml(path, proj) or {}
         conns = data.get("connectors") or []
     except Exception as e:  # malformed: fall back to name patterns, treat unmapped
         return None, False, "user/settings/connectors.yaml could not be read (%s)" % e
@@ -241,24 +241,24 @@ def lookup_tag(tool_name, proj):
 def guard_locked(tool_name, risks, proj, ctx, what):
     """risks: the locked kinds this call falls under (send/share/delete).
     An approval for any one of their classes authorizes the call."""
-    nova.STATE.locked = True
+    atlas.STATE.locked = True
     classes = {LOCKED_CLASS[r] for r in risks}
     cls = LOCKED_CLASS[max(risks, key=lambda r: SEVERITY[r])]
     if ctx != "chat":
-        nova.block(
-            "%s is a locked action (%s) and this is a routine (NOVA_CONTEXT=routine). "
+        atlas.block(
+            "%s is a locked action (%s) and this is a routine (ATLAS_CONTEXT=routine). "
             "Routines never send, share or delete. Prepare a draft if useful and queue the action "
             "in user/inbox/approvals.md for the user (system/rules/governance.md)." % (what, cls))
-    rec, why = nova.approval_matches(proj, tool_name, classes)
+    rec, why = atlas.approval_matches(proj, tool_name, classes)
     if rec is None:
-        nova.block(
+        atlas.block(
             "%s is a locked action (%s) and needs an approval record: %s. "
             "Locked action: show the user exactly what will happen, wait for an explicit yes, then write "
-            ".nova-tmp/approval.json with action '%s' and tool '%s' (format: system/schemas/formats.md "
+            ".atlas-tmp/approval.json with action '%s' and tool '%s' (format: system/schemas/formats.md "
             "section 2; procedure: system/rules/governance.md) and retry. Never write a record without a "
             "real confirmation." % (what, cls, why, cls, tool_name))
-    nova.consume_approval(proj)
-    nova.allow()
+    atlas.consume_approval(proj)
+    atlas.allow()
 
 
 def handle_mcp(payload, proj, ctx):
@@ -274,23 +274,23 @@ def handle_mcp(payload, proj, ctx):
         if not (tag == "write" and not has_attendees(payload.get("tool_input"))):
             risks.add("send")
     if "security" in risks:
-        nova.STATE.locked = True
-        nova.block(
+        atlas.STATE.locked = True
+        atlas.block(
             "%s looks like a financial, legal or security action (payments, purchases, signing, "
-            "credentials, account security). Nova never does these, in any context (N4). Tell the user "
+            "credentials, account security). Atlas never does these, in any context (N4). Tell the user "
             "and offer to prepare what they need to do it themselves." % tool_name)
     locked = [r for r in risks if r in LOCKED_CLASS]
     if locked:
         guard_locked(tool_name, locked, proj, ctx, "Calling %s" % tool_name)
     if not risks and not mapped and not read_only_name(tokens(bare)):
         msg = ("%s is not mapped in user/settings/connectors.yaml and its name doesn't show what it does, "
-               "so it is treated as risky until mapped (run nova-connectors in a chat)." % tool_name)
+               "so it is treated as risky until mapped (run atlas-connectors in a chat)." % tool_name)
         if warning:
             msg += " Note: " + warning
         if ctx != "chat":
-            nova.block(msg)
-        nova.ask(msg)
-    nova.allow(warning)
+            atlas.block(msg)
+        atlas.ask(msg)
+    atlas.allow(warning)
 
 
 EXEMPT_DELETE = ("user/inbox/drop/", "user/knowledge/_index/")
@@ -299,33 +299,33 @@ EXEMPT_DELETE = ("user/inbox/drop/", "user/knowledge/_index/")
 def handle_bash(payload, proj, ctx):
     command = (payload.get("tool_input") or {}).get("command")
     if not isinstance(command, str) or not command.strip():
-        nova.allow()
-    base = nova.session_cwd(payload, proj)
+        atlas.allow()
+    base = atlas.session_cwd(payload, proj)
     hits = []
     for seg in shell.segments(command, base):
         writes, deletes = shell.write_targets(seg)
         if seg.name == "mv" or (seg.name == "git" and shell.git_subcommand(seg.argv)[0] == "mv"):
             # moving within user/ is a rename, not a delete
             dest = writes[-1] if writes else ""
-            drel = nova.rel_to_project(shell.literal_prefix(dest), seg.cwd, proj) if dest else None
+            drel = atlas.rel_to_project(shell.literal_prefix(dest), seg.cwd, proj) if dest else None
             if drel is not None and drel.startswith("user/"):
                 deletes = []
         for word in deletes:
             if shell.unresolvable(word):
                 continue
-            rel = nova.rel_to_project(shell.literal_prefix(word) if shell.has_glob(word) else word, seg.cwd, proj)
-            if rel is None or not nova.overlaps(rel, "user/"):
+            rel = atlas.rel_to_project(shell.literal_prefix(word) if shell.has_glob(word) else word, seg.cwd, proj)
+            if rel is None or not atlas.overlaps(rel, "user/"):
                 continue
             r = rel.rstrip("/") + ("/" if os.path.isdir(os.path.join(proj, rel)) else "")
             if any(r.startswith(e) for e in EXEMPT_DELETE):
                 continue
-            if rel in nova.GOVERNANCE_FILES:
+            if rel in atlas.GOVERNANCE_FILES:
                 continue  # paths.py guards governance files (governance_settings)
             hits.append(rel or ".")
     if hits:
         guard_locked("Bash", ["delete"], proj, ctx,
                      "Deleting %s" % ", ".join(sorted(set(hits))[:5]))
-    nova.allow()
+    atlas.allow()
 
 
 def main(payload, proj, ctx):
@@ -334,12 +334,12 @@ def main(payload, proj, ctx):
         handle_mcp(payload, proj, ctx)
     elif tool_name in ("Bash", "Monitor"):
         handle_bash(payload, proj, ctx)
-    nova.allow()
+    atlas.allow()
 
 
 if __name__ == "__main__":
     try:
-        nova.run("actions", main)
+        atlas.run("actions", main)
     except SystemExit as _exit:
         if _exit.code in (0, 2, None):
             raise

@@ -31,7 +31,7 @@ Observed once (2026-10), for orientation only: tools named like `search_threads`
 - Exclusions from `data-rules.yaml` translate directly to Gmail syntax (`-from:`, `-label:`).
 
 ## Known quirks
-- Attachment **content** may not be readable (help center, 2026-10): note attachment names; ask the user to drop important attachments into Nova Drop.
+- Attachment **content** may not be readable (help center, 2026-10): note attachment names; ask the user to drop important attachments into Atlas Drop.
 - Threads are the natural Source unit; message IDs differ from thread IDs.
 - Personal Gmail accounts and Workspace accounts look the same; ask the user which inbox is work.
 

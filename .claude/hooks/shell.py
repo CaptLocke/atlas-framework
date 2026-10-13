@@ -1,4 +1,4 @@
-"""Nova hooks: pragmatic shell-command analysis for Bash tool calls.
+"""Atlas hooks: pragmatic shell-command analysis for Bash tool calls.
 
 Used by actions.py (deletes under user/), paths.py (writes to owned and
 governance paths) and git.py (git subcommands). Not a hook itself.

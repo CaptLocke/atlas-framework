@@ -7,7 +7,7 @@ covers: [source(file), project(update), event(milestone), drop handling, evidenc
 ---
 # Expected: 08 Dropped file: Globex pilot scope v2
 
-A draft document dropped for Nova. Tests filing a dropped file, enriching the existing project instead of duplicating it, and **not** closing a commitment on insufficient evidence.
+A draft document dropped for Atlas. Tests filing a dropped file, enriching the existing project instead of duplicating it, and **not** closing a commitment on insufficient evidence.
 
 ## Sources
 | ID | Level | Expectation |

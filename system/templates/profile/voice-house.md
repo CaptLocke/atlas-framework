@@ -1,7 +1,7 @@
 ---
 type: profile
 part: voice-house
-updated: null                  # set by nova-setup when first written
+updated: null                  # set by atlas-setup when first written
 ---
 # House voice
 

@@ -1,5 +1,5 @@
-# Health results and known issues. Copied to user/.state/health.yaml by nova-setup.
-# Written only by Nova. Format: system/schemas/formats.md §1.
+# Health results and known issues. Copied to user/.state/health.yaml by atlas-setup.
+# Written only by Atlas. Format: system/schemas/formats.md §1.
 last_user_check: null
 last_system_check: null
 known_issues: []

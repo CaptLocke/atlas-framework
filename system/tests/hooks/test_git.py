@@ -6,7 +6,7 @@ import unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from hook_support import HookTestCase, sh  # noqa: E402
 
-TRAILERS = "Nova-Actor: chat\nNova-Reason: test change"
+TRAILERS = "Atlas-Actor: chat\nAtlas-Reason: test change"
 
 
 def fake(*parts):
@@ -71,11 +71,11 @@ class HistoryRewrite(HookTestCase):
 
     def test_origin_change_blocked_even_with_purge_lock(self):
         self.purge_lock()
-        for cmd in ("git remote set-url origin https://github.com/CaptLocke/nova",
+        for cmd in ("git remote set-url origin https://github.com/CaptLocke/atlas-framework",
                     "git remote remove origin", "git config remote.origin.url https://x/y/z"):
             self.assertBlocked(self.bash("git", cmd, "chat"))
         self.assertAllowed(self.bash("git", "git remote get-url origin", "routine"))
-        self.assertAllowed(self.bash("git", "git remote add upstream https://github.com/CaptLocke/nova", "routine"))
+        self.assertAllowed(self.bash("git", "git remote add upstream https://github.com/CaptLocke/atlas-framework", "routine"))
 
 
 class RefDeletion(HookTestCase):
@@ -87,7 +87,7 @@ class RefDeletion(HookTestCase):
         self.update_lock()
         self.assertAllowed(self.bash("git", cmd, "routine"))
         self.assertAllowed(self.bash("git", "git push origin --delete refs/tags/pre-update-1.0.0", "routine"))
-        os.remove(self.path(".nova-tmp/update.lock"))
+        os.remove(self.path(".atlas-tmp/update.lock"))
         self.purge_lock()
         self.assertAllowed(self.bash("git", cmd, "chat"))
         self.assertBlocked(self.bash("git", cmd, "routine"))
@@ -112,15 +112,15 @@ class RefDeletion(HookTestCase):
 
 class RepoVisibility(HookTestCase):
     def test_visibility_and_collaborators_blocked(self):
-        for cmd in ("gh repo edit --visibility public", "gh repo edit owner/nova --visibility=public",
-                    "gh api -X PUT repos/maya-chen/nova/collaborators/someone",
-                    "gh api repos/maya-chen/nova -f visibility=public",
-                    "gh api --method PATCH repos/maya-chen/nova -F private=false -F visibility=public"):
+        for cmd in ("gh repo edit --visibility public", "gh repo edit owner/atlas --visibility=public",
+                    "gh api -X PUT repos/maya-chen/atlas/collaborators/someone",
+                    "gh api repos/maya-chen/atlas -f visibility=public",
+                    "gh api --method PATCH repos/maya-chen/atlas -F private=false -F visibility=public"):
             self.assertBlocked(self.bash("git", cmd, "chat"), "N9")
 
     def test_reads_allowed(self):
-        for cmd in ("gh repo view", "gh api repos/maya-chen/nova/collaborators",
-                    "gh repo edit --description 'Nova'"):
+        for cmd in ("gh repo view", "gh api repos/maya-chen/atlas/collaborators",
+                    "gh repo edit --description 'Atlas'"):
             self.assertAllowed(self.bash("git", cmd, "routine"))
 
 
@@ -131,45 +131,45 @@ class CommitTrailers(HookTestCase):
         sh(["git", "add", "-A"], self.root)
 
     def test_commit_without_trailers_blocked(self):
-        self.assertBlocked(self.bash("git", "git commit -m 'nova(chat): filed note'", "chat"), "Nova-Actor")
+        self.assertBlocked(self.bash("git", "git commit -m 'atlas(chat): filed note'", "chat"), "Atlas-Actor")
 
     def test_commit_missing_reason_blocked(self):
-        cmd = "git commit -m 'nova(chat): x' -m 'Nova-Actor: chat'"
-        self.assertBlocked(self.bash("git", cmd, "chat"), "Nova-Reason")
+        cmd = "git commit -m 'atlas(chat): x' -m 'Atlas-Actor: chat'"
+        self.assertBlocked(self.bash("git", cmd, "chat"), "Atlas-Reason")
 
     def test_commit_with_trailers_allowed(self):
-        cmd = "git commit -m 'nova(chat): filed note' -m '%s'" % TRAILERS
+        cmd = "git commit -m 'atlas(chat): filed note' -m '%s'" % TRAILERS
         self.assertAllowed(self.bash("git", cmd, "chat"))
 
     def test_heredoc_message(self):
-        cmd = ("git add -A && git commit -F - <<'EOF'\nnova(routine): ingest\n\n"
-               "Nova-Actor: routine:nightly-cycle\nNova-Reason: nightly ingest\nNova-Records: -\nEOF")
+        cmd = ("git add -A && git commit -F - <<'EOF'\natlas(routine): ingest\n\n"
+               "Atlas-Actor: routine:nightly-cycle\nAtlas-Reason: nightly ingest\nAtlas-Records: -\nEOF")
         self.assertAllowed(self.bash("git", cmd, "routine"))
-        cmd2 = ("git commit -m \"$(cat <<'EOF'\nnova(chat): x\n\nno trailers here\nEOF\n)\"")
+        cmd2 = ("git commit -m \"$(cat <<'EOF'\natlas(chat): x\n\nno trailers here\nEOF\n)\"")
         self.assertBlocked(self.bash("git", cmd2, "chat"))
 
     def test_message_file(self):
-        self.write("msg.txt", "nova(chat): x\n\n%s\n" % TRAILERS)
+        self.write("msg.txt", "atlas(chat): x\n\n%s\n" % TRAILERS)
         self.assertAllowed(self.bash("git", "git commit -F msg.txt", "chat"))
-        self.write("msg.txt", "nova(chat): x\n")
+        self.write("msg.txt", "atlas(chat): x\n")
         self.assertBlocked(self.bash("git", "git commit --file=msg.txt", "chat"))
 
     def test_setup_commit_allowed_in_any_context(self):
-        cmd = "git commit -m 'nova(setup): step 5' -m 'Nova-Actor: setup\nNova-Reason: setup step 5'"
+        cmd = "git commit -m 'atlas(setup): step 5' -m 'Atlas-Actor: setup\nAtlas-Reason: setup step 5'"
         for ctx in ("chat", "routine", None):
             self.assertAllowed(self.bash("git", cmd, ctx))
 
     def test_routine_cannot_claim_chat(self):
         cmd = "git commit -m 'x' -m '%s'" % TRAILERS
         r = self.bash("git", cmd, "routine")
-        self.assertBlocked(r, "NOVA_CONTEXT=routine")
+        self.assertBlocked(r, "ATLAS_CONTEXT=routine")
         self.assertIn("routine:<routine-name>", r.stderr)
-        self.assertNotIn("NOVA_CONTEXT=chat", r.stderr)
+        self.assertNotIn("ATLAS_CONTEXT=chat", r.stderr)
         self.assertBlocked(self.bash("git", cmd, "Routine"))
         # missing or empty context is a chat: committing as chat is fine
         self.assertAllowed(self.bash("git", cmd, None))
         self.assertAllowed(self.bash("git", cmd, ""))
-        self.assertBlocked(self.bash("git", "git commit -m 'x' -m 'Nova-Actor: robot\nNova-Reason: y'", "chat"),
+        self.assertBlocked(self.bash("git", "git commit -m 'x' -m 'Atlas-Actor: robot\nAtlas-Reason: y'", "chat"),
                            "not valid")
 
     def test_unknown_message_source_allowed_with_warning(self):
@@ -179,7 +179,7 @@ class CommitTrailers(HookTestCase):
 
 
 class SecretScan(HookTestCase):
-    COMMIT = "git commit -m 'nova(chat): x' -m '%s'" % TRAILERS
+    COMMIT = "git commit -m 'atlas(chat): x' -m '%s'" % TRAILERS
 
     def stage(self, text, rel="user/knowledge/people/dana-ruiz.md"):
         self.write(rel, text)
@@ -211,7 +211,7 @@ class SecretScan(HookTestCase):
 
     def test_clean_commit_allowed(self):
         self.stage("Dana prefers email. Password kept in the user's password manager.\n"
-                   "Link: https://github.com/example-user/nova\n")
+                   "Link: https://github.com/example-user/atlas\n")
         self.assertAllowed(self.bash("git", self.COMMIT, "chat"))
 
     def test_removed_secret_lines_not_flagged(self):

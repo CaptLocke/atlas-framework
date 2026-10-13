@@ -1,14 +1,14 @@
-# Nova automation profile: Standard
+# Atlas automation profile: Standard
 # Suggested for: Claude Max 5x.
 # Approx. runs: ~4.4 per day (5 on weekdays, 2 on weekend days, + weekly and upkeep).
 # A full morning cycle, ingest refreshes during the workday, and an evening cycle
 # that prepares tomorrow. The first chat of the day also runs a quick catch-up
 # ingest if the last ingest is over 3 hours old.
-# Schedules are cron in the user's time zone (user/settings/nova.yaml: timezone),
+# Schedules are cron in the user's time zone (user/settings/atlas.yaml: timezone),
 # minutes off the hour to avoid delayed starts. One schedule per routine.
 # The daytime-ingest hours sit inside default work hours (08:00-18:00, Mon-Fri);
-# nova-setup adjusts them if rhythms.yaml work_hours differ.
-# nova-setup copies this file to user/settings/routines.yaml when the user picks it.
+# atlas-setup adjusts them if rhythms.yaml work_hours differ.
+# atlas-setup copies this file to user/settings/routines.yaml when the user picks it.
 profile: standard
 routines:
   - name: morning-cycle

@@ -38,4 +38,4 @@ Tool names vary; always verify from the live tool list. Guide: `system/connector
 - `share`: change owner, team assignment.
 
 ## Fallback
-"Export your deals view (*Export* → CSV) weekly into your **Nova Drop** folder, or forward deal emails with **[nova]** in the subject."
+"Export your deals view (*Export* → CSV) weekly into your **Atlas Drop** folder, or forward deal emails with **[atlas]** in the subject."

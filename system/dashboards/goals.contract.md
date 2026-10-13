@@ -41,7 +41,7 @@ Full example: `system/tests/dashboards/goals.json`.
 | Field | Notes |
 |---|---|
 | `progress` | 0–1, or `null`. Set only when `current` and `target` are comparable numbers (`current / target`, or the inverse for "reduce to" goals). Never invented. |
-| `assessment` | `on_track`, `at_risk`, `off_track`, or `null` (not yet assessed). Nova's judgment from evidence; shown as a chip. |
+| `assessment` | `on_track`, `at_risk`, `off_track`, or `null` (not yet assessed). Atlas's judgment from evidence; shown as a chip. |
 | `evidence[].direction` | `for`, `against`, or `neutral`. |
 | `rank` | The user's rank for an active goal (1 = most important), or `null` if unranked (`system/schemas/goal.md` §Ranking). Shown as "#1". |
 

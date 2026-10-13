@@ -5,14 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <title>Daily Brief</title>
-<style id="nova-base">
-/* Nova dashboard base styles.
+<style id="atlas-base">
+/* Atlas dashboard base styles.
    CANONICAL COPY. Every template in system/dashboards/*.html inlines this file
-   verbatim inside <style id="nova-base">. Edit this file, then run
+   verbatim inside <style id="atlas-base">. Edit this file, then run
    `python3 system/tests/dashboards/render.py --sync` to copy it into the
    templates, and `--check` to confirm they match.
 
-   Theming: nova-dashboards fills <style id="nova-theme"> with --brand-* values
+   Theming: atlas-dashboards fills <style id="atlas-theme"> with --brand-* values
    from user/profile/design-system.md. Nothing here sets --brand-*, so an empty
    theme block falls back to the neutral defaults below. */
 
@@ -162,7 +162,7 @@ button, input, select { font: inherit; color: inherit; }
   .item-aside { text-align: left; justify-items: start; display: flex; flex-wrap: wrap; gap: .4rem; }
 }
 
-/* Record IDs: always visible so the user can ask Nova about the record. */
+/* Record IDs: always visible so the user can ask Atlas about the record. */
 .rid { font-family: var(--font-id); font-size: .76rem; color: var(--ink-2); background: var(--surface-2); padding: .05em .4em; border-radius: 4px; -webkit-user-select: all; user-select: all; overflow-wrap: anywhere; justify-self: start; }
 a.rid { text-decoration: none; }
 a.rid:hover { color: var(--accent); }
@@ -218,7 +218,7 @@ a.rid:hover { color: var(--accent); }
   a { color: inherit; text-decoration: none; }
 }
 </style>
-<style id="nova-page">
+<style id="atlas-page">
 .prio { list-style: none; margin: 0; padding: 0; counter-reset: prio; display: grid; gap: 1.1rem; }
 .prio li { counter-increment: prio; display: grid; grid-template-columns: 2.4rem minmax(0, 1fr); gap: .25rem .75rem; }
 .prio li::before { content: counter(prio); grid-row: span 3; font-family: var(--font-heading); font-size: 2.1rem; line-height: 1; color: var(--star); font-weight: 600; }
@@ -236,15 +236,15 @@ a.rid:hover { color: var(--accent); }
 }
 .notes { margin: 0; padding-left: 1.1rem; display: grid; gap: .45rem; max-width: var(--measure); }
 </style>
-<style id="nova-theme">{{NOVA_THEME_CSS}}</style>
+<style id="atlas-theme">{{ATLAS_THEME_CSS}}</style>
 </head>
 <body>
 <div id="app"></div>
-<script id="nova-data" type="application/json">{{NOVA_DATA}}</script>
-<script id="nova-base-js">
-/* Nova dashboard runtime.
+<script id="atlas-data" type="application/json">{{ATLAS_DATA}}</script>
+<script id="atlas-base-js">
+/* Atlas dashboard runtime.
    CANONICAL COPY. Every template inlines this file verbatim inside
-   <script id="nova-base-js">. Edit here, then run
+   <script id="atlas-base-js">. Edit here, then run
    `python3 system/tests/dashboards/render.py --sync`.
 
    Safety: dashboard data comes from emails, documents, and meetings, so it is
@@ -253,7 +253,7 @@ a.rid:hover { color: var(--accent); }
    only for UI conveniences (theme, remembered filter) and is optional. */
 (function () {
   "use strict";
-  var N = (window.Nova = {});
+  var N = (window.Atlas = {});
   N.meta = {};
 
   var LABELS = {
@@ -318,13 +318,13 @@ a.rid:hover { color: var(--accent); }
 
   /* ---- Browser storage (optional; never required) ---- */
   N.store = {
-    get: function (k) { try { return window.localStorage.getItem("nova:" + k); } catch (e) { return null; } },
-    set: function (k, v) { try { window.localStorage.setItem("nova:" + k, v); } catch (e) { /* ignore */ } }
+    get: function (k) { try { return window.localStorage.getItem("atlas:" + k); } catch (e) { return null; } },
+    set: function (k, v) { try { window.localStorage.setItem("atlas:" + k, v); } catch (e) { /* ignore */ } }
   };
 
   /* ---- Data ---- */
   N.load = function () {
-    var node = document.getElementById("nova-data");
+    var node = document.getElementById("atlas-data");
     var raw = node ? node.textContent.trim() : "";
     if (!raw || raw.indexOf("{{") === 0) return null;
     try { return JSON.parse(raw); } catch (e) { return null; }
@@ -390,10 +390,10 @@ a.rid:hover { color: var(--accent); }
     if (base && /^https:\/\//.test(base) && /^[a-z]+\/[a-z0-9][a-z0-9-]*$/.test(id)) {
       return h("a", { class: "rid", href: base + id + ".md", target: "_blank", rel: "noopener noreferrer", title: "Open the record file" }, text);
     }
-    return h("code", { class: "rid", title: "Record ID: mention it in chat to ask Nova about it" }, text);
+    return h("code", { class: "rid", title: "Record ID: mention it in chat to ask Atlas about it" }, text);
   };
   /* A file path in the user's repository (not a record), e.g. a prep note or profile file. */
-  N.path = function (p) { return p ? h("code", { class: "rid", title: "File in your Nova repository" }, p) : null; };
+  N.path = function (p) { return p ? h("code", { class: "rid", title: "File in your Atlas repository" }, p) : null; };
   /* A ref is {id, title}. Renders the title followed by its ID. */
   N.ref = function (r, opts) {
     if (!r) return null;
@@ -429,7 +429,7 @@ a.rid:hover { color: var(--accent); }
   N.more = function (key) {
     var n = (N.meta.truncated || {})[key];
     if (!n) return null;
-    return h("p", { class: "more" }, n + " more not shown here. Ask Nova in chat to see them.");
+    return h("p", { class: "more" }, n + " more not shown here. Ask Atlas in chat to see them.");
   };
   N.total = function (key, shown) { return shown + ((N.meta.truncated || {})[key] || 0); };
 
@@ -557,7 +557,7 @@ a.rid:hover { color: var(--accent); }
     var nav = N.list(N.meta.nav).filter(function (n) { return n && n.url && /^https:\/\//.test(n.url); });
     return h("header", { class: "mast" },
       h("div", { class: "mast-top" },
-        h("p", { class: "mast-who" }, star(), N.meta.user_display_name ? "Nova for " + N.meta.user_display_name : "Nova"),
+        h("p", { class: "mast-who" }, star(), N.meta.user_display_name ? "Atlas for " + N.meta.user_display_name : "Atlas"),
         N.refreshed()),
       h("h1", null, o.title),
       o.subtitle ? h("p", { class: "mast-sub" }, o.subtitle) : null,
@@ -565,7 +565,7 @@ a.rid:hover { color: var(--accent); }
       o.stats && o.stats.length ? h("ul", { class: "mast-stats" }, o.stats.map(function (s) {
         return h("li", null, h("b", null, String(s[0])), s[1]);
       })) : null,
-      nav.length ? h("nav", { class: "mast-nav", "aria-label": "Other Nova pages" }, nav.map(function (n) {
+      nav.length ? h("nav", { class: "mast-nav", "aria-label": "Other Atlas pages" }, nav.map(function (n) {
         return h("a", { href: n.url, target: "_blank", rel: "noopener noreferrer", "aria-current": n.name === N.meta.dashboard ? "page" : null }, n.title || n.name);
       })) : null);
   };
@@ -573,8 +573,8 @@ a.rid:hover { color: var(--accent); }
   N.footer = function () {
     var at = N.meta.generated_at;
     return h("footer", { class: "foot" },
-      h("p", null, (at ? "Refreshed " + N.dateY(at) + ", " + N.time(at) : "Not refreshed yet") + " · Ask Nova in chat to change anything"),
-      h("p", { class: "chips" }, N.meta.nova_version ? h("span", null, "Nova " + N.meta.nova_version) : null, N.themeButton()));
+      h("p", null, (at ? "Refreshed " + N.dateY(at) + ", " + N.time(at) : "Not refreshed yet") + " · Ask Atlas in chat to change anything"),
+      h("p", { class: "chips" }, N.meta.atlas_version ? h("span", null, "Atlas " + N.meta.atlas_version) : null, N.themeButton()));
   };
 
   /* Render a page. build(data, main) appends sections to main and may return masthead options. */
@@ -588,13 +588,13 @@ a.rid:hover { color: var(--accent); }
     var mastOpts = { title: N.meta.title || defaults.title };
     if (!data) {
       mastOpts.subtitle = "Waiting for data";
-      main.appendChild(N.empty("This page has no data yet. Ask Nova in chat to refresh it."));
+      main.appendChild(N.empty("This page has no data yet. Ask Atlas in chat to refresh it."));
     } else {
       try {
         var extra = build(data, main) || {};
         for (var k in extra) mastOpts[k] = extra[k];
       } catch (e) {
-        main.appendChild(h("div", { class: "error-box", role: "alert" }, "Part of this page couldn't be displayed. Ask Nova in chat to refresh it."));
+        main.appendChild(h("div", { class: "error-box", role: "alert" }, "Part of this page couldn't be displayed. Ask Atlas in chat to refresh it."));
         if (window.console) console.error(e);
       }
     }
@@ -612,9 +612,9 @@ a.rid:hover { color: var(--accent); }
   };
 })();
 </script>
-<script id="nova-page-js">
+<script id="atlas-page-js">
 (function () {
-  var N = window.Nova, h = N.h, L = N.list;
+  var N = window.Atlas, h = N.h, L = N.list;
 
   function notes(list) {
     return h("ul", { class: "notes" }, L(list).map(function (n) { return h("li", null, N.rich(n.text)); }));
@@ -628,17 +628,17 @@ a.rid:hover { color: var(--accent); }
     var acts = L(d.actions);
     if (acts.length) {
       main.appendChild(N.section({ id: "actions", title: "Action needed",
-        note: "Only you can do these. They stay here until they're done; tell Nova in chat when you've done one.",
+        note: "Only you can do these. They stay here until they're done; tell Atlas in chat when you've done one.",
         body: N.items(acts.map(function (a) {
           return N.item({ tone: "warn", title: a.text, text: a.how || null,
-            insight: a.copy_text ? "The text to copy is on the Control Center, or ask Nova in chat." : null,
+            insight: a.copy_text ? "The text to copy is on the Control Center, or ask Atlas in chat." : null,
             aside: [h("span", null, a.id)] });
         })) }));
     }
 
     if (L(d.since_last_night).length) {
       main.appendChild(N.section({ id: "since", title: catchUp ? "While you were away" : "Since last night",
-        note: catchUp ? null : "Picked up when you opened Nova this morning.", body: notes(d.since_last_night), key: "since_last_night" }));
+        note: catchUp ? null : "Picked up when you opened Atlas this morning.", body: notes(d.since_last_night), key: "since_last_night" }));
     }
 
     main.appendChild(N.section({ id: "priorities", title: "Top priorities", note: "Ranked against your goals, not just due dates.",
@@ -679,7 +679,7 @@ a.rid:hover { color: var(--accent); }
       }), "You're not waiting on anyone.") }));
 
     if (L(d.insights).length) {
-      main.appendChild(N.section({ id: "insights", title: "Worth knowing", note: "Patterns Nova noticed, with the reasoning.",
+      main.appendChild(N.section({ id: "insights", title: "Worth knowing", note: "Patterns Atlas noticed, with the reasoning.",
         body: N.items(L(d.insights).map(function (i) {
           return N.item({ tone: "accent", title: i.text, text: i.why,
             nextStep: i.suggested_action,

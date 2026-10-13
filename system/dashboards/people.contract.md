@@ -9,7 +9,7 @@ stale_after_hours: 192
 # Dashboard: people
 
 ## Purpose
-Key relationships: last contact, open items each way, who has gone quiet, and upcoming touchpoints, with a relationship insight where Nova has one. Filters: Everyone / Gone quiet / Open items / Meeting soon, plus search by name or company.
+Key relationships: last contact, open items each way, who has gone quiet, and upcoming touchpoints, with a relationship insight where Atlas has one. Filters: Everyone / Gone quiet / Open items / Meeting soon, plus search by name or company.
 
 ## Data (JSON shape embedded in the page)
 ```json

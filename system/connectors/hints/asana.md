@@ -38,4 +38,4 @@ Tool names vary; always verify from the live tool list. Guide: `system/connector
 - `share`: change project membership or privacy, invite users.
 
 ## Fallback
-"From a project or My Tasks, use *Export → CSV* weekly into your **Nova Drop** folder, or turn on Asana email notifications."
+"From a project or My Tasks, use *Export → CSV* weekly into your **Atlas Drop** folder, or turn on Asana email notifications."

@@ -42,8 +42,8 @@ Capture who decided, when, and why. If the why is missing, set `rationale: unkno
 
 ## Archive, forget, purge
 - **Archive:** `archived: true`; reversible; nothing removed.
-- **Forget** (destructive, approval required, chat only, via `nova-memory`): delete the record file and its index lines; remove links to it from other records (replace with plain text where context matters); add `record: <id>` (and source-level exclusions if appropriate) to `data-rules.yaml` exclusions after confirming the governance change; tell the user plainly that a copy remains in Nova's version history, and that "permanently erase" removes it there too.
-- **Purge** ("permanently erase"; destructive, explicit confirmation, chat only, via `nova-memory` with the purge lock): remove the content from all history for the named paths, then force-push. Log that a purge happened and which paths, never the content. Tell the user GitHub may retain cached copies for a period.
+- **Forget** (destructive, approval required, chat only, via `atlas-memory`): delete the record file and its index lines; remove links to it from other records (replace with plain text where context matters); add `record: <id>` (and source-level exclusions if appropriate) to `data-rules.yaml` exclusions after confirming the governance change; tell the user plainly that a copy remains in Atlas's version history, and that "permanently erase" removes it there too.
+- **Purge** ("permanently erase"; destructive, explicit confirmation, chat only, via `atlas-memory` with the purge lock): remove the content from all history for the named paths, then force-push. Log that a purge happened and which paths, never the content. Tell the user GitHub may retain cached copies for a period.
 
 ## Profile
 Profile lines follow `system/schemas/profile.md`. New observations are written as `proposed` questions in `user/inbox/questions.md`, never directly into the profile, unless `profile_update: auto`.

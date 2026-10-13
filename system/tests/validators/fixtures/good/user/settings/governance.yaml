@@ -1,9 +1,9 @@
-# Autonomy settings. Copied to user/settings/governance.yaml by nova-setup.
+# Autonomy settings. Copied to user/settings/governance.yaml by atlas-setup.
 # PROTECTED (N6): changes only in chat with the user's explicit confirmation.
 # Levels: auto | propose | approve | never. Locked classes cannot be changed.
 # Format and override scope grammar: system/schemas/settings.md; meaning: system/rules/governance.md.
 autonomy:
-  # inside Nova
+  # inside Atlas
   read: auto
   records_write: auto
   merge_supersede: auto          # clear cases follow this; ambiguous always proposed
@@ -15,7 +15,7 @@ autonomy:
   extensions_create: propose
   updates_minor: auto            # patch + minor releases
   updates_major: propose
-  # outside Nova
+  # outside Atlas
   external_read: auto
   web_research: auto
   drafts_create: auto

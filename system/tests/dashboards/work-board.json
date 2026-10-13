@@ -9,8 +9,8 @@
     "timezone": "America/Los_Angeles",
     "locale": "en-US",
     "user_display_name": "Maya Chen",
-    "nova_version": "1.0.0",
-    "record_base_url": "https://github.com/maya-chen/nova/blob/main/user/knowledge/",
+    "atlas_version": "1.0.0",
+    "record_base_url": "https://github.com/maya-chen/atlas/blob/main/user/knowledge/",
     "nav": [],
     "notices": [],
     "truncated": {}

@@ -7,10 +7,10 @@ version: 1.0.0
 ---
 # Things you can say
 
-A cheat sheet. Use your own words: Nova understands the meaning, not exact phrases. Names here are just examples.
+A cheat sheet. Use your own words: Atlas understands the meaning, not exact phrases. Names here are just examples.
 
 ## Remember
-Tell Nova anything worth keeping, in one sentence.
+Tell Atlas anything worth keeping, in one sentence.
 - "Remember that the auditor prefers PDFs."
 - "I told Jordan I'd send the roadmap by Tuesday."
 - "Priya promised the signed scope by the 21st."
@@ -18,10 +18,10 @@ Tell Nova anything worth keeping, in one sentence.
 - "Idea: pilot fees count toward year one."
 - "Morning thoughts: …" / "Evening thoughts: …"
 - "Here's the contract." (attach the file)
-- "Here's how we run month-end close: …" (Nova saves it as a playbook)
+- "Here's how we run month-end close: …" (Atlas saves it as a playbook)
 
 ## Find
-Ask about anything in your work. Nova shows where each answer came from.
+Ask about anything in your work. Atlas shows where each answer came from.
 - "What did we decide about pricing, and why?"
 - "What do I owe people this week?"
 - "What am I waiting on from Dana?"
@@ -30,7 +30,7 @@ Ask about anything in your work. Nova shows where each answer came from.
 - "Where was I on the vendor evaluation?"
 - "Catch me up on Globex."
 - "What happened while I was away?"
-- To browse everything Nova has filed, open the **Records** page and search by name, type, or status.
+- To browse everything Atlas has filed, open the **Records** page and search by name, type, or status.
 
 ## Prepare
 Get ready for what's next.
@@ -71,7 +71,7 @@ Look back and look ahead.
 - "Put together my performance review notes for Q4."
 
 ## Control
-Change how Nova behaves, any time.
+Change how Atlas behaves, any time.
 - "What did you do overnight?"
 - "Undo what you did to the Globex record this morning."
 - "Forget that." / "Permanently erase everything about that candidate."
@@ -83,7 +83,7 @@ Change how Nova behaves, any time.
 - "Move my brief to be ready by 6:30."
 - "Switch me to the Standard automation profile."
 - "What do you know about me?"
-- "Update Nova." / "What's new?"
+- "Update Atlas." / "What's new?"
 - "Is everything working?"
 - "Report an issue: …"
-- "Start Nova" (if Nova ever seems not to know your setup)
+- "Start Atlas" (if Atlas ever seems not to know your setup)

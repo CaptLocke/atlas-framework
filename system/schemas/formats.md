@@ -4,12 +4,12 @@ name: formats
 ---
 # File formats: state, inbox, logs, indexes, journal, outputs, extensions
 
-Exact formats for every non-record file Nova reads or writes. Skills, jobs, hooks, validators, and dashboards rely on these.
+Exact formats for every non-record file Atlas reads or writes. Skills, jobs, hooks, validators, and dashboards rely on these.
 
 ---
 
 ## 1. State (`user/.state/`)
-Committed to the repo (they're part of the user's history), written only by Nova.
+Committed to the repo (they're part of the user's history), written only by Atlas.
 
 ### cursors.yaml
 ```yaml
@@ -55,7 +55,7 @@ last_user_check: 2026-10-01
 last_system_check: 2026-10-01
 known_issues:
   - { id: conn-outlook-auth, severity: high, since: 2026-10-10, summary: "Outlook connection expired", fix: "Reconnect Outlook in Settings → Connectors", status: open }
-  - { id: routine-env-missing, severity: high, since: 2026-10-12, routine: nightly-cycle, summary: "The nightly-cycle routine ran without NOVA_CONTEXT=routine", fix: "Attach the nightly-cycle routine to the 'Nova routine' environment (nova-setup, reference/automations.md §3)", status: open }
+  - { id: routine-env-missing, severity: high, since: 2026-10-12, routine: nightly-cycle, summary: "The nightly-cycle routine ran without ATLAS_CONTEXT=routine", fix: "Attach the nightly-cycle routine to the 'Atlas routine' environment (atlas-setup, reference/automations.md §3)", status: open }
 smoke_test: { last_run: 2026-10-01, results: { repo_push: pass, connectors: pass, hooks: pass, artifact_republish: pass } }
 routine_availability:              # evidence from routine runs; applied to connectors.yaml in the next chat (N6)
   outlook: { available: true, observed: 2026-10-12, run: nightly-cycle-20261012-2007 }
@@ -63,7 +63,7 @@ insight_engagement: { period: 2026-09, by_kind: { risk: { acted: 3, dismissed: 1
 indicators: { period: 2026-09, time_to_first_brief_hours: 14, cited_answer_share: 0.82, auto_commitments: 41, manual_commitments: 6, automation_success_rate: 0.97, user_action_issues: 1, corrections: 3, active_weeks: 4 }
 ```
 
-## 2. Transient (`.nova-tmp/`, git-ignored)
+## 2. Transient (`.atlas-tmp/`, git-ignored)
 
 ### approval.json (single-use, chat only)
 ```json
@@ -75,10 +75,10 @@ Hooks consume (delete) it on the matching call. One record authorizes one call.
 
 ### update.lock / purge.lock
 ```json
-{"by": "nova-update", "version_from": "1.0.0", "version_to": "1.1.0", "created": "…", "expires": "…"}
-{"by": "nova-memory", "targets": ["user/knowledge/people/jane-doe.md"], "user_confirmation": "yes, permanently erase", "created": "…", "expires": "…"}
+{"by": "atlas-update", "version_from": "1.0.0", "version_to": "1.1.0", "created": "…", "expires": "…"}
+{"by": "atlas-memory", "targets": ["user/knowledge/people/jane-doe.md"], "user_confirmation": "yes, permanently erase", "created": "…", "expires": "…"}
 ```
-Update lock expires after 30 minutes; purge lock after 15. Purge locks can only be created in a chat: the hooks refuse them in a session marked `NOVA_CONTEXT=routine`.
+Update lock expires after 30 minutes; purge lock after 15. Purge locks can only be created in a chat: the hooks refuse them in a session marked `ATLAS_CONTEXT=routine`.
 
 ## 3. Inbox (`user/inbox/`)
 
@@ -123,10 +123,10 @@ counts: { new: 1, seen: 0, acted: 0, dismissed: 0, expired: 0 }
 - **Suggested action:** Raise at Thursday's product sync.
 - **Status history:** new 2026-10-12
 ```
-Each entry also has a `- **Kind:** <kind>` line (kinds defined in `.claude/skills/nova-insights/reference/insight-kinds.md`). When the suggested action is a message to someone, the entry has `- **Draft for:** [[people/<slug>]] · email | message`; once the draft exists, `email-drafts` adds `- **Draft:** <where, plain words> "<subject>" (draft id …)` (or `- **Draft:** text below` followed by the text indented, when no draft tool exists). The `Draft:` line is the marker that stops a second draft. Statuses: `new | seen | acted | dismissed | expired`. An insight is `seen` once it is included in a published brief or shown in chat; unseen insights expire after 30 days. `score` 0–1 = relevance to goals × urgency × novelty. Engagement signals (acted/dismissed counts by insight kind) are summarized in `health.yaml` and used by `nova-insights` to adapt volume.
+Each entry also has a `- **Kind:** <kind>` line (kinds defined in `.claude/skills/atlas-insights/reference/insight-kinds.md`). When the suggested action is a message to someone, the entry has `- **Draft for:** [[people/<slug>]] · email | message`; once the draft exists, `email-drafts` adds `- **Draft:** <where, plain words> "<subject>" (draft id …)` (or `- **Draft:** text below` followed by the text indented, when no draft tool exists). The `Draft:` line is the marker that stops a second draft. Statuses: `new | seen | acted | dismissed | expired`. An insight is `seen` once it is included in a published brief or shown in chat; unseen insights expire after 30 days. `score` 0–1 = relevance to goals × urgency × novelty. Engagement signals (acted/dismissed counts by insight kind) are summarized in `health.yaml` and used by `atlas-insights` to adapt volume.
 
 ### questions.md
-Nova's questions for the user (profile proposals, migration questions, unclear relationships, vague commitments).
+Atlas's questions for the user (profile proposals, migration questions, unclear relationships, vague commitments).
 ```markdown
 ---
 type: inbox
@@ -140,23 +140,23 @@ counts: { open: 1, answered: 0, dismissed: 0 }
 ```
 Kinds: `profile | migration | relationship | commitment | setup | action | other`. Statuses: `open | answered | dismissed`.
 
-**Action entries** (`kind: action`) are things only the user can do, queued by `nova-update` from a release's `### Action needed` list or a higher `bootstrap_version`, and by the chat boot check (kernel §2 step 0):
+**Action entries** (`kind: action`) are things only the user can do, queued by `atlas-update` from a release's `### Action needed` list or a higher `bootstrap_version`, and by the chat boot check (kernel §2 step 0):
 ```markdown
 ## Q-2026-10-18-01 · open · action
-- **Question:** Update your Nova Project's instructions (Nova was updated to 1.1.0).
+- **Question:** Update your Atlas Project's instructions (Atlas was updated to 1.1.0).
 - **Action key:** bootstrap
-- **How:** In the Claude app, open the Nova Project, replace its instructions with the text below, and save.
+- **How:** In the Claude app, open the Atlas Project, replace its instructions with the text below, and save.
 - **Copy text:**
-    This Project is my Nova (Nova bootstrap 3). At the start of every conversation:
+    This Project is my Atlas (Atlas bootstrap 3). At the start of every conversation:
     …
 - **Asked:** 2026-10-18
 ```
 - `Action key` deduplicates: there is at most one open entry per key. `bootstrap` for the Project instructions; `release-<version>-<n>` for the n-th `Action needed` line of a release. `How` and `Copy text` (indented block, filled in for this user) are optional.
-- Done → status `answered` with `- **Done:** <date> · <confirmed by Nova | user said done>`; the user can also skip it (`dismissed`). Never closed just because time passed.
+- Done → status `answered` with `- **Done:** <date> · <confirmed by Atlas | user said done>`; the user can also skip it (`dismissed`). Never closed just because time passed.
 - Open action entries come first wherever questions are shown (Daily Brief "Action needed", Control Center, chat), oldest first, and are never cut by question caps.
 
 ### drop/
-Files attached in chat land here, then are filed by `nova-capture` and removed from `drop/` (the source record keeps a pointer; the file itself moves to `user/library/YYYY/<file>` only if its data-rule handling is `full` and it is 10 MB or less). Removing processed files from `drop/` is housekeeping, not a destructive action (hooks allow it).
+Files attached in chat land here, then are filed by `atlas-capture` and removed from `drop/` (the source record keeps a pointer; the file itself moves to `user/library/YYYY/<file>` only if its data-rule handling is `full` and it is 10 MB or less). Removing processed files from `drop/` is housekeeping, not a destructive action (hooks allow it).
 
 ## 4. Logs (`user/logs/`)
 
@@ -175,7 +175,7 @@ routine: nightly-cycle
 started: 2026-10-12T20:07:03-07:00
 finished: 2026-10-12T20:31:40-07:00
 status: ok              # ok | partial | failed
-nova_context: routine   # the NOVA_CONTEXT value observed at the start of the run, verbatim ("unset" if missing); anything but routine means routine-env-missing
+atlas_context: routine   # the ATLAS_CONTEXT value observed at the start of the run, verbatim ("unset" if missing); anything but routine means routine-env-missing
 ---
 | Job | Status | Items | Notes |
 |---|---|---|---|
@@ -235,21 +235,21 @@ source: "[[sources/2026-10-12-journal]]"
 | Monthly report (goal progress, health, automation review, indicators) | `user/work/reports/YYYY-MM.md`, named for the **month reviewed** (the November run writes `2026-10.md` and sets `period_done: 2026-11`) |
 | Quarterly report (reset, role refresh) | `user/work/reports/YYYY-Qn.md`, named for the **quarter reviewed** |
 | Performance review pack | `user/work/reports/YYYY-Qn-performance.md` |
-| Accomplishments | Appended to the relevant goal's `accomplishments` field and `user/work/accomplishments.md` (running list; line format in `.claude/skills/nova-review/reference/weekly.md`) |
-| Deliverable working files | `user/work/deliverables/<YYYY-MM-DD-slug>/` (markdown/data used to build it; the finished binary goes to the deliverables folder per `.claude/skills/nova-write/reference/deliverables.md`) |
+| Accomplishments | Appended to the relevant goal's `accomplishments` field and `user/work/accomplishments.md` (running list; line format in `.claude/skills/atlas-review/reference/weekly.md`) |
+| Deliverable working files | `user/work/deliverables/<YYYY-MM-DD-slug>/` (markdown/data used to build it; the finished binary goes to the deliverables folder per `.claude/skills/atlas-write/reference/deliverables.md`) |
 | Project page data | rendered on request; no file |
 | Deliverable template | `user/work/templates/<slug>.md` (below) |
 
-Each output has frontmatter `type: <brief|prep|review|status|report|performance>`, `date`, and `sources`, plus as relevant: `generated` (timestamp), `window_start`/`window_end`, `period`, `kind: catch-up`, `audience`, `subject`. Section structure: Daily Brief and catch-up brief per `.claude/skills/nova-brief/reference/`; reviews and reports per `.claude/skills/nova-review/reference/`; prep notes per `.claude/skills/nova-prep/reference/templates.md`.
+Each output has frontmatter `type: <brief|prep|review|status|report|performance>`, `date`, and `sources`, plus as relevant: `generated` (timestamp), `window_start`/`window_end`, `period`, `kind: catch-up`, `audience`, `subject`. Section structure: Daily Brief and catch-up brief per `.claude/skills/atlas-brief/reference/`; reviews and reports per `.claude/skills/atlas-review/reference/`; prep notes per `.claude/skills/atlas-prep/reference/templates.md`.
 
 ### Deliverable templates (`user/work/templates/<slug>.md`)
-A reusable shape for something the user produces again and again: the weekly status email, the monthly board update, the QBR deck, the month-end close summary. `nova-write` uses a matching active template, so every edition is consistent and faster to make.
+A reusable shape for something the user produces again and again: the weekly status email, the monthly board update, the QBR deck, the month-end close summary. `atlas-write` uses a matching active template, so every edition is consistent and faster to make.
 ```markdown
 ---
 type: template
 name: monthly-board-update
 title: Monthly board update
-status: active                 # draft (proposed by Nova) | active | retired
+status: active                 # draft (proposed by Atlas) | active | retired
 kind: doc                      # email | message | doc | deck | sheet
 used_for: The update Maya sends the board in the first week of each month
 audience: ["[[people/jordan-lee]]"]   # optional
@@ -269,7 +269,7 @@ updated: 2026-10-12
 ## Notes
 - Last edition's open items are carried into "Follow-ups" (the user asked for this on 2026-10-02).
 ```
-Rules: one file per recurring deliverable; only the user's confirmation makes a `draft` template `active`; edits the user makes to an edition are proposed back into the template with the same learning rule as voice (`nova-write` §6). Templates never store data values, only where to get them.
+Rules: one file per recurring deliverable; only the user's confirmation makes a `draft` template `active`; edits the user makes to an edition are proposed back into the template with the same learning rule as voice (`atlas-write` §6). Templates never store data values, only where to get them.
 
 ## 8. Extensions registry (`user/extensions/registry.yaml`)
 ```yaml
@@ -278,7 +278,7 @@ extensions:
     kind: type          # skill | job | routine | trigger | type | dashboard | playbook
     path: types/deal.md
     overrides: null     # or the name of a system component, explicitly
-    requires_nova: ">=1.0"
+    requires_atlas: ">=1.0"
     created: 2026-10-20
     description: "Sales deals with stage and value."
 ```

@@ -39,4 +39,4 @@ Tool names vary; always verify from the live tool list. Guide: `system/connector
 - `share`: change channel membership or sharing, share files externally.
 
 ## Fallback
-*More actions → Share message / Copy link* and email it to the connected inbox with **[nova]**; or paste into chat.
+*More actions → Share message / Copy link* and email it to the connected inbox with **[atlas]**; or paste into chat.

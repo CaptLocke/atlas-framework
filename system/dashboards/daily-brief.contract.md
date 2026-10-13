@@ -21,8 +21,8 @@ Envelope: `meta` as in `system/dashboards/README.md`; `meta.as_of` = the brief's
   "meta": { "dashboard": "daily-brief", "schema_version": 1, "as_of": "2026-10-13", "…": "…" },
   "brief": { "date": "2026-10-13", "kind": "daily", "path": "user/work/briefs/2026-10-13.md",
              "headline": "A customer-heavy day: …", "away": null },
-  "actions": [ { "id": "Q-2026-10-13-01", "text": "Update your Nova Project's instructions (Nova was updated to 1.1.0).",
-                 "how": "In the Claude app, open the Nova Project, replace its instructions, and save.", "copy_text": true } ],
+  "actions": [ { "id": "Q-2026-10-13-01", "text": "Update your Atlas Project's instructions (Atlas was updated to 1.1.0).",
+                 "how": "In the Claude app, open the Atlas Project, replace its instructions, and save.", "copy_text": true } ],
   "since_last_night": [ { "text": "Sam confirmed the agenda ([[sources/2026-10-13-brightline-agenda-thread]])." } ],
   "priorities": [ { "text": "Send pricing feedback to Jordan", "why": "Due today; Thursday's decision depends on it.",
                     "ref": { "id": "commitments/send-pricing-feedback", "title": "Send pricing feedback to Jordan" } } ],
@@ -62,7 +62,7 @@ Full example: `system/tests/dashboards/daily-brief.json`.
 ## Sources (file → field)
 | Field | Source |
 |---|---|
-| `brief.*`, `priorities`, `changes`, `since_last_night` | The brief file `user/work/briefs/<as_of>.md` (or `-catch-up.md`) written by `nova-brief` in the same run; `priorities[].ref` and `[[…]]` mentions are the record IDs cited there |
+| `brief.*`, `priorities`, `changes`, `since_last_night` | The brief file `user/work/briefs/<as_of>.md` (or `-catch-up.md`) written by `atlas-brief` in the same run; `priorities[].ref` and `[[…]]` mentions are the record IDs cited there |
 | `today[]` | Event records (`user/knowledge/events/`) with `start` on `as_of`, `status: scheduled`, and shown by the meeting filter (`rhythms.yaml: meetings`, rule in `system/schemas/settings.md`): `id, title, kind, start, end, all_day, location, attendees` (→ person refs); `prep.path` = event `prep`; `prep.summary` = first line of the prep note's suggested agenda |
 | `due[]` | Commitments, `direction: i_owe`, `status: open|slipped`, `due` ≤ `as_of` + `rhythms.yaml: triggers.deadline_approaching.days` (default 3): `id, title, direction, status, due, priority, counterparty, next_step` |
 | `waiting_on[]` | Commitments, `direction: waiting_on`, `status: open|slipped`; `since` = `created` |

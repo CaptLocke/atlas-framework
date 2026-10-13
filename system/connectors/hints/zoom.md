@@ -37,4 +37,4 @@ Tool names vary; always verify from the live tool list. Guide: `system/connector
 - `security`: change account, passcode, or security settings.
 
 ## Fallback
-"In Zoom, open *Recordings*, download the transcript (.vtt or .txt), and put it in your **Nova Drop** folder."
+"In Zoom, open *Recordings*, download the transcript (.vtt or .txt), and put it in your **Atlas Drop** folder."

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Nova hook: don't end a turn with changes stranded locally (Stop).
+"""Atlas hook: don't end a turn with changes stranded locally (Stop).
 
 Claude Code contract relied on (https://code.claude.com/docs/en/hooks and
 https://code.claude.com/docs/en/hooks-guide, checked 2026-10-12):
@@ -16,11 +16,11 @@ Behavior (system/rules/sync.md "after each logical change set"):
 - No-op in the upstream product repo (same bypass as the other hooks), outside
   a git repo, or without an `origin` remote.
 - Blocks the stop when (a) tracked files have uncommitted changes or there are
-  untracked, non-ignored files (except .nova-tmp/ and user/inbox/drop/), or an
+  untracked, non-ignored files (except .atlas-tmp/ and user/inbox/drop/), or an
   unfinished rebase/merge, or (b) HEAD has commits origin/main doesn't (after
   the local `origin/main` tracking ref; no network call).
 - Loop safety: when `stop_hook_active` is true, or this would be the 3rd
-  consecutive block (counter in .nova-tmp/sync_guard.json, per session), the
+  consecutive block (counter in .atlas-tmp/sync_guard.json, per session), the
   stop is allowed: an open high-severity known issue `sync-push-failing` is
   added to user/.state/health.yaml when that can be done safely, and the user
   sees a one-line warning. A clean stop resets the counter.
@@ -33,14 +33,14 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-STATE = ".nova-tmp/sync_guard.json"
+STATE = ".atlas-tmp/sync_guard.json"
 MAX_BLOCKS = 2          # the 3rd consecutive block is turned into an allowed stop
 FETCH_TIMEOUT = 5
 STALE_SECONDS = 3600
-REASON = ("Unsaved Nova changes: commit (with Nova-Actor/Nova-Reason trailers) and push to origin main before "
+REASON = ("Unsaved Atlas changes: commit (with Atlas-Actor/Atlas-Reason trailers) and push to origin main before "
           "finishing (system/rules/sync.md).")
-USER_WARNING = ("Nova couldn't save your latest changes to GitHub. They are kept on this session's copy and "
-                "will be retried; if this repeats, reconnect GitHub (Settings > Connectors) and ask Nova to "
+USER_WARNING = ("Atlas couldn't save your latest changes to GitHub. They are kept on this session's copy and "
+                "will be retried; if this repeats, reconnect GitHub (Settings > Connectors) and ask Atlas to "
                 "\"save my changes\".")
 
 
@@ -59,7 +59,7 @@ def load_counter(proj, session):
 def save_counter(proj, session, blocks):
     import time
     try:
-        os.makedirs(os.path.join(proj, ".nova-tmp"), exist_ok=True)
+        os.makedirs(os.path.join(proj, ".atlas-tmp"), exist_ok=True)
         path = os.path.join(proj, STATE)
         if blocks <= 0:
             if os.path.exists(path):
@@ -99,10 +99,10 @@ def give_up(gs, proj, session, found):
         recorded = gs.health_issue(
             proj, "sync-push-failing",
             "Latest changes could not be saved to GitHub",
-            "Reconnect GitHub (Settings > Connectors), then ask Nova to save changes")
+            "Reconnect GitHub (Settings > Connectors), then ask Atlas to save changes")
     except Exception:
         recorded = False
-    msg = USER_WARNING + ("" if recorded else " (Nova could not record this as a known issue.)")
+    msg = USER_WARNING + ("" if recorded else " (Atlas could not record this as a known issue.)")
     return {"systemMessage": msg}
 
 
@@ -132,7 +132,7 @@ if __name__ == "__main__":
             sys.stdout.write(json.dumps(out))
     except BaseException as e:  # fail open, with a warning
         try:
-            sys.stdout.write(json.dumps({"systemMessage": "Nova sync check could not run (%s: %s); make sure "
+            sys.stdout.write(json.dumps({"systemMessage": "Atlas sync check could not run (%s: %s); make sure "
                                          "your latest changes were saved to GitHub." % (type(e).__name__, e)}))
         except BaseException:
             pass

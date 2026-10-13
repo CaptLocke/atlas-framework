@@ -9,7 +9,7 @@ checked: "2026-10: general knowledge of Linear's model; tool names not verified"
 Tool names vary; always verify from the live tool list. Guide: `system/connectors/tasks.md`.
 
 ## Likely categories
-`tasks`. Linear projects and initiatives map well to Nova `project` records; project updates carry health.
+`tasks`. Linear projects and initiatives map well to Atlas `project` records; project updates carry health.
 
 ## Typical operations
 | Operation | What to look for |
@@ -38,4 +38,4 @@ Tool names vary; always verify from the live tool list. Guide: `system/connector
 - `share`: team membership, workspace invites.
 
 ## Fallback
-"Use *Export → CSV* on a filtered view weekly into your **Nova Drop** folder, or keep Linear email notifications on."
+"Use *Export → CSV* on a filtered view weekly into your **Atlas Drop** folder, or keep Linear email notifications on."

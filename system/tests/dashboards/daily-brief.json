@@ -9,7 +9,7 @@
     "timezone": "America/Los_Angeles",
     "locale": "en-US",
     "user_display_name": "Maya Chen",
-    "nova_version": "1.0.0",
+    "atlas_version": "1.0.0",
     "record_base_url": null,
     "nav": [
       { "name": "daily-brief", "title": "Daily Brief", "url": "https://claude.ai/artifact/example-daily-brief" },
@@ -30,7 +30,7 @@
     "away": null
   },
   "actions": [
-    { "id": "Q-2026-10-13-01", "text": "Update your Nova Project's instructions (Nova was updated to 1.1.0).", "how": "In the Claude app, open the Nova Project, replace its instructions, and save.", "copy_text": true }
+    { "id": "Q-2026-10-13-01", "text": "Update your Atlas Project's instructions (Atlas was updated to 1.1.0).", "how": "In the Claude app, open the Atlas Project, replace its instructions, and save.", "copy_text": true }
   ],
   "since_last_night": [
     { "text": "Sam Okafor confirmed the renewal call agenda and added a question about SSO pricing ([[sources/2026-10-13-brightline-agenda-thread]])." }

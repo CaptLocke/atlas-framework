@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render Nova dashboard templates with fixture data and check them.
+"""Render Atlas dashboard templates with fixture data and check them.
 
 Standard library only (Playwright is used for screenshots only if installed).
 
@@ -12,10 +12,10 @@ Standard library only (Playwright is used for screenshots only if installed).
 
 Output goes to system/tests/dashboards/out/ (git-ignored).
 
-The injection here mirrors what the nova-dashboards skill does at publish time
+The injection here mirrors what the atlas-dashboards skill does at publish time
 (system/dashboards/README.md, "How a page is rendered"): serialize the JSON,
-escape <, >, &, U+2028 and U+2029, and replace the single {{NOVA_DATA}} and
-{{NOVA_THEME_CSS}} placeholders.
+escape <, >, &, U+2028 and U+2029, and replace the single {{ATLAS_DATA}} and
+{{ATLAS_THEME_CSS}} placeholders.
 """
 import argparse
 import json
@@ -29,13 +29,13 @@ DASH = HERE.parent.parent / "dashboards"
 OUT = HERE / "out"
 
 NAMES = ["daily-brief", "work-board", "goals", "week-ahead", "people",
-         "decisions-risks", "control-center", "about-you", "nova-guide", "records", "project-page"]
-DATA_PH = "{{NOVA_DATA}}"
-THEME_PH = "{{NOVA_THEME_CSS}}"
+         "decisions-risks", "control-center", "about-you", "atlas-guide", "records", "project-page"]
+DATA_PH = "{{ATLAS_DATA}}"
+THEME_PH = "{{ATLAS_THEME_CSS}}"
 REQUIRED_META = ["dashboard", "schema_version", "generated_at", "as_of", "timezone"]
 BLOCKS = {  # inlined canonical files: (opening tag, closing tag, source file)
-    "css": ('<style id="nova-base">', "</style>", DASH / "_base.css"),
-    "js": ('<script id="nova-base-js">', "</script>", DASH / "_base.js"),
+    "css": ('<style id="atlas-base">', "</style>", DASH / "_base.css"),
+    "js": ('<script id="atlas-base-js">', "</script>", DASH / "_base.js"),
 }
 
 
@@ -104,7 +104,7 @@ class Checker(HTMLParser):
             self.errors.append("external stylesheet %s" % a.get("href"))
         if tag not in self.VOID:
             self.stack.append(tag)
-        self._in_data = tag == "script" and a.get("id") == "nova-data"
+        self._in_data = tag == "script" and a.get("id") == "atlas-data"
 
     def handle_endtag(self, tag):
         if tag in self.VOID:
@@ -136,10 +136,10 @@ def check_template(name, text):
     for ph in (DATA_PH, THEME_PH):
         if text.count(ph) != 1:
             problems.append("expected exactly one %s" % ph)
-    if '<script id="nova-data" type="application/json">' + DATA_PH + "</script>" not in text:
-        problems.append("data placeholder is not in the standard <script id=\"nova-data\"> element")
-    if '<style id="nova-theme">' + THEME_PH + "</style>" not in text:
-        problems.append("theme placeholder is not in <style id=\"nova-theme\">")
+    if '<script id="atlas-data" type="application/json">' + DATA_PH + "</script>" not in text:
+        problems.append("data placeholder is not in the standard <script id=\"atlas-data\"> element")
+    if '<style id="atlas-theme">' + THEME_PH + "</style>" not in text:
+        problems.append("theme placeholder is not in <style id=\"atlas-theme\">")
     if re.search(r"https?://(?!www\.w3\.org/2000/svg)", text):
         problems.append("template references an external URL")
     if "innerHTML" in text:
@@ -149,7 +149,7 @@ def check_template(name, text):
 
 def check_page(name, page, data):
     problems = []
-    if "{{NOVA_" in page:
+    if "{{ATLAS_" in page:
         problems.append("placeholder left in rendered page")
     c = Checker()
     c.feed(page)

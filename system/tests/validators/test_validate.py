@@ -29,7 +29,7 @@ class TempRepo(unittest.TestCase):
     fixture = GOOD
 
     def setUp(self):
-        self.tmp = tempfile.mkdtemp(prefix="nova-validatetest-")
+        self.tmp = tempfile.mkdtemp(prefix="atlas-validatetest-")
         self.root = self.tmp
         ignore = shutil.ignore_patterns("__pycache__", "tests")
         shutil.copytree(os.path.join(REPO, "system"), os.path.join(self.root, "system"), ignore=ignore)
@@ -138,21 +138,21 @@ class SeededUserErrors(TempRepo):
         self.replace("user/settings/sources.yaml", "connector: outlook", "connector: gmail")
         self.assertError(run_validate(self.root, "--user"), "sources.yaml", "not in connectors.yaml")
 
-    def test_nova_unquoted_version_and_bad_plan(self):
-        self.replace("user/settings/nova.yaml", 'installed_version: "1.0.0"', "installed_version: 1.0")
-        self.replace("user/settings/nova.yaml", "plan: pro", "plan: platinum")
+    def test_atlas_unquoted_version_and_bad_plan(self):
+        self.replace("user/settings/atlas.yaml", 'installed_version: "1.0.0"', "installed_version: 1.0")
+        self.replace("user/settings/atlas.yaml", "plan: pro", "plan: platinum")
         r = run_validate(self.root, "--user")
-        self.assertError(r, "nova.yaml", "installed_version")
-        self.assertError(r, "nova.yaml", "plan must be")
+        self.assertError(r, "atlas.yaml", "installed_version")
+        self.assertError(r, "atlas.yaml", "plan must be")
 
-    def test_nova_bad_company(self):
-        self.replace("user/settings/nova.yaml", "website: https://acme.com", "website: acme")
-        self.replace("user/settings/nova.yaml", "email_domains: [acme.com]", "email_domains: acme.com")
-        self.replace("user/settings/nova.yaml", "fiscal_year_start_month: 2", "fiscal_year_start_month: 13")
-        self.replace("user/settings/nova.yaml", "fiscal_year_label: end", "fiscal_year_label: middle")
+    def test_atlas_bad_company(self):
+        self.replace("user/settings/atlas.yaml", "website: https://acme.com", "website: acme")
+        self.replace("user/settings/atlas.yaml", "email_domains: [acme.com]", "email_domains: acme.com")
+        self.replace("user/settings/atlas.yaml", "fiscal_year_start_month: 2", "fiscal_year_start_month: 13")
+        self.replace("user/settings/atlas.yaml", "fiscal_year_label: end", "fiscal_year_label: middle")
         r = run_validate(self.root, "--user")
         for msg in ("company.website", "company.email_domains", "fiscal_year_start_month", "fiscal_year_label"):
-            self.assertError(r, "nova.yaml", msg)
+            self.assertError(r, "atlas.yaml", msg)
 
     def test_unparseable_yaml(self):
         self.write("user/settings/sources.yaml", "ingest: [\n")
@@ -169,8 +169,8 @@ class SetupAndLeniency(TempRepo):
 
     def test_step5_from_setup_state(self):
         os.remove(self.path("user/settings/governance.yaml"))
-        self.replace("user/settings/nova.yaml", "attestation:\n", "attestation_pending:\n")
-        self.replace("user/settings/nova.yaml", "first_brief_delivered", "attestation: null\nfirst_brief_delivered")
+        self.replace("user/settings/atlas.yaml", "attestation:\n", "attestation_pending:\n")
+        self.replace("user/settings/atlas.yaml", "first_brief_delivered", "attestation: null\nfirst_brief_delivered")
         self.write("user/.state/setup.yaml", "started: 2026-10-12\ncurrent_step: 5\ncompleted: [1, 2, 3, 4]\n")
         r = run_validate(self.root, "--user")
         self.assertNotIn("governance.yaml: missing", r.stdout)
@@ -320,18 +320,18 @@ class SetupAndLeniency(TempRepo):
         self.assertError(run_validate(self.root, "--user"), "rhythms.yaml", "meetings.not_responded")
 
     def test_newer_data_version_is_a_warning(self):
-        self.replace("user/settings/nova.yaml", "data_version: 1", "data_version: 2")
+        self.replace("user/settings/atlas.yaml", "data_version: 1", "data_version: 2")
         r = run_validate(self.root, "--user")
         self.assertEqual(r.returncode, 0, r.stdout)
         self.assertIn("rollback", r.stdout)
 
     def test_bootstrap_confirmed(self):
-        self.replace("user/settings/nova.yaml", "bootstrap_confirmed: 2", "bootstrap_confirmed: 1")
+        self.replace("user/settings/atlas.yaml", "bootstrap_confirmed: 2", "bootstrap_confirmed: 1")
         r = run_validate(self.root, "--user")
         self.assertEqual(r.returncode, 0, r.stdout)
         self.assertIn("Project instructions confirmed for bootstrap 1", r.stdout)
-        self.replace("user/settings/nova.yaml", "bootstrap_confirmed: 1", "bootstrap_confirmed: two")
-        self.assertError(run_validate(self.root, "--user"), "nova.yaml", "bootstrap_confirmed must be")
+        self.replace("user/settings/atlas.yaml", "bootstrap_confirmed: 1", "bootstrap_confirmed: two")
+        self.assertError(run_validate(self.root, "--user"), "atlas.yaml", "bootstrap_confirmed must be")
 
     def test_custom_profile(self):
         self.replace("user/settings/routines.yaml", "profile: lean", "profile: custom")
@@ -416,7 +416,7 @@ class SeededSystemErrors(TempRepo):
         self.assertError(self.system_errors(), "manifest.yaml", "CHANGELOG.md does not exist")
 
     def test_manifest_fields(self):
-        self.replace("system/manifest.yaml", "upstream: CaptLocke/nova", "upstream: not a repo")
+        self.replace("system/manifest.yaml", "upstream: CaptLocke/atlas-framework", "upstream: not a repo")
         self.replace("system/manifest.yaml", "data_version: 1", "data_version: one")
         r = self.system_errors()
         self.assertError(r, "manifest.yaml", "upstream must be")
@@ -443,15 +443,15 @@ class SeededSystemErrors(TempRepo):
         self.assertError(self.system_errors(), "system/jobs/triage.md", "expected job is missing")
 
     def test_skill_name_mismatch_and_missing_description(self):
-        self.write(".claude/skills/nova-recall/SKILL.md", "---\nname: nova-remember\n---\n# x\n")
+        self.write(".claude/skills/atlas-recall/SKILL.md", "---\nname: atlas-remember\n---\n# x\n")
         r = self.system_errors()
-        self.assertError(r, "nova-recall/SKILL.md", "must equal the folder name")
-        self.assertError(r, "nova-recall/SKILL.md", "description is required")
+        self.assertError(r, "atlas-recall/SKILL.md", "must equal the folder name")
+        self.assertError(r, "atlas-recall/SKILL.md", "description is required")
 
     def test_skill_frontmatter_invalid_yaml(self):
-        self.write(".claude/skills/nova-recall/SKILL.md",
-                   "---\nname: nova-recall\ndescription: Find things: answers and more\n---\n# x\n")
-        self.assertError(self.system_errors(), "nova-recall/SKILL.md", "not valid YAML")
+        self.write(".claude/skills/atlas-recall/SKILL.md",
+                   "---\nname: atlas-recall\ndescription: Find things: answers and more\n---\n# x\n")
+        self.assertError(self.system_errors(), "atlas-recall/SKILL.md", "not valid YAML")
 
     def test_settings_template_checked(self):
         self.replace("system/templates/settings/governance.yaml", "destructive: approve", "destructive: auto")

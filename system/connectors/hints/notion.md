@@ -9,7 +9,7 @@ checked: "2026-10: general knowledge of Notion pages and databases; tool names n
 Tool names vary; always verify from the live tool list. Guides: `system/connectors/files.md`, `tasks.md`.
 
 ## Likely categories
-- **files**: pages and wikis (documents, meeting notes, specs). Notion is not a binary file store: it is **not** suitable as the Nova Drop or deliverables folder; use a cloud drive.
+- **files**: pages and wikis (documents, meeting notes, specs). Notion is not a binary file store: it is **not** suitable as the Atlas Drop or deliverables folder; use a cloud drive.
 - **tasks**: databases used as task trackers or project lists (identify them by properties like Assignee, Status, Due). Map only if the user tracks work there.
 
 ## Typical operations
@@ -39,4 +39,4 @@ Tool names vary; always verify from the live tool list. Guides: `system/connecto
 - `share`: change page permissions, publish to web.
 
 ## Fallback
-"Use *••• → Export* (Markdown or PDF) on important pages and put the file in your **Nova Drop** folder."
+"Use *••• → Export* (Markdown or PDF) on important pages and put the file in your **Atlas Drop** folder."

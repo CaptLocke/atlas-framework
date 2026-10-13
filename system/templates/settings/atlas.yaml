@@ -1,0 +1,30 @@
+# Atlas core settings. Copied to user/settings/atlas.yaml by atlas-setup at step 5 (attestation).
+# Format: system/schemas/settings.md. Placeholders (null) are filled during setup.
+user_display_name: null                # e.g. "Maya Chen"
+timezone: null                         # IANA, e.g. America/Los_Angeles
+repo: null                             # owner/name of this repo
+installed_version: null                # setup writes system/VERSION; atlas-update keeps it current
+data_version: null                     # setup writes system/manifest.yaml: data_version; migrations keep it current
+bootstrap_confirmed: null              # setup writes system/manifest.yaml: bootstrap_version; the chat boot check keeps it current
+plan: null                             # pro | max_5x | max_20x | team | enterprise (user-stated)
+attestation: null                      # REQUIRED before any ingestion; recorded in chat at setup step 5
+#  statement: "I confirm I am permitted to store work information from my employer in this private GitHub repository."
+#  employer: "[[organizations/<slug>]]"
+#  role: <role>
+#  recorded_on: YYYY-MM-DD
+#  atlas_version: <version>
+#  reconfirm_due: YYYY-MM-DD           # first business day of next (fiscal) quarter
+company:                               # filled at setup steps 6–8
+  website: null                        # e.g. https://acme.com
+  email_domains: []                    # e.g. [acme.com]; mail from these is internal
+  fiscal_year_start_month: 1           # 1–12; January unless the user says otherwise
+  fiscal_year_label: end               # end | start (only matters if the start month isn't 1)
+deliverables_folder:                   # where finished files are saved
+  connector: null                      # connector name from connectors.yaml, or null (download only)
+  path: "Atlas Deliverables"
+  folder_id: null
+drop_folder:
+  connector: null                      # or null if no cloud drive
+  path: "Atlas Drop"
+  folder_id: null
+first_brief_delivered: null            # set by daily-brief on the first brief

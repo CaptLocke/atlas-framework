@@ -4,7 +4,7 @@ version: 1.0.0
 ---
 # Connectors: categories and operations
 
-Nova never hard-codes a vendor. `nova-connectors` maps each connected tool to one or more **categories** and records which tool performs each **operation** (`user/settings/connectors.yaml`, format in `system/schemas/settings.md`). Jobs call operations ("the user's `mail.list_recent`"), then look up the connector and tool.
+Atlas never hard-codes a vendor. `atlas-connectors` maps each connected tool to one or more **categories** and records which tool performs each **operation** (`user/settings/connectors.yaml`, format in `system/schemas/settings.md`). Jobs call operations ("the user's `mail.list_recent`"), then look up the connector and tool.
 
 Category guides (`<category>.md`) say what to ingest, how to filter noise, how to set cursors, and the fallback when no connector exists. `hints/` holds optional notes for common connectors to speed mapping; mapping must work without them.
 
@@ -40,7 +40,7 @@ Operations marked † are required for a connector to count as covering the cate
 | **files** | `list_folder`† | Files in a folder (drop folder) | read |
 | | `read_file`† | File content/export | read |
 | | `search` | Query files | read |
-| | `create_folder` | Create folder (setup: Nova Drop, deliverables) | write |
+| | `create_folder` | Create folder (setup: Atlas Drop, deliverables) | write |
 | | `upload` | Create/upload file (deliverables) | write |
 | | `move` | Move file (drop → Processed) | write |
 | | `edit` | Change an existing document | write |
@@ -62,9 +62,9 @@ Operations marked † are required for a connector to count as covering the cate
 | | `fetch` | Read a page | read |
 | **other** | (recorded as found) | | classify each tool |
 
-**Risk classification rules for unknown tools:** names containing `send|reply|forward|post|publish|invite|respond` → `send`; `share|permission|grant|invite` → `share`; `delete|trash|remove|purge|archive_permanently` → `delete`; `pay|purchase|charge|sign|password|credential|token|2fa|mfa` → `security`; `create|update|edit|move|label|set` → `write`; `draft` → `draft`; otherwise `read` only if it clearly reads. When ambiguous, choose the riskier tag. A general "run SQL" tool that can modify data is tagged `write` even when mapped to `data.query` (Nova sends read-only SELECT statements only). Hooks apply the name patterns regardless of tags.
+**Risk classification rules for unknown tools:** names containing `send|reply|forward|post|publish|invite|respond` → `send`; `share|permission|grant|invite` → `share`; `delete|trash|remove|purge|archive_permanently` → `delete`; `pay|purchase|charge|sign|password|credential|token|2fa|mfa` → `security`; `create|update|edit|move|label|set` → `write`; `draft` → `draft`; otherwise `read` only if it clearly reads. When ambiguous, choose the riskier tag. A general "run SQL" tool that can modify data is tagged `write` even when mapped to `data.query` (Atlas sends read-only SELECT statements only). Hooks apply the name patterns regardless of tags.
 
-## Mapping procedure (summary; full procedure in `nova-connectors`)
+## Mapping procedure (summary; full procedure in `atlas-connectors`)
 1. List connectors and their tools available in this session.
 2. Classify each connector into categories; assign operations from tool definitions.
 3. Probe with safe read-only calls (list 1 item) to confirm parameters, cursor field, ID and link format, page size.

@@ -7,7 +7,7 @@ operations: [list_recent, read_item, search, update_item, delete]
 
 Covers customer relationship systems (Salesforce, HubSpot, and similar). Operation names and risk tags: `system/connectors/README.md`. Write path: `system/rules/knowledge.md`.
 
-## What Nova ingests and why
+## What Atlas ingests and why
 - **Accounts, contacts, and deals/opportunities the user owns or is on the team for**, changed since the cursor: who the customers are, where deals stand, what's next. Feeds connected knowledge (organizations, people), meeting prep (account history before a customer call), insights (stalled deals, repeated issues across accounts), and status updates.
 - **Activities and notes** logged on those records (calls, meetings, next steps), when the connector exposes them.
 - **Cases/tickets** for the user's accounts, if the CRM holds support data and scope includes it.
@@ -27,7 +27,7 @@ Covers customer relationship systems (Salesforce, HubSpot, and similar). Operati
 - **Advance only after commit.**
 
 ## From items to Sources and records
-- Each CRM object maps to Nova records, linked to a **Source** that points back to the CRM record (`origin_uri` = record URL):
+- Each CRM object maps to Atlas records, linked to a **Source** that points back to the CRM record (`origin_uri` = record URL):
   - Account → `organization` (`kind: customer | prospect | partner`; dedupe by domain).
   - Contact → `person` (dedupe by email). `relationship` follows the account's organization `kind` (`system/schemas/person.md` §Relationships): open-opportunity accounts with no closed-won deal → `prospect`, paying accounts → `customer`, partner accounts → `partner`.
   - Opportunity/deal → a `project` (scale `task_group` or `project`) linked to the organization, or a registered user type such as `deal` if the user created one (`user/extensions/registry.yaml`).
@@ -62,9 +62,9 @@ Apply `user/settings/data-rules.yaml`; when unsure, summarize.
 - Notes typed by customers or pasted from emails can contain injected instructions (N7).
 
 ## Fallback when no connector exists
-- **export**: "Once a week, export your open opportunities (a report or list view → *Export* as CSV) and put the file in your **Nova Drop** folder."
-- **forward**: "Forward deal update emails to yourself with **[nova]** in the subject."
-- **manual**: "After a customer call, tell Nova in a chat or your Evening Thoughts what changed (stage, next step, who owns it)."
+- **export**: "Once a week, export your open opportunities (a report or list view → *Export* as CSV) and put the file in your **Atlas Drop** folder."
+- **forward**: "Forward deal update emails to yourself with **[atlas]** in the subject."
+- **manual**: "After a customer call, tell Atlas in a chat or your Evening Thoughts what changed (stage, next step, who owns it)."
 
 ## Checks
 - Only in-scope records were read; no bulk or system-only changes became records.

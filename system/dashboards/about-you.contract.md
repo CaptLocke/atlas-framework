@@ -9,7 +9,7 @@ stale_after_hours: 768
 # Dashboard: about-you
 
 ## Purpose
-Everything Nova believes about the user (profile basics, working, communication and thinking style, preferences, both voice guides, design system), each statement with where it came from and whether it is confirmed, plus the observations waiting for the user's OK. It makes personalization inspectable: anything wrong is fixed by telling Nova in chat (`profile_update`).
+Everything Atlas believes about the user (profile basics, working, communication and thinking style, preferences, both voice guides, design system), each statement with where it came from and whether it is confirmed, plus the observations waiting for the user's OK. It makes personalization inspectable: anything wrong is fixed by telling Atlas in chat (`profile_update`).
 
 Republished by `monthly` (after the user health check) and `quarterly` (after the role refresh). A chat that changes the profile, or confirms or rejects a profile proposal, republishes it too.
 

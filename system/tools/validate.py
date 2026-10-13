@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Nova validator (build plan T-2).
+"""Atlas validator (build plan T-2).
 
 Usage:
   python3 system/tools/validate.py [--system | --user | --all] [--root DIR] [paths...]
@@ -30,14 +30,14 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "vendor"))
 import yaml  # noqa: E402  (vendored)
 
-SKILLS = ["nova-recall", "nova-capture", "nova-brief", "nova-triage", "nova-insights", "nova-memory",
-          "nova-thoughts", "nova-review", "nova-status-update", "nova-prep", "nova-write", "nova-setup",
-          "nova-settings", "nova-extend", "nova-health", "nova-update", "nova-dashboards", "nova-away",
-          "nova-connectors", "nova-report-issue"]
+SKILLS = ["atlas-recall", "atlas-capture", "atlas-brief", "atlas-triage", "atlas-insights", "atlas-memory",
+          "atlas-thoughts", "atlas-review", "atlas-status-update", "atlas-prep", "atlas-write", "atlas-setup",
+          "atlas-settings", "atlas-extend", "atlas-health", "atlas-update", "atlas-dashboards", "atlas-away",
+          "atlas-connectors", "atlas-report-issue"]
 JOBS = ["ingest", "triage", "intelligence", "email-drafts", "meeting-prep", "daily-brief", "weekly-review",
         "status-updates", "monthly", "quarterly", "maintenance", "update-check"]
 DASHBOARDS = ["daily-brief", "work-board", "goals", "week-ahead", "people", "decisions-risks",
-              "control-center", "about-you", "nova-guide", "records"]
+              "control-center", "about-you", "atlas-guide", "records"]
 ON_DEMAND_DASHBOARDS = ["project-page"]
 JOB_SECTIONS = ["Purpose", "Runs when", "Away and paused", "Readiness check", "Inputs", "Steps",
                 "Outputs", "Early exit", "Guardrails", "Run report"]
@@ -59,7 +59,7 @@ PROFILES = ["lean", "standard", "full", "custom"]
 DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 MEETING_FILTERS = ["all_day", "tentative", "not_responded"]
 FALLBACK_METHODS = ["drop", "forward", "export", "manual"]
-SETTINGS_FILES = ["nova.yaml", "governance.yaml", "data-rules.yaml", "connectors.yaml", "sources.yaml",
+SETTINGS_FILES = ["atlas.yaml", "governance.yaml", "data-rules.yaml", "connectors.yaml", "sources.yaml",
                   "rhythms.yaml", "routines.yaml", "dashboards.yaml"]
 # date-valued fields per record type (null allowed); "dt" also allows datetimes
 DATE_FIELDS = {
@@ -296,11 +296,11 @@ def check_manifest(c):
     if data.get("min_plan") is not None and data.get("min_plan") not in PLANS:
         rep.error(path, "min_plan must be one of %s" % ", ".join(PLANS))
     if data.get("support_email") is None and "support_email" in data:
-        rep.warn(path, "support_email is null (nova-report-issue has nowhere to send reports)")
+        rep.warn(path, "support_email is null (atlas-report-issue has nowhere to send reports)")
     kv, bv = data.get("kernel_version"), data.get("bootstrap_version")
-    for key, val, rel, pattern in (("kernel_version", kv, ("system", "kernel.md"), r"nova-kernel-(\d+)"),
+    for key, val, rel, pattern in (("kernel_version", kv, ("system", "kernel.md"), r"atlas-kernel-(\d+)"),
                                    ("bootstrap_version", bv, ("system", "templates", "bootstrap-stub.md"),
-                                    r"Nova bootstrap (\d+)")):
+                                    r"Atlas bootstrap (\d+)")):
         if val is None:
             rep.error(path, "missing field '%s'" % key)
             continue
@@ -503,7 +503,7 @@ def check_dashboards(c):
             c.rep.error(path, "republished_by must be a list")
         else:
             for j in rb:
-                if j not in jobs and not str(j).startswith("nova-"):
+                if j not in jobs and not str(j).startswith("atlas-"):
                     c.rep.warn(path, "republished_by names unknown job %r" % j)
         missing = [s for s in ("Purpose", "Data", "Sources", "Rendering notes")
                    if not any(h.startswith(s.lower()) for h in headings(body))]
@@ -999,7 +999,7 @@ def check_dashboards_settings(c, path, data, template):
         rep.error(path, "project_pages must be a mapping of project ID to url")
 
 
-def check_nova(c, path, data, template):
+def check_atlas(c, path, data, template):
     rep = c.rep
     if not isinstance(data, dict):
         rep.error(path, "must be a YAML mapping")
@@ -1023,7 +1023,7 @@ def check_nova(c, path, data, template):
     if isinstance(dv, int) and isinstance(mdv, int) and not template:
         if dv > mdv:
             rep.warn(path, "data_version %d is newer than this release expects (%d); usual after a rollback "
-                           "(nova-update handles it)" % (dv, mdv))
+                           "(atlas-update handles it)" % (dv, mdv))
         elif dv < mdv:
             rep.warn(path, "data_version %d is older than this release expects (%d); migrations are pending"
                      % (dv, mdv))
@@ -1032,7 +1032,7 @@ def check_nova(c, path, data, template):
     bc = data.get("bootstrap_confirmed")
     if bc is not None:
         if isinstance(bc, bool) or not isinstance(bc, int) or bc < 0:
-            rep.error(path, "bootstrap_confirmed must be a whole number (the Nova bootstrap version)")
+            rep.error(path, "bootstrap_confirmed must be a whole number (the Atlas bootstrap version)")
         elif not template:
             mbv = c.load_manifest().get("bootstrap_version")
             if isinstance(mbv, int) and bc < mbv:
@@ -1067,7 +1067,7 @@ def check_nova(c, path, data, template):
         if not isinstance(att, dict):
             rep.error(path, "attestation must be a mapping")
         else:
-            for k in ("statement", "employer", "role", "recorded_on", "nova_version", "reconfirm_due"):
+            for k in ("statement", "employer", "role", "recorded_on", "atlas_version", "reconfirm_due"):
                 if not att.get(k):
                     rep.error(path, "attestation.%s is required" % k)
             for k in ("recorded_on", "reconfirm_due"):
@@ -1083,7 +1083,7 @@ def check_nova(c, path, data, template):
 
 
 SETTINGS_CHECKS = {
-    "nova.yaml": check_nova,
+    "atlas.yaml": check_atlas,
     "governance.yaml": check_governance,
     "data-rules.yaml": check_data_rules,
     "connectors.yaml": check_connectors,
@@ -1149,8 +1149,8 @@ def check_registry(c, path):
             rep.error(path, "%s: path must be relative to user/extensions/" % where)
         elif not is_template and not os.path.exists(c.p("user", "extensions", *p.split("/"))):
             rep.error(path, "%s: user/extensions/%s does not exist" % (where, p))
-        if not isinstance(e.get("requires_nova"), str) or not e.get("requires_nova"):
-            rep.error(path, "%s: requires_nova range is required (e.g. \">=1.0\")" % where)
+        if not isinstance(e.get("requires_atlas"), str) or not e.get("requires_atlas"):
+            rep.error(path, "%s: requires_atlas range is required (e.g. \">=1.0\")" % where)
         if not is_date(e.get("created")):
             rep.error(path, "%s: created must be YYYY-MM-DD" % where)
         ov = e.get("overrides")
@@ -1328,7 +1328,7 @@ def check_field_formats(c, path, fm, rtype):
 
 def setup_step5_done(c):
     """True once setup step 5 is complete: user/.state/setup.yaml lists 5 as
-    completed, or nova.yaml has an attestation recorded."""
+    completed, or atlas.yaml has an attestation recorded."""
     sp = c.p("user", ".state", "setup.yaml")
     if os.path.exists(sp):
         try:
@@ -1338,7 +1338,7 @@ def setup_step5_done(c):
                 return True
         except (OSError, yaml.YAMLError, AttributeError):
             pass
-    np = c.p("user", "settings", "nova.yaml")
+    np = c.p("user", "settings", "atlas.yaml")
     if os.path.exists(np):
         try:
             with open(np, encoding="utf-8") as f:
@@ -1353,8 +1353,8 @@ def check_user(c):
     rep = c.rep
     sdir = c.p("user", "settings")
     present = [f for f in listdir(sdir) if f.endswith(".yaml")]
-    if not os.path.exists(os.path.join(sdir, "nova.yaml")):
-        rep.warn(sdir, "user/settings/nova.yaml not found: Nova is not set up yet (settings checks skipped "
+    if not os.path.exists(os.path.join(sdir, "atlas.yaml")):
+        rep.warn(sdir, "user/settings/atlas.yaml not found: Atlas is not set up yet (settings checks skipped "
                        "for missing files)")
     for f in present:
         check_settings_file(c, os.path.join(sdir, f))
@@ -1556,7 +1556,7 @@ def check_path(c, path):
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(description="Validate Nova system and user files.")
+    ap = argparse.ArgumentParser(description="Validate Atlas system and user files.")
     g = ap.add_mutually_exclusive_group()
     g.add_argument("--system", action="store_true", help="validate the system half")
     g.add_argument("--user", action="store_true", help="validate the user half")
@@ -1582,7 +1582,7 @@ def main(argv=None):
         check_user(c)
         scope.append("user")
 
-    print("Nova validate: %s (%s)" % (", ".join(scope), root))
+    print("Atlas validate: %s (%s)" % (", ".join(scope), root))
     for path, msg in rep.errors:
         print("ERROR  %s: %s" % (path, msg))
     if not args.quiet:

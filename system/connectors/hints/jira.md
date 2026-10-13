@@ -25,7 +25,7 @@ Tool names vary; always verify from the live tool list. Guide: `system/connector
 - First run: `assignee = currentUser() AND statusCategory != Done` for open work.
 
 ## Known quirks
-- Issue keys (`ATLAS-123`) are stable, human-readable IDs: put them in `aliases` of the matching commitment.
+- Issue keys (`ORION-123`) are stable, human-readable IDs: put them in `aliases` of the matching commitment.
 - Status names vary by project workflow; use the status *category* (To Do / In Progress / Done) to decide open vs. done.
 - Engineering projects generate heavy automated churn (CI links, sprint moves, bot comments): filter by human authors.
 - Cloud site URL is needed for links (`https://<site>.atlassian.net/browse/<KEY>`); confirm at probe.
@@ -39,4 +39,4 @@ Tool names vary; always verify from the live tool list. Guide: `system/connector
 - Confluence: create page → `write` (`docs_create`); edit page → `write` (`docs_edit`); comment → `send`; restrictions → `share`.
 
 ## Fallback
-"From an issue filter, use *Export → CSV* weekly into your **Nova Drop** folder, or keep Jira email notifications on."
+"From an issue filter, use *Export → CSV* weekly into your **Atlas Drop** folder, or keep Jira email notifications on."

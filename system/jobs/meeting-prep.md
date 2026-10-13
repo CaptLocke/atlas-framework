@@ -2,7 +2,7 @@
 type: job
 name: meeting-prep
 model: strongest
-skills: [nova-prep]
+skills: [atlas-prep]
 ---
 # Job: meeting-prep
 
@@ -23,13 +23,13 @@ If the target window falls within away, exit with `skipped_away` (no prep for me
 
 ## Inputs
 - Event records in the window (`user/knowledge/events/`) and the calendar for the window.
-- Attendee person records, their organizations, linked projects, open commitments each way, recent decisions, open risks and questions (L3 via `nova-recall`).
+- Attendee person records, their organizations, linked projects, open commitments each way, recent decisions, open risks and questions (L3 via `atlas-recall`).
 - Existing prep notes in `user/work/prep/`.
 
 ## Steps
 1. List events in the window. Select meaningful ones: those meeting `key_meeting_upcoming` (a `one_on_one`, external attendees, or at least one linked open commitment or decision) plus any the user has asked to always prep. Skip holds, focus blocks, personal items, declined or cancelled events, and events hidden by the meeting filter (`rhythms.yaml: meetings`; rule in `system/schemas/settings.md`).
 2. For each selected event, check the fire-once key (`event start`) in `user/.state/triggers.yaml` and whether a prep note exists. If one exists and nothing relevant changed since it was written, skip it.
-3. Invoke `nova-prep` (meeting mode) to write or refresh the note at `user/work/prep/YYYY-MM-DD-<event-slug>.md` (frontmatter `type: prep`, `date`, `sources`).
+3. Invoke `atlas-prep` (meeting mode) to write or refresh the note at `user/work/prep/YYYY-MM-DD-<event-slug>.md` (frontmatter `type: prep`, `date`, `sources`).
 4. Set the event record's `prep` field to the note path (create the event record if missing, per the event schema) and record the trigger firing.
 5. Commit.
 

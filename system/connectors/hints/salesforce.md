@@ -40,4 +40,4 @@ Tool names vary; always verify from the live tool list. Guide: `system/connector
 - `security`: execute anonymous code, user/permission administration, approve/submit approval processes.
 
 ## Fallback
-"Run your *My Open Opportunities* report → *Export* (CSV) weekly into your **Nova Drop** folder."
+"Run your *My Open Opportunities* report → *Export* (CSV) weekly into your **Atlas Drop** folder."

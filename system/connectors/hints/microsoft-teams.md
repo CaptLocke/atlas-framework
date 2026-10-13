@@ -29,7 +29,7 @@ Usually part of the Microsoft 365 connector (`outlook.md`); map as one connector
 - Meetings: meeting end time; recaps and transcripts can lag, so hold the cursor per the meetings guide.
 
 ## Known quirks
-- **Message sending is often blocked by the organization** (per-tool restrictions); the connector may be read-only for Teams. Nova never needs to post anyway.
+- **Message sending is often blocked by the organization** (per-tool restrictions); the connector may be read-only for Teams. Atlas never needs to post anyway.
 - Listing teams and people may require extra tenant permissions; a permission error means "ask the admin", not "re-map".
 - Channel messages and chat messages are different objects; replies hang off a parent.
 - Message bodies are HTML: strip markup before summarizing.
@@ -41,4 +41,4 @@ Usually part of the Microsoft 365 connector (`outlook.md`); map as one connector
 - `share`: add members, change team/channel membership.
 
 ## Fallback
-Messaging: copy link or text into chat, or forward to email. Meetings: *Recap → Download transcript* into Nova Drop.
+Messaging: copy link or text into chat, or forward to email. Meetings: *Recap → Download transcript* into Atlas Drop.

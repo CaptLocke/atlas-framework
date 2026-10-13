@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Nova hook: pull the latest repo state at session start (SessionStart).
+"""Atlas hook: pull the latest repo state at session start (SessionStart).
 
 Claude Code contract relied on (https://code.claude.com/docs/en/hooks and
 https://code.claude.com/docs/en/hooks-guide, checked 2026-10-12):
@@ -21,12 +21,12 @@ Behavior (system/rules/sync.md "Session start"):
   the remote whether this session may push). Sessions can come up with a
   read-only attachment; if the dry run is refused, the context tells Claude
   to re-attach the repo with write access before anything else (kernel §2.1).
-- Success: one boot line, "Nova boot: synced to origin/main at <sha>; push access confirmed." plus
+- Success: one boot line, "Atlas boot: synced to origin/main at <sha>; push access confirmed." plus
   the kernel version Claude must find in its context (manifest kernel_version), so a kernel
   that CLAUDE.md failed to load is noticed on the first turn (kernel §2 step 0).
 - Failure (network, auth, conflict, not on main): additional context telling
-  Claude to retry the pull before reading or writing Nova files; the reason is
-  logged to .nova-tmp/sync.log. Never blocks, never crashes, always exit 0.
+  Claude to retry the pull before reading or writing Atlas files; the reason is
+  logged to .atlas-tmp/sync.log. Never blocks, never crashes, always exit 0.
 """
 import os
 import sys
@@ -51,10 +51,10 @@ def kernel_version(proj):
 
 def boot_line(proj, rest):
     kv = kernel_version(proj)
-    check = ("Boot check (kernel §2 step 0): your context must hold the Nova kernel with boot marker "
-             "nova-kernel-%s; if it doesn't, read system/kernel.md now. Mention the boot check to the user only "
+    check = ("Boot check (kernel §2 step 0): your context must hold the Atlas kernel with boot marker "
+             "atlas-kernel-%s; if it doesn't, read system/kernel.md now. Mention the boot check to the user only "
              "if something fails." % kv) if kv else "Read system/kernel.md now (no kernel_version in the manifest)."
-    return "Nova boot: %s %s" % (rest, check)
+    return "Atlas boot: %s %s" % (rest, check)
 
 
 def context(text):
@@ -64,7 +64,7 @@ def context(text):
 def failure(gs, proj, reason):
     gs.log(proj, "sync_start.failed", reason)
     return context(
-        "Nova sync at session start FAILED (%s). Before reading or writing any Nova file, retry: "
+        "Atlas sync at session start FAILED (%s). Before reading or writing any Atlas file, retry: "
         "`git pull --rebase` on main (system/rules/sync.md); resolve conflicts as that rule says. If it "
         "keeps failing, keep working, record a known issue in user/.state/health.yaml, and tell the user in "
         "one line (usually: reconnect GitHub)." % gs.one_line(reason, 200))
@@ -97,8 +97,8 @@ def main():
         reason = (err or out).strip() or "exit %d" % rc
         gs.log(proj, "sync_start.read_only", reason)
         return context(
-            "Nova boot: repo synced to origin/%s at %s, but this session CAN'T PUSH to it (%s). It is probably "
-            "attached read-only. Before reading or writing Nova files, re-attach the repository with write "
+            "Atlas boot: repo synced to origin/%s at %s, but this session CAN'T PUSH to it (%s). It is probably "
+            "attached read-only. Before reading or writing Atlas files, re-attach the repository with write "
             "(push) access and clone it again (kernel §2 step 1). If write access is refused, tell the user in "
             "one line: give the Claude GitHub App write access to this repository (GitHub → Settings → "
             "Applications → Claude → Configure), then start a new chat." % (gs.BRANCH, sha, gs.one_line(reason, 160)))
@@ -116,8 +116,8 @@ if __name__ == "__main__":
         try:
             import json
             sys.stdout.write(json.dumps(context(
-                "Nova sync hook could not run (%s: %s). Pull the repo yourself (`git pull --rebase` on main, "
-                "system/rules/sync.md) before reading or writing Nova files." % (type(e).__name__, e))))
+                "Atlas sync hook could not run (%s: %s). Pull the repo yourself (`git pull --rebase` on main, "
+                "system/rules/sync.md) before reading or writing Atlas files." % (type(e).__name__, e))))
         except BaseException:
             pass
     sys.stdout.flush()

@@ -1,4 +1,4 @@
-# Last run per job. Copied to user/.state/jobs.yaml by nova-setup.
-# Written only by Nova. Format: system/schemas/formats.md §1.
+# Last run per job. Copied to user/.state/jobs.yaml by atlas-setup.
+# Written only by Atlas. Format: system/schemas/formats.md §1.
 # Entries are added as jobs run, e.g. ingest: { last_success: "...", last_status: ok }.
 jobs: {}

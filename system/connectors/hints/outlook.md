@@ -41,4 +41,4 @@ The Microsoft 365 connector is usually **one connector spanning several categori
 - `write`: categories, flags, move, mail rules (internal only).
 
 ## Fallback
-Mail: forward from another inbox, Save as PDF to Nova Drop, or paste. Calendar: *File → Save Calendar* (.ics) to Nova Drop, or Morning Thoughts.
+Mail: forward from another inbox, Save as PDF to Atlas Drop, or paste. Calendar: *File → Save Calendar* (.ics) to Atlas Drop, or Morning Thoughts.

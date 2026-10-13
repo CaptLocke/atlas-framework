@@ -22,12 +22,12 @@ Tool names vary; always verify from the live tool list. Guide: `system/connector
 
 ## Cursor ideas
 - Last-modified time filter where available; otherwise search scoped to the folder and compare modified times with existing Sources.
-- Nova Drop: rely on the move to `Processed`.
+- Atlas Drop: rely on the move to `Processed`.
 
 ## Known quirks
 - **Write actions depend on the organization's settings.** Documentation (2026-10) describes creating and updating files in SharePoint; OneDrive folder creation and file moves may not be available. Probe at mapping:
-  - No `create_folder`: ask the user to create "Nova Drop" (with "Processed" inside) and "Nova Deliverables" themselves, then find them by search.
-  - No `move`: Nova cannot tidy the Drop folder; record processed file IDs in their Sources and skip them on later runs (note this in `limits`).
+  - No `create_folder`: ask the user to create "Atlas Drop" (with "Processed" inside) and "Atlas Deliverables" themselves, then find them by search.
+  - No `move`: Atlas cannot tidy the Drop folder; record processed file IDs in their Sources and skip them on later runs (note this in `limits`).
   - No `upload`: deliverables are download-only.
 - **Indexing delay:** newly added files may not appear in search for a while; a dropped file may be picked up one run later.
 - Work or school accounts only; tenant admin consent required.
@@ -39,4 +39,4 @@ Tool names vary; always verify from the live tool list. Guide: `system/connector
 - `write`: create/update file or folder in the user's own OneDrive, move within it.
 
 ## Fallback
-Chat attachments for drops; downloads for deliverables. If only search/read works, the user can still drop files into a folder they create, and Nova reads them (no move).
+Chat attachments for drops; downloads for deliverables. If only search/read works, the user can still drop files into a folder they create, and Atlas reads them (no move).

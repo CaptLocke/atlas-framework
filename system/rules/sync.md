@@ -8,14 +8,14 @@ name: sync
 Every session that changes files in the repo.
 
 ## The rule
-**The GitHub repo is the only source of truth.** Read Nova files only from the clone of the user's repo attached to this session, save every change there, and push it to `origin/main`. Never read or write Nova files anywhere else: not in folders on the user's computer (even if a copy of the repo is connected as a local folder), not in Claude Project knowledge, not in uploads. If you notice another copy, ignore it and tell the user once that Nova only uses the GitHub repo.
+**The GitHub repo is the only source of truth.** Read Atlas files only from the clone of the user's repo attached to this session, save every change there, and push it to `origin/main`. Never read or write Atlas files anywhere else: not in folders on the user's computer (even if a copy of the repo is connected as a local folder), not in Claude Project knowledge, not in uploads. If you notice another copy, ignore it and tell the user once that Atlas only uses the GitHub repo.
 
 The user never sees or manages git. Pull at the start, commit and push after each logical change set, resolve conflicts yourself, and never rewrite history (N8; sole exception: purge).
 
 ## Procedure
 | Moment | Action |
 |---|---|
-| Session start | `git pull --rebase` on `main`, then `git push --dry-run origin HEAD:main` to confirm write access (the `SessionStart` hook does both; if it reports a failure, retry before reading or writing Nova files). **Read-only attachment** (the dry run is refused): re-attach the repository with write (push) access and clone it again; if that is refused too, tell the user in one line to give the Claude GitHub App write access to the repository (GitHub → Settings → Applications → Claude → Configure → Repository permissions) and start a new chat |
+| Session start | `git pull --rebase` on `main`, then `git push --dry-run origin HEAD:main` to confirm write access (the `SessionStart` hook does both; if it reports a failure, retry before reading or writing Atlas files). **Read-only attachment** (the dry run is refused): re-attach the repository with write (push) access and clone it again; if that is refused too, tell the user in one line to give the Claude GitHub App write access to the repository (GitHub → Settings → Applications → Claude → Configure → Repository permissions) and start a new chat |
 | Before acting on a new request in a long chat (last pull > 15 minutes ago) | `git pull --rebase`, so routine runs made meanwhile are included |
 | After each logical change set (a filed input, a job, a settings change, a deliverable) | `git add -A`, `git commit` with trailers (below), `git pull --rebase`, `git push origin HEAD:main` |
 | Conflict during rebase | Resolve (below), `git rebase --continue`, push |
@@ -24,13 +24,13 @@ The user never sees or manages git. Pull at the start, commit and push after eac
 
 ## Commit messages
 ```
-nova(<actor>): <short summary>
+atlas(<actor>): <short summary>
 
-Nova-Actor: chat | routine:<routine-name> | update | setup
-Nova-Reason: <why, one line>
-Nova-Records: <record IDs or paths touched, comma-separated; may be "-" for settings/logs only>
+Atlas-Actor: chat | routine:<routine-name> | update | setup
+Atlas-Reason: <why, one line>
+Atlas-Records: <record IDs or paths touched, comma-separated; may be "-" for settings/logs only>
 ```
-Hooks reject commits without `Nova-Actor` and `Nova-Reason` (N12). Commit messages never contain sensitive content.
+Hooks reject commits without `Atlas-Actor` and `Atlas-Reason` (N12). Commit messages never contain sensitive content.
 
 ## Conflict resolution
 - **Records:** merge both sides. Frontmatter: take the side with the later `updated` per field; union list fields (aliases, links, sources). Body: keep both sides' content; `## Updates` is the union in date order.
@@ -44,5 +44,5 @@ Revert with a **forward commit** (`git revert` or restoring file contents from a
 
 ## Never
 - Force-push, `rebase -i` on pushed commits, `filter-branch`/`filter-repo` (except the purge procedure), deleting branches with unmerged work.
-- Commit `.nova-tmp/` or secrets.
+- Commit `.atlas-tmp/` or secrets.
 - Ask the user to run git commands.

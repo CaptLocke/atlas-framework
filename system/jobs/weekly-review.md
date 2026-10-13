@@ -2,7 +2,7 @@
 type: job
 name: weekly-review
 model: strongest
-skills: [nova-review]
+skills: [atlas-review]
 ---
 # Job: weekly-review
 
@@ -27,10 +27,10 @@ If `triage` has not succeeded in the last 24 hours, run `triage` in `light` mode
 
 ## Steps
 1. If `user/work/reviews/YYYY-Www.md` exists for this week, refresh it instead of creating a new one.
-2. Invoke `nova-review` (weekly mode) to write the review (`type: review`, `date`, `sources`), every item citing its record.
+2. Invoke `atlas-review` (weekly mode) to write the review (`type: review`, `date`, `sources`), every item citing its record.
 3. Accomplishments: append dated entries for real outcomes this week to the relevant goals' `accomplishments` and to `user/work/accomplishments.md` (running list), skipping entries already present (`records_write`).
 4. Suggested priorities for next week go in the review; any change to commitments' priority is left to `triage`.
-5. Invoke `nova-dashboards` to republish every dashboard whose contract (`system/dashboards/*.contract.md`) lists `weekly-review` in `republished_by`.
+5. Invoke `atlas-dashboards` to republish every dashboard whose contract (`system/dashboards/*.contract.md`) lists `weekly-review` in `republished_by`.
 6. Commit.
 
 ## Outputs

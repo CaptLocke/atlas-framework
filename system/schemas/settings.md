@@ -5,19 +5,19 @@ folder: user/settings/
 ---
 # Schema: settings
 
-All settings are YAML in `user/settings/`. Defaults ship in `system/templates/settings/` and are copied in by `nova-setup`. `system/tools/validate.py` checks every file against this spec and `schema.yaml`.
+All settings are YAML in `user/settings/`. Defaults ship in `system/templates/settings/` and are copied in by `atlas-setup`. `system/tools/validate.py` checks every file against this spec and `schema.yaml`.
 
 **Protected files (N6):** `governance.yaml`, `data-rules.yaml`, `connectors.yaml` change only in a chat, after the user explicitly confirms the change (`system/rules/governance.md`). Hooks block writes to them in routine context.
 
 ---
 
-## nova.yaml
+## atlas.yaml
 ```yaml
 user_display_name: Maya Chen
 timezone: America/Los_Angeles          # IANA
 locale: en-US                          # dates and numbers in output and dashboards
-repo: maya-chen/nova                   # owner/name of this repo
-installed_version: 1.0.0               # updated by nova-update
+repo: maya-chen/atlas                   # owner/name of this repo
+installed_version: 1.0.0               # updated by atlas-update
 installed_from_commit: null            # template commit the repo was created from; baseline for drift checks until the first real update
 data_version: 1                        # updated by migrations
 bootstrap_confirmed: 2                 # Project-instructions version last confirmed current (setup, chat boot check); optional
@@ -27,7 +27,7 @@ attestation:                           # required before any ingestion
   employer: "[[organizations/acme]]"
   role: Product Manager
   recorded_on: 2026-10-12
-  nova_version: 1.0.0
+  atlas_version: 1.0.0
   reconfirm_due: 2027-01-04            # first business day of next (fiscal) quarter
 company:                               # the user's employer; filled at setup steps 6–8
   website: https://acme.com
@@ -39,13 +39,13 @@ company:                               # the user's employer; filled at setup st
 # or after a change of employer/role until a new attestation is recorded.
 deliverables_folder:                   # where finished files are saved (C13)
   connector: google-drive              # connector name from connectors.yaml, or null (download only)
-  path: "Nova Deliverables"
+  path: "Atlas Deliverables"
   folder_id: null                      # connector-specific ID once created/found
 drop_folder:
   connector: google-drive              # or null if no cloud drive
-  path: "Nova Drop"
+  path: "Atlas Drop"
   folder_id: null
-  move_supported: true                 # false → Nova remembers processed file IDs in cursors instead of moving files
+  move_supported: true                 # false → Atlas remembers processed file IDs in cursors instead of moving files
 first_brief_delivered: 2026-10-13
 ```
 
@@ -53,7 +53,7 @@ first_brief_delivered: 2026-10-13
 Levels: `auto`, `propose`, `approve`, `never` (no other values). Locked classes cannot be changed; validators reject edits to them.
 ```yaml
 autonomy:
-  # inside Nova
+  # inside Atlas
   read: auto
   records_write: auto
   merge_supersede: auto          # clear cases follow this; ambiguous always proposed
@@ -65,7 +65,7 @@ autonomy:
   extensions_create: propose
   updates_minor: auto            # patch + minor releases
   updates_major: propose
-  # outside Nova
+  # outside Atlas
   external_read: auto
   web_research: auto
   drafts_create: auto
@@ -111,7 +111,7 @@ exclusions:                       # never read; the ONLY place exclusions are de
 **Exclusion syntax:** `<category or connector>: <query>` where query is the connector's own search syntax or a simple `field:value` (`from:`, `to:`, `channel:`, `series:`, `folder:`, `label:`); or `record: <id>` to stop capturing a forgotten subject.
 
 ## connectors.yaml
-Written by `nova-connectors`. One entry per connector.
+Written by `atlas-connectors`. One entry per connector.
 ```yaml
 connectors:
   - connector: outlook                 # name as shown in the connector list
@@ -143,7 +143,7 @@ connectors:
 Operation names per category are defined in `system/connectors/README.md`.
 
 ## sources.yaml
-Which categories Nova ingests, how far back, and fallbacks.
+Which categories Atlas ingests, how far back, and fallbacks.
 ```yaml
 ingest:
   - category: mail
@@ -156,7 +156,7 @@ ingest:
 fallbacks:                              # categories with no connector
   - category: crm
     method: forward                     # drop | forward | export | manual
-    instructions: "Forward deal update emails to yourself with [nova] in the subject."
+    instructions: "Forward deal update emails to yourself with [atlas] in the subject."
 ```
 
 ## rhythms.yaml
@@ -187,11 +187,11 @@ insights:
   brief_max: 3
   engagement: adaptive                  # adaptive | fixed
   suppressed_kinds: []                  # insight kinds the user turned off, e.g. [idea] ("stop suggesting ideas in the brief")
-meetings:                               # which calendar events Nova shows and preps; optional, every key defaults to include
+meetings:                               # which calendar events Atlas shows and preps; optional, every key defaults to include
   all_day: include                      # include | skip: all-day events (holidays, conference days, OOO notices)
   tentative: include                    # include | skip: meetings the user tentatively accepted
   not_responded: include                # include | skip: invitations the user hasn't answered yet
-away:                                   # set by nova-away; null when not away
+away:                                   # set by atlas-away; null when not away
   start: null                           # YYYY-MM-DD, first day away
   end: null                             # YYYY-MM-DD, LAST day away (inclusive); null while away = away until the user says they're back
   set_on: null
@@ -203,14 +203,14 @@ paused: []                              # e.g. [{ job: weekly-review, until: 202
 - `tentative: skip` and the event record's `response` is `tentative`.
 - `not_responded: skip` and `response` is `not_responded`.
 
-Events the user organizes (`response: organizer`) and accepted events are always shown; declined events are already skipped at ingestion (`system/connectors/calendar.md`). A skipped event is still recorded in knowledge, so it appears normally once the user accepts it. It is left out of the Daily Brief's Today, Week Ahead's events and meeting hours, meeting prep, and the `key_meeting_upcoming` trigger. Focus suggestions still avoid its time, so Nova never suggests focus time on top of a meeting the user may attend. Changing the filter is `behavior_settings`.
+Events the user organizes (`response: organizer`) and accepted events are always shown; declined events are already skipped at ingestion (`system/connectors/calendar.md`). A skipped event is still recorded in knowledge, so it appears normally once the user accepts it. It is left out of the Daily Brief's Today, Week Ahead's events and meeting hours, meeting prep, and the `key_meeting_upcoming` trigger. Focus suggestions still avoid its time, so Atlas never suggests focus time on top of a meeting the user may attend. Changing the filter is `behavior_settings`.
 
 ## routines.yaml
 ```yaml
 profile: lean                           # lean | standard | full | custom (custom = user-edited)
 routines:
   - name: nightly-cycle
-    schedule: "7 20 * * *"              # cron in nova.yaml timezone; one schedule per routine
+    schedule: "7 20 * * *"              # cron in atlas.yaml timezone; one schedule per routine
     model: strongest                    # role from system/manifest.yaml models
     routine_id: null                    # platform ID once created
     jobs:
@@ -236,7 +236,7 @@ dashboards:
   decisions-risks: { url: null, last_published: null }
   control-center: { url: null, last_published: null }
   about-you: { url: null, last_published: null }
-  nova-guide: { url: null, last_published: null }
+  atlas-guide: { url: null, last_published: null }
   records: { url: null, last_published: null }
 project_pages: {}                       # project ID → url, created on request
 # User dashboards from extensions are additional keys named after the extension.
