@@ -243,6 +243,10 @@ a.rid:hover { color: var(--accent); }
 @media (max-width: 34rem) { .log li { grid-template-columns: minmax(0, 1fr); } }
 .fix { font-size: .92rem; }
 .fix b { font-weight: 600; }
+.copy { margin-top: .6rem; }
+.copy pre { margin: 0; padding: .7rem .9rem; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius); font-family: var(--font-id); font-size: .82rem; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+.copy button { margin-top: .45rem; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: .2rem .8rem; cursor: pointer; font-size: .85rem; }
+.copy button:hover { border-color: var(--accent); }
 </style>
 <style id="nova-theme">{{NOVA_THEME_CSS}}</style>
 </head>
@@ -631,11 +635,35 @@ a.rid:hover { color: var(--accent); }
 
   N.page({ title: "Control Center" }, function (d, main) {
     var issues = L(d.known_issues).filter(function (i) { return i.status !== "resolved"; });
-    var asks = L(d.approvals), qs = L(d.questions), routines = L(d.routines);
+    var asks = L(d.approvals), routines = L(d.routines);
+    var acts = L(d.questions).filter(function (q) { return q.kind === "action"; });
+    var qs = L(d.questions).filter(function (q) { return q.kind !== "action"; });
+
+    function copyBlock(text) {
+      var pre = h("pre", null, text);
+      var btn = h("button", { type: "button" }, "Copy");
+      btn.addEventListener("click", function () {
+        try {
+          navigator.clipboard.writeText(text).then(function () { btn.textContent = "Copied"; },
+            function () { btn.textContent = "Select the text above to copy it"; });
+        } catch (e) { btn.textContent = "Select the text above to copy it"; }
+      });
+      return h("div", { class: "copy" }, pre, btn);
+    }
 
     if (d.away && d.away.active) {
       main.appendChild(h("ul", { class: "notices" }, h("li", { class: "notice", "data-level": "info" },
         "Away mode is on until " + N.dateY(d.away.end) + ". Briefs and drafts are paused; information is still collected. Say \"I'm back\" in chat to end it.")));
+    }
+
+    if (acts.length) {
+      main.appendChild(N.section({ id: "actions", title: "Action needed",
+        note: "Only you can do these. Nova keeps them here, and at the top of your Daily Brief, until they're done. Tell Nova in chat when you've done one.",
+        body: N.items(acts.map(function (q) {
+          return N.item({ tone: "warn", title: q.text, text: q.how || null,
+            extra: q.copy_text ? copyBlock(q.copy_text) : null,
+            aside: [h("span", null, q.id), q.asked ? h("span", null, "Since " + N.date(q.asked)) : null] });
+        })) }));
     }
 
     main.appendChild(N.section({ id: "issues", title: "Known issues", count: N.total("known_issues", issues.length), key: "known_issues",
@@ -730,8 +758,9 @@ a.rid:hover { color: var(--accent); }
     var failing = routines.filter(function (r) { var s = (r.last_run || {}).status; return s === "failed" || s === "partial"; }).length;
     var st = d.status || {};
     return { subtitle: st.headline || (failing ? failing + " automation needs a look" : "Everything is running"),
-      stats: [[routines.filter(function (r) { return r.enabled !== false; }).length, "automations on"],
-        [N.total("approvals", asks.length), "waiting for your OK"], [N.total("questions", qs.length), "questions"], [issues.length, "known issues"]] };
+      stats: (acts.length ? [[acts.length, acts.length === 1 ? "action for you" : "actions for you"]] : []).concat([
+        [routines.filter(function (r) { return r.enabled !== false; }).length, "automations on"],
+        [N.total("approvals", asks.length), "waiting for your OK"], [N.total("questions", qs.length), "questions"], [issues.length, "known issues"]]) };
   });
 })();
 </script>

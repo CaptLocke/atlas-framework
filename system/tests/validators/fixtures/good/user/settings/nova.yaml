@@ -3,6 +3,7 @@ timezone: America/Los_Angeles
 repo: maya-chen/nova
 installed_version: "1.0.0"
 data_version: 1
+bootstrap_confirmed: 2
 plan: pro
 attestation:
   statement: "I confirm I am permitted to store work information from my employer in this private GitHub repository."

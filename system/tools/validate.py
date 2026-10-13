@@ -575,8 +575,34 @@ def check_profiles(c):
                 c.rep.error(path, "profile must be %r" % f[:-5])
 
 
+CHANGELOG_SUBSECTIONS = ("what's new", "action needed", "under the hood")
+
+
+def check_changelog(c):
+    """CHANGELOG.md has a section for system/VERSION and only the three known ### headings
+    (docs/maintainers/releasing.md)."""
+    path = c.p("CHANGELOG.md")
+    if not os.path.exists(path):
+        return  # reported by check_manifest (owned path missing)
+    with open(path, encoding="utf-8") as f:
+        text = f.read()
+    versions = [m.group(1) for m in re.finditer(r"^## +(\S+)", text, re.M)]
+    vpath = c.p("system", "VERSION")
+    if os.path.exists(vpath):
+        with open(vpath, encoding="utf-8") as f:
+            ver = f.read().strip()
+        if ver and ver not in versions:
+            c.rep.error(path, "no '## %s' section for system/VERSION (release checklist: "
+                              "docs/maintainers/releasing.md)" % ver)
+    for m in re.finditer(r"^### +(.+?)\s*$", text, re.M):
+        if m.group(1).strip().lower() not in CHANGELOG_SUBSECTIONS:
+            c.rep.error(path, "unknown heading '### %s' (use What's new, Action needed, or Under the hood)"
+                        % m.group(1).strip())
+
+
 def check_system(c):
     check_manifest(c)
+    check_changelog(c)
     check_schema_files(c)
     check_rules(c)
     check_skills(c)
@@ -1003,6 +1029,15 @@ def check_nova(c, path, data, template):
                      % (dv, mdv))
     if data.get("plan") is not None and data.get("plan") not in PLANS:
         rep.error(path, "plan must be one of %s" % ", ".join(PLANS))
+    bc = data.get("bootstrap_confirmed")
+    if bc is not None:
+        if isinstance(bc, bool) or not isinstance(bc, int) or bc < 0:
+            rep.error(path, "bootstrap_confirmed must be a whole number (the Nova bootstrap version)")
+        elif not template:
+            mbv = c.load_manifest().get("bootstrap_version")
+            if isinstance(mbv, int) and bc < mbv:
+                rep.warn(path, "Project instructions confirmed for bootstrap %d, this release uses %d: an "
+                               "'action' question asks the user to update them" % (bc, mbv))
     comp = data.get("company")
     if comp is not None:
         if not isinstance(comp, dict):
@@ -1509,6 +1544,9 @@ def check_path(c, path):
             check_routines(c, p, data, template=False)
     elif rel in ("system/manifest.yaml", "system/VERSION"):
         check_manifest(c)
+        check_changelog(c)
+    elif rel == "CHANGELOG.md":
+        check_changelog(c)
     elif rel.startswith("system/dashboards/") or rel.startswith("system/migrations/"):
         (check_dashboards if "dashboards" in rel else check_migrations)(c)
     elif rel.startswith("system/rules/"):

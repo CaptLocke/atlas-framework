@@ -20,6 +20,7 @@ repo: maya-chen/nova                   # owner/name of this repo
 installed_version: 1.0.0               # updated by nova-update
 installed_from_commit: null            # template commit the repo was created from; baseline for drift checks until the first real update
 data_version: 1                        # updated by migrations
+bootstrap_confirmed: 2                 # Project-instructions version last confirmed current (setup, chat boot check); optional
 plan: pro                              # pro | max_5x | max_20x | team | enterprise (user-stated)
 attestation:                           # required before any ingestion
   statement: "I confirm I am permitted to store work information from my employer in this private GitHub repository."

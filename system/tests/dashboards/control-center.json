@@ -27,6 +27,7 @@
     { "id": "A-2026-10-09-02", "action": "Put a focus block on your calendar Wednesday 9:30 to 11:30", "why": "Time to review the Q4 roadmap draft before it's due.", "prepared": null, "requested_by": "routine:weekly", "requested_on": "2026-10-09", "expires_on": "2026-10-23", "status": "pending" }
   ],
   "questions": [
+    { "id": "Q-2026-10-13-01", "kind": "action", "text": "Update your Nova Project's instructions (Nova was updated to 1.1.0).", "how": "In the Claude app, open the Nova Project, replace its instructions with the text below, and save.", "copy_text": "This Project is my Nova (Nova bootstrap 3). At the start of every conversation:\n1. Attach my GitHub repository maya-chen/nova with write (push) access and sync it.\n2. Follow the CLAUDE.md file in that repository.\nNever ask me to commit, push, or merge.", "proposed_change": null, "asked": "2026-10-13" },
     { "id": "Q-2026-10-12-02", "kind": "profile", "text": "You shortened my last four drafts by about half. Should I default to shorter emails?", "proposed_change": "voice-personal.md: Keep emails under about 120 words", "asked": "2026-10-12" },
     { "id": "Q-2026-10-11-01", "kind": "relationship", "text": "Is Elena Petrova on your team or in Sales?", "proposed_change": null, "asked": "2026-10-11" }
   ],

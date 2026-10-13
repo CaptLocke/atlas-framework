@@ -34,7 +34,7 @@ Source of intent: tactical §9.4a and strategy §7.18. Each job's own spec (`sys
 - Pausing `ingest` or `maintenance` is allowed only on explicit request, with a warning.
 
 ## Catch-up brief contents (produced by `nova-brief`)
-1. **Needs you first:** approvals waiting, slipped `i_owe` commitments, deadlines in the next 3 days, held trigger actions.
+1. **Needs you first:** open `action` questions (things only the user can do), approvals waiting, slipped `i_owe` commitments, deadlines in the next 3 days, held trigger actions.
 2. **What changed:** decisions, new projects and people, risk changes, grouped by project.
 3. **Waiting on others:** overdue `waiting_on` items, with offered follow-up drafts.
 4. **Top insights** held during away (max 3; the rest stay in the inbox).

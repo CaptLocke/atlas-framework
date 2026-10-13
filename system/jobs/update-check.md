@@ -36,7 +36,7 @@ Runs during away; patch and minor updates apply as usual and "What's new" waits 
 
 ## Outputs
 - Replaced owned paths and migrated user files (applied updates only); `nova.yaml: installed_version`, `data_version`.
-- "What's new" entry for the next brief and the Nova Guide; approval entry for prepared updates; known issue on failure.
+- "What's new" entry for the next brief and the Nova Guide; open `action` questions for anything only the user can do (shown first in the next brief); approval entry for prepared updates; known issue on failure.
 
 ## Early exit
 Not Sunday (in a routine), already checked today, lock present, or no newer release → `early_exit` / `ok`.

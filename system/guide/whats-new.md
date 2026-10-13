@@ -15,7 +15,8 @@ This section is **generated, not written here.** Its content comes from the `###
 - `nova-dashboards` renders this section of the Nova Guide from `CHANGELOG.md`: the installed version (`user/settings/nova.yaml: installed_version`) first, then earlier releases, newest first. Show the latest three releases expanded and older ones collapsed.
 - Entries are written for users: plain language, one line each, and what they can now say or do. Any new example requests also belong in `features.md` or `requests.md`.
 - If an update asked the user a question (a new setting, for example), the entry says so and points to it.
+- Anything only the user can do (update their Project instructions, for example) is not left to this section: it comes from the release's `### Action needed` list (and from a higher `bootstrap_version`) and `nova-update` turns each item into an open `action` entry in `user/inbox/questions.md`, shown at the top of the next Daily Brief and in the Control Center until it's done.
 
 ## Maintainer rules
-- Every release adds a `## <version>` section with a `### What's new` list to `CHANGELOG.md`. Technical notes go under a separate `### Under the hood` heading, which is not shown to users.
+- How to write the changelog and cut a release: `docs/maintainers/releasing.md` (the release checklist).
 - Never edit this file to announce a release.
