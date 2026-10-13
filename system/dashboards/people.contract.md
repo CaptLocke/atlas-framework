@@ -4,6 +4,7 @@ name: people
 template: people.html
 republished_by: [weekly-review]
 size_budget_kb: 250
+stale_after_hours: 192
 ---
 # Dashboard: people
 

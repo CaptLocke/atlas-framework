@@ -495,6 +495,9 @@ def check_dashboards(c):
             c.rep.error(path, "template %r not found in system/dashboards/" % tpl)
         if not isinstance(fm.get("size_budget_kb"), int):
             c.rep.error(path, "size_budget_kb must be an integer")
+        sah = fm.get("stale_after_hours")
+        if sah is not None and (isinstance(sah, bool) or not isinstance(sah, int) or sah < 1):
+            c.rep.error(path, "stale_after_hours must be a whole number of hours (omit it for pages that never go stale)")
         rb = fm.get("republished_by")
         if not isinstance(rb, list):
             c.rep.error(path, "republished_by must be a list")

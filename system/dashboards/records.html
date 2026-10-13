@@ -106,7 +106,9 @@ button, input, select { font: inherit; color: inherit; }
 
 /* Masthead: the one expressive element. */
 .mast { padding: 2.25rem 0 1.75rem; border-bottom: 1px solid var(--line); margin-bottom: 1.5rem; }
-.mast-who { display: flex; align-items: center; gap: .5rem; color: var(--ink-2); font-size: .9rem; margin-bottom: 1.1rem; }
+.mast-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .35rem 1rem; margin-bottom: 1.1rem; }
+.mast-who { display: flex; align-items: center; gap: .5rem; color: var(--ink-2); font-size: .9rem; margin: 0; }
+.mast-fresh { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin: 0; color: var(--ink-2); font-size: .85rem; font-variant-numeric: tabular-nums; }
 .mast-who svg { width: 1.1rem; height: 1.1rem; fill: var(--star); flex: none; }
 .mast h1 { font-size: clamp(2.1rem, 6vw, 3.4rem); letter-spacing: -0.015em; font-weight: 600; }
 .mast-sub { font-family: var(--font-heading); font-size: clamp(1.1rem, 2.6vw, 1.4rem); color: var(--ink-2); margin-top: .35rem; }
@@ -524,11 +526,35 @@ a.rid:hover { color: var(--accent); }
     return svg;
   }
 
+  /* The standard refresh marker: when this page was last refreshed and by what, flagged when older
+     than meta.stale_after_hours (from the contract). Staleness is the one thing measured against the
+     viewer's clock: it is about how old the page is when someone opens it. */
+  N.refreshedText = function () {
+    var at = N.meta.generated_at;
+    if (!at) return "Not refreshed yet";
+    var by = N.meta.generated_by, who = "";
+    if (by === "chat") who = " in chat";
+    else if (by && /^routine:/.test(by)) who = " by the " + by.slice(8).replace(/-/g, " ") + " run";
+    return "Refreshed " + N.weekday(at) + ", " + N.time(at) + who;
+  };
+  N.isStale = function () {
+    var at = Date.parse(N.meta.generated_at || ""), limit = N.meta.stale_after_hours;
+    return !isNaN(at) && typeof limit === "number" && limit > 0 && (Date.now() - at) / 36e5 > limit;
+  };
+  N.refreshed = function () {
+    var stale = N.isStale();
+    return h("p", { class: "mast-fresh", "data-stale": stale ? "1" : null },
+      h("time", { datetime: N.meta.generated_at || null }, N.refreshedText()),
+      stale ? N.chip("May be out of date", "warn") : null);
+  };
+
   /* opts: {title, subtitle, lede, stats:[[value,label]]} */
   N.masthead = function (o) {
     var nav = N.list(N.meta.nav).filter(function (n) { return n && n.url && /^https:\/\//.test(n.url); });
     return h("header", { class: "mast" },
-      h("p", { class: "mast-who" }, star(), N.meta.user_display_name ? "Nova for " + N.meta.user_display_name : "Nova"),
+      h("div", { class: "mast-top" },
+        h("p", { class: "mast-who" }, star(), N.meta.user_display_name ? "Nova for " + N.meta.user_display_name : "Nova"),
+        N.refreshed()),
       h("h1", null, o.title),
       o.subtitle ? h("p", { class: "mast-sub" }, o.subtitle) : null,
       o.lede ? h("p", { class: "mast-lede" }, N.rich(o.lede)) : null,
@@ -543,7 +569,7 @@ a.rid:hover { color: var(--accent); }
   N.footer = function () {
     var at = N.meta.generated_at;
     return h("footer", { class: "foot" },
-      h("p", null, "Updated " + (at ? N.dateY(at) + ", " + N.time(at) : "never") + " · Ask Nova in chat to change anything"),
+      h("p", null, (at ? "Refreshed " + N.dateY(at) + ", " + N.time(at) : "Not refreshed yet") + " · Ask Nova in chat to change anything"),
       h("p", { class: "chips" }, N.meta.nova_version ? h("span", null, "Nova " + N.meta.nova_version) : null, N.themeButton()));
   };
 

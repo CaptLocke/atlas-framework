@@ -1,6 +1,6 @@
 {
   "meta": {
-    "dashboard": "daily-brief",
+    "dashboard": "daily-brief", "stale_after_hours": 36,
     "schema_version": 1,
     "title": "Daily Brief",
     "generated_at": "2026-10-12T20:31:40-07:00",

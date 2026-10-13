@@ -4,6 +4,7 @@ name: control-center
 template: control-center.html
 republished_by: [daily-brief, monthly]
 size_budget_kb: 200
+stale_after_hours: 36
 ---
 # Dashboard: control-center
 
