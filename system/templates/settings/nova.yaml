@@ -5,6 +5,7 @@ timezone: null                         # IANA, e.g. America/Los_Angeles
 repo: null                             # owner/name of this repo
 installed_version: null                # setup writes system/VERSION; nova-update keeps it current
 data_version: null                     # setup writes system/manifest.yaml: data_version; migrations keep it current
+bootstrap_confirmed: null              # setup writes system/manifest.yaml: bootstrap_version; the chat boot check keeps it current
 plan: null                             # pro | max_5x | max_20x | team | enterprise (user-stated)
 attestation: null                      # REQUIRED before any ingestion; recorded in chat at setup step 5
 #  statement: "I confirm I am permitted to store work information from my employer in this private GitHub repository."

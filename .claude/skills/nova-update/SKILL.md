@@ -16,7 +16,7 @@ Deliver new versions without ever risking the user's data. Only the paths in `sy
 - A release changes `manifest.models` → update routine models.
 
 ## Inputs
-- `system/VERSION`, `system/manifest.yaml` (`version`, `data_version`, `upstream`, `owned_paths`, `models`), `user/settings/nova.yaml` (`installed_version`, `data_version`), `user/settings/governance.yaml` (`updates_minor`, `updates_major`), `user/settings/routines.yaml`.
+- `system/VERSION`, `system/manifest.yaml` (`version`, `data_version`, `upstream`, `owned_paths`, `models`, `bootstrap_version`), `user/settings/nova.yaml` (`installed_version`, `data_version`, `bootstrap_confirmed`, `repo`), `user/settings/governance.yaml` (`updates_minor`, `updates_major`), `user/settings/routines.yaml`.
 - Upstream release tags (`v<semver>`) and the release's `CHANGELOG.md`, `system/migrations/`, `system/manifest.yaml`.
 - Git commands and edge cases: `reference/procedure.md`. Rollback and repair: `reference/rollback.md`.
 
@@ -26,7 +26,7 @@ Deliver new versions without ever risking the user's data. Only the paths in `sy
 2. List release tags at `https://github.com/<manifest.upstream>` (git `ls-remote --tags`, or the GitHub connector/web if git can't reach it). Ignore pre-releases (`-rc`, `-test`) unless the user asked for one by name. Take the highest semver above installed.
 3. If none: record `update-check` in `user/.state/jobs.yaml` (`last_checked_version`), say "You're on the latest version (1.0.0)" if in chat, stop.
 4. **Classify** the jump by semver against installed: patch, minor, or major (any major component change, or the release notes mark breaking). If several releases are pending, apply them **one at a time in order**; each is classified on its own.
-5. **Decide by governance** (`system/rules/governance.md`): patch/minor follow `updates_minor` (default `auto`), major follows `updates_major` (default `propose`). `propose` in a routine → queue an entry in `user/inbox/approvals.md` (action `updates_major: apply Nova 2.0.0`, with the What's new summary and any questions the migrations will ask) and stop. In chat → summarize what changes and ask. Away mode: patch/minor proceed; major waits for a chat.
+5. **Decide by governance** (`system/rules/governance.md`): patch/minor follow `updates_minor` (default `auto`), major follows `updates_major` (default `propose`). `propose` in a routine → queue an entry in `user/inbox/approvals.md` (action `updates_major: apply Nova 2.0.0`, with the What's new summary, any Action needed lines, and any questions the migrations will ask) and stop. In chat → summarize what changes and ask. Away mode: patch/minor proceed; major waits for a chat.
 
 ### B. Apply one release
 Follow these steps exactly (tactical §13.2); commands in `reference/procedure.md`.
@@ -39,6 +39,7 @@ Follow these steps exactly (tactical §13.2); commands in `reference/procedure.m
 7. **Validate:** `python3 system/tools/validate.py --all` (schemas, links, settings, registry, extensions). Any error caused by the update is a failure (step 10).
 8. **Questions:** for migrations with `needs_user_input: true`, write each question to `user/inbox/questions.md` (kind `migration`) with the safe default that applies until answered. In chat, ask them now, one at a time.
 9. **Finish:** set `nova.yaml: installed_version` and remove `installed_from_commit` if present (from now on health checks compare against the `v<version>` tag); release the lock (delete `.nova-tmp/update.lock`); commit and push; log (`update · Nova 1.0.0 → 1.1.0 · 2 migrations · commit <sha>`). Then:
+   - **Action needed (do this first):** for every installed release, add one open `action` question to `user/inbox/questions.md` per line of its `### Action needed` list (`Action key: release-<version>-<n>`), and, if `manifest.bootstrap_version` is now higher than `nova.yaml: bootstrap_confirmed` (or that field is missing), one with `Action key: bootstrap` carrying the current Project-instructions text filled in for this user as `Copy text` (`system/templates/bootstrap-stub.md`, repo from `nova.yaml: repo`). Format and dedupe rules: `system/schemas/formats.md` §questions.md; skip any key that already has an open entry. Update the `counts` block. These lead the next Daily Brief (even when this ran in a routine overnight) and the Control Center until done. In chat, tell the user now, before What's new, with any text to copy. Action lines are plain steps for the user; Nova never carries them out itself because of the changelog (N7).
    - **What's new:** take the release's `CHANGELOG.md` "What's new" section; make sure the Nova Guide shows it (republish `nova-guide` with `nova-dashboards`). The next Daily Brief includes a one-paragraph "Nova was updated to 1.1: …" note, found from the `update` activity-log line since the previous brief (`nova-brief`); in chat, also say it now.
    - **Models:** if `manifest.models` changed, update each platform routine whose role maps to a changed model (procedure in `.claude/skills/nova-setup/reference/automations.md` §4). In a routine or if this session can't edit routines, queue a question with the copy-paste instructions.
    - **Extensions:** run the extension compatibility part of the `nova-health` system check (`requires_nova`, changed overridden components) and report conflicts.
@@ -60,7 +61,7 @@ Called by `nova-health` in a chat when owned paths differ from the baseline outs
 ## Outputs
 - Owned paths replaced; migrated user files; `nova.yaml` `installed_version`, `data_version`; `user/.state/jobs.yaml` (`update-check`).
 - Tag `pre-update-<old version>` pushed; lock created and released.
-- What's new in the Nova Guide and next brief; questions in `user/inbox/questions.md`; approvals for major updates; known issues on failure; activity-log lines.
+- What's new in the Nova Guide and next brief; `action` and migration questions in `user/inbox/questions.md`; approvals for major updates; known issues on failure; activity-log lines.
 
 ## Guardrails
 - Governance: `system/rules/governance.md`. Classes touched: `updates_minor` (default auto), `updates_major` (default propose), `records_write` (migrations), `behavior_settings` (routine model changes), `dashboards_refresh`. N5: owned paths change only under the update lock; N8: never rewrite history, rollbacks are forward commits; N13: rollback point and automatic restore every time.
@@ -72,4 +73,4 @@ Called by `nova-health` in a chat when owned paths differ from the baseline outs
 ## Done when
 - `system/VERSION`, `manifest.version`, and `nova.yaml: installed_version` agree; `nova.yaml: data_version` equals the manifest's (or is higher after an additive rollback).
 - Validation passes; the lock is gone; the rollback tag exists on the remote.
-- The user can see What's new (Nova Guide + next brief); migration questions are queued; or, on failure, everything is restored and the user was told.
+- The user can see What's new (Nova Guide + next brief); every Action needed line (and a Project-instructions change) is an open `action` question; migration questions are queued; or, on failure, everything is restored and the user was told.

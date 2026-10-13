@@ -625,6 +625,17 @@ a.rid:hover { color: var(--accent); }
     var catchUp = b.kind === "catch-up";
     var today = L(d.today), due = L(d.due), waiting = L(d.waiting_on);
 
+    var acts = L(d.actions);
+    if (acts.length) {
+      main.appendChild(N.section({ id: "actions", title: "Action needed",
+        note: "Only you can do these. They stay here until they're done; tell Nova in chat when you've done one.",
+        body: N.items(acts.map(function (a) {
+          return N.item({ tone: "warn", title: a.text, text: a.how || null,
+            insight: a.copy_text ? "The text to copy is on the Control Center, or ask Nova in chat." : null,
+            aside: [h("span", null, a.id)] });
+        })) }));
+    }
+
     if (L(d.since_last_night).length) {
       main.appendChild(N.section({ id: "since", title: catchUp ? "While you were away" : "Since last night",
         note: catchUp ? null : "Picked up when you opened Nova this morning.", body: notes(d.since_last_night), key: "since_last_night" }));

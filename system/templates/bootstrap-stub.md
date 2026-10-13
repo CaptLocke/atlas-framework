@@ -5,7 +5,7 @@ destination: the user's "Nova" Project instructions in the Claude app (pasted by
 ---
 # Bootstrap stub (canonical)
 
-The setup guide (`docs/setup/04-create-the-nova-project.md`) and `nova-setup` both use exactly this text. `nova-setup` shows it with the user's repository filled in, ready to copy, so the user never writes it themselves. `Nova bootstrap <N>` must equal `system/manifest.yaml: bootstrap_version`; bump both whenever this text changes, so the kernel's boot check (§2 step 0) can tell users their instructions are out of date.
+The setup guide (`docs/setup/04-create-the-nova-project.md`) and `nova-setup` both use exactly this text. `nova-setup` shows it with the user's repository filled in, ready to copy, so the user never writes it themselves. `Nova bootstrap <N>` must equal `system/manifest.yaml: bootstrap_version`; bump both whenever this text changes (release checklist: `docs/maintainers/releasing.md`). A higher `bootstrap_version` is how users are told to update their instructions: `nova-update` queues an action item for it, and the kernel's boot check (§2 step 0) shows the new text.
 
 ```text
 This Project is my Nova (Nova bootstrap 2). At the start of every conversation:

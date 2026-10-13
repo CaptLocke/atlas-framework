@@ -13,6 +13,9 @@ sources: ["[[events/2026-10-13-acme-msa-call]]", "[[commitments/maya-pricing-fee
 ---
 # Tuesday, Oct 13
 
+## Action needed
+- **Update your Nova Project's instructions** (Nova was updated to 1.1.0). The text to copy is on the Control Center, or ask me in chat.
+
 ## Today
 - **9:30 Acme MSA call** with Dana Ruiz. Two open items both ways. Prep: [prep note](../prep/2026-10-13-acme-msa-call.md) · [[events/2026-10-13-acme-msa-call]]
 - **11:00 1:1 with Jordan.** Bring the pricing feedback. Prep: [prep note](../prep/2026-10-13-jordan-1-1.md)

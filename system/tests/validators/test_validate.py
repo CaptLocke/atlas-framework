@@ -325,6 +325,14 @@ class SetupAndLeniency(TempRepo):
         self.assertEqual(r.returncode, 0, r.stdout)
         self.assertIn("rollback", r.stdout)
 
+    def test_bootstrap_confirmed(self):
+        self.replace("user/settings/nova.yaml", "bootstrap_confirmed: 2", "bootstrap_confirmed: 1")
+        r = run_validate(self.root, "--user")
+        self.assertEqual(r.returncode, 0, r.stdout)
+        self.assertIn("Project instructions confirmed for bootstrap 1", r.stdout)
+        self.replace("user/settings/nova.yaml", "bootstrap_confirmed: 1", "bootstrap_confirmed: two")
+        self.assertError(run_validate(self.root, "--user"), "nova.yaml", "bootstrap_confirmed must be")
+
     def test_custom_profile(self):
         self.replace("user/settings/routines.yaml", "profile: lean", "profile: custom")
         r = run_validate(self.root, "--user")
@@ -394,6 +402,14 @@ class SeededSystemErrors(TempRepo):
     def test_version_mismatch(self):
         self.write("system/VERSION", "9.9.9\n")
         self.assertError(self.system_errors(), "system/VERSION", "does not match")
+
+    def test_changelog_section_and_headings(self):
+        self.replace("CHANGELOG.md", "### Under the hood", "### Notes")
+        r = self.system_errors()
+        self.assertError(r, "CHANGELOG.md", "unknown heading '### Notes'")
+        self.write("system/VERSION", "1.0.1\n")
+        self.replace("system/manifest.yaml", "version: 1.0.0", "version: 1.0.1")
+        self.assertError(self.system_errors(), "CHANGELOG.md", "no '## 1.0.1' section")
 
     def test_owned_path_missing(self):
         os.remove(self.path("CHANGELOG.md"))

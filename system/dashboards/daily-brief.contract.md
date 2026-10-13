@@ -9,7 +9,7 @@ stale_after_hours: 36
 # Dashboard: daily-brief
 
 ## Purpose
-Today at a glance, readable in two minutes: top priorities, today's meetings with prep status, what is due or slipping, who the user is waiting on, what changed overnight, up to three insights, drafts ready to review, and anything that needs the user (approvals, questions). It is the page view of the brief file `user/work/briefs/YYYY-MM-DD.md`; the brief file and this page are built in the same step and must agree.
+Today at a glance, readable in two minutes: top priorities, today's meetings with prep status, what is due or slipping, who the user is waiting on, what changed overnight, up to three insights, drafts ready to review, and anything that needs the user (actions only they can do, approvals, questions). It is the page view of the brief file `user/work/briefs/YYYY-MM-DD.md`; the brief file and this page are built in the same step and must agree.
 
 Also republished by any chat that runs the morning catch-up (kernel §2.3), which adds `since_last_night`. After away mode it renders the catch-up brief (`brief.kind: "catch-up"`).
 
@@ -21,6 +21,8 @@ Envelope: `meta` as in `system/dashboards/README.md`; `meta.as_of` = the brief's
   "meta": { "dashboard": "daily-brief", "schema_version": 1, "as_of": "2026-10-13", "…": "…" },
   "brief": { "date": "2026-10-13", "kind": "daily", "path": "user/work/briefs/2026-10-13.md",
              "headline": "A customer-heavy day: …", "away": null },
+  "actions": [ { "id": "Q-2026-10-13-01", "text": "Update your Nova Project's instructions (Nova was updated to 1.1.0).",
+                 "how": "In the Claude app, open the Nova Project, replace its instructions, and save.", "copy_text": true } ],
   "since_last_night": [ { "text": "Sam confirmed the agenda ([[sources/2026-10-13-brightline-agenda-thread]])." } ],
   "priorities": [ { "text": "Send pricing feedback to Jordan", "why": "Due today; Thursday's decision depends on it.",
                     "ref": { "id": "commitments/send-pricing-feedback", "title": "Send pricing feedback to Jordan" } } ],
@@ -54,6 +56,7 @@ Full example: `system/tests/dashboards/daily-brief.json`.
 | `prep.status` | `ready` (prep note exists), `planned` (meeting-prep will create one before the meeting), `none` (meaningful meeting without prep), `not_needed`. |
 | `due[].status` | `open` or `slipped`. |
 | `drafts[].where` | Plain words for where the draft is ("Outlook drafts"). Never the draft body. |
+| `actions[]` | Things only the user can do. `how` is optional; `copy_text` is `true` when the entry has text to copy (shown on the Control Center, never on this page). |
 | `insights[].draft` | `{ to, where }` when the insight's suggested action already has a draft (its `Draft:` line in `insights.md`), else `null`. Never the draft body. |
 
 ## Sources (file → field)
@@ -66,12 +69,13 @@ Full example: `system/tests/dashboards/daily-brief.json`.
 | `insights[]` | `user/inbox/insights.md`, status `new`, highest `score` first, max `rhythms.yaml: insights.brief_max` (default 3): heading ID, Insight, Why it matters, Suggested action, Links |
 | `drafts[]` | The `email-drafts` job's list for the brief (titles, recipients, reasons) from this run |
 | `approvals[]` | `user/inbox/approvals.md`, status `pending` |
-| `questions[]` | `user/inbox/questions.md`, status `open`, newest first |
+| `actions[]` | `user/inbox/questions.md`, kind `action`, status `open`, oldest first: heading ID, Question, How, whether Copy text exists |
+| `questions[]` | `user/inbox/questions.md`, status `open`, kind not `action`, newest first |
 | `meta.notices` | `user/.state/health.yaml` open high-severity issues affecting ingestion; staleness found by the job's readiness check (`user/.state/jobs.yaml`) |
 
 ## Rendering notes
-- Order on the page: since last night (if any), priorities (numbered: they are ranked), today, due and slipping, waiting on, insights, what changed, drafts, needs you.
+- Order on the page: action needed (if any), since last night (if any), priorities (numbered: they are ranked), today, due and slipping, waiting on, insights, what changed, drafts, needs you.
 - Sorting: `priorities` in rank order (3 to 5 items); `today` by `start`, all-day items last; `due` overdue first, then by `due`, then priority; `waiting_on` slipped first, then by `due` (nulls last); `changes` most important first.
-- Caps (then `meta.truncated`): `today` 15, `due` 10, `waiting_on` 8, `changes` 10, `drafts` 8, `approvals` 5, `questions` 3, `since_last_night` 8. The brief file keeps the full lists.
+- Caps (then `meta.truncated`): `today` 15, `due` 10, `waiting_on` 8, `changes` 10, `drafts` 8, `approvals` 5, `questions` 3, `since_last_night` 8. `actions` is never capped. The brief file keeps the full lists.
 - Text limits: `headline` 200 characters, `why`/`next_step`/`summary` 240.
 - The page is typically under 15 KB of data; the budget only matters after long away periods (catch-up), where `changes` and `since_last_night` are truncated first.

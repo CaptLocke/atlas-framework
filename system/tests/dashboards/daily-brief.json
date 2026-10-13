@@ -29,6 +29,9 @@
     "headline": "A customer-heavy day: the Brightline renewal call at 10, and your pricing feedback for Jordan is due by end of day.",
     "away": null
   },
+  "actions": [
+    { "id": "Q-2026-10-13-01", "text": "Update your Nova Project's instructions (Nova was updated to 1.1.0).", "how": "In the Claude app, open the Nova Project, replace its instructions, and save.", "copy_text": true }
+  ],
   "since_last_night": [
     { "text": "Sam Okafor confirmed the renewal call agenda and added a question about SSO pricing ([[sources/2026-10-13-brightline-agenda-thread]])." }
   ],

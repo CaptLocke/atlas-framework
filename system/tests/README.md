@@ -4,7 +4,7 @@ version: 1.0.0
 ---
 # Tests
 
-Nova's automated checks. All tests use Python 3 standard library `unittest` plus the vendored YAML parser (`system/tools/vendor/`); nothing needs installing. Run them from the repository root. They must all pass before a release (`system/tools/build-zip.md`) and after every update (`nova-update`, `nova-health`).
+Nova's automated checks. All tests use Python 3 standard library `unittest` plus the vendored YAML parser (`system/tools/vendor/`); nothing needs installing. Run them from the repository root. They must all pass before a release (`docs/maintainers/releasing.md`) and after every update (`nova-update`, `nova-health`).
 
 **Everything at once:**
 ```

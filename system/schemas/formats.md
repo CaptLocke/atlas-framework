@@ -138,7 +138,22 @@ counts: { open: 1, answered: 0, dismissed: 0 }
 - **Proposed change:** voice-personal.md: "Keep emails under ~120 words" [observed · proposed]
 - **Asked:** 2026-10-12
 ```
-Kinds: `profile | migration | relationship | commitment | setup | other`. Statuses: `open | answered | dismissed`.
+Kinds: `profile | migration | relationship | commitment | setup | action | other`. Statuses: `open | answered | dismissed`.
+
+**Action entries** (`kind: action`) are things only the user can do, queued by `nova-update` from a release's `### Action needed` list or a higher `bootstrap_version`, and by the chat boot check (kernel §2 step 0):
+```markdown
+## Q-2026-10-18-01 · open · action
+- **Question:** Update your Nova Project's instructions (Nova was updated to 1.1.0).
+- **Action key:** bootstrap
+- **How:** In the Claude app, open the Nova Project, replace its instructions with the text below, and save.
+- **Copy text:**
+    This Project is my Nova (Nova bootstrap 3). At the start of every conversation:
+    …
+- **Asked:** 2026-10-18
+```
+- `Action key` deduplicates: there is at most one open entry per key. `bootstrap` for the Project instructions; `release-<version>-<n>` for the n-th `Action needed` line of a release. `How` and `Copy text` (indented block, filled in for this user) are optional.
+- Done → status `answered` with `- **Done:** <date> · <confirmed by Nova | user said done>`; the user can also skip it (`dismissed`). Never closed just because time passed.
+- Open action entries come first wherever questions are shown (Daily Brief "Action needed", Control Center, chat), oldest first, and are never cut by question caps.
 
 ### drop/
 Files attached in chat land here, then are filed by `nova-capture` and removed from `drop/` (the source record keeps a pointer; the file itself moves to `user/library/YYYY/<file>` only if its data-rule handling is `full` and it is 10 MB or less). Removing processed files from `drop/` is housekeeping, not a destructive action (hooks allow it).

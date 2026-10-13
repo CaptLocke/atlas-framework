@@ -5,24 +5,25 @@ All notable changes to Nova. Nova follows semantic versioning:
 - **Minor** (1.x.0): additive features, new optional fields, additive migrations. Applied automatically by default.
 - **Major** (x.0.0): a migration that needs user input, a non-additive data change, or a breaking change for extensions. Applied after the user says yes.
 
-Each release's "What's new" section is shown to users in the Nova Guide and their next Daily Brief. "Under the hood" notes are for maintainers and are not shown to users.
+Each release's "What's new" section is shown to users in the Nova Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes a "Needs you" item at the top of the next Daily Brief that stays until it's done. "Under the hood" notes are for maintainers and are not shown to users. How to write this file and cut a release: `docs/maintainers/releasing.md`.
 
-## Unreleased
+## 1.0.0
 
 ### What's new
+- First public release of Nova.
 - Choose which meetings Nova shows: all-day events, tentatively accepted meetings, and invitations you haven't answered can each be included or skipped in your brief, Week Ahead, and meeting prep. Everything is included unless you change it, and deadlines on your calendar always show.
 - Two new people categories, **prospect** and **board**, and clear definitions for every category so people are sorted the same way every time.
 - **Rank your goals.** Tell Nova which goal matters most, at setup, at the quarterly reset, or any time ("make retention my top goal"). Work tied to your top goals now rises higher in your priorities, and the Goals page lists them in your order.
 - **New Records page**: browse and search everything Nova has filed, by name, type, or status, with what each record links to.
-- Nova now checks at the start of every chat that it can save to your repository, and fixes it if a chat started read-only. **Please update your Nova Project's instructions**: ask Nova for the latest text, or copy it from the setup guide (step 4).
+- Nova now checks at the start of every chat that it can save to your repository, and fixes it if a chat started read-only.
 - **Nova learns from your corrections.** When you keep dropping the same kind of "commitment", reranking the same kind of work, or dismissing the same kind of insight, Nova suggests a rule and follows it once you agree. The monthly report shows what it learned.
 - **Playbooks.** Nova notices work you repeat and offers to save it as a playbook. When one starts, it sets up the checklist with dates, drafts the messages as each step comes due, and flags steps that are missed or out of order.
 - **Insights come with the draft.** When an insight suggests messaging someone, the draft is already waiting in your mail.
 - **Focus time for what you owe.** When something you owe is due soon and your calendar is filling up, Nova offers to block time for it (a private hold, only after you say yes).
 - **Templates for things you make often.** Nova offers to turn a recurring deliverable into a template, so every edition is consistent and quicker.
-- Nova checks itself at the start of each chat (instructions, kernel, sync, saving) and only speaks up if something's wrong. If your Project instructions are out of date, it shows you the current text once, ready to copy.
-
+- Nova checks itself at the start of each chat (instructions, kernel, sync, saving) and only speaks up if something's wrong.
 - Every dashboard now shows at the top when it was last refreshed and by what, and flags "May be out of date" when a page is older than it should be.
+- **Things only you can do come first.** When an update needs something from you, like new Project instructions, it appears at the top of your next Daily Brief under "Action needed" and stays there until it's done. The Control Center shows any text to copy.
 
 ### Under the hood
 - `rhythms.yaml: meetings` (`all_day`, `tentative`, `not_responded`: `include | skip`), optional with `include` defaults; the filter rule lives in `system/schemas/settings.md` and is referenced by the brief, Week Ahead, meeting prep, `nova-prep`, and `key_meeting_upcoming`. Validator checks the block.
@@ -42,9 +43,6 @@ Each release's "What's new" section is shown to users in the Nova Guide and thei
 - Commitments gain `effort` (`quick | hour | half_day | day`); new built-in trigger `focus_time_needed` proposes a focus block (`own_calendar_manage`, propose) when free time before a due date is under 2× the effort (`.claude/skills/nova-triage/reference/focus-time.md`).
 - Deliverable templates in `user/work/templates/<slug>.md` (formats.md §7), detected from 3+ similar deliverables in 6 months, used by `nova-write` and status updates; validator checks them.
 - Refresh marker: `N.refreshed()` in `_base.js` (masthead, all templates via `render.py --sync`) from `meta.generated_at` / `generated_by`; contracts gain optional `stale_after_hours` (daily pages 36, weekly 192, About You 768, none for Nova Guide), copied into `meta` by `nova-dashboards` and checked by the validator. The footer says "Refreshed" too.
+- Release checklist in `docs/maintainers/releasing.md`, the one place for release steps; `build-zip.md`, the tests README, the What's-new guide rules, and the bootstrap stub point to it. No release tags until 1.0.0 ships.
+- User actions: changelog releases may carry `### Action needed`; `nova-update` turns each line, and any rise in `bootstrap_version`, into an open `action` question (new kind) in `user/inbox/questions.md`, deduplicated by `Action key`. Daily Brief shows open actions first (`action_needed` section, uncapped); the Control Center shows `copy_text`. New optional `nova.yaml: bootstrap_confirmed`, set by setup and by the chat boot check when the Project instructions are current; the boot check opens or closes the `bootstrap` action instead of the old `bootstrap-outdated` known issue. Validator checks `bootstrap_confirmed` and that `CHANGELOG.md` has a section for `system/VERSION` with only known `###` headings.
 - All changes are additive: no migration and no `data_version` change. Existing inbox files without a `counts` block get a warning until the next `maintenance` run adds it.
-
-## 1.0.0
-
-### What's new
-- First public release of Nova.
