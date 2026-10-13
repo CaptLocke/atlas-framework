@@ -36,7 +36,7 @@ Give the user a two-minute, trustworthy picture of where they stand: what's on, 
    3. **Waiting on:** aging `waiting_on` items (oldest first, with days waiting) and any overdue; note if a follow-up draft is ready.
    4. **What changed:** at most 5 bullets: decisions made, projects whose health changed, new risks, new commitments to the user, notable replies. Include a "From your Evening Thoughts" line group if last night's journal produced items. Add "What's new in Nova" (one line) if `nova.yaml: installed_version` changed since the last brief.
    5. **Top priorities:** 3–5 items ranked against active goals first, then urgency (triage `priority`, due dates, who's waiting). Each with a one-line reason tied to a goal or person.
-   6. **Insights:** up to `brief_max` of the highest-scoring `new` insights not shown before; each with its one-line why and link. Then mark them `seen` (via `nova-insights` lifecycle).
+   6. **Insights:** up to `brief_max` of the highest-scoring `new` insights not shown before; each with its one-line why and link, and "Draft ready in <where>" when its entry has a `Draft:` line. Then mark them `seen` (via `nova-insights` lifecycle).
    7. **Drafts ready to review:** each draft with recipient, subject, why, and where it is (e.g. "in your Outlook drafts").
    8. **Awaiting your approval:** pending approvals with ID, action, and why; note any expiring within 3 days.
    9. **Questions from Nova:** up to 3 open questions (vague commitments to confirm, relationships, profile proposals), oldest first; "+N more" if needed.

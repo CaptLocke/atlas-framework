@@ -26,7 +26,7 @@ The user owns their knowledge. Every record can be viewed, corrected, superseded
 ### A. Correct a fact
 1. Find every record stating the wrong fact (the main record and linked records that repeated it; text-search the value).
 2. Update each: new value in the field/body, `updated`, Updates line "Corrected by user: was X, now Y" with `provenance: stated` for the corrected fact. If the whole record is wrong (wrong person merged, wrong project), split or supersede: new record with `supersedes`, old with `superseded_by`; move links that belong to the new one.
-3. Update indexes; commit (`Nova-Reason: user correction`); log with the word "correction" (the monthly indicators count it).
+3. Update indexes; commit (`Nova-Reason: user correction`); log with the word "correction" (the monthly indicators count it). If the correction undoes triage (a commitment that was never a promise, something wrongly closed), also log the matching `feedback` line (`.claude/skills/nova-triage/reference/learning.md` §1).
 4. Confirm in one line with links. If the wrong fact came from a source, note that in the source's Updates so it isn't re-learned.
 
 ### B. Archive / unarchive

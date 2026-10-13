@@ -15,7 +15,7 @@ Strategy §3 indicators, computed by the monthly automation review from files in
 | `manual_commitments` | Commitments created in the period from the user directly | `created` in period with `provenance: stated` or sources of kind `manual`/`journal` |
 | `automation_success_rate` | Jobs completed without failure ÷ jobs run | Run reports in period: job rows `ok`, `skipped_away`, `skipped_paused`, `early_exit` count as success; `partial` counts as half; `failed` as failure |
 | `user_action_issues` | Problems that needed the user to act | `health.yaml: known_issues` opened in the period whose fix requires the user (reconnect, permission, choose) |
-| `corrections` | Times the user corrected or reversed Nova | Activity-log lines in period for corrections and undo (`nova-memory` correct/forget, forward reverts at the user's request, rejected approvals, profile proposals rejected) |
+| `corrections` | Times the user corrected or reversed Nova | Activity-log lines in period for corrections and undo (`nova-memory` correct/forget, forward reverts at the user's request, rejected approvals, profile proposals rejected, and `feedback` lines) |
 | `active_weeks` | ISO weeks in the period with at least one user interaction | Commits with `Nova-Actor: chat` or journal entries, grouped by ISO week. Also report rolling counts for the last 3, 6, and 12 months in the report (not stored) |
 
 ## Reading them

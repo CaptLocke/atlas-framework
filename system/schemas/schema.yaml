@@ -82,7 +82,7 @@ types:
       status: [active, dormant]
   playbook:
     folder: playbooks
-    fields: [trigger, steps, last_used, automatable]
+    fields: [trigger, anchor, steps, auto_start, last_used, automatable]
     enums:
       status: [draft, active, retired]
   source:
@@ -94,6 +94,28 @@ types:
       kind: [email, meeting, message, doc, web, data, record, manual, journal, file, deliverable]
       flags: [suspicious]
       retention: [full, summary, pointer]
+
+# Field formats, used by system/tools/validate.py (errors) and system/tools/normalize.py (fixes).
+#   ref   = one "[[folder/slug]]" link          refs  = list of links
+#   list  = list of strings                     date  = YYYY-MM-DD
+#   dt    = YYYY-MM-DD or ISO 8601 datetime     bool  = true / false
+#   int   = whole number                        email = lowercase address (in lists: emails)
+# Enum fields (common and per type, above) are lowercase snake_case values from their list.
+field_formats:
+  common: { aliases: list, sources: refs, supersedes: ref, superseded_by: ref, archived: bool, created: date, updated: date }
+  person: { emails: emails, org: ref, last_contact: date }
+  organization: {}
+  project: { owner: ref, goal: ref, start: date, target: date }
+  goal: { owner: ref, rank: int }
+  commitment: { owner: ref, counterparty: ref, origin: ref, due: date, completed_on: date }
+  decision: { deciders: refs, decided_on: date, revisit_on: date, reversible: bool }
+  event: { attendees: refs, start: dt, end: dt, all_day: bool }
+  risk: { owner: ref }
+  question: { asked_by: ref, asked_on: date, answered_on: date }
+  idea: { origin: ref }
+  topic: {}
+  playbook: { steps: steps, last_used: date, automatable: bool, auto_start: bool }
+  source: { participants: refs, connector: text, captured_on: date, occurred_on: dt, flags: list }
 
 autonomy_levels: [auto, propose, approve, never]
 locked_classes:

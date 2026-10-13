@@ -14,7 +14,7 @@ The profile is who the user is and how they want Nova to behave. It is core conf
 | `working-style.md` | How they plan, focus, prioritize, and like work organized |
 | `communication-style.md` | How they like to receive information (length, format, numbers-first vs narrative), meeting habits |
 | `thinking-style.md` | How they reason and decide (data-led, intuitive, collaborative), what they want challenged |
-| `preferences.md` | Likes and dislikes about their work; standing behavior preferences for Nova ("never draft to my CEO without asking") |
+| `preferences.md` | Likes and dislikes about their work; standing behavior preferences for Nova ("never draft to my CEO without asking"); `## Triage rules` and `## Insight rules` learned from the user's corrections once confirmed (`.claude/skills/nova-triage/reference/learning.md`) |
 | `voice-personal.md` | Personal voice guide (see below) |
 | `voice-house.md` | Company/house voice guide (see below) |
 | `design-system.md` | Company design system (see below) |

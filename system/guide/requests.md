@@ -65,6 +65,7 @@ Look back and look ahead.
 - "What did I get done this quarter?"
 - "How am I doing on my goals?"
 - "Rank my goals." / "Hiring matters more than the launch now."
+- "What have you learned about how I work?"
 - "Which commitments slipped this month?"
 - "Who haven't I talked to in a while?"
 - "Put together my performance review notes for Q4."

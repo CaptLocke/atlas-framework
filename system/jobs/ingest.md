@@ -35,7 +35,7 @@ Runs normally during away (nothing is lost while the user is out). Questions it 
 3. Hand each remaining item to `nova-capture` (routine mode): classify, apply data-rule handling, create or update the Source, resolve and write records, link, and update index lines.
 4. Drop folder: list new files (`files.list_folder`), capture each as a Source, then move it to `Nova Drop/Processed` (`files.move`, `drop_folder_housekeeping`). Files in `user/inbox/drop/` are captured and removed from `drop/` (`system/schemas/formats.md` §3).
 5. Journal: for each day with unprocessed Morning or Evening Thoughts, capture via `nova-capture` (journal mode) and add the section to `processed`. Never edit the entry text.
-6. Evaluate triggers `new_project` and `new_key_person` (plus user triggers evaluated by `ingest`) as records are filed; fire once each (`system/triggers.md`).
+6. Evaluate triggers `new_project`, `new_key_person`, and `playbook_start` (plus user triggers evaluated by `ingest`) as records are filed; fire once each (`system/triggers.md`).
 7. Advance each cursor only after the items before it are filed and committed. Commit in batches (about one commit per source category) so a failure loses little work.
 
 ## Outputs

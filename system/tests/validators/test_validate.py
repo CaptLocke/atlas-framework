@@ -199,6 +199,53 @@ class SetupAndLeniency(TempRepo):
             self.assertEqual(self.errors(r), [], r.stdout)
             self.replace("user/knowledge/people/dana-ruiz.md", "relationship: " + value, "relationship: customer")
 
+    def test_field_formats_are_enforced_and_normalize_fixes_them(self):
+        rel = "user/knowledge/people/dana-ruiz.md"
+        text = self.read(rel)
+        messy = text.replace('org: "[[organizations/acme]]"', "org: organizations/acme   # employer")
+        messy = messy.replace("emails: [dana@acme.example]", "emails: Dana@ACME.example")
+        messy = messy.replace("relationship: customer", "relationship: Customer")
+        self.assertNotEqual(messy, text, "fixture lines to replace not found")
+        self.write(rel, messy)
+        r = run_validate(self.root, "--user")
+        for pattern in ("org must be one", "emails must be a list", "relationship 'Customer'"):
+            self.assertError(r, "dana-ruiz.md", pattern)
+        n = subprocess.run([sys.executable, os.path.join(self.root, "system", "tools", "normalize.py"),
+                            "--root", self.root, "--fix"], capture_output=True, text=True, timeout=60)
+        self.assertEqual(n.returncode, 0, n.stdout + n.stderr)
+        self.assertIn("FIXED user/knowledge/people/dana-ruiz.md", n.stdout)
+        fixed = self.read(rel)
+        self.assertIn('org: "[[organizations/acme]]"   # employer', fixed)
+        self.assertIn("emails: [dana@acme.example]", fixed)
+        self.assertIn("relationship: customer", fixed)
+        self.assertEqual(fixed.split("\n---", 1)[1], text.split("\n---", 1)[1], "the body must not change")
+        r = run_validate(self.root, "--user")
+        self.assertEqual(self.errors(r), [], r.stdout)
+
+    def test_inbox_counts_and_archive(self):
+        entry = "## A-2026-10-01-01 · %s\n- **Action:** send_communication: x\n- **Status history:** %s 2026-10-01\n\n"
+        head = "---\ntype: inbox\nname: approvals\ncounts: { pending: %d, approved: 0, rejected: 0, executed: %d, expired: 0 }\n---\n"
+        self.write("user/inbox/approvals.md", head % (1, 0) + entry % ("pending", "pending"))
+        self.assertEqual(self.errors(run_validate(self.root, "--user")), [])
+        self.write("user/inbox/approvals.md", head % (2, 0) + entry % ("pending", "pending"))
+        self.assertError(run_validate(self.root, "--user"), "approvals.md", "counts don't match")
+        self.write("user/inbox/approvals.md", head % (0, 0))
+        arch = "---\ntype: inbox-archive\nname: approvals\nmonth: 2026-10\ncounts: { pending: 0, approved: 0, rejected: 0, executed: 1, expired: 0 }\n---\n"
+        self.write("user/inbox/archive/2026-10-approvals.md", arch + entry % ("executed", "executed"))
+        self.assertEqual(self.errors(run_validate(self.root, "--user")), [])
+        self.write("user/inbox/archive/2026-10-approvals.md", arch.replace("executed: 1", "executed: 0").replace("pending: 0", "pending: 1") + entry % ("pending", "pending"))
+        self.assertError(run_validate(self.root, "--user"), "2026-10-approvals.md", "only resolved entries")
+
+    def test_playbook_steps(self):
+        head = ("---\nid: playbooks/renewal\ntype: playbook\ntitle: Renewal\nsummary: Renewal steps.\nstatus: active\n"
+                "created: 2026-10-01\nupdated: 2026-10-01\ntrigger: A renewal is 60 days out\nanchor: the renewal date\n"
+                "auto_start: false\nsteps:\n%s---\nBody.\n")
+        good = '  - Review usage\n  - { step: "Send the quote", when: -45d, draft: email, to: "customer champion" }\n'
+        self.write("user/knowledge/playbooks/renewal.md", head % good)
+        self.assertEqual(self.errors(run_validate(self.root, "--user")), [])
+        self.write("user/knowledge/playbooks/renewal.md", head % '  - { step: "Send the quote", when: "45 days before", draft: fax }\n')
+        self.assertError(run_validate(self.root, "--user"), "renewal.md", "when must look like")
+
     def goal(self, slug, rank, status="active"):
         self.write("user/knowledge/goals/%s.md" % slug, "---\nid: goals/%s\ntype: goal\ntitle: %s\nsummary: A goal.\n"
                    "status: %s\ncreated: 2026-10-01\nupdated: 2026-10-01\nrank: %s\n---\nBody.\n" % (slug, slug, status, rank))

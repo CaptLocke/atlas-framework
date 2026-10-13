@@ -646,8 +646,10 @@ a.rid:hover { color: var(--accent); }
         body: N.items(L(d.insights).map(function (i) {
           return N.item({ tone: "accent", title: i.text, text: i.why,
             nextStep: i.suggested_action,
-            extra: L(i.refs).length ? h("p", { class: "item-meta" }, h("span", null, "Based on ", N.refs(i.refs))) : null,
-            aside: [h("span", null, i.id)] });
+            extra: [i.draft && i.draft.where ? h("p", { class: "item-insight" }, h("b", null, "Draft ready: "),
+                (i.draft.to ? "to " + i.draft.to + ", " : "") + "in " + i.draft.where + ". Review and send it yourself, or say \"send it\" in chat.") : null,
+              L(i.refs).length ? h("p", { class: "item-meta" }, h("span", null, "Based on ", N.refs(i.refs))) : null],
+            aside: [h("span", null, i.id), i.draft && i.draft.where ? N.chip("Draft ready", "ok") : null] });
         })) }));
     }
 

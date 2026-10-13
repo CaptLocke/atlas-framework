@@ -11,10 +11,12 @@ How something gets done, step by step.
 ## Fields (in addition to `_common.md`)
 | Field | Type | Required | Values / notes |
 |---|---|---|---|
-| `trigger` | text | no | When this playbook applies. |
-| `steps` | list | no | Ordered steps. |
-| `last_used` | date | no |  |
-| `automatable` | bool | no | Candidate for a user job. |
+| `trigger` | text | no | When this playbook applies, in plain words ("a customer renewal is 60 days out"). Nova matches new work against it. |
+| `anchor` | text | no | The date a run counts from ("the renewal date", "the start date"). Step `when` offsets are relative to it. |
+| `steps` | list | no | Ordered steps. Each is a string, or a mapping: `step` (what to do, required), `when` (offset from the anchor: `-30d`, `+2d`), `draft` (`email` or `message` when the step is a communication Nova should pre-draft), `to` (who it goes to, as a role: "customer champion", "my manager"). |
+| `auto_start` | bool | no | `true`: Nova starts a run as soon as the trigger matches. Default `false`: Nova asks first. |
+| `last_used` | date | no | When a run last finished. |
+| `automatable` | bool | no | Candidate for a user job (`nova-extend`), for work beyond a checklist. |
 
 ## Status vocabulary
 draft, active, retired
@@ -22,5 +24,21 @@ draft, active, retired
 ## Links
 Typically links to: projects, people (owners), topics.
 
+## Runs
+A **run** is one use of the playbook: a project record (`scale: task_group`, `links.playbooks: ["[[playbooks/<slug>]]"]`, `target` = the anchor date) with one `i_owe` commitment per step (`origin: "[[playbooks/<slug>]]"`, due = anchor + `when`). Triage, the brief, the Work Board, and email drafts then handle the checklist like any other work. How runs start, pre-draft, and flag missed steps: `.claude/skills/nova-triage/reference/playbooks.md`.
+
+Example:
+```yaml
+trigger: A customer renewal is 60 days out
+anchor: the renewal date
+auto_start: false
+steps:
+  - { step: "Review usage and open issues for the account", when: -60d }
+  - { step: "Send the renewal quote", when: -45d, draft: email, to: "customer champion" }
+  - { step: "Renewal call", when: -30d }
+  - { step: "Send the contract for signature", when: -14d, draft: email, to: "customer champion" }
+  - { step: "Tell my manager the outcome", when: +1d, draft: message, to: "my manager" }
+```
+
 ## Capture guidance
-Create when the user describes a repeatable process or asks Nova to remember how something is done. Suggest automation when `automatable: true`.
+Create when the user describes a repeatable process or asks Nova to remember how something is done ("save how we do renewals as a playbook"). Nova also proposes one when it sees the same work recur (`.claude/skills/nova-triage/reference/playbooks.md` §1); a proposed playbook is `status: draft` until the user confirms it. Suggest automation when `automatable: true`.
