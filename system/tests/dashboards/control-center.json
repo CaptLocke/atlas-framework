@@ -88,6 +88,7 @@
     "data_version": 1,
     "last_user_check": "2026-10-01",
     "last_system_check": "2026-10-01",
-    "update": { "available": false, "latest_version": "1.0.0", "last_checked": "2026-10-11", "notes": null }
+    "update": { "available": false, "latest_version": "1.0.0", "last_checked": "2026-10-11", "notes": null },
+    "notes_migration": { "status": "running", "source_system": "Obsidian", "total": 312, "processed": 140, "skipped": 12 }
   }
 }

@@ -18,6 +18,7 @@ Tell Atlas anything worth keeping, in one sentence.
 - "Idea: pilot fees count toward year one."
 - "Morning thoughts: …" / "Evening thoughts: …"
 - "Here's the contract." (attach the file)
+- "Bring in my notes from Notion." (a one-time migration from another notes app)
 - "Here's how we run month-end close: …" (Atlas saves it as a playbook)
 
 ## Find

@@ -108,7 +108,7 @@ exclusions:                       # never read; the ONLY place exclusions are de
   - "record: people/jane-doe"      # added by 'forget' to stop re-capture
 ```
 **Handling:** `ignore` (do not store anything), `pointer` (a source record noting it exists, no content), `summary` (summary without sensitive details), `full` (store normally).
-**Exclusion syntax:** `<category or connector>: <query>` where query is the connector's own search syntax or a simple `field:value` (`from:`, `to:`, `channel:`, `series:`, `folder:`, `label:`); or `record: <id>` to stop capturing a forgotten subject.
+**Exclusion syntax:** `<category or connector>: <query>` where query is the connector's own search syntax or a simple `field:value` (`from:`, `to:`, `channel:`, `series:`, `folder:`, `label:`); or `record: <id>` to stop capturing a forgotten subject. A notes migration's folder is excluded as `files: folder:<folder_id>` with a `#` comment naming it; the notes migration alone reads it, once (`system/rules/knowledge.md` § Write path).
 
 ## connectors.yaml
 Written by `atlas-connectors`. One entry per connector.
