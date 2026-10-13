@@ -9,13 +9,13 @@ Keep the user's commitments honest and their priorities clear: nothing promised 
 
 ## When to use
 - **Job:** `triage` (`mode: full` default; `mode: light` on daytime runs).
-- **Chat:** "What do I owe this week?", "What am I waiting on?", "What's slipping?", "Prioritize my week", "I sent the deck to Jordan" (close with evidence), "Drop the vendor survey commitment".
+- **Chat:** "What do I owe this week?", "What am I waiting on?", "What's slipping?", "Prioritize my week", "Rank my goals", "Make retention my top goal" (set `rank` per `system/schemas/goal.md` §Ranking, then a full priority pass), "I sent the deck to Jordan" (close with evidence), "Drop the vendor survey commitment".
 - After `nova-thoughts` or a large manual capture, a light pass over the affected commitments.
 
 ## Inputs
 - Commitments: `_index/commitments.md` filtered to `open` and `slipped`; open the records.
 - Recent evidence since `jobs.yaml: triage.last_success` (chat: since the last triage or 7 days): Sources captured in that window, `mail.list_sent`, `tasks.list_recent` (completed tasks), the user's statements in chat and journal.
-- Active goals and projects; `people-map.md` (who is the manager, key stakeholders).
+- Active goals (with `rank`) and projects; `people-map.md` (who is the manager, key stakeholders).
 - Calendar for the next 14 days (events records) for due-date context.
 - `rhythms.yaml: triggers` (each trigger's `enabled`, `deadline_approaching.days`), `away` (`end: null` = open-ended), `paused`; `user/.state/triggers.yaml`.
 - Signal guide: `reference/signals.md`.
@@ -27,7 +27,7 @@ Keep the user's commitments honest and their priorities clear: nothing promised 
 4. **Close with evidence.** For each open commitment, look for completion evidence (`reference/signals.md` § Completion): a sent message delivering it, a delivered file, a completed task, a source showing it done, the user's word. Found → `status: done`, `completed_on`, Updates line citing the evidence. Likely but uncertain → `questions.md` (kind `commitment`): "Did you send Acme the SOC report? I saw an email with an attachment on 10/12."
 5. **Drop or move.** If evidence shows it's no longer wanted (cancelled meeting, decision reversed) → `status: dropped` with reason; if a new date was agreed → update `due`, keep "was X, now Y" in Updates.
 6. **Slipped.** Open items past `due` → `status: slipped` (this is the `commitment_overdue` condition; see step 9). A slipped item that gets done → `done`.
-7. **Priority** (skip in `mode: light` except for new commitments). Set `priority` high/medium/low against goals first, then urgency and people (`reference/signals.md` § Priority). Due-less items get a suggested date in `next_step`, not in `due`.
+7. **Priority** (skip in `mode: light` except for new commitments). Set `priority` high/medium/low against goals first (weighted by each goal's `rank`), then urgency and people (`reference/signals.md` § Priority). Due-less items get a suggested date in `next_step`, not in `due`.
 8. **Insight and next step.**
    - Every open or slipped commitment: `insight` (one line: why it matters or may slip, grounded in evidence) and `next_step` (one concrete action with a time). Refresh only when stale or circumstances changed.
    - **Aging waiting-on:** compute days waiting (since created, or since the last follow-up recorded in Updates). Aging = past due, or no movement for more than 5 business days, or due within 2 days with no sign of progress. Say so in `insight` and suggest the follow-up channel in `next_step` (person's `cadence`/habits if known).

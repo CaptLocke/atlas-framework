@@ -20,9 +20,10 @@ The `nova-dashboards` skill owns rendering and publishing. This folder holds wha
 | Control Center | `control-center.html` | `control-center.contract.md` | `daily-brief`, `monthly` | 200 KB |
 | About You | `about-you.html` | `about-you.contract.md` | `monthly`, `quarterly` | 200 KB |
 | Nova Guide | `nova-guide.html` | `nova-guide.contract.md` | `update-check` (after an update is applied) | 250 KB |
+| Records | `records.html` | `records.contract.md` | `maintenance`, `weekly-review` | 1500 KB |
 | Project page (on request) | `project-page.html` | `project-page.contract.md` | created in chat; then `triage`, `weekly-review` while listed | 250 KB |
 
-Any chat may also republish any dashboard after changing the records it shows (`dashboards_refresh: auto`). `nova-setup` publishes all nine for the first time.
+Any chat may also republish any dashboard after changing the records it shows (`dashboards_refresh: auto`). `nova-setup` publishes all ten for the first time. A dashboard added by an update is published at the user's next chat (`nova-dashboards`, Publish).
 
 Shared files:
 - `_base.css`: canonical base styles. **Every template inlines it verbatim** inside `<style id="nova-base">`.

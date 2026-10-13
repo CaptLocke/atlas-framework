@@ -234,6 +234,7 @@ dashboards:
   control-center: { url: null, last_published: null }
   about-you: { url: null, last_published: null }
   nova-guide: { url: null, last_published: null }
+  records: { url: null, last_published: null }
 project_pages: {}                       # project ID → url, created on request
 # User dashboards from extensions are additional keys named after the extension.
 ```

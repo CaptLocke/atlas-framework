@@ -29,7 +29,7 @@ DASH = HERE.parent.parent / "dashboards"
 OUT = HERE / "out"
 
 NAMES = ["daily-brief", "work-board", "goals", "week-ahead", "people",
-         "decisions-risks", "control-center", "about-you", "nova-guide", "project-page"]
+         "decisions-risks", "control-center", "about-you", "nova-guide", "records", "project-page"]
 DATA_PH = "{{NOVA_DATA}}"
 THEME_PH = "{{NOVA_THEME_CSS}}"
 REQUIRED_META = ["dashboard", "schema_version", "generated_at", "as_of", "timezone"]

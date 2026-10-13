@@ -34,7 +34,7 @@ A **Project** is a workspace in Claude. You'll make one called "Nova" and give i
 
    ```text
    This Project is my Nova. At the start of every conversation:
-   1. Attach my GitHub repository YOUR-USERNAME/YOUR-REPO and sync it.
+   1. Attach my GitHub repository YOUR-USERNAME/YOUR-REPO with write (push) access and sync it.
    2. Follow the CLAUDE.md file in that repository.
    Never ask me to commit, push, or merge.
    If you can't attach the repository, tell me in one sentence and give me the one step to fix it (usually: connect GitHub in Settings → Connectors, or give the Claude GitHub App access to this repository; if my Claude account is through work, my admin must turn on unified chat and Cowork in Organization settings → Capabilities).
@@ -48,7 +48,7 @@ A **Project** is a workspace in Claude. You'll make one called "Nova" and give i
 4. **Replace `YOUR-USERNAME/YOUR-REPO` with your Nova's address.** For example, if your GitHub username is `maya-chen` and you named the repository `nova`, the line becomes:
 
    ```text
-   1. Attach my GitHub repository maya-chen/nova and sync it.
+   1. Attach my GitHub repository maya-chen/nova with write (push) access and sync it.
    ```
 
    Only change that one part. Keep the slash, and don't add spaces.

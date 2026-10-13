@@ -90,6 +90,19 @@ class SessionStart(SyncCase):
         self.assertFalse(os.path.exists(self.path(".git/rebase-merge")))
         self.assertFalse(os.path.exists(self.path(".git/rebase-apply")))
 
+    def test_push_access_confirmed(self):
+        self.assertIn("push access confirmed", self.start())
+
+    def test_read_only_attachment_is_reported(self):
+        # fetch still works, but pushes go to a remote that refuses them
+        sh(["git", "remote", "set-url", "--push", "origin", os.path.join(self.outside, "no-push.git")], self.root)
+        ctx = self.start()
+        self.assertIn("synced", ctx)
+        self.assertIn("CAN'T PUSH", ctx)
+        self.assertIn("write", ctx)
+        with open(self.path(".nova-tmp/sync.log")) as f:
+            self.assertIn("sync_start.read_only", f.read())
+
     def test_not_on_main(self):
         sh(["git", "checkout", "-q", "-b", "claude/x"], self.root)
         self.assertIn("not main", self.start())

@@ -24,7 +24,7 @@ Check before anything else:
 
 ## 2. Starting a chat session
 Do these quietly, then answer the user. Never narrate them unless something needs the user.
-1. **Sync:** pull the repo (`system/rules/sync.md`).
+1. **Sync and check write access:** pull the repo, then confirm this session can push (`git push --dry-run origin HEAD:main`; the session-start hook reports the result). If it can't, the repo is attached read-only: re-attach it **with write (push) access** and clone it again before doing anything else. If write access is refused, tell the user in one line how to fix it (`system/rules/sync.md`, Session start). Never work in a read-only copy: nothing could be saved.
 2. **Orient (L0):** read `user/profile/profile.md`, the `## Summary` sections of the voice guides, `user/settings/rhythms.yaml`, `user/knowledge/_index/hot.md`, and the counts of open items in `user/inbox/` (approvals, questions, new insights). Read `user/.state/health.yaml` for known issues.
 3. **Catch up:** if this is the first chat of the day and `user/.state/jobs.yaml` shows `ingest` last succeeded more than 3 hours ago, run a quick catch-up ingest of mail and calendar (`nova-capture`), add new items to today's brief under "Since last night", and republish the Daily Brief (`nova-brief`, `nova-dashboards`). Keep it short; don't block the user's request on it—answer first if they asked something urgent, then catch up.
 4. **Check triggers:** evaluate `system/triggers.md` conditions against what you now know; act on any that fire (once each).

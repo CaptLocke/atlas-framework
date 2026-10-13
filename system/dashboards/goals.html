@@ -217,6 +217,7 @@ a.rid:hover { color: var(--accent); }
 }
 </style>
 <style id="nova-page">
+.goal-head .rank { font-family: var(--font-heading); color: var(--star); margin-right: .45rem; font-variant-numeric: tabular-nums; }
 .goal { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.1rem 1.25rem 1.25rem; display: grid; gap: .75rem; }
 .goal + .goal { margin-top: 1rem; }
 .goal-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .5rem 1rem; align-items: baseline; }
@@ -606,13 +607,28 @@ a.rid:hover { color: var(--accent); }
   }
 
   N.page({ title: "Goals" }, function (d, main) {
-    var goals = L(d.goals);
+    var STATUS_ORDER = { active: 0, draft: 1 };
+    var ASSESS_ORDER = { off_track: 0, at_risk: 1, on_track: 3 };
+    var goals = L(d.goals).map(function (g, i) { return { g: g, i: i }; }).sort(function (a, b) {
+      var x = a.g, y = b.g;
+      var sx = x.status in STATUS_ORDER ? STATUS_ORDER[x.status] : 2, sy = y.status in STATUS_ORDER ? STATUS_ORDER[y.status] : 2;
+      if (sx !== sy) return sx - sy;
+      if (x.status === "active") {
+        var rx = typeof x.rank === "number" ? x.rank : Infinity, ry = typeof y.rank === "number" ? y.rank : Infinity;
+        if (rx !== ry) return rx < ry ? -1 : 1;
+        if (rx === Infinity) {
+          var ax = x.assessment in ASSESS_ORDER ? ASSESS_ORDER[x.assessment] : 2, ay = y.assessment in ASSESS_ORDER ? ASSESS_ORDER[y.assessment] : 2;
+          if (ax !== ay) return ax - ay;
+        }
+      }
+      return a.i - b.i;
+    }).map(function (o) { return o.g; });
     var body = goals.length ? goals.map(function (g) {
       var hid = "g-" + g.id.replace(/\W/g, "-");
       var ev = L(g.evidence);
       return h("article", { class: "goal", "aria-labelledby": hid },
         h("div", { class: "goal-head" },
-          h("h3", { id: hid }, g.title),
+          h("h3", { id: hid }, g.status === "active" && typeof g.rank === "number" ? h("span", { class: "rank", title: "Your rank for this goal" }, "#" + g.rank) : null, g.title),
           h("div", { class: "chips" }, g.assessment ? N.chip(N.label(g.assessment), ASSESS_TONE[g.assessment]) : null, g.status !== "active" ? N.status(g.status) : null)),
         g.summary ? h("p", { class: "item-text" }, N.rich(g.summary)) : null,
         g.metric ? h("div", { class: "goal-measure" },
@@ -631,7 +647,7 @@ a.rid:hover { color: var(--accent); }
         N.rid(g.id));
     }) : N.empty("No active goals. Tell Nova your goals in chat to add them.");
     main.appendChild(N.section({ id: "goals", title: "Goals", count: N.total("goals", goals.length), key: "goals",
-      note: "Progress, evidence for and against, and the work behind each goal.", body: body }));
+      note: "In the order you ranked them. Progress, evidence for and against, and the work behind each goal.", body: body }));
 
     var log = L(d.accomplishments);
     main.appendChild(N.section({ id: "accomplishments", title: "Accomplishments", count: N.total("accomplishments", log.length), key: "accomplishments",
