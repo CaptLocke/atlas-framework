@@ -6,7 +6,7 @@ version: 1.0.0
 
 Triggers are conditions Atlas checks every time it runs; they are not scheduled. On/off switches and parameters live in `user/settings/rhythms.yaml: triggers`. User triggers live in `user/extensions/triggers/` (same format) and are registered in `registry.yaml`.
 
-**Migrated history** (records whose every source is `kind: import`; `.claude/skills/atlas-capture/reference/notes-migration.md` §10) never fires `new_project`, `new_key_person`, or `playbook_start`; live items it brought in are ordinary open work for the date-driven triggers.
+**Imported history** (records whose every source is `kind: import`; `.claude/skills/atlas-capture/reference/import.md` §10) never fires `new_project`, `new_key_person`, or `playbook_start`; live items it brought in are ordinary open work for the date-driven triggers.
 
 **Fire once:** before acting, check `user/.state/triggers.yaml` for `(trigger, record, key)`; after acting, record it. **Away/paused:** during away mode, triggers are evaluated but their user-facing actions are held for the catch-up brief (record creation still happens).
 

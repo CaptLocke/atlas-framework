@@ -48,7 +48,7 @@ Republished by `daily-brief` (each cycle) and `monthly` (after health checks and
                     "source": "sources/2026-10-12-unknown-sender-contract" } ],
   "system": { "installed_version": "1.0.0", "data_version": 1, "last_user_check": "2026-10-01", "last_system_check": "2026-10-01",
               "update": { "available": false, "latest_version": "1.0.0", "last_checked": "2026-10-11", "notes": null },
-              "notes_migration": { "status": "complete", "source_system": "Obsidian", "total": 312, "processed": 300, "skipped": 12 } }
+              "notes_import": { "status": "complete", "source_system": "Obsidian", "total": 312, "processed": 300, "skipped": 12 } }
 }
 ```
 Full example: `system/tests/dashboards/control-center.json`.
@@ -76,7 +76,7 @@ Full example: `system/tests/dashboards/control-center.json`.
 | `connections[]` | `user/settings/connectors.yaml` (`connector, categories, available_in_routines`), health from the latest run reports' "Connector health" and `health.yaml`; `last_seen` from `user/.state/cursors.yaml`; fallbacks from `sources.yaml: fallbacks`. The GitHub connection is listed from the last successful push |
 | `activity[]` | `user/logs/activity/YYYY-MM.md`, newest first |
 | `suspicious[]` | "Suspicious content flagged" sections of run reports from the last 14 days |
-| `system.notes_migration` | `user/.state/notes-migration.yaml` (`status, source_system`, and `counts`: `total, processed, skipped`); omitted when there is no migration. |
+| `system.notes_import` | `user/.state/import.yaml` (`status, source_system`, and `counts`: `total, processed, skipped`); omitted when there is no import. |
 | `system` | `atlas.yaml` (`installed_version, data_version`), `health.yaml` (`last_user_check, last_system_check`), `jobs.yaml: update-check.last_checked_version` and the latest upstream release seen by `update-check` |
 
 ## Rendering notes

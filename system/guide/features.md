@@ -44,12 +44,12 @@ Atlas reads your connected email, calendar, meeting transcripts, chat, and files
 - "File this meeting: we agreed to start the pilot with the EMEA team."
 
 ## Coming from another notes app
-During setup, Atlas asks whether you're moving from another notes app, product, or framework. Put your notes in the **Atlas Migration** folder in your drive (or attach the export), and Atlas reads them once, before your first Daily Brief: notes about you shape your profile (after you confirm), and everything else becomes connected records, with links back to the original notes. Atlas never changes or deletes your old notes. Open to-dos from the last 60 days stay live; older ones become history. Say "undo the migration" to take it all back out.
+During setup, Atlas asks whether you're moving from another notes app, product, or framework. Put your notes in the **Atlas Import** folder in your drive (or attach the export), and Atlas reads them once, before your first Daily Brief: notes about you shape your profile (after you confirm), and everything else becomes connected records, with links back to the original notes. Atlas never changes or deletes your old notes. Open to-dos from the last 60 days stay live; older ones become history. Say "undo the import" to take it all back out.
 
 **Try:**
 - "I'm moving over from Obsidian."
 - "Bring in my notes from Notion." (attach the export, zipped or not)
-- "Undo the migration."
+- "Undo the import."
 
 ## Morning and Evening Thoughts
 Twice a day, if you like, brain-dump whatever's on your mind, typed or dictated, as messy as you want. Atlas keeps your words exactly as you said them in your journal, then pulls out commitments, ideas, questions, and decisions and links them to the right places.

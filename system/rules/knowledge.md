@@ -12,7 +12,7 @@ Preserve and connect. Each fact lives in exactly one record, is linked to relate
 
 ## Write path
 For every input (chat statement, journal entry, connector item, file):
-1. **Exclusions first.** If the input matches an exclusion in `data-rules.yaml`, stop. One exception: a running notes migration reads its own migration folder, which is excluded so nothing else reads it (`.claude/skills/atlas-capture/reference/notes-migration.md` §3).
+1. **Exclusions first.** If the input matches an exclusion in `data-rules.yaml`, stop. One exception: a running import reads its own import folder, which is excluded so nothing else reads it (`.claude/skills/atlas-capture/reference/import.md` §3).
 2. **Classify.** What does it contain? (people, organizations, projects, decisions, commitments, events, risks, questions, ideas, topics, playbooks, facts about existing records). Most inputs contain several things or nothing worth keeping; noise (newsletters, notifications, automated messages, pleasantries) is skipped.
 3. **Sensitivity.** Classify against data-rule categories; choose handling (`ignore | pointer | summary | full`). When unsure, choose the more conservative option.
 4. **Source.** Create or update the Source record for the input (one per thread, meeting, document, drop, journal day).

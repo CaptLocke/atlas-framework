@@ -1220,8 +1220,8 @@ def check_record(c, path):
                 rep.error(path, "a compacted source must have retention summary or pointer")
             if not re.match(r"^[0-9a-f]{7,40}$", str(fm.get("full_text_commit") or "")):
                 rep.error(path, "a compacted source needs full_text_commit (the commit holding the full body)")
-        if expected == "source" and fm.get("kind") == "import" and not fm.get("notes_migration"):
-            rep.error(path, "an import source needs notes_migration (the notes migration's id), so undo can find it")
+        if expected == "source" and fm.get("kind") == "import" and not fm.get("import_id"):
+            rep.error(path, "an import source needs import_id (the import's id), so undo can find it")
         if expected == "goal" and fm.get("rank") is not None:
             rk = fm["rank"]
             if isinstance(rk, bool) or not isinstance(rk, int) or rk < 1:
@@ -1351,12 +1351,12 @@ def setup_step5_done(c):
     return False
 
 
-NOTES_MIGRATION_STATUS = ["planned", "sampling", "running", "complete", "undone"]
-NOTES_MIGRATION_ROUTES = ["drive", "attachment", "computer"]
+IMPORT_STATUS = ["planned", "sampling", "running", "complete", "undone"]
+IMPORT_ROUTES = ["drive", "attachment", "computer"]
 
 
-def check_notes_migration(c, path):
-    """user/.state/notes-migration.yaml (formats.md §1), present only once a notes migration exists."""
+def check_import(c, path):
+    """user/.state/import.yaml (formats.md §1), present only once a import exists."""
     rep = c.rep
     data, ok = load_yaml(path, rep)
     if not ok:
@@ -1369,17 +1369,17 @@ def check_notes_migration(c, path):
             rep.error(path, "missing field '%s'" % k)
     if data.get("route") is None and data.get("status") not in (None, "planned"):
         rep.error(path, "missing field 'route' (chosen before any note is read)")
-    if data.get("status") is not None and data.get("status") not in NOTES_MIGRATION_STATUS:
-        rep.error(path, "status must be one of %s" % ", ".join(NOTES_MIGRATION_STATUS))
-    if data.get("route") is not None and data.get("route") not in NOTES_MIGRATION_ROUTES:
-        rep.error(path, "route must be one of %s" % ", ".join(NOTES_MIGRATION_ROUTES))
+    if data.get("status") is not None and data.get("status") not in IMPORT_STATUS:
+        rep.error(path, "status must be one of %s" % ", ".join(IMPORT_STATUS))
+    if data.get("route") is not None and data.get("route") not in IMPORT_ROUTES:
+        rep.error(path, "route must be one of %s" % ", ".join(IMPORT_ROUTES))
     if data.get("route") == "drive" and not (isinstance(data.get("folder"), dict) and data["folder"].get("folder_id")):
-        rep.error(path, "the drive route needs folder.folder_id (the migration folder is tracked by ID)")
+        rep.error(path, "the drive route needs folder.folder_id (the import folder is tracked by ID)")
     for k in ("started", "completed"):
         if data.get(k) is not None and not is_date(data.get(k)):
             rep.error(path, "%s must be YYYY-MM-DD" % k)
     if data.get("status") == "complete" and data.get("completed") is None:
-        rep.error(path, "a complete notes migration needs completed (the date it finished)")
+        rep.error(path, "a complete import needs completed (the date it finished)")
     lw = data.get("live_window_days")
     if lw is not None and (isinstance(lw, bool) or not isinstance(lw, int) or lw < 0):
         rep.error(path, "live_window_days must be a whole number of days")
@@ -1418,9 +1418,9 @@ def check_user(c):
     reg = c.p("user", "extensions", "registry.yaml")
     if os.path.exists(reg):
         check_registry(c, reg)
-    nm = c.p("user", ".state", "notes-migration.yaml")
+    nm = c.p("user", ".state", "import.yaml")
     if os.path.exists(nm):
-        check_notes_migration(c, nm)
+        check_import(c, nm)
     kdir = c.p("user", "knowledge")
     for folder in listdir(kdir):
         fpath = os.path.join(kdir, folder)
@@ -1601,8 +1601,8 @@ def check_path(c, path):
         check_changelog(c)
     elif rel == "CHANGELOG.md":
         check_changelog(c)
-    elif rel == "user/.state/notes-migration.yaml":
-        check_notes_migration(c, p)
+    elif rel == "user/.state/import.yaml":
+        check_import(c, p)
     elif rel.startswith("system/dashboards/") or rel.startswith("system/migrations/"):
         (check_dashboards if "dashboards" in rel else check_migrations)(c)
     elif rel.startswith("system/rules/"):

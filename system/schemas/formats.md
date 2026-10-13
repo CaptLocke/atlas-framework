@@ -49,14 +49,14 @@ skipped: []
 notes: { 4: "Project created; stub pasted" }
 ```
 
-### notes-migration.yaml (only while a notes migration exists)
-Written only by the notes migration (`.claude/skills/atlas-capture/reference/notes-migration.md`) and its undo (`atlas-memory` §G). Created once the attestation is recorded; `route` is added when chosen.
+### import.yaml (only while a import exists)
+Written only by the import (`.claude/skills/atlas-capture/reference/import.md`) and its undo (`atlas-memory` §G). Created once the attestation is recorded; `route` is added when chosen.
 ```yaml
 id: 2026-10-14-obsidian
 status: running                  # planned | sampling | running | complete | undone
 source_system: Obsidian          # what the user called it
 route: drive                     # drive | attachment | computer
-folder: { connector: google-drive, folder_id: "1AbC…", name: "Atlas Migration" }   # drive route only
+folder: { connector: google-drive, folder_id: "1AbC…", name: "Atlas Import" }   # drive route only
 started: 2026-10-14
 completed: null
 exclude: ["Old job/", "Personal/"]
@@ -67,9 +67,9 @@ live_window_days: 60
 counts: { total: 312, processed: 140, skipped: 12, records_created: 205 }
 processed: ["1 About me/Working style.md", "…"]       # file IDs (drive) or paths
 skipped: [{ path: "CLAUDE.md", why: "AI instruction file" }]
-previous: []                     # ids of earlier migrations, so undo can still find them
+previous: []                     # ids of earlier imports, so undo can still find them
 ```
-A completed or undone migration is never reopened; a new one replaces this file with a new `id` and adds the old `id` to `previous`.
+A completed or undone import is never reopened; a new one replaces this file with a new `id` and adds the old `id` to `previous`.
 
 ### health.yaml
 ```yaml
@@ -187,7 +187,7 @@ Files attached in chat land here, then are filed by `atlas-capture` and removed 
 - 2026-10-12 20:09 · routine:nightly-cycle · ingest · filed 14 sources, 3 commitments, 2 decisions · commit 4f2a9c1
 - 2026-10-12 15:02 · chat · send_communication (approved) · follow-up to Dana Ruiz · commit 9b31e07
 ```
-Format: `- <date> <time> · <actor> · <job or action> · <summary> · commit <short-sha>`. Never includes sensitive content. A notes migration logs its change sets with the action `notes_migration` (`notes_migration · notes 26–50 · 31 records`), which marks them as migrated history.
+Format: `- <date> <time> · <actor> · <job or action> · <summary> · commit <short-sha>`. Never includes sensitive content. An import logs its change sets with the action `import` (`import · notes 26–50 · 31 records`), which marks them as imported history.
 
 ### runs/YYYY-MM/<routine>-<YYYYMMDD-HHMM>.md
 ```markdown

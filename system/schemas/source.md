@@ -11,7 +11,7 @@ Where information came from. Every fact in Atlas traces to a source.
 ## Fields (in addition to `_common.md`)
 | Field | Type | Required | Values / notes |
 |---|---|---|---|
-| `kind` | enum | yes | email, meeting, message, doc, web, data (query results), record (CRM/task items), manual, journal, file, deliverable, import (a note brought in by a migration) |
+| `kind` | enum | yes | email, meeting, message, doc, web, data (query results), record (CRM/task items), manual, journal, file, deliverable, import (a note brought in by an import) |
 | `origin_uri` | text | no | Permalink, doc URL, thread ID, or path. |
 | `connector` | text | no | Connector that provided it. |
 | `captured_on` | date | yes |  |
@@ -19,7 +19,7 @@ Where information came from. Every fact in Atlas traces to a source.
 | `participants` | list of IDs | no |  |
 | `retention` | enum | yes | full, summary, pointer, per data rules |
 | `file_pointer` | text | no | For deliverables and drops: location in the user's cloud drive. |
-| `notes_migration` | text | no | For `kind: import`: the migration's `id` (`user/.state/notes-migration.yaml`). Undo removes by it. |
+| `import_id` | text | no | For `kind: import`: the import's `id` (`user/.state/import.yaml`). Undo removes by it. |
 | `original_path` | text | no | For `kind: import`: the note's path inside the export. |
 | `flags` | list | no | `suspicious` when the content contained instruction-like text aimed at an assistant (N7). |
 | `compacted_on` | date | no | Set when maintenance compacted the body (§Compaction). |
@@ -48,4 +48,4 @@ Once a source's facts are in records, its full body is rarely needed, but its po
 **Getting the full text back:** prefer the original in the connected tool (`origin_uri`), which is current and authoritative. Otherwise restore it from `full_text_commit`. Restoring for one answer is a read; writing it back into the record is `user_content_edit` (propose). A purge (`atlas-memory`) removes the history copy too, as intended.
 
 ## Capture guidance
-One source per email thread, meeting, document, page, drop, deliverable, journal day, or migrated note (`kind: import`: the note's frontmatter is kept as plain text under `## Original metadata`, never as fields; `.claude/skills/atlas-capture/reference/notes-migration.md`). Body holds a summary and key excerpts (if `retention` allows). Binary files are never copied into the repo by default.
+One source per email thread, meeting, document, page, drop, deliverable, journal day, or imported note (`kind: import`: the note's frontmatter is kept as plain text under `## Original metadata`, never as fields; `.claude/skills/atlas-capture/reference/import.md`). Body holds a summary and key excerpts (if `retention` allows). Binary files are never copied into the repo by default.

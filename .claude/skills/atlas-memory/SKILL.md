@@ -1,6 +1,6 @@
 ---
 name: atlas-memory
-description: "Give the user control over what Atlas remembers\u2014correct or update a fact, archive or unarchive, forget a record (and stop capturing it), permanently erase it from history, undo a migration, export everything, or minimize stored content to pointers and summaries. Use for \"that's wrong, it's\u2026\", \"forget that\", \"forget everything about\u2026\", \"permanently erase\u2026\", \"archive the vendor project\", \"bring back\u2026\", \"undo the migration\", \"export my Atlas\", \"store less\", \"minimize what you keep\"."
+description: "Give the user control over what Atlas remembers\u2014correct or update a fact, archive or unarchive, forget a record (and stop capturing it), permanently erase it from history, undo an import, export everything, or minimize stored content to pointers and summaries. Use for \"that's wrong, it's\u2026\", \"forget that\", \"forget everything about\u2026\", \"permanently erase\u2026\", \"archive the vendor project\", \"bring back\u2026\", \"undo the import\", \"export my Atlas\", \"store less\", \"minimize what you keep\"."
 ---
 # Memory controls
 
@@ -59,12 +59,12 @@ Convert stored content to pointers or summaries for the categories the user choo
 2. Treat it as `destructive` (bulk overwrite inside Atlas): explicit yes, approval record, then execute in batches with commits.
 3. Tell the user the older full content remains in history and offer purge for it.
 
-### G. Undo a migration
-"Undo the migration", "take out everything you imported from Obsidian". Destructive: same care as forget (§C).
-1. **Scope** by the migration's id (`user/.state/notes-migration.yaml: id`, or an earlier one in its `previous` list): records whose every source is `kind: import` with that `notes_migration` are removed; records that existed before keep their content but lose the import sources and the `## Updates` lines citing them; the import sources themselves are removed. Profile changes the user confirmed stay (they were the user's own answers).
+### G. Undo an import
+"Undo the import", "take out everything you imported from Obsidian". Destructive: same care as forget (§C).
+1. **Scope** by the import's id (`user/.state/import.yaml: id`, or an earlier one in its `previous` list): records whose every source is `kind: import` with that `import_id` are removed; records that existed before keep their content but lose the import sources and the `## Updates` lines citing them; the import sources themselves are removed. Profile changes the user confirmed stay (they were the user's own answers).
 2. **Show the plan** with counts by type, plus the history disclosure from §C.
 3. **Explicit yes** and one `destructive` approval record (`system/rules/governance.md`).
-4. **Execute** in batches with commits (`Atlas-Reason: undo notes migration <id>`), update indexes, set `status: undone` in `notes-migration.yaml` (for the current migration). The data-rule exclusion stays unless the user asks to remove it (a separate `governance_settings` change). The migration folder is never touched, so a new migration can run afterwards.
+4. **Execute** in batches with commits (`Atlas-Reason: undo import <id>`), update indexes, set `status: undone` in `import.yaml` (for the current import). The data-rule exclusion stays unless the user asks to remove it (a separate `governance_settings` change). The import folder is never touched, so a new import can run afterwards.
 
 ## Outputs
 - Updated, superseded, archived, or deleted records; updated indexes; `data-rules.yaml` exclusions/handling (confirmed).
@@ -85,5 +85,5 @@ Convert stored content to pointers or summaries for the categories the user choo
 - Forget: files gone from the current tree, no links point to them, indexes clean, exclusions added, user told about history and offered purge.
 - Purge: target paths absent from every commit on every branch and tag on the remote; lock deleted; log line written; user told about caches.
 - Export: user received the zip; nothing was shared.
-- Undo migration: no record or source from that migration remains, indexes are clean, `notes-migration.yaml: status: undone`.
+- Undo import: no record or source from that import remains, indexes are clean, `import.yaml: status: undone`.
 - Minimize: targeted content converted; counts reported; history disclosure given.

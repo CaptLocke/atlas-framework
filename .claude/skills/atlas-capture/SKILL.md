@@ -1,6 +1,6 @@
 ---
 name: atlas-capture
-description: "File information into Atlas's knowledge, from a sentence in chat (\"remember that\u2026\", \"note that\u2026\", \"Dana will send the redlines Tuesday\"), an attached file, the Atlas Drop folder, a journal entry, a finished deliverable, notes brought in once from another product or framework (migration: \"bring in my notes from Notion\"), or new items from connected tools during the ingest job; also the quick catch-up ingest at the first chat of the day."
+description: "File information into Atlas's knowledge, from a sentence in chat (\"remember that\u2026\", \"note that\u2026\", \"Dana will send the redlines Tuesday\"), an attached file, the Atlas Drop folder, a journal entry, a finished deliverable, notes brought in once from another product or framework (import: \"bring in my notes from Notion\"), or new items from connected tools during the ingest job; also the quick catch-up ingest at the first chat of the day."
 ---
 # Capture
 
@@ -11,7 +11,7 @@ Operationalize the write path in `system/rules/knowledge.md`: turn any input int
 - **Chat, explicit:** "Remember that the auditor prefers PDFs", "Note: Jordan approved the Q4 hiring plan", "Add that I owe Priya the roadmap by Friday".
 - **Chat, implicit:** the user mentions something worth keeping while doing something else (kernel §3). File it and say so in one line.
 - **Chat attachments:** any file the user attaches for Atlas to keep or use.
-- **Migration:** notes brought in once from another product, service, or framework, during setup or from a chat ("bring in my notes from Notion"): `reference/notes-migration.md`.
+- **Import:** notes brought in once from another product, service, or framework, during setup or from a chat ("bring in my notes from Notion"): `reference/import.md`.
 - **Jobs:** `ingest` (connector items, Atlas Drop folder, unprocessed journal sections); `triage` (missed commitments); `atlas-thoughts` (brain dumps); `atlas-write` (deliverable pointers); `atlas-insights` (risk/question/idea records).
 - **Kernel §2 step 3:** quick catch-up ingest (mode below).
 
@@ -26,7 +26,7 @@ Operationalize the write path in `system/rules/knowledge.md`: turn any input int
 
 ### 1. The write path (every input)
 Follow `system/rules/knowledge.md` § Write path in order. How to apply each step:
-1. **Exclusions first.** Match the input against every `exclusions` line, including `record: <id>` lines (a forgotten subject: do not re-create or re-enrich it). Excluded → stop; for connector items, still advance past it. The one exception: a running migration reads its own folder (`reference/notes-migration.md` §3).
+1. **Exclusions first.** Match the input against every `exclusions` line, including `record: <id>` lines (a forgotten subject: do not re-create or re-enrich it). Excluded → stop; for connector items, still advance past it. The one exception: a running import reads its own folder (`reference/import.md` §3).
 2. **Classify.** Decide what the input contains. Most inputs contain several things or nothing. Noise is skipped silently (`reference/extraction.md` § Noise). Apply the user's learned `## Triage rules` in `user/profile/preferences.md` first: what counts as a commitment, what is noise. When the user adds a commitment from a source Atlas already filed, log a `missed_commitment` feedback line (`.claude/skills/atlas-triage/reference/learning.md` §1).
 3. **Sensitivity.** Classify against data-rule categories and custom `match` descriptions; choose handling. Unsure → more conservative. Effects:
    - `ignore`: store nothing, not even a source.
@@ -38,7 +38,7 @@ Follow `system/rules/knowledge.md` § Write path in order. How to apply each ste
 6. **Write.** New records with all required fields, `provenance`, `sources`, links. Existing records: update fields, `updated`, append a dated `## Updates` line citing the source; changed facts keep the old value ("was X, now Y"). Replacement → supersede.
 7. **Link** both ways on hubs (people, projects, topics, organizations). Update `last_contact` on people seen in a source.
 8. **Index.** Update affected lines in `_index/<type>.md`, `hot.md`, `people-map.md` (`formats.md` §5).
-9. **Triggers.** Evaluate `new_project` and `new_key_person` (`system/triggers.md`) for records you just created or matched (never for migrated history, `reference/notes-migration.md` §10); check `user/.state/triggers.yaml` first; act; record the firing. Away mode: create the records, hold the questions for the catch-up brief.
+9. **Triggers.** Evaluate `new_project` and `new_key_person` (`system/triggers.md`) for records you just created or matched (never for imported history, `reference/import.md` §10); check `user/.state/triggers.yaml` first; act; record the firing. Away mode: create the records, hold the questions for the catch-up brief.
 10. **Log and commit** (`system/rules/sync.md`): one commit per input batch with `Atlas-Records`; one activity-log line per change set.
 
 ### 2. Commitments: explicit vs vague
@@ -66,8 +66,8 @@ Procedures in `reference/files.md`:
 - **Atlas Drop folder** (ingest): list via `files.list_folder` on `atlas.yaml: drop_folder`, read, file, then `files.move` to `Atlas Drop/Processed` (`drop_folder_housekeeping`).
 - **Deliverable pointers** (from `atlas-write`): Source with `kind: deliverable` and `file_pointer`.
 
-### 5a. Migration (once, from another system)
-Procedure in `reference/notes-migration.md`: imported files are never records; each note becomes a `kind: import` source, then records through the write path; the migration folder is read-only and read once.
+### 5a. Import (once, from another system)
+Procedure in `reference/import.md`: imported files are never records; each note becomes a `kind: import` source, then records through the write path; the import folder is read-only and read once.
 
 ### 6. Journal sections (ingest or `atlas-thoughts`)
 Unprocessed sections (journal `processed` field; cursor `journal.last_processed`) go through the write path with the day's journal Source (`sources/YYYY-MM-DD-journal`, `kind: journal`); then add the section to `processed`. `atlas-thoughts` owns the capture and confirmation; this skill does the extraction.

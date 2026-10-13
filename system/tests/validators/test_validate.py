@@ -255,37 +255,37 @@ class SetupAndLeniency(TempRepo):
         self.assertError(r, "pricing-sync.md", "retention summary or pointer")
         self.assertError(r, "pricing-sync.md", "needs full_text_commit")
 
-    def test_import_source_needs_its_notes_migration(self):
+    def test_import_source_needs_its_import_id(self):
         rel = "user/knowledge/sources/2026-10-12-pricing-sync.md"
         text = self.read(rel)
-        self.write(rel, text.replace("kind: meeting", "kind: import\nnotes_migration: 2026-10-14-obsidian\noriginal_path: Meetings/Pricing.md"))
+        self.write(rel, text.replace("kind: meeting", "kind: import\nimport_id: 2026-10-14-obsidian\noriginal_path: Meetings/Pricing.md"))
         self.assertEqual(self.errors(run_validate(self.root, "--user")), [])
         self.write(rel, text.replace("kind: meeting", "kind: import"))
-        self.assertError(run_validate(self.root, "--user"), "pricing-sync.md", "needs notes_migration")
+        self.assertError(run_validate(self.root, "--user"), "pricing-sync.md", "needs import_id")
 
-    def test_notes_migration_state(self):
-        rel = "user/.state/notes-migration.yaml"
+    def test_import_state(self):
+        rel = "user/.state/import.yaml"
         good = ("id: 2026-10-14-obsidian\nstatus: running\nsource_system: Obsidian\nroute: drive\n"
-                "folder: { connector: google-drive, folder_id: \"1AbC\", name: \"Atlas Migration\" }\n"
+                "folder: { connector: google-drive, folder_id: \"1AbC\", name: \"Atlas Import\" }\n"
                 "started: 2026-10-14\ncompleted: null\nexclude: [\"Old job/\"]\nlive_window_days: 60\n"
                 "counts: { total: 312, processed: 140, skipped: 12 }\nprocessed: [\"1 About me/Me.md\"]\n"
                 "skipped: [{ path: CLAUDE.md, why: AI instruction file }]\n")
         self.write(rel, good)
         self.assertEqual(self.errors(run_validate(self.root, "--user")), [])
         self.write(rel, good.replace("status: running", "status: complete")
-                   .replace("folder: { connector: google-drive, folder_id: \"1AbC\", name: \"Atlas Migration\" }", "folder: null")
+                   .replace("folder: { connector: google-drive, folder_id: \"1AbC\", name: \"Atlas Import\" }", "folder: null")
                    .replace("processed: 140", "processed: 400"))
         r = run_validate(self.root, "--user")
-        self.assertError(r, "notes-migration.yaml", "needs completed")
-        self.assertError(r, "notes-migration.yaml", "needs folder.folder_id")
-        self.assertError(r, "notes-migration.yaml", "larger than counts.total")
+        self.assertError(r, "import.yaml", "needs completed")
+        self.assertError(r, "import.yaml", "needs folder.folder_id")
+        self.assertError(r, "import.yaml", "larger than counts.total")
         self.write(rel, good.replace("route: drive", "route: carrier-pigeon"))
-        self.assertError(run_validate(self.root, "--user"), "notes-migration.yaml", "route must be one of")
+        self.assertError(run_validate(self.root, "--user"), "import.yaml", "route must be one of")
         planned = "id: 2026-10-14-obsidian\nstatus: planned\nsource_system: Obsidian\nstarted: 2026-10-14\n"
         self.write(rel, planned)
         self.assertEqual(self.errors(run_validate(self.root, "--user")), [])
         self.write(rel, planned.replace("status: planned", "status: sampling"))
-        self.assertError(run_validate(self.root, "--user"), "notes-migration.yaml", "missing field 'route'")
+        self.assertError(run_validate(self.root, "--user"), "import.yaml", "missing field 'route'")
 
     def test_commitment_effort(self):
         rel = "user/knowledge/commitments/send-pricing-feedback.md"

@@ -34,8 +34,8 @@ Tool names vary; always verify from the live tool list. Guide: `system/connector
 - Shared drives and shortcuts behave differently from My Drive: create Atlas folders in My Drive.
 - Moving a file into a shared folder changes who can see it (see risk).
 
-## Migration folder
-Used once, read-only, when a user brings notes in from another system (`.claude/skills/atlas-capture/reference/notes-migration.md` §3). Check at mapping:
+## Import folder
+Used once, read-only, when a user brings notes in from another system (`.claude/skills/atlas-capture/reference/import.md` §3). Check at mapping:
 - Listing reaches subfolders (recursive listing, or listing each child folder by ID).
 - A raw `.md` or `.txt` file reads back as plain text, not as a conversion error or binary download.
 Either fails → use the attachment route. Never move or rename anything in that folder; track it by file ID.
