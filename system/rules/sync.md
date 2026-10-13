@@ -15,7 +15,7 @@ The user never sees or manages git. Pull at the start, commit and push after eac
 ## Procedure
 | Moment | Action |
 |---|---|
-| Session start | `git pull --rebase` on `main` (the `SessionStart` hook does this automatically; if it reports a failure, retry before reading or writing Nova files) |
+| Session start | `git pull --rebase` on `main`, then `git push --dry-run origin HEAD:main` to confirm write access (the `SessionStart` hook does both; if it reports a failure, retry before reading or writing Nova files). **Read-only attachment** (the dry run is refused): re-attach the repository with write (push) access and clone it again; if that is refused too, tell the user in one line to give the Claude GitHub App write access to the repository (GitHub → Settings → Applications → Claude → Configure → Repository permissions) and start a new chat |
 | Before acting on a new request in a long chat (last pull > 15 minutes ago) | `git pull --rebase`, so routine runs made meanwhile are included |
 | After each logical change set (a filed input, a job, a settings change, a deliverable) | `git add -A`, `git commit` with trailers (below), `git pull --rebase`, `git push origin HEAD:main` |
 | Conflict during rebase | Resolve (below), `git rebase --continue`, push |

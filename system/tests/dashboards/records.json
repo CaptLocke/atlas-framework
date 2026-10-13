@@ -1,0 +1,573 @@
+{
+ "meta": {
+  "dashboard": "records",
+  "schema_version": 1,
+  "title": "Records",
+  "generated_at": "2026-10-11T03:12:40-07:00",
+  "generated_by": "routine:upkeep",
+  "as_of": "2026-10-11",
+  "timezone": "America/Los_Angeles",
+  "locale": "en-US",
+  "user_display_name": "Maya Chen",
+  "nova_version": "1.0.0",
+  "record_base_url": null,
+  "nav": [],
+  "notices": [],
+  "truncated": {}
+ },
+ "summary": {
+  "total": 21,
+  "current": 19,
+  "restricted": 2,
+  "archived": 5
+ },
+ "types": [
+  {
+   "type": "person",
+   "label": "People",
+   "count": 3
+  },
+  {
+   "type": "organization",
+   "label": "Organizations",
+   "count": 2
+  },
+  {
+   "type": "project",
+   "label": "Projects",
+   "count": 2
+  },
+  {
+   "type": "goal",
+   "label": "Goals",
+   "count": 2
+  },
+  {
+   "type": "commitment",
+   "label": "Commitments",
+   "count": 3
+  },
+  {
+   "type": "decision",
+   "label": "Decisions",
+   "count": 1
+  },
+  {
+   "type": "event",
+   "label": "Events",
+   "count": 1
+  },
+  {
+   "type": "risk",
+   "label": "Risks",
+   "count": 1
+  },
+  {
+   "type": "question",
+   "label": "Questions",
+   "count": 1
+  },
+  {
+   "type": "idea",
+   "label": "Ideas",
+   "count": 1
+  },
+  {
+   "type": "topic",
+   "label": "Topics",
+   "count": 1
+  },
+  {
+   "type": "playbook",
+   "label": "Playbooks",
+   "count": 1
+  },
+  {
+   "type": "source",
+   "label": "Sources",
+   "count": 1
+  },
+  {
+   "type": "deal",
+   "label": "Deals",
+   "count": 1
+  }
+ ],
+ "records": [
+  {
+   "id": "people/jordan-lee",
+   "type": "person",
+   "title": "Jordan Lee",
+   "summary": "Maya's manager; VP Product. Weekly 1:1 on Mondays.",
+   "status": "active",
+   "current": true,
+   "updated": "2026-10-08",
+   "created": "2026-10-01",
+   "aliases": [
+    "JL"
+   ],
+   "facts": [
+    "VP Product",
+    "Acme",
+    "Manager"
+   ],
+   "links": [
+    {
+     "id": "organizations/acme",
+     "title": "Acme"
+    },
+    {
+     "id": "projects/enterprise-launch",
+     "title": "Enterprise launch"
+    }
+   ]
+  },
+  {
+   "id": "people/dana-ruiz",
+   "type": "person",
+   "title": "Dana Ruiz",
+   "summary": "Acme's commercial counsel; reviews customer contracts and DPAs.",
+   "status": "active",
+   "current": true,
+   "updated": "2026-10-09",
+   "created": "2026-10-01",
+   "aliases": [
+    "D. Ruiz"
+   ],
+   "facts": [
+    "Commercial Counsel",
+    "Acme",
+    "Peer"
+   ],
+   "links": [
+    {
+     "id": "organizations/acme",
+     "title": "Acme"
+    }
+   ]
+  },
+  {
+   "id": "people/sam-okafor",
+   "type": "person",
+   "title": "Sam Okafor",
+   "summary": "Head of Operations at Brightline; renewal decision owner.",
+   "status": "active",
+   "current": true,
+   "updated": "2026-10-08",
+   "created": "2026-09-20",
+   "aliases": [],
+   "facts": [
+    "Head of Operations",
+    "Brightline Logistics",
+    "Customer"
+   ],
+   "links": [
+    {
+     "id": "organizations/brightline-logistics",
+     "title": "Brightline Logistics"
+    }
+   ]
+  },
+  {
+   "id": "organizations/brightline-logistics",
+   "type": "organization",
+   "title": "Brightline Logistics",
+   "summary": "Mid-market logistics customer; renewal due in November.",
+   "status": "active",
+   "current": true,
+   "updated": "2026-10-08",
+   "created": "2026-09-20",
+   "aliases": [
+    "Brightline"
+   ],
+   "facts": [
+    "Customer",
+    "Logistics",
+    "Renewal in Q4"
+   ],
+   "links": [
+    {
+     "id": "people/sam-okafor",
+     "title": "Sam Okafor"
+    }
+   ]
+  },
+  {
+   "id": "organizations/globex",
+   "type": "organization",
+   "title": "Globex",
+   "summary": "Prospect running an EMEA-only pilot of 50 seats from November 9.",
+   "status": "active",
+   "current": true,
+   "updated": "2026-10-07",
+   "created": "2026-10-02",
+   "aliases": [],
+   "facts": [
+    "Prospect",
+    "Manufacturing",
+    "Pilot from Nov 9"
+   ],
+   "links": [
+    {
+     "id": "projects/enterprise-launch",
+     "title": "Enterprise launch"
+    }
+   ]
+  },
+  {
+   "id": "projects/enterprise-launch",
+   "type": "project",
+   "title": "Enterprise launch",
+   "summary": "Launch the enterprise tier with SSO, audit logs, and per-seat pricing by end of Q4.",
+   "status": "active",
+   "current": true,
+   "updated": "2026-10-10",
+   "created": "2026-10-01",
+   "aliases": [
+    "Enterprise tier"
+   ],
+   "facts": [
+    "At risk",
+    "Target Dec 15",
+    "Maya Chen"
+   ],
+   "links": [
+    {
+     "id": "goals/2026-q4-enterprise-revenue",
+     "title": "Launch the enterprise tier"
+    },
+    {
+     "id": "people/jordan-lee",
+     "title": "Jordan Lee"
+    },
+    {
+     "id": "organizations/globex",
+     "title": "Globex"
+    }
+   ]
+  },
+  {
+   "id": "projects/vendor-shortlist",
+   "type": "project",
+   "title": "Vendor shortlist",
+   "summary": "Pick a usage-analytics vendor; three finalists scored.",
+   "status": "done",
+   "current": false,
+   "updated": "2026-09-12",
+   "created": "2026-08-04",
+   "aliases": [],
+   "facts": [
+    "On track",
+    "Target Sep 10"
+   ],
+   "links": []
+  },
+  {
+   "id": "goals/2026-q4-enterprise-revenue",
+   "type": "goal",
+   "title": "Launch the enterprise tier",
+   "summary": "Enterprise tier live with two paying pilots by quarter end.",
+   "status": "active",
+   "current": true,
+   "updated": "2026-10-09",
+   "created": "2026-10-01",
+   "aliases": [],
+   "facts": [
+    "#1",
+    "2026-Q4",
+    "1 of 2 pilots"
+   ],
+   "links": [
+    {
+     "id": "projects/enterprise-launch",
+     "title": "Enterprise launch"
+    }
+   ]
+  },
+  {
+   "id": "goals/2026-q4-retention",
+   "type": "goal",
+   "title": "Keep gross retention at 92% or better",
+   "summary": "Hold gross revenue retention at or above 92% this quarter.",
+   "status": "active",
+   "current": true,
+   "updated": "2026-10-06",
+   "created": "2026-10-01",
+   "aliases": [
+    "Q4 retention"
+   ],
+   "facts": [
+    "#2",
+    "2026-Q4",
+    "90.5% of 92%"
+   ],
+   "links": [
+    {
+     "id": "risks/onboarding-import-failures",
+     "title": "Onboarding import failures"
+    }
+   ]
+  },
+  {
+   "id": "commitments/send-pricing-feedback",
+   "type": "commitment",
+   "title": "Send pricing feedback to Jordan",
+   "summary": "Maya's written feedback on the enterprise per-seat pricing, needed for Friday's exec review.",
+   "status": "open",
+   "current": true,
+   "updated": "2026-10-10",
+   "created": "2026-10-06",
+   "aliases": [],
+   "facts": [
+    "You owe Jordan Lee",
+    "Due Oct 13",
+    "High priority"
+   ],
+   "links": [
+    {
+     "id": "people/jordan-lee",
+     "title": "Jordan Lee"
+    },
+    {
+     "id": "projects/enterprise-launch",
+     "title": "Enterprise launch"
+    }
+   ]
+  },
+  {
+   "id": "commitments/dana-msa-review",
+   "type": "commitment",
+   "title": "Dana reviews the enterprise MSA",
+   "summary": "Dana owes redlines on the enterprise MSA before the pilot can start.",
+   "status": "slipped",
+   "current": true,
+   "updated": "2026-10-09",
+   "created": "2026-09-30",
+   "aliases": [
+    "MSA review"
+   ],
+   "facts": [
+    "Waiting on Dana Ruiz",
+    "Due Oct 7",
+    "High priority"
+   ],
+   "links": [
+    {
+     "id": "people/dana-ruiz",
+     "title": "Dana Ruiz"
+    },
+    {
+     "id": "projects/enterprise-launch",
+     "title": "Enterprise launch"
+    }
+   ]
+  },
+  {
+   "id": "commitments/share-q3-metrics",
+   "type": "commitment",
+   "title": "Share Q3 metrics deck with the team",
+   "summary": "Sent the Q3 metrics deck to the product team on October 2.",
+   "status": "done",
+   "current": false,
+   "updated": "2026-10-02",
+   "created": "2026-09-28",
+   "aliases": [],
+   "facts": [
+    "You owe Priya Nair",
+    "Due Oct 2",
+    "Medium priority"
+   ],
+   "links": []
+  },
+  {
+   "id": "decisions/2026-10-12-enterprise-tier-pricing",
+   "type": "decision",
+   "title": "Enterprise tier priced per seat",
+   "summary": "Per-seat pricing with a 50-seat minimum; usage pricing rejected as too hard to forecast.",
+   "status": "made",
+   "current": true,
+   "updated": "2026-10-10",
+   "created": "2026-10-10",
+   "aliases": [],
+   "facts": [
+    "Decided Oct 10",
+    "Jordan Lee, Maya Chen"
+   ],
+   "links": [
+    {
+     "id": "projects/enterprise-launch",
+     "title": "Enterprise launch"
+    }
+   ]
+  },
+  {
+   "id": "events/2026-10-13-brightline-renewal-call",
+   "type": "event",
+   "title": "Brightline renewal call",
+   "summary": "Renewal check-in with Sam; lead with the import fix date.",
+   "status": "scheduled",
+   "current": true,
+   "updated": "2026-10-10",
+   "created": "2026-10-03",
+   "aliases": [],
+   "facts": [
+    "Meeting",
+    "Oct 13, 10:00 AM",
+    "Prep ready"
+   ],
+   "links": [
+    {
+     "id": "people/sam-okafor",
+     "title": "Sam Okafor"
+    },
+    {
+     "id": "organizations/brightline-logistics",
+     "title": "Brightline Logistics"
+    }
+   ]
+  },
+  {
+   "id": "risks/onboarding-import-failures",
+   "type": "risk",
+   "title": "Onboarding import failures",
+   "summary": "CSV imports fail for files over 20 MB; three customers raised it this month.",
+   "status": "active",
+   "current": true,
+   "updated": "2026-10-08",
+   "created": "2026-09-18",
+   "aliases": [
+    "Import bug"
+   ],
+   "facts": [
+    "High likelihood",
+    "High impact",
+    "Tomás Herrera"
+   ],
+   "links": [
+    {
+     "id": "goals/2026-q4-retention",
+     "title": "Keep gross retention at 92% or better"
+    }
+   ]
+  },
+  {
+   "id": "questions/globex-data-residency",
+   "type": "question",
+   "title": "Does Globex need EU data residency?",
+   "summary": "Open question from the pilot planning call; affects hosting for the pilot.",
+   "status": "open",
+   "current": true,
+   "updated": "2026-10-07",
+   "created": "2026-10-07",
+   "aliases": [],
+   "facts": [
+    "Asked by Maya Chen"
+   ],
+   "links": [
+    {
+     "id": "organizations/globex",
+     "title": "Globex"
+    }
+   ]
+  },
+  {
+   "id": "ideas/self-serve-import-checker",
+   "type": "idea",
+   "title": "Self-serve import file checker",
+   "summary": "Let customers validate a CSV before uploading it, to cut import tickets.",
+   "status": "exploring",
+   "current": true,
+   "updated": "2026-10-05",
+   "created": "2026-10-05",
+   "aliases": [],
+   "facts": [
+    "Morning Thoughts, Oct 5"
+   ],
+   "links": [
+    {
+     "id": "risks/onboarding-import-failures",
+     "title": "Onboarding import failures"
+    }
+   ]
+  },
+  {
+   "id": "topics/pricing",
+   "type": "topic",
+   "title": "Pricing",
+   "summary": "Everything about how Acme prices its plans and discounts.",
+   "status": "active",
+   "current": true,
+   "updated": "2026-10-10",
+   "created": "2026-10-01",
+   "aliases": [],
+   "facts": [
+    "Plans, discounts, packaging"
+   ],
+   "links": [
+    {
+     "id": "decisions/2026-10-12-enterprise-tier-pricing",
+     "title": "Enterprise tier priced per seat"
+    }
+   ]
+  },
+  {
+   "id": "playbooks/renewal-at-risk",
+   "type": "playbook",
+   "title": "Renewal at risk",
+   "summary": "Steps when a customer signals they may not renew.",
+   "status": "active",
+   "current": true,
+   "updated": "2026-09-22",
+   "created": "2026-09-22",
+   "aliases": [],
+   "facts": [
+    "A customer hints at churn",
+    "Last used Sep 22"
+   ],
+   "links": []
+  },
+  {
+   "id": "sources/2026-10-12-pricing-sync",
+   "type": "source",
+   "title": "Pricing sync (meeting)",
+   "summary": "Transcript summary of the pricing sync with Jordan and finance.",
+   "status": "processed",
+   "current": true,
+   "updated": "2026-10-10",
+   "created": "2026-10-10",
+   "aliases": [],
+   "facts": [
+    "Meeting",
+    "From Zoom",
+    "Oct 10"
+   ],
+   "links": [
+    {
+     "id": "decisions/2026-10-12-enterprise-tier-pricing",
+     "title": "Enterprise tier priced per seat"
+    }
+   ]
+  },
+  {
+   "id": "deals/acme-renewal",
+   "type": "deal",
+   "title": "Brightline renewal",
+   "summary": "Annual renewal, 120 seats; decision in November.",
+   "status": "open",
+   "current": true,
+   "updated": "2026-10-08",
+   "created": "2026-09-20",
+   "aliases": [],
+   "facts": [
+    "120 seats",
+    "Close Nov 30"
+   ],
+   "links": [
+    {
+     "id": "organizations/brightline-logistics",
+     "title": "Brightline Logistics"
+    }
+   ]
+  }
+ ]
+}

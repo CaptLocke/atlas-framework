@@ -34,7 +34,7 @@ types:
       scale: [task_group, project, initiative, program]
   goal:
     folder: goals
-    fields: [horizon, period, metric, target, current, owner, accomplishments]
+    fields: [horizon, period, metric, target, current, owner, accomplishments, rank]
     enums:
       status: [draft, active, achieved, missed, dropped]
       horizon: [quarter, half, year, multi_year]

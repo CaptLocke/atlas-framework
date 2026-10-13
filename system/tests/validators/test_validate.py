@@ -199,6 +199,25 @@ class SetupAndLeniency(TempRepo):
             self.assertEqual(self.errors(r), [], r.stdout)
             self.replace("user/knowledge/people/dana-ruiz.md", "relationship: " + value, "relationship: customer")
 
+    def goal(self, slug, rank, status="active"):
+        self.write("user/knowledge/goals/%s.md" % slug, "---\nid: goals/%s\ntype: goal\ntitle: %s\nsummary: A goal.\n"
+                   "status: %s\ncreated: 2026-10-01\nupdated: 2026-10-01\nrank: %s\n---\nBody.\n" % (slug, slug, status, rank))
+
+    def test_goal_ranks(self):
+        self.goal("retention", 1)
+        self.goal("launch", 2)
+        self.goal("hiring", "null")
+        r = run_validate(self.root, "--user")
+        self.assertEqual(self.errors(r), [], r.stdout)
+        self.goal("launch", 1)
+        self.assertError(run_validate(self.root, "--user"), "goals/", "rank 1 is shared")
+        self.goal("launch", 0)
+        self.assertError(run_validate(self.root, "--user"), "launch.md", "rank must be a whole number")
+        self.goal("launch", 2, status="achieved")
+        r = run_validate(self.root, "--user")
+        self.assertEqual(self.errors(r), [], r.stdout)
+        self.assertIn("isn't active", r.stdout)
+
     def test_meetings_filter(self):
         # absent block is fine (defaults to include); a full block validates; bad values are errors
         self.replace("user/settings/rhythms.yaml", "engagement: adaptive",

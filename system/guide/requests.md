@@ -30,6 +30,7 @@ Ask about anything in your work. Nova shows where each answer came from.
 - "Where was I on the vendor evaluation?"
 - "Catch me up on Globex."
 - "What happened while I was away?"
+- To browse everything Nova has filed, open the **Records** page and search by name, type, or status.
 
 ## Prepare
 Get ready for what's next.
@@ -63,6 +64,7 @@ Look back and look ahead.
 - "How did this week go?"
 - "What did I get done this quarter?"
 - "How am I doing on my goals?"
+- "Rank my goals." / "Hiring matters more than the launch now."
 - "Which commitments slipped this month?"
 - "Who haven't I talked to in a while?"
 - "Put together my performance review notes for Q4."

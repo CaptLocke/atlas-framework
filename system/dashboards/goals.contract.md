@@ -19,7 +19,7 @@ Republished by `weekly-review` (which appends accomplishments), `monthly` (goal 
   "period": { "label": "2026-Q4", "start": "2026-10-01", "end": "2026-12-31" },
   "goals": [
     { "id": "goals/2026-q4-retention", "title": "Keep gross retention at 92% or better", "status": "active",
-      "horizon": "quarter", "period": "2026-Q4", "summary": "…",
+      "horizon": "quarter", "period": "2026-Q4", "rank": 1, "summary": "…",
       "metric": "Gross revenue retention", "target": "92%", "current": "90.5%", "current_as_of": "2026-10-01",
       "progress": 0.84, "assessment": "at_risk",
       "owner": { "id": "people/maya-chen", "title": "Maya Chen" }, "insight": "…",
@@ -42,12 +42,13 @@ Full example: `system/tests/dashboards/goals.json`.
 | `progress` | 0–1, or `null`. Set only when `current` and `target` are comparable numbers (`current / target`, or the inverse for "reduce to" goals). Never invented. |
 | `assessment` | `on_track`, `at_risk`, `off_track`, or `null` (not yet assessed). Nova's judgment from evidence; shown as a chip. |
 | `evidence[].direction` | `for`, `against`, or `neutral`. |
+| `rank` | The user's rank for an active goal (1 = most important), or `null` if unranked (`system/schemas/goal.md` §Ranking). Shown as "#1". |
 
 ## Sources (file → field)
 | Field | Source |
 |---|---|
 | `period` | The current quarter (or the period most active goals share), from the goals' `period` |
-| `goals[]` | `user/knowledge/goals/*.md` with `status: active|draft`, plus `achieved|missed` goals whose `period` is the current one: `id, title, status, horizon, period, summary, metric, target, current, owner` |
+| `goals[]` | `user/knowledge/goals/*.md` with `status: active|draft`, plus `achieved|missed` goals whose `period` is the current one: `id, title, status, horizon, period, rank, summary, metric, target, current, owner` |
 | `current_as_of` | The date in the goal's `current` text or its latest `## Updates` line that changed `current` |
 | `assessment`, `insight`, `evidence` | Weekly review / monthly goal progress output (`user/work/reviews/YYYY-Www.md`, `user/work/reports/YYYY-MM.md`) and linked records (projects' `health`, risks, decisions); each evidence line cites its record |
 | `projects[]` | Projects whose `goal` is this goal or that link to it: `id, title, health` |
@@ -55,7 +56,7 @@ Full example: `system/tests/dashboards/goals.json`.
 | `accomplishments[]` | `user/work/accomplishments.md` (running list), newest first; `goal` = the goal the entry is filed under, or `null` |
 
 ## Rendering notes
-- Goals sort: active before draft before achieved/missed; within active, `assessment` off_track, at_risk, null, on_track; then title.
+- Goals sort: active before draft before achieved/missed; within active, ranked goals by `rank` (1 first), then unranked by `assessment` off_track, at_risk, null, on_track; then title. The page applies the same order, so data order doesn't matter for active goals.
 - Caps: 20 goals; 8 accomplishments per goal; 60 entries in `accomplishments` (current and previous period). Older entries are dropped first; `meta.truncated.accomplishments` counts them.
 - Text limits: `summary`, `insight`, evidence `text` 240 characters; accomplishment `text` 300.
 - Goals without a metric show no progress bar; that is expected, not an error.

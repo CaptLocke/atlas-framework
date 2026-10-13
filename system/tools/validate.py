@@ -37,7 +37,7 @@ SKILLS = ["nova-recall", "nova-capture", "nova-brief", "nova-triage", "nova-insi
 JOBS = ["ingest", "triage", "intelligence", "email-drafts", "meeting-prep", "daily-brief", "weekly-review",
         "status-updates", "monthly", "quarterly", "maintenance", "update-check"]
 DASHBOARDS = ["daily-brief", "work-board", "goals", "week-ahead", "people", "decisions-risks",
-              "control-center", "about-you", "nova-guide"]
+              "control-center", "about-you", "nova-guide", "records"]
 ON_DEMAND_DASHBOARDS = ["project-page"]
 JOB_SECTIONS = ["Purpose", "Runs when", "Away and paused", "Readiness check", "Inputs", "Steps",
                 "Outputs", "Early exit", "Guardrails", "Run report"]
@@ -1163,6 +1163,12 @@ def check_record(c, path):
                 rep.error(path, "%s %r is not one of %s" % (k, fm[k], ", ".join(allowed)))
         if expected == "event" and fm.get("all_day") is not None and not isinstance(fm["all_day"], bool):
             rep.error(path, "all_day must be true or false")
+        if expected == "goal" and fm.get("rank") is not None:
+            rk = fm["rank"]
+            if isinstance(rk, bool) or not isinstance(rk, int) or rk < 1:
+                rep.error(path, "rank must be a whole number from 1 (most important), or null")
+            elif fm.get("status") != "active":
+                rep.warn(path, "rank is set on a goal that isn't active; clear it and renumber the active goals")
         for k, kind in DATE_FIELDS.get(expected, {}).items():
             v = fm.get(k)
             if v is None:
@@ -1251,6 +1257,27 @@ def check_user(c):
                 check_record(c, os.path.join(fpath, f))
             elif not f.startswith("."):
                 rep.warn(os.path.join(fpath, f), "non-markdown file in a knowledge folder")
+    check_goal_ranks(c)
+
+
+def check_goal_ranks(c):
+    """Active goals' ranks must be unique (system/schemas/goal.md, Ranking)."""
+    gdir = c.p("user", "knowledge", "goals")
+    seen = {}
+    for f in listdir(gdir):
+        if not f.endswith(".md"):
+            continue
+        path = os.path.join(gdir, f)
+        fm, _ = read_frontmatter(path, Report(c.root))
+        if not isinstance(fm, dict) or fm.get("status") != "active":
+            continue
+        rk = fm.get("rank")
+        if isinstance(rk, int) and not isinstance(rk, bool) and rk >= 1:
+            seen.setdefault(rk, []).append(path)
+    for rk, paths in sorted(seen.items()):
+        if len(paths) > 1:
+            for p in paths:
+                c.rep.error(p, "rank %d is shared by %d active goals; ranks must be unique" % (rk, len(paths)))
 
 
 # ================================================================ dispatch

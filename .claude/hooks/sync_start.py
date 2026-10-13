@@ -17,6 +17,10 @@ Behavior (system/rules/sync.md "Session start"):
 - `git fetch origin` then `git pull --rebase --autostash origin main` (about
   20 s budget, never prompts for credentials). A rebase that stops on a
   conflict is aborted so the working tree is left as it was.
+- Write check: `git push --dry-run origin HEAD:main` (no effect; it only asks
+  the remote whether this session may push). Sessions can come up with a
+  read-only attachment; if the dry run is refused, the context tells Claude
+  to re-attach the repo with write access before anything else (kernel §2.1).
 - Success: additional context "Nova repo synced to origin/main at <sha>".
 - Failure (network, auth, conflict, not on main): additional context telling
   Claude to retry the pull before reading or writing Nova files; the reason is
@@ -29,6 +33,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 FETCH_TIMEOUT = 8
 PULL_TIMEOUT = 12
+PUSH_CHECK_TIMEOUT = 8
 
 
 def context(text):
@@ -65,8 +70,19 @@ def main():
             gs.git(proj, ["rebase", "--abort"], timeout=10)
         return failure(gs, proj, "git pull --rebase failed: %s" % ((err or out).strip() or "exit %d" % rc))
     sha = gs.short_sha(proj)
-    gs.log(proj, "sync_start.ok", "origin/%s at %s" % (gs.BRANCH, sha))
-    return context("Nova repo synced to origin/%s at %s." % (gs.BRANCH, sha))
+    rc, out, err = gs.git(proj, ["push", "--dry-run", "--quiet", "origin", "HEAD:" + gs.BRANCH],
+                          timeout=PUSH_CHECK_TIMEOUT)
+    if rc != 0:
+        reason = (err or out).strip() or "exit %d" % rc
+        gs.log(proj, "sync_start.read_only", reason)
+        return context(
+            "Nova repo synced to origin/%s at %s, but this session CAN'T PUSH to it (%s). It is probably "
+            "attached read-only. Before reading or writing Nova files, re-attach the repository with write "
+            "(push) access and clone it again (kernel §2 step 1). If write access is refused, tell the user in "
+            "one line: give the Claude GitHub App write access to this repository (GitHub → Settings → "
+            "Applications → Claude → Configure), then start a new chat." % (gs.BRANCH, sha, gs.one_line(reason, 160)))
+    gs.log(proj, "sync_start.ok", "origin/%s at %s (push ok)" % (gs.BRANCH, sha))
+    return context("Nova repo synced to origin/%s at %s; push access confirmed." % (gs.BRANCH, sha))
 
 
 if __name__ == "__main__":

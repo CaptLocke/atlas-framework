@@ -5,17 +5,17 @@ description: "Render Nova's dashboards from their templates and data contracts, 
 # Dashboards
 
 ## Purpose
-Keep a small set of always-current, browsable pages: Daily Brief, Work Board, Goals, Week Ahead, People, Decisions & Risks, Control Center, About You, and Nova Guide, plus project pages on request and the user's own dashboards. Each page is a self-contained HTML file built from a system template with the data embedded, themed to the user's design system, and published privately so routines can refresh it unattended.
+Keep a small set of always-current, browsable pages: Daily Brief, Work Board, Goals, Week Ahead, People, Decisions & Risks, Control Center, About You, Nova Guide, and Records, plus project pages on request and the user's own dashboards. Each page is a self-contained HTML file built from a system template with the data embedded, themed to the user's design system, and published privately so routines can refresh it unattended.
 
 ## When to use
-- Setup step 11: publish all nine (`nova-setup`).
+- Setup step 11: publish all ten (`nova-setup`).
 - Jobs (per each contract's `republished_by`, e.g. `daily-brief`, `triage`, `weekly-review`, `monthly`): republish the dashboards whose data changed.
 - Skills after relevant changes: `nova-settings`/`nova-away` (Control Center, Daily Brief), `nova-update` (Nova Guide, Control Center), `nova-review` (Goals, About You), `nova-health` (Control Center).
 - User: "refresh my dashboards", "I lost the link to …", "make a project page for Atlas", "add the deals dashboard I built".
 - Dashboards are views only. Requests to change things *from* a dashboard ("mark that done") are handled in chat by the owning skill, then the page is republished.
 
 ## Inputs
-- `system/dashboards/<name>.html` (template) and `system/dashboards/<name>.contract.md` (data shape, sources, `republished_by`, `size_budget_kb`, rendering notes) for the nine dashboards and `project-page`.
+- `system/dashboards/<name>.html` (template) and `system/dashboards/<name>.contract.md` (data shape, sources, `republished_by`, `size_budget_kb`, rendering notes) for the ten dashboards and `project-page`.
 - User dashboards: `user/extensions/dashboards/<name>.html` + `<name>.contract.md`, registered in `user/extensions/registry.yaml` (kind `dashboard`). A user dashboard with `overrides: <system dashboard>` replaces it (`system/rules/extensions.md`).
 - The files named in each contract's "Sources" section; `user/profile/design-system.md` for theme; `user/settings/dashboards.yaml` for URLs.
 - Rendering detail, theming, size trimming, and publishing rules: `reference/rendering.md`.
@@ -33,7 +33,7 @@ Keep a small set of always-current, browsable pages: Daily Brief, Work Board, Go
 
 ### Republish (chats and routines)
 7. Republish to the stored URL with the new page (same title). Keep it private, page-only, without grants, so routines can update it unattended. Update `last_published`. Batch: render and republish only dashboards whose sources changed since `last_published`, plus any the caller names.
-8. **If republish fails:** in a routine, record it in the run report and as a known issue in `user/.state/health.yaml` ("Dashboards couldn't update; I'll refresh them when you next chat"), don't retry endlessly; in a chat, retry once, then publish a new private page, update the URL, tell the user the new link, and close the known issue. If a URL is missing (never published, or lost), publish fresh in a chat; a routine records a known issue instead.
+8. **If republish fails:** in a routine, record it in the run report and as a known issue in `user/.state/health.yaml` ("Dashboards couldn't update; I'll refresh them when you next chat"), don't retry endlessly; in a chat, retry once, then publish a new private page, update the URL, tell the user the new link, and close the known issue. If a URL is missing (never published, or lost), publish fresh in a chat; a routine records a known issue instead. A built-in dashboard with no entry in `dashboards.yaml` at all (new in an update) is added there with `url: null` and published at the next chat, with one line telling the user what it is ("New: a Records page to search everything I've filed"); routines skip it without a known issue.
 
 ### Project pages and user dashboards
 9. **Project page** ("make a page for Atlas"): resolve the project, render `project-page` with that project's data, publish privately, store in `project_pages`. Republish it when the project changes (`triage`, `weekly-review`) while it's listed. Remove the entry (not the page) if the user says they no longer need it; deleting the published page is `destructive` and needs approval.

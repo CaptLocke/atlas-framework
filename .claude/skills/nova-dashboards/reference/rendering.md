@@ -6,7 +6,7 @@ skill: nova-dashboards
 > **Contracts govern.** `system/dashboards/README.md` and each `<name>.contract.md` define placeholders, theme tokens, truncation, and titles; where this file differs, they win.
 # Rendering and publishing detail
 
-## The nine dashboards (and who usually refreshes them)
+## The ten dashboards (and who usually refreshes them)
 The contract's `republished_by` is authoritative; this is the usual pattern.
 | Dashboard | Shows | Typical republishers |
 |---|---|---|
@@ -19,6 +19,7 @@ The contract's `republished_by` is authoritative; this is the usual pattern.
 | `control-center` | Routines and jobs (status, last/next run), activity, approvals, questions, connection health, known issues | every routine's last job, settings/away/update/health changes |
 | `about-you` | Profile, preferences, voice and design guides with provenance and confirmation status | monthly, after profile changes |
 | `nova-guide` | Features, example requests, automations, controls, troubleshooting, What's new (`system/guide/`) | update, setup |
+| `records` | Every record, searchable by name, type, and status; links between records | maintenance, weekly-review |
 | `project-page` | One project: state, next step, commitments, decisions, risks, people, timeline | on request; triage, weekly-review while listed |
 
 ## Building data

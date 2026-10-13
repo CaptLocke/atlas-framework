@@ -23,6 +23,7 @@ Per goal of the period: outcome (achieved / partly / missed / dropped), the evid
 - Sources: unfinished goals worth carrying over, plans the user stated (journal, chats), manager or company priorities recorded in decisions/sources, projects starting.
 - Create each as a goal record: `status: draft`, `horizon: quarter`, `period: YYYY-Qn`, `metric`, `target`, links to projects. Max 5.
 - Ask the user to confirm, edit, drop, or import their official goals (e.g., "paste your OKRs and I'll set them up"). Only on confirmation set `status: active`; update `profile.md` current goals (profile line `[stated · confirmed <date>]`).
+- Then ask the user to rank the confirmed goals ("Which matters most this quarter? Put them in order, or just name the top one."), suggesting an order from manager and company priorities. Write `rank` per `system/schemas/goal.md` §Ranking. Carried-over goals keep their place unless the user reorders. In routines, ask through `questions.md` (kind `other`) and leave goals unranked until answered.
 
 ### Role refresh
 Ask (one at a time in chat; as `questions.md` entries kind `profile` in routines), skipping anything clearly unchanged:

@@ -169,7 +169,7 @@ Tell Nova something's wrong in one sentence. It gathers the details Nova's maker
 - "Something's broken with my calendar sync. Can you report it?"
 
 ## Dashboards
-Always-current pages you can open any time: **Daily Brief**, **Work Board** (every project and commitment), **Goals** (with your running list of accomplishments), **Week Ahead**, **People**, **Decisions & Risks**, **Control Center**, **About You**, and this **Nova Guide**. Ask for a page for any project.
+Always-current pages you can open any time: **Daily Brief**, **Work Board** (every project and commitment), **Goals** (with your running list of accomplishments), **Week Ahead**, **People**, **Decisions & Risks**, **Control Center**, **About You**, **Records** (search everything Nova has filed, by name, type, or status), and this **Nova Guide**. Ask for a page for any project.
 
 **Try:**
 - "Open my Work Board."

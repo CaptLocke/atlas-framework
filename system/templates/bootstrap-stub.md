@@ -9,7 +9,7 @@ The setup guide (`docs/setup/04-create-the-nova-project.md`) and `nova-setup` bo
 
 ```text
 This Project is my Nova. At the start of every conversation:
-1. Attach my GitHub repository YOUR-USERNAME/YOUR-REPO and sync it.
+1. Attach my GitHub repository YOUR-USERNAME/YOUR-REPO with write (push) access and sync it.
 2. Follow the CLAUDE.md file in that repository.
 Never ask me to commit, push, or merge.
 If you can't attach the repository, tell me in one sentence and give me the one step to fix it (usually: connect GitHub in Settings → Connectors, or give the Claude GitHub App access to this repository; if my Claude account is through work, my admin must turn on unified chat and Cowork in Organization settings → Capabilities).

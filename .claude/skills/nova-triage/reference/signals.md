@@ -15,7 +15,12 @@ For `waiting_on`: the counterparty's message delivering it, or a Source showing 
 
 ## Priority rubric
 Score each open commitment, then map: high (top ~20%), medium, low.
-1. **Goal link:** linked (directly or via its project) to an active goal → strong boost; to the user's manager's stated priorities → boost.
+1. **Goal link:** linked (directly or via its project) to an active goal → a boost **scaled by the goal's `rank`** (`system/schemas/goal.md` §Ranking); to the user's manager's stated priorities → boost.
+   - With N ranked active goals, a goal of rank r gets a weight of `1 − 0.6 × (r − 1) / (N − 1)`: rank 1 = 1.0 (the full strong boost), the lowest-ranked = 0.4. With one ranked goal, its weight is 1.0.
+   - Unranked active goals get 0.4 while any goal is ranked, and 1.0 when none are (so a user who never ranks sees the same behavior as before).
+   - A commitment linked to several goals takes the highest weight, not the sum.
+   - Example, four ranked goals: rank 1 = 1.0, rank 2 = 0.8, rank 3 = 0.6, rank 4 = 0.4.
+   - In the `insight` or the brief's reason, name the goal when its rank drove the priority ("Supports your #1 goal, Q4 retention").
 2. **Who's waiting** (counterparty `relationship`, `system/schemas/person.md` §Relationships): `manager`, `board`, `customer`, or a senior `stakeholder` → boost; `prospect` in an active deal → boost; `peer`, `report`, `vendor`, `partner`, `external` → neutral.
 3. **Time:** due within 3 days or already slipped → boost; no date → neutral.
 4. **Consequence:** blocks others (others' commitments or a decision depend on it), or affects revenue, legal, or launch dates → boost.

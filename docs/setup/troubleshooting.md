@@ -36,7 +36,7 @@ Fix this before you go any further. It takes a minute and nothing is lost.
 Claude says it can't find, attach, or access your repository. Work through these in order; most people are fixed by the first, second, or third.
 
 1. **If your Claude account is through work, check the company setting.** Your company's Claude admin must turn on **unified chat and Cowork** in **Organization settings → Capabilities**. Without it, Claude can't open any GitHub repository from a chat, even when everything below is set up correctly. Ask your admin if you can't see Organization settings. (Details: [Step 3, Before you start](03-connect-github.md#before-you-start-is-your-claude-account-through-work).) After it's turned on, start a fresh chat in the Nova Project.
-2. **Check the address in the Project instructions.** Open the Nova Project, open its instructions, and check the line `Attach my GitHub repository …`. It must be exactly your GitHub username, a slash, and the repository name (for example `maya-chen/nova`), with no spaces and no `https://github.com/` in front.
+2. **Check the address in the Project instructions.** Open the Nova Project, open its instructions, and check the line `Attach my GitHub repository … with write (push) access …`. It must be exactly your GitHub username, a slash, and the repository name (for example `maya-chen/nova`), with no spaces and no `https://github.com/` in front.
 3. **Check GitHub is connected in Claude.** Settings → **Connectors** → **GitHub** should say **Connected**. If it shows **Connect**, click it and authorize. (Details: [Step 3, Part B](03-connect-github.md#part-b-check-github-is-connected-in-claude-in-the-desktop-app).)
 4. **Check the Claude GitHub App can see your Nova repository.**
    1. On GitHub, click your profile picture → **Settings** → **Applications** (under "Integrations" in the left-hand list).
@@ -48,6 +48,16 @@ Claude says it can't find, attach, or access your repository. Work through these
 
 5. **Reinstall the app if Claude isn't listed.** Go to [github.com/apps/claude/installations/select_target](https://github.com/apps/claude/installations/select_target) and follow [Step 3, Part A](03-connect-github.md#part-a-give-claude-access-to-your-nova-repository-in-your-browser) again.
 6. **Start a fresh chat** in the Nova Project and say **`Start Nova`**.
+
+---
+
+## Nova can read my Nova but can't save anything
+
+Nova says it can't save, or that your repository is attached **read-only**. Nova checks this at the start of every chat and normally fixes it itself by re-attaching your repository with write access. If it still can't:
+
+1. **Check the Project instructions** ask for write access. The first numbered line should end with **with write (push) access and sync it**. If yours doesn't, copy the text from [Step 4](04-create-the-nova-project.md#add-the-instructions) again (or ask Nova for it) and paste it in place of the old one.
+2. **Check the Claude GitHub App can write to your Nova.** On GitHub, click your profile picture → **Settings** → **Applications** → next to **Claude**, click **Configure**. If GitHub shows a banner asking you to **accept new permissions**, accept it. Make sure your Nova is listed under **Repository access**.
+3. **Start a fresh chat** in the Nova Project and say **`Start Nova`**.
 
 ---
 

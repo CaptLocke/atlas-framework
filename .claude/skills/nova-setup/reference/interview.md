@@ -77,7 +77,7 @@ Ask only what the material didn't answer, one per message, in this order of valu
 |---|---|---|---|
 | 1 | Who's your manager? (name, and email if handy) | none | person record `relationship: manager`; `profile.md` link |
 | 2 | Who are the 3–5 people you work with most? How do you know them (team, customer, prospect, partner, board)? | Learned from mail/calendar later | person records with `relationship` chosen per `system/schemas/person.md` §Relationships; `profile.md` ## Key people |
-| 3 | What are you trying to achieve this quarter or year? | Draft from research and documents; confirm at quarterly reset | goal records (`status: active`, `horizon`, `period`); `profile.md` ## Current goals |
+| 3 | What are you trying to achieve this quarter or year? Then, if there's more than one: which matters most? Put them in order (or just name the top one). | Draft from research and documents; confirm at quarterly reset. Ranking skipped → unranked (all goals weigh the same) | goal records (`status: active`, `horizon`, `period`, `rank` per `system/schemas/goal.md` §Ranking); `profile.md` ## Current goals |
 | 4 | What big projects or initiatives are you on right now? | Discovered by ingest | project records |
 | 5 | What does your job involve day to day? (only if research and LinkedIn didn't make it clear) | Suggested responsibilities from research | `profile.md` ## Responsibilities |
 | 6 | When I report to you, what works best: short bullets, a few sentences, numbers first, or the story first? And how long should a brief be? | Short bullets, most important first; two-minute read | `communication-style.md` |
