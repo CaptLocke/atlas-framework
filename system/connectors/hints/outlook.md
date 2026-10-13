@@ -32,6 +32,7 @@ The Microsoft 365 connector is usually **one connector spanning several categori
 - Drafts created through the connector may not support attachments: link to the file in the deliverables folder instead (the user's own private link; do not change sharing).
 - Search results can be partial for large mailboxes; narrow by date range.
 - Mail rules, automatic replies, and mailbox settings tools exist on some versions.
+- Calendar: `isAllDay` → `all_day`. The user's RSVP is `responseStatus.response`: `organizer` → organizer, `accepted` → accepted, `tentativelyAccepted` → tentative, `notResponded` or `none` → not_responded (but `none` on an event with no attendees → organizer), `declined` → declined.
 
 ## Risk-sensitive tools
 - `send`: send, reply, forward, **automatic replies** (they send to others), create/update event **with attendees**, respond to invitation, find-and-book meeting tools.

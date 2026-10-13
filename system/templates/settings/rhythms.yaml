@@ -24,6 +24,10 @@ insights:
   brief_max: 3
   engagement: adaptive           # adaptive | fixed
   suppressed_kinds: []           # insight kinds the user turned off
+meetings:                        # which calendar events Nova shows and preps (filter: system/schemas/settings.md)
+  all_day: include               # include | skip (deadlines and milestones always show)
+  tentative: include             # include | skip
+  not_responded: include         # include | skip (invitations not yet answered)
 away:                            # set by nova-away; all null when not away
   start: null                    # YYYY-MM-DD (first day away)
   end: null                      # YYYY-MM-DD (last day away, inclusive); null while away = until the user says they are back

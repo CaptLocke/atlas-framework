@@ -18,7 +18,7 @@ types:
     fields: [emails, org, role, relationship, last_contact, cadence, phone, location, notes_private]
     enums:
       status: [active, inactive]
-      relationship: [self, manager, report, peer, stakeholder, customer, vendor, partner, external, other]
+      relationship: [self, manager, report, peer, stakeholder, board, customer, prospect, vendor, partner, external, other]
   organization:
     folder: organizations
     fields: [domain, kind, relationship_status, industry, website, size, headquarters]
@@ -53,10 +53,11 @@ types:
       status: [proposed, made, reversed, superseded]
   event:
     folder: events
-    fields: [kind, start, end, attendees, series, location, outcomes, prep]
+    fields: [kind, start, end, attendees, series, location, outcomes, prep, all_day, response]
     enums:
       status: [scheduled, held, cancelled]
       kind: [meeting, one_on_one, deadline, milestone, occurrence]
+      response: [organizer, accepted, tentative, not_responded, declined]
   risk:
     folder: risks
     fields: [likelihood, impact, owner, mitigation]

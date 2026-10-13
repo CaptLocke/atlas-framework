@@ -50,7 +50,7 @@ Full example: `system/tests/dashboards/people.json`.
 | Excluded always | `notes_private`, `emails`, `phone`, `location` |
 
 ## Rendering notes
-- Which people: everyone with an open item either way, a touchpoint in the next 14 days, `quiet: true`, or a relationship of manager, report, customer, stakeholder, or partner; then others by most recent `last_contact`.
-- Sort: quiet first, then by relationship weight (manager, report, customer, stakeholder, partner, peer, vendor, external, other), then by number of open items, then `last_contact` (most recent first).
+- Which people: everyone with an open item either way, a touchpoint in the next 14 days, `quiet: true`, or a relationship of manager, report, board, customer, prospect, stakeholder, or partner; then others by most recent `last_contact`.
+- Sort: quiet first, then by relationship weight (manager, report, board, customer, stakeholder, prospect, partner, peer, vendor, external, other), then by number of open items, then `last_contact` (most recent first).
 - Caps: 80 people, 5 items per direction per person, soonest due first (the rest are on the Work Board). `meta.truncated.people` counts people left out (lowest in the sort order go first).
 - Text limits: `insight`, `quiet_reason` 240 characters.

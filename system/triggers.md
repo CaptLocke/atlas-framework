@@ -11,9 +11,9 @@ Triggers are conditions Nova checks every time it runs; they are not scheduled. 
 | Trigger | Evaluated by | Condition | Key | Action |
 |---|---|---|---|---|
 | `new_project` | `ingest`, chat | Work with a clear outcome is discussed and no project record matches | project ID | Create the project record (`nova-capture`); add up to 3 questions (owner, goal, target date) to `questions.md` |
-| `new_key_person` | `ingest`, chat | A person without a record appears in ≥3 sources within 14 days, or in a decision, commitment, or 1:1 | person ID | Create and link the person; if relationship is unclear, add a `relationship` question |
+| `new_key_person` | `ingest`, chat | A person without a record appears in ≥3 sources within 14 days, or in a decision, commitment, or 1:1 | person ID | Create and link the person with a `relationship` chosen per `system/schemas/person.md` §Relationships; if it's unclear, set `other` and add a `relationship` question |
 | `deadline_approaching` | `triage`, chat | Open commitment (`i_owe`) or deadline event due within `days` (default 3) | due date | Add to the next brief's "Due soon"; the day before, raise to the top of the brief and the Work Board |
-| `key_meeting_upcoming` | `meeting-prep`, chat | A `one_on_one` event, or a meeting with external attendees or ≥1 linked open commitment/decision, within the next 24h | event start | Create a prep note (`nova-prep`) and link it in the brief |
+| `key_meeting_upcoming` | `meeting-prep`, chat | A `one_on_one` event, or a meeting with external attendees or ≥1 linked open commitment/decision, within the next 24h, and shown by the meeting filter (`rhythms.yaml: meetings`) | event start | Create a prep note (`nova-prep`) and link it in the brief |
 | `commitment_overdue` | `triage`, chat | Open commitment past due (either direction; `waiting_on` items approaching their date are surfaced by triage's aging rules, not `deadline_approaching`) | due date | Set `status: slipped` (triage owns this); flag in the brief; if `waiting_on`, create a follow-up email draft (`nova-write`) and an approval entry |
 
 ## User trigger format (`user/extensions/triggers/<name>.md`)

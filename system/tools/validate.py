@@ -57,6 +57,7 @@ MOMENTS = ["morning_thoughts", "evening_thoughts", "daily_brief", "weekly_review
 PLANS = ["pro", "max_5x", "max_20x", "team", "enterprise"]
 PROFILES = ["lean", "standard", "full", "custom"]
 DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+MEETING_FILTERS = ["all_day", "tentative", "not_responded"]
 FALLBACK_METHODS = ["drop", "forward", "export", "manual"]
 SETTINGS_FILES = ["nova.yaml", "governance.yaml", "data-rules.yaml", "connectors.yaml", "sources.yaml",
                   "rhythms.yaml", "routines.yaml", "dashboards.yaml"]
@@ -837,6 +838,15 @@ def check_rhythms(c, path, data, template):
         for k in ins:
             if k not in ("brief_max", "engagement", "suppressed_kinds"):
                 rep.warn(path, "insights: unknown key %r" % k)
+    meetings = data.get("meetings")
+    if isinstance(meetings, dict):
+        for k, v in meetings.items():
+            if k not in MEETING_FILTERS:
+                rep.warn(path, "meetings: unknown key %r (known: %s)" % (k, ", ".join(MEETING_FILTERS)))
+            elif v not in ("include", "skip"):
+                rep.error(path, "meetings.%s must be include or skip (got %r)" % (k, v))
+    elif meetings is not None:
+        rep.error(path, "meetings must be a mapping (all_day, tentative, not_responded)")
     away = data.get("away")
     if away is not None:
         if not isinstance(away, dict):
@@ -1151,6 +1161,8 @@ def check_record(c, path):
         for k, allowed in (tdef.get("enums") or {}).items():
             if fm.get(k) is not None and fm[k] not in allowed:
                 rep.error(path, "%s %r is not one of %s" % (k, fm[k], ", ".join(allowed)))
+        if expected == "event" and fm.get("all_day") is not None and not isinstance(fm["all_day"], bool):
+            rep.error(path, "all_day must be true or false")
         for k, kind in DATE_FIELDS.get(expected, {}).items():
             v = fm.get(k)
             if v is None:

@@ -192,6 +192,22 @@ class SetupAndLeniency(TempRepo):
         self.replace("user/settings/rhythms.yaml", "suppressed_kinds: [quiet_person]", "suppressed_kinds: lots")
         self.assertError(run_validate(self.root, "--user"), "rhythms.yaml", "suppressed_kinds")
 
+    def test_new_relationship_values(self):
+        for value in ("prospect", "board"):
+            self.replace("user/knowledge/people/dana-ruiz.md", "relationship: customer", "relationship: " + value)
+            r = run_validate(self.root, "--user")
+            self.assertEqual(self.errors(r), [], r.stdout)
+            self.replace("user/knowledge/people/dana-ruiz.md", "relationship: " + value, "relationship: customer")
+
+    def test_meetings_filter(self):
+        # absent block is fine (defaults to include); a full block validates; bad values are errors
+        self.replace("user/settings/rhythms.yaml", "engagement: adaptive",
+                     "engagement: adaptive\nmeetings:\n  all_day: skip\n  tentative: include\n  not_responded: skip")
+        r = run_validate(self.root, "--user")
+        self.assertEqual(self.errors(r), [], r.stdout)
+        self.replace("user/settings/rhythms.yaml", "not_responded: skip", "not_responded: maybe")
+        self.assertError(run_validate(self.root, "--user"), "rhythms.yaml", "meetings.not_responded")
+
     def test_newer_data_version_is_a_warning(self):
         self.replace("user/settings/nova.yaml", "data_version: 1", "data_version: 2")
         r = run_validate(self.root, "--user")
@@ -236,6 +252,7 @@ class BadFixtures(TempRepo):
             ("rhythms.yaml", "moments.daily_brief"),
             ("rhythms.yaml", "brief_max"),
             ("rhythms.yaml", "engagement"),
+            ("rhythms.yaml", "meetings.all_day must be include or skip"),
             ("rhythms.yaml", "away.end is before"),
             ("rhythms.yaml", "unknown job 'make-coffee'"),
             ("rhythms.yaml", r"paused\[0\].until"),

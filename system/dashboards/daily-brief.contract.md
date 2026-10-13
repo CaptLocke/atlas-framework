@@ -57,7 +57,7 @@ Full example: `system/tests/dashboards/daily-brief.json`.
 | Field | Source |
 |---|---|
 | `brief.*`, `priorities`, `changes`, `since_last_night` | The brief file `user/work/briefs/<as_of>.md` (or `-catch-up.md`) written by `nova-brief` in the same run; `priorities[].ref` and `[[…]]` mentions are the record IDs cited there |
-| `today[]` | Event records (`user/knowledge/events/`) with `start` on `as_of` and `status: scheduled`: `id, title, kind, start, end, location, attendees` (→ person refs); `prep.path` = event `prep`; `prep.summary` = first line of the prep note's suggested agenda |
+| `today[]` | Event records (`user/knowledge/events/`) with `start` on `as_of`, `status: scheduled`, and shown by the meeting filter (`rhythms.yaml: meetings`, rule in `system/schemas/settings.md`): `id, title, kind, start, end, all_day, location, attendees` (→ person refs); `prep.path` = event `prep`; `prep.summary` = first line of the prep note's suggested agenda |
 | `due[]` | Commitments, `direction: i_owe`, `status: open|slipped`, `due` ≤ `as_of` + `rhythms.yaml: triggers.deadline_approaching.days` (default 3): `id, title, direction, status, due, priority, counterparty, next_step` |
 | `waiting_on[]` | Commitments, `direction: waiting_on`, `status: open|slipped`; `since` = `created` |
 | `insights[]` | `user/inbox/insights.md`, status `new`, highest `score` first, max `rhythms.yaml: insights.brief_max` (default 3): heading ID, Insight, Why it matters, Suggested action, Links |
