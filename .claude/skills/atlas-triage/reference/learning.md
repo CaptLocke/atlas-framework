@@ -22,6 +22,8 @@ Whenever one of these happens, write one activity-log line (`system/schemas/form
 ```
 - 2026-10-12 15:02 · chat · feedback · not_a_commitment · [[commitments/look-at-deck]] · phrase "I'll take a look" · commit 9b31e07
 ```
+Corrections the user makes while reviewing an import's results are not signals: log nothing for them (`.claude/skills/atlas-capture/reference/import.md` §10).
+
 Silent signals count too, but only where the evidence is clear. The learning pass (§2) counts them from records; nothing is logged for them:
 - Records from one sender, channel, or series that the user archived, dropped, or never touched across ≥ 5 items in 60 days. These count as `noise`.
 - Insights about the same subject dismissed ≥ 3 times and never acted on. These count as `insight_noise`.

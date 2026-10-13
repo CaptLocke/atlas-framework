@@ -33,6 +33,12 @@ Tool names vary; always verify from the live tool list. Guide: `system/connector
 - Work or school accounts only; tenant admin consent required.
 - SharePoint sites are shared by nature: never upload deliverables to a team site unless the user explicitly chose it (that exposes the file).
 
+## Import folder
+Used once, read-only, when a user brings notes in from another system (`.claude/skills/atlas-capture/reference/import.md` §3). Check at mapping:
+- Listing reaches subfolders (recursive listing, or listing each child folder by ID).
+- A raw `.md` or `.txt` file reads back as plain text, not as a conversion error or binary download.
+Either fails → use the attachment route. Never move or rename anything in that folder; track it by file ID.
+
 ## Risk-sensitive tools
 - `share`: share, create sharing link, grant access, upload to a SharePoint team site or shared library.
 - `delete`: delete, recycle.
