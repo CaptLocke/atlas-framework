@@ -20,7 +20,7 @@ Runs during away; new insights stay `new` in `user/inbox/insights.md` and are su
 If `ingest` has not succeeded in the last 24 hours and is not earlier in this routine, proceed and note the staleness in the run report.
 
 ## Inputs
-- Records and sources created or updated since `jobs.yaml: intelligence.last_success` (from `updated` dates and `hot.md`).
+- Records and sources created or updated since `jobs.yaml: intelligence.last_success` (from `updated` dates in `hot.md` and the type indexes; sources from `_index/sources.md`, since `hot.md` never lists them).
 - Active goals, open risks, open questions, active projects (indexes first, then records as needed per `system/rules/retrieval.md`).
 - `user/inbox/insights.md` (to avoid repeats) and engagement signals in `user/.state/health.yaml` (acted/dismissed by kind).
 - `rhythms.yaml: insights` (`brief_max`, `engagement`, `suppressed_kinds`).

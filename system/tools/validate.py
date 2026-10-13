@@ -50,7 +50,7 @@ AUTONOMY_CLASSES = [
     "shared_records_update", "governance_settings", "send_communication", "share_expose", "destructive",
     "financial_legal_security"]
 BUILTIN_TRIGGERS = ["new_project", "new_key_person", "deadline_approaching", "key_meeting_upcoming",
-                    "commitment_overdue", "playbook_start"]
+                    "commitment_overdue", "playbook_start", "focus_time_needed"]
 MOMENTS = ["morning_thoughts", "evening_thoughts", "daily_brief", "weekly_review", "status_updates",
            "goal_progress", "user_health_check", "system_health_check", "automation_review", "reset_goals",
            "role_refresh", "performance_review"]
@@ -297,6 +297,20 @@ def check_manifest(c):
         rep.error(path, "min_plan must be one of %s" % ", ".join(PLANS))
     if data.get("support_email") is None and "support_email" in data:
         rep.warn(path, "support_email is null (nova-report-issue has nowhere to send reports)")
+    kv, bv = data.get("kernel_version"), data.get("bootstrap_version")
+    for key, val, rel, pattern in (("kernel_version", kv, ("system", "kernel.md"), r"nova-kernel-(\d+)"),
+                                   ("bootstrap_version", bv, ("system", "templates", "bootstrap-stub.md"),
+                                    r"Nova bootstrap (\d+)")):
+        if val is None:
+            rep.error(path, "missing field '%s'" % key)
+            continue
+        fp = c.p(*rel)
+        if os.path.exists(fp):
+            with open(fp, encoding="utf-8") as f:
+                found = re.findall(pattern, f.read())
+            if not found or any(int(x) != val for x in found):
+                rep.error(fp, "%s marker must be %s (system/manifest.yaml: %s); found %s"
+                          % (key.split("_")[0], val, key, ", ".join(found) or "none"))
     up = data.get("upstream")
     if up is not None and not (isinstance(up, str) and re.match(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$", up)):
         rep.error(path, "upstream must be 'owner/repo'")
@@ -1163,6 +1177,11 @@ def check_record(c, path):
                 rep.error(path, "%s %r is not one of %s" % (k, fm[k], ", ".join(allowed)))
         if expected == "event" and fm.get("all_day") is not None and not isinstance(fm["all_day"], bool):
             rep.error(path, "all_day must be true or false")
+        if expected == "source" and fm.get("compacted_on") is not None:
+            if fm.get("retention") not in ("summary", "pointer"):
+                rep.error(path, "a compacted source must have retention summary or pointer")
+            if not re.match(r"^[0-9a-f]{7,40}$", str(fm.get("full_text_commit") or "")):
+                rep.error(path, "a compacted source needs full_text_commit (the commit holding the full body)")
         if expected == "goal" and fm.get("rank") is not None:
             rk = fm["rank"]
             if isinstance(rk, bool) or not isinstance(rk, int) or rk < 1:
@@ -1321,6 +1340,11 @@ def check_user(c):
             elif not f.startswith("."):
                 rep.warn(os.path.join(fpath, f), "non-markdown file in a knowledge folder")
     check_goal_ranks(c)
+    check_hot(c)
+    tdir = c.p("user", "work", "templates")
+    for f in listdir(tdir):
+        if f.endswith(".md"):
+            check_template(c, os.path.join(tdir, f))
     idir = c.p("user", "inbox")
     for f in listdir(idir):
         if f in INBOX_STATUSES:
@@ -1371,6 +1395,66 @@ def check_inbox(c, path):
             rep.error(path, "counts don't match the entries: " + ", ".join(wrong))
 
 
+HOT_MAX = 75
+HOT_NEVER = ("sources/", "people/", "organizations/")
+INDEX_LINE_RE = re.compile(r"^- \[\[([a-z]+/[a-z0-9][a-z0-9-]*)\]\]")
+
+
+TEMPLATE_KINDS = ["email", "message", "doc", "deck", "sheet"]
+
+
+def check_template(c, path):
+    """user/work/templates/<slug>.md (formats.md §7, Deliverable templates)."""
+    rep = c.rep
+    fm, body = read_frontmatter(path, rep)
+    if fm is None:
+        return
+    slug = os.path.basename(path)[:-3]
+    if fm.get("type") != "template":
+        rep.error(path, "frontmatter type must be 'template'")
+    if fm.get("name") != slug:
+        rep.error(path, "name must equal the file name (%s)" % slug)
+    if fm.get("status") not in ("draft", "active", "retired"):
+        rep.error(path, "status must be draft, active, or retired")
+    if fm.get("kind") not in TEMPLATE_KINDS:
+        rep.error(path, "kind must be one of %s" % ", ".join(TEMPLATE_KINDS))
+    for k in ("title", "used_for"):
+        if not fm.get(k):
+            rep.error(path, "missing '%s'" % k)
+    for k in ("audience", "examples"):
+        v = fm.get(k)
+        if v is not None and not (isinstance(v, list) and all(isinstance(x, str) and LINK_ONLY_RE.match(x) for x in v)):
+            rep.error(path, "%s must be a list of [[folder/slug]] links" % k)
+    for target in sorted(set(wiki_links({"a": fm.get("audience"), "e": fm.get("examples")}))):
+        if not c.record_exists(target):
+            rep.error(path, "link target [[%s]] does not exist" % target)
+    if "## Structure" not in (body or ""):
+        rep.error(path, "needs a ## Structure section")
+
+
+def check_hot(c):
+    """user/knowledge/_index/hot.md stays small and live (formats.md §5)."""
+    path = c.p("user", "knowledge", "_index", "hot.md")
+    if not os.path.exists(path):
+        return
+    with open(path, encoding="utf-8") as f:
+        lines = [l for l in f.read().splitlines() if INDEX_LINE_RE.match(l)]
+    if len(lines) > HOT_MAX:
+        c.rep.error(path, "%d record lines; the hot index holds at most %d (formats.md §5)" % (len(lines), HOT_MAX))
+    closed = c.load_schema().get("closed_statuses") or {}
+    folder_type = {t.get("folder"): n for n, t in (c.load_schema().get("types") or {}).items() if isinstance(t, dict)}
+    for l in lines:
+        rid = INDEX_LINE_RE.match(l).group(1)
+        if rid.startswith(HOT_NEVER):
+            c.rep.error(path, "[[%s]]: sources, people, and organizations never go in hot.md" % rid)
+            continue
+        fields = [x.strip() for x in l.split("|")]
+        status = fields[3] if len(fields) > 3 else None
+        rtype = folder_type.get(rid.split("/")[0])
+        if rtype and status in (closed.get(rtype) or []):
+            c.rep.error(path, "[[%s]] is %s; closed records never go in hot.md" % (rid, status))
+
+
 def check_goal_ranks(c):
     """Active goals' ranks must be unique (system/schemas/goal.md, Ranking)."""
     gdir = c.p("user", "knowledge", "goals")
@@ -1400,6 +1484,8 @@ def check_path(c, path):
         return
     if rel.startswith("user/knowledge/") and rel.endswith(".md") and "/_" not in rel:
         check_record(c, p)
+    elif re.match(r"^user/work/templates/[^/]+\.md$", rel):
+        check_template(c, p)
     elif re.match(r"^user/inbox/(archive/)?[^/]+\.md$", rel):
         check_inbox(c, p)
     elif rel.startswith("user/settings/") and rel.endswith(".yaml"):

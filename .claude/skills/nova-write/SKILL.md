@@ -19,6 +19,7 @@ Output that starts at finished quality: correct, specific, in the user's voice (
 - `user/profile/preferences.md` (standing rules like "never draft to my CEO without asking").
 - `connectors.yaml` (`mail.create_draft`, `mail.update_draft`, `mail.send`, `files.upload`), `nova.yaml: deliverables_folder`.
 - Deliverable production details: `reference/deliverables.md`.
+- Active templates in `user/work/templates/` (`system/schemas/formats.md` §7, Deliverable templates).
 
 ## Procedure
 
@@ -27,6 +28,7 @@ Output that starts at finished quality: correct, specific, in the user's voice (
 2. **Voice** per `system/rules/writing.md`: customer-facing, external, or official company material → house; internal, personal, replies, manager updates → personal; unclear → personal. A reply follows the thread's existing register.
 3. **Format:** message, document, deck, sheet, PDF, or chat answer: whatever fits the job (a decision memo is a doc; numbers for comparison are a sheet; a story for a room is a deck). If the user named a format, use it.
 4. **Standing preferences:** check `preferences.md` for rules about this recipient or kind of writing; follow them (e.g. ask before drafting to the CEO).
+5. **Template:** if an `active` template's `used_for` matches the piece (the same recurring deliverable), follow its Structure, its "Pull from" sources, and its Voice and format notes, building on `base_file` when set. Mention the template in one line ("Using your Monthly board update template"). With no template, after the 3rd similar piece in 6 months, offer one (§7).
 
 ### 2. Write
 1. Ground every claim in records; never invent facts, figures, quotes, or commitments. Gaps → ask, or leave a clearly marked placeholder ("[confirm date]") and say so.
@@ -58,10 +60,17 @@ Full procedure: `reference/deliverables.md`. In short:
 8. Sharing the file with anyone is `share_expose` 🔒: only on explicit request, through the approval procedure.
 
 ### 6. Learning from edits
+For template-based pieces, the same rule applies to the template. Consistent edits to its editions (≥2 of the last 3) become a proposed template change (a `questions.md` entry, kind `profile`, with the exact change). The template file changes only on the user's yes.
 1. Signals: the user edits a draft in chat ("make it shorter", rewrites a line), or the sent version of a Nova draft (seen via `mail.list_sent` during ingest) differs from the draft.
 2. Note the pattern (shorter, removes greetings, changes sign-off, avoids a word, adds bullets). One instance is noise; act on a consistent pattern (≥3 instances, or the user states a rule).
 3. Propose a voice-guide change as a `questions.md` entry (kind `profile`) with the proposed line in profile-tag format (`[observed · proposed]`) and the evidence. Write it into the guide only after the user confirms, or directly if `profile_update: auto` (then mention it).
 4. A rule the user states ("never use 'circle back'") is `stated`: confirm in one line and record it (`profile_update` per the user's level).
+
+### 7. Templates for recurring deliverables
+1. **Detect.** The same kind of deliverable has been produced 3 or more times in 6 months: same audience or purpose, a similar structure, a regular rhythm. Sources are `kind: deliverable` sources, status-update files, and sent mail that matches earlier Nova drafts. `nova-insights` checks this in the intelligence job; this skill checks it whenever it writes.
+2. **Draft.** Write `user/work/templates/<slug>.md` with `status: draft`. Take the shared structure from the examples (the section order and what each section holds), where each section's facts came from (records, sheets, reports), and the voice and format notes. Keep only what most editions share; never copy data values.
+3. **Propose.** Use an `opportunity` insight, or in chat: "You've written the monthly board update 3 times with the same 5 sections. Save it as a template so the next one starts from it?"
+4. **On yes:** set `status: active` (the user may edit it first). On no: `status: retired`, so it's not proposed again. "Make this a template" from the user creates one straight from the piece in front of them.
 
 ## Outputs
 - Text in chat; email drafts in the user's mail tool; sent messages only after approval.

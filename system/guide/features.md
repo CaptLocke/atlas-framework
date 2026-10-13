@@ -59,6 +59,21 @@ Nova writes, analyzes, prepares, and plans with you, grounded in what it knows a
 - "Turn this into a one-pager."
 - "Draft a reply to Priya about the security review."
 
+## Templates for things you make often
+When you produce the same kind of thing again and again (a weekly status email, a monthly board update, a QBR deck), Nova offers to save its shape as a template: the sections, where each section's facts come from, and the tone. Every edition after that starts from it, so they're consistent and quicker to make. When you keep changing an edition the same way, Nova offers to update the template.
+
+**Try:**
+- "Make this a template."
+- "Use my board update template for October."
+
+## Time for what you owe
+When something you owe is due in the next few days and your calendar is filling up, Nova offers to block focus time for it in the best open slot. It only adds a private hold on your own calendar, and only after you say yes. If there's no time left at all, it tells you which meeting is easiest to move.
+
+**Try:**
+- "The board memo will take me about half a day."
+- "Block time for the pricing feedback."
+- "Stop suggesting focus blocks."
+
 ## Playbooks
 When you do the same kind of work again and again (renewals, onboarding a new hire, month-end close), Nova notices and offers to save it as a playbook. Next time one starts, Nova sets up the checklist with dates, has the right messages drafted when each step comes due, and tells you if a step is missed or out of order. Insights that suggest messaging someone come with the draft already written too.
 

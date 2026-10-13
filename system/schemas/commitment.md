@@ -17,6 +17,7 @@ Something someone has promised to do. Direction says who owes it.
 | `due` | date or null | yes | `null` if no date was given; triage may propose one. |
 | `origin` | ID | no | Source or event where it was made. |
 | `priority` | enum | no | high, medium, low, set by triage against goals. |
+| `effort` | enum | no | Rough size of the work, for `i_owe`: `quick` (under 30 min), `hour` (about an hour), `half_day`, `day`. Set by triage (inferred) or the user; used to protect focus time (`focus_time_needed`). |
 | `insight` | text | no | One-line insight, e.g. why it may slip. |
 | `next_step` | text | no | One recommended action. |
 | `completed_on` | date | no |  |

@@ -181,6 +181,7 @@ triggers:                               # built-ins from system/triggers.md; use
   key_meeting_upcoming: on
   commitment_overdue: on
   playbook_start: on
+  focus_time_needed: on
 insights:
   brief_max: 3
   engagement: adaptive                  # adaptive | fixed

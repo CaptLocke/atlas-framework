@@ -17,7 +17,7 @@ Remove the weekly status-writing chore: an accurate, audience-shaped update is w
 - Period: since that previous update, else the last 7 days (or what the user says).
 - Records changed in the period for the audience's scope: projects (status, health, insight, next_step), decisions made, commitments done/slipped/new/due next, risks opened/changed/resolved, questions needing the audience, goal progress (`current`, accomplishments), the latest Weekly Review (`user/work/reviews/`) if it exists.
 - Voice: `system/rules/writing.md`; `user/profile/voice-personal.md` / `voice-house.md`; `communication-style.md`.
-- Template and examples: `reference/template.md`.
+- Template and examples: `reference/template.md`. If the user has an `active` template in `user/work/templates/` for this audience, it takes precedence.
 
 ## Procedure
 1. **Away/paused.** If away is active or `status-updates` / the `status_updates` moment is paused, stop (job records the skip). Chat requests always work.

@@ -36,6 +36,7 @@ Surface the few things the user would want to know but hasn't noticed, each with
    - An important gap that needs an answer → `question`.
    - An opportunity worth keeping → `idea` (`status: seed`).
    - Recurring work (the same kind of work at least 3 times in 12 months) → a draft playbook plus an `opportunity` insight proposing it (`.claude/skills/nova-triage/reference/playbooks.md` §1).
+   - A recurring deliverable (the same kind of output at least 3 times in 6 months) → a draft template plus an `opportunity` insight proposing it (`.claude/skills/nova-write/SKILL.md` §7).
    Link the insight entry to the new record.
 10. **Project insight.** If an insight is the most important thing about an active project, update that project's `insight` (and `next_step` if the suggested action is better than triage's), with an Updates line.
 11. **Expire** entries `new` for more than 30 days (never seen) → `expired`.
