@@ -72,7 +72,7 @@ Read batch 1 with the other uploads. Its findings join the step 7 drafts and the
 
 ## 8. Batch 2: records (end of setup step 8, before connectors and routines)
 1. **Sample** (`status: sampling`): process 5 representative notes and show what they became (records, links, what stayed live). Ask "does this look right?" A no → fix the mapping with the user and sample again.
-2. **The rest, in chunks** (`status: running`): about 25 notes at a time. After each chunk, commit (`Atlas-Actor: setup` or `chat`, `Atlas-Reason: import <id>: notes N–M`) and update `import.yaml` (`processed`, `counts`). One progress line every few chunks ("Migration: 140 of 312 notes").
+2. **The rest, in chunks** (`status: running`): about 25 notes at a time. After each chunk, commit (`Atlas-Actor: setup` or `chat`, `Atlas-Reason: import <id>: notes N–M`) and update `import.yaml` (`processed`, `counts`). One progress line every few chunks ("Import: 140 of 312 notes").
 3. **Usage limit or a closed chat:** nothing is lost. The next chat resumes from `processed`. Setup resumes at step 8 and moves on only once the import is complete (or the user chooses to stop it).
 4. **Review, at the end:** one grouped list per kind: possible duplicate people or organizations, the "still open?" items, notes whose type was unclear. Apply the answers; anything unanswered stays as it was filed.
 

@@ -12,11 +12,7 @@ You'll make your own private copy of Atlas from the Atlas template. Your copy is
 
 3. **Click the green Use this template button** near the top right of the page.
 
-   ![The Atlas template page on GitHub, with the green "Use this template" button near the top right](images/atlas-template-page.png)
-
 4. **Click Create a new repository** in the small menu that opens.
-
-   ![The small menu under "Use this template", with "Create a new repository" at the top](images/use-template-menu.png)
 
 5. **Check the Owner.** It should show your GitHub username. If you belong to any organizations on GitHub, make sure your **personal** username is selected.
 
@@ -26,8 +22,6 @@ You'll make your own private copy of Atlas from the Atlas template. Your copy is
 
 8. **Choose Private.** This is the most important choice in the whole setup.
 
-   ![The new repository form: owner is your username, name is "atlas", and Private is selected](images/create-repo-form.png)
-
    > ⚠️ **Make sure "Private" is selected, not "Public".** A public repository can be seen by anyone on the internet. Your Atlas will hold information about your work, so it must be private. If you choose Public by mistake, see [Troubleshooting: my repository is public](troubleshooting.md#my-repository-is-public-by-mistake).
 
 9. **Leave "Include all branches" unticked.**
@@ -36,12 +30,10 @@ You'll make your own private copy of Atlas from the Atlas template. Your copy is
 
 11. **Check for the word "Private"** in a small label next to the repository name at the top of the page.
 
-    ![Your new repository, with the word "Private" in a small label next to its name](images/new-repo-created.png)
-
 You now have your own Atlas. You'll see a list of files and folders; you don't need to open or change any of them. Atlas looks after them.
 
 > **If it looks different:**
-> - **No "Use this template" button?** Make sure you're signed in. If your browser window is narrow, the button may have moved; try making the window wider. You can also open this link directly, which takes you straight to step 5: [github.com/new?template_owner=CaptLocke&template_name=atlas](https://github.com/new?template_owner=CaptLocke&template_name=atlas). More help: [Troubleshooting](troubleshooting.md#i-cant-find-use-this-template).
+> - **No "Use this template" button?** Make sure you're signed in. If your browser window is narrow, the button may have moved; try making the window wider. You can also open this link directly, which takes you straight to step 5: [github.com/new?template_owner=CaptLocke&template_name=atlas-framework](https://github.com/new?template_owner=CaptLocke&template_name=atlas-framework). More help: [Troubleshooting](troubleshooting.md#i-cant-find-use-this-template).
 > - **You see "Fork" but not "Use this template"?** Don't use Fork. Forks of a public repository are public. Use the direct link above instead.
 > - **The page asks you to choose between "Public" and "Private" in a drop-down** rather than with round buttons: choose **Private**.
 

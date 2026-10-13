@@ -4,7 +4,7 @@ skill: atlas-away
 ---
 # What continues and what pauses
 
-Source of intent: tactical §9.4a and strategy §7.18. Each job's own spec (`system/jobs/<job>.md`, section "Away and paused") is authoritative; this table is what to tell the user.
+Each job's own spec (`system/jobs/<job>.md`, section "Away and paused") is authoritative; this table is what to tell the user.
 
 ## During away (`start ≤ today` and `end` null or `today ≤ end`)
 `end: null` means open-ended away until the user says "I'm back".

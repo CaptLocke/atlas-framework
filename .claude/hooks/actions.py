@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Atlas hook: locked external actions, N1-N4 (build plan H-3).
+"""Atlas hook: locked external actions, N1-N4.
 
 Registered in .claude/settings.json as a PreToolUse hook for MCP tools
 (matcher "mcp__.*") and shell commands (matcher "Bash|Monitor").

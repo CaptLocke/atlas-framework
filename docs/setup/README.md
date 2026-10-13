@@ -4,7 +4,7 @@
 
 This guide gets you from nothing to a working Atlas. You do **four short steps** yourself, then Atlas takes over in conversation and does the rest with you.
 
-You don't need to be technical. Every step is one small action, with a picture of what you should see. If something on your screen looks different, each step has a note for that.
+You don't need to be technical. Every step is one small action, and each one tells you what you should see. If something on your screen looks different, each step has a note for that.
 
 **Total time:** about 20 minutes for the four steps below, then 30 to 45 minutes chatting with Atlas. You can stop at any point and pick up where you left off.
 
@@ -38,7 +38,7 @@ Atlas keeps everything it learns about your work in a **private GitHub repositor
 | [1. Create a free GitHub account](01-github-account.md) | Sign up and turn on two-factor authentication | 5 to 10 min |
 | [2. Create your Atlas](02-create-your-atlas.md) | Make your own private copy of Atlas | 2 to 3 min |
 | [3. Connect GitHub to Claude](03-connect-github.md) | Let Claude open your Atlas, and nothing else | 3 to 5 min |
-| [4. Create the Atlas Project in Claude](04-create-the-atlas-project.md) | Make a "Atlas" Project, paste a short note, say "Set up Atlas" | 5 min |
+| [4. Create the Atlas Project in Claude](04-create-the-atlas-project.md) | Make an "Atlas" Project, paste a short note, say "Set up Atlas" | 5 min |
 
 Then: [What happens next](05-what-happens-next.md) (Atlas guides you from here).
 

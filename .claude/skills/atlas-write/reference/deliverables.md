@@ -1,6 +1,6 @@
 # Finished deliverables (docx, pptx, xlsx, pdf)
 
-Strategy §7.5, tactical §9.6a. Fictional examples.
+How `atlas-write` produces a finished file. Examples are fictional.
 
 ## 1. Set up the working folder
 `user/work/deliverables/<YYYY-MM-DD-slug>/` (e.g. `2026-10-14-vendor-scoring/`), committed:

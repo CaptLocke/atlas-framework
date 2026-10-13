@@ -4,7 +4,7 @@ version: 1.0.0
 ---
 # Migrations
 
-A migration changes the shape of the user's data (`user/`) when an Atlas release needs it. Updates replace only the system-owned paths (`system/manifest.yaml: owned_paths`); `user/` changes **only** through migrations. Each migration is a markdown spec that Claude executes, run by `atlas-update` (tactical §13.2–13.3).
+A migration changes the shape of the user's data (`user/`) when an Atlas release needs it. Updates replace only the system-owned paths (`system/manifest.yaml: owned_paths`); `user/` changes **only** through migrations. Each migration is a markdown spec that Claude executes, run by `atlas-update` (§B "Apply one release", step 6).
 
 ## Versions
 - `system/manifest.yaml: data_version` is the data format this release expects. `user/settings/atlas.yaml: data_version` is the format the user's data is in.

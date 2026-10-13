@@ -4,7 +4,7 @@ skill: atlas-review
 ---
 # Success indicators (computed locally)
 
-Strategy §3 indicators, computed by the monthly automation review from files in the user's repo only. Stored in `user/.state/health.yaml: indicators` (format: `system/schemas/formats.md` §1) and shown in the monthly report. **Nothing is sent anywhere.** They leave the repo only if the user chooses to include them in an issue report.
+Atlas's success indicators, computed by the monthly automation review from files in the user's repo only. Stored in `user/.state/health.yaml: indicators` (format: `system/schemas/formats.md` §1) and shown in the monthly report. **Nothing is sent anywhere.** They leave the repo only if the user chooses to include them in an issue report.
 
 | Field | Definition | Computed from |
 |---|---|---|

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Atlas hook: git history, secrets and attribution, N8 / N10 / N12 (build plan H-5).
+"""Atlas hook: git history, secrets and attribution, N8 / N10 / N12.
 
 Registered in .claude/settings.json as a PreToolUse hook for shell commands
 (matcher "Bash|Monitor").

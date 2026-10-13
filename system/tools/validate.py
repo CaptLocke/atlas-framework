@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Atlas validator (build plan T-2).
+"""Atlas validator.
 
 Usage:
   python3 system/tools/validate.py [--system | --user | --all] [--root DIR] [paths...]
@@ -1356,7 +1356,7 @@ IMPORT_ROUTES = ["drive", "attachment", "computer"]
 
 
 def check_import(c, path):
-    """user/.state/import.yaml (formats.md §1), present only once a import exists."""
+    """user/.state/import.yaml (formats.md §1), present only once an import exists."""
     rep = c.rep
     data, ok = load_yaml(path, rep)
     if not ok:
