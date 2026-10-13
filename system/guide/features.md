@@ -59,6 +59,14 @@ Nova writes, analyzes, prepares, and plans with you, grounded in what it knows a
 - "Turn this into a one-pager."
 - "Draft a reply to Priya about the security review."
 
+## Playbooks
+When you do the same kind of work again and again (renewals, onboarding a new hire, month-end close), Nova notices and offers to save it as a playbook. Next time one starts, Nova sets up the checklist with dates, has the right messages drafted when each step comes due, and tells you if a step is missed or out of order. Insights that suggest messaging someone come with the draft already written too.
+
+**Try:**
+- "Save how we do renewals as a playbook."
+- "Start the renewal playbook for Brightline."
+- "Add a step to the onboarding playbook: send the welcome pack."
+
 ## Your Daily Brief
 Every morning, a short brief answers: what's on today, what to prepare, what's due or slipping, what changed overnight, what you're waiting on, and your top priorities. It includes up to three insights, drafts ready for review, and anything waiting for your approval. It's built to read in two minutes.
 
@@ -86,10 +94,13 @@ Routine work happens on its own, in the cloud, even when your computer is off: b
 ## Made for you
 Everything Nova does is shaped by what it knows about you: your role, company, goals, working style, and how you like to receive information. When Nova notices something new about how you work, it asks before treating it as fact. You can see and change everything it believes about you on the **About You** dashboard.
 
+Nova also learns from your corrections. When you keep dropping the same kind of "commitment", raising the same kind of work, or dismissing the same kind of insight, it suggests a rule ("Stop treating 'I'll take a look' as a promise?") and follows it once you say yes. The monthly report shows what it learned.
+
 **Try:**
 - "What do you know about how I like to work?"
 - "I prefer numbers first in briefs."
 - "That's wrong: my manager is Jordan, not Sam."
+- "That's not a commitment." / "That insight wasn't useful."
 
 ## Your voice and your company's style
 Nova keeps a personal voice guide (how you write), a house voice guide (how your company writes), and a design system (your company's colors, fonts, and layouts). Customer-facing and official material uses the house voice; everything else uses yours. Drafts aim to pass the "would I send this as-is?" test, and Nova learns from your edits.

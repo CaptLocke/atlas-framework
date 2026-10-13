@@ -40,13 +40,13 @@ Per kind over the last 60 days: `act_rate = acted / (acted + dismissed + expired
 - Adjusted score = score × (0.6 + 0.8 × act_rate − 0.4 × dismiss_rate), clamped to 0–1.
 - Kinds with fewer than 5 outcomes: no adjustment yet.
 - `risk` insights with impact high are never adjusted below 0.4.
-- If a summary exists in `user/.state/health.yaml` (computed monthly), prefer it; otherwise compute from `insights.md`.
+- If a summary exists in `user/.state/health.yaml` (computed monthly), prefer it; otherwise compute from `insights.md` plus the archive files for the window (`user/inbox/archive/*-insights.md`).
 
 ## Writing an insight
 - **Insight:** one sentence, specific, with the number or fact that makes it real.
 - **Why it matters:** tie to a goal, person, project, or date.
 - **Sources:** the records/sources that show it (≥1; ≥3 for patterns).
-- **Suggested action:** one concrete, optional step.
+- **Suggested action:** one concrete, optional step. When the step is a message to one person or a small group ("Email Sam a holding answer", "Ping Tomás in #eng"), name the recipient and the channel, and add `- **Draft for:** [[people/<slug>]] · email` (or `message`). `email-drafts` then writes the draft, so the insight arrives ready to send. Don't add it for actions that are meetings, decisions, or the user's own work.
 
 Entry example:
 ```markdown

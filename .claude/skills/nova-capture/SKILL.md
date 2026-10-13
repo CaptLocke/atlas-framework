@@ -26,7 +26,7 @@ Operationalize the write path in `system/rules/knowledge.md`: turn any input int
 ### 1. The write path (every input)
 Follow `system/rules/knowledge.md` § Write path in order. How to apply each step:
 1. **Exclusions first.** Match the input against every `exclusions` line, including `record: <id>` lines (a forgotten subject: do not re-create or re-enrich it). Excluded → stop; for connector items, still advance past it.
-2. **Classify.** Decide what the input contains. Most inputs contain several things or nothing. Noise is skipped silently (`reference/extraction.md` § Noise).
+2. **Classify.** Decide what the input contains. Most inputs contain several things or nothing. Noise is skipped silently (`reference/extraction.md` § Noise). Apply the user's learned `## Triage rules` in `user/profile/preferences.md` first: what counts as a commitment, what is noise. When the user adds a commitment from a source Nova already filed, log a `missed_commitment` feedback line (`.claude/skills/nova-triage/reference/learning.md` §1).
 3. **Sensitivity.** Classify against data-rule categories and custom `match` descriptions; choose handling. Unsure → more conservative. Effects:
    - `ignore`: store nothing, not even a source.
    - `pointer`: a Source with metadata only (kind, date, origin link, non-sensitive title); no summary, no derived facts beyond "this exists"; `retention: pointer`, `sensitivity: <category>`.

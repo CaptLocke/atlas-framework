@@ -36,6 +36,7 @@ Envelope: `meta` as in `system/dashboards/README.md`; `meta.as_of` = the brief's
                     "counterparty": { "id": "people/dana-ruiz", "title": "Dana Ruiz" }, "next_step": "…" } ],
   "changes": [ { "text": "Decision recorded: … ([[decisions/2026-10-12-enterprise-tier-pricing]])." } ],
   "insights": [ { "id": "I-2026-10-12-03", "text": "…", "why": "…", "suggested_action": "…",
+                  "draft": { "to": "Sam Okafor", "where": "Outlook drafts" },
                   "refs": [ { "id": "risks/onboarding-import-failures", "title": "Onboarding import failures" } ] } ],
   "drafts": [ { "title": "Contract review: quick check-in", "to": "Dana Ruiz", "where": "Outlook drafts", "why": "…",
                 "ref": { "id": "commitments/dana-msa-review", "title": "…" } } ],
@@ -52,6 +53,7 @@ Full example: `system/tests/dashboards/daily-brief.json`.
 | `prep.status` | `ready` (prep note exists), `planned` (meeting-prep will create one before the meeting), `none` (meaningful meeting without prep), `not_needed`. |
 | `due[].status` | `open` or `slipped`. |
 | `drafts[].where` | Plain words for where the draft is ("Outlook drafts"). Never the draft body. |
+| `insights[].draft` | `{ to, where }` when the insight's suggested action already has a draft (its `Draft:` line in `insights.md`), else `null`. Never the draft body. |
 
 ## Sources (file → field)
 | Field | Source |

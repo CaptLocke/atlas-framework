@@ -17,13 +17,14 @@ python3 -m unittest discover -s system/tests -t system/tests
 | Folder | Covers | Build plan |
 |---|---|---|
 | `hooks/` | `.claude/hooks/actions.py` (N1-N4), `paths.py` (N5, N6), `git.py` (N8, N10, N12), the upstream bypass and context detection in `context.py`, `failsafe.py`, and the sync hooks `sync_start.py` (SessionStart) and `sync_guard.py` (Stop) in `test_sync.py` | T-1 (H-1..H-6) |
-| `validators/` | `system/tools/validate.py`: record frontmatter, settings files, registry, manifest, VERSION, skills, jobs, profiles, dashboard contracts, migrations, settings templates; plus a check that this repository itself validates | T-2 |
+| `validators/` | `system/tools/validate.py`: record frontmatter, settings files, registry, manifest, VERSION, skills, jobs, profiles, dashboard contracts, migrations, settings templates; field formats (`schema.yaml: field_formats`) and a `normalize.py --fix` round trip; plus a check that this repository itself validates | T-2 |
 
 ### How to run
 ```
 python3 -m unittest discover -s system/tests/hooks -v        # hook tests
 python3 -m unittest discover -s system/tests/validators -v   # validator tests
 python3 system/tools/validate.py --all                       # validate this repo
+python3 system/tools/normalize.py [--fix] [FILE...]           # report or fix record field formats
 ```
 `validate.py` options: `--system`, `--user`, `--all` (default), `--root DIR` (validate another checkout), `--quiet` (errors only), or a list of file paths. It exits 1 when there is any ERROR. Folders that have no files yet produce warnings; once a folder has files, every expected component (20 skills, 12 jobs, dashboard contracts, settings templates) must exist.
 

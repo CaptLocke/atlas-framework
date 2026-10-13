@@ -82,11 +82,22 @@ Update lock expires after 30 minutes; purge lock after 15. Purge locks can only 
 
 ## 3. Inbox (`user/inbox/`)
 
+**Counts block.** Each inbox file's frontmatter carries `counts`: how many entries in the file have each status. Every writer updates it in the same edit as the entry, so jobs and the kernel read open items from the frontmatter alone, without parsing entries. The validator checks it matches.
+```yaml
+---
+type: inbox
+name: approvals
+counts: { pending: 2, approved: 0, rejected: 1, executed: 3, expired: 0 }
+---
+```
+**Lifecycle.** An entry is *resolved* in its final statuses: approvals `rejected | executed | expired`; insights `acted | dismissed | expired`; questions `answered | dismissed`. `maintenance` moves entries resolved more than 14 days ago (by the date of their last status-history line, or `Asked`/answer date for questions) to the dated archive `user/inbox/archive/YYYY-MM-<name>.md`, where `YYYY-MM` is the month they were resolved. It moves them whole and unchanged, newest first, and updates `counts` in both files. Archive files have frontmatter `type: inbox-archive`, `name`, `month`, and their own `counts`; nothing is ever deleted from them. Anything that needs history (insight engagement over 60 days, the monthly automation review, indicators, novelty checks) reads the archive files for its window as well as the live file. Open entries (`pending`, `approved`, `new`, `seen`, `open`) never move.
+
 ### approvals.md
 ```markdown
 ---
 type: inbox
 name: approvals
+counts: { pending: 1, approved: 0, rejected: 0, executed: 0, expired: 0 }
 ---
 ## A-2026-10-12-01 · pending
 - **Action:** send_communication: send follow-up to Dana Ruiz
@@ -102,6 +113,7 @@ Statuses: `pending | approved | rejected | executed | expired` (expires after 14
 ---
 type: inbox
 name: insights
+counts: { new: 1, seen: 0, acted: 0, dismissed: 0, expired: 0 }
 ---
 ## I-2026-10-12-03 · new · score 0.82
 - **Insight:** Three customers raised the onboarding import bug this month.
@@ -111,7 +123,7 @@ name: insights
 - **Suggested action:** Raise at Thursday's product sync.
 - **Status history:** new 2026-10-12
 ```
-Each entry also has a `- **Kind:** <kind>` line (kinds defined in `.claude/skills/nova-insights/reference/insight-kinds.md`). Statuses: `new | seen | acted | dismissed | expired`. An insight is `seen` once it is included in a published brief or shown in chat; unseen insights expire after 30 days. `score` 0–1 = relevance to goals × urgency × novelty. Engagement signals (acted/dismissed counts by insight kind) are summarized in `health.yaml` and used by `nova-insights` to adapt volume.
+Each entry also has a `- **Kind:** <kind>` line (kinds defined in `.claude/skills/nova-insights/reference/insight-kinds.md`). When the suggested action is a message to someone, the entry has `- **Draft for:** [[people/<slug>]] · email | message`; once the draft exists, `email-drafts` adds `- **Draft:** <where, plain words> "<subject>" (draft id …)` (or `- **Draft:** text below` followed by the text indented, when no draft tool exists). The `Draft:` line is the marker that stops a second draft. Statuses: `new | seen | acted | dismissed | expired`. An insight is `seen` once it is included in a published brief or shown in chat; unseen insights expire after 30 days. `score` 0–1 = relevance to goals × urgency × novelty. Engagement signals (acted/dismissed counts by insight kind) are summarized in `health.yaml` and used by `nova-insights` to adapt volume.
 
 ### questions.md
 Nova's questions for the user (profile proposals, migration questions, unclear relationships, vague commitments).
@@ -119,6 +131,7 @@ Nova's questions for the user (profile proposals, migration questions, unclear r
 ---
 type: inbox
 name: questions
+counts: { open: 1, answered: 0, dismissed: 0 }
 ---
 ## Q-2026-10-12-02 · open · profile
 - **Question:** You shortened my last 4 drafts by about half. Should I default to shorter emails?

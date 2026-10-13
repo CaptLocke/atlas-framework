@@ -180,6 +180,7 @@ triggers:                               # built-ins from system/triggers.md; use
   deadline_approaching: { enabled: true, days: 3 }
   key_meeting_upcoming: on
   commitment_overdue: on
+  playbook_start: on
 insights:
   brief_max: 3
   engagement: adaptive                  # adaptive | fixed

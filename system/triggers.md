@@ -15,6 +15,7 @@ Triggers are conditions Nova checks every time it runs; they are not scheduled. 
 | `deadline_approaching` | `triage`, chat | Open commitment (`i_owe`) or deadline event due within `days` (default 3) | due date | Add to the next brief's "Due soon"; the day before, raise to the top of the brief and the Work Board |
 | `key_meeting_upcoming` | `meeting-prep`, chat | A `one_on_one` event, or a meeting with external attendees or ≥1 linked open commitment/decision, within the next 24h, and shown by the meeting filter (`rhythms.yaml: meetings`) | event start | Create a prep note (`nova-prep`) and link it in the brief |
 | `commitment_overdue` | `triage`, chat | Open commitment past due (either direction; `waiting_on` items approaching their date are surfaced by triage's aging rules, not `deadline_approaching`) | due date | Set `status: slipped` (triage owns this); flag in the brief; if `waiting_on`, create a follow-up email draft (`nova-write`) and an approval entry |
+| `playbook_start` | `ingest`, `triage`, chat | New work matches the `trigger` of an `active` playbook (a renewal date 60 days out, a new hire's start date), and no open run of that playbook exists for the same subject | playbook ID + subject ID + anchor date | `auto_start: true`: start the run. Otherwise ask: in chat directly, in routines as a `questions.md` entry (kind `other`): "Start your Renewal playbook for Brightline (5 steps, first due Oct 20)?" (`.claude/skills/nova-triage/reference/playbooks.md` §2) |
 
 ## User trigger format (`user/extensions/triggers/<name>.md`)
 ```markdown

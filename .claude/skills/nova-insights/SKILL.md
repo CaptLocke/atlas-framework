@@ -16,7 +16,7 @@ Surface the few things the user would want to know but hasn't noticed, each with
 ## Inputs
 - Changes since `jobs.yaml: intelligence.last_success` (records updated, sources captured, activity log).
 - `_index/hot.md`; active goals; open risks, questions, decisions (`proposed`), projects; people records (`last_contact`, `cadence`, relationship).
-- `user/inbox/insights.md` (existing insights and their status histories, for novelty and engagement).
+- `user/inbox/insights.md` and, for windows longer than 14 days, `user/inbox/archive/*-insights.md` (existing insights and their status histories, for novelty and engagement).
 - `rhythms.yaml: insights` (`brief_max`, `engagement: adaptive | fixed`, `suppressed_kinds`); `health.yaml` engagement summary if present.
 - Detection and scoring guide: `reference/insight-kinds.md`.
 
@@ -28,13 +28,14 @@ Surface the few things the user would want to know but hasn't noticed, each with
 3. **Look** across the changed records and their neighborhoods (`system/rules/retrieval.md` L3) for each kind in `reference/insight-kinds.md`, skipping every kind listed in `rhythms.yaml: insights.suppressed_kinds`: risks, gaps, quiet people, patterns, connections, contradictions, opportunities, goal drift.
 4. **Ground** every candidate in at least one record or source; write the reasoning in one line. Drop candidates you can't cite.
 5. **Score** each: `score = goal_relevance × urgency × novelty` (each 0–1; rubric in the reference). Novelty is low when `insights.md` already holds the same insight (same links and gist) in the last 30 days in any status; a dismissed insight returns only if something material changed (say what).
-6. **Adapt volume** (if `engagement: adaptive`): compute engagement per kind from status histories over the last 60 days (acted, dismissed, expired-unseen). Lower the kind's effective score by its dismiss/expire rate and raise it by its act rate; never suppress `risk` kinds with high impact entirely. With `fixed`, skip this step.
+6. **Apply insight rules** from `user/profile/preferences.md ## Insight rules` (drop or raise matching candidates), then **adapt volume** (if `engagement: adaptive`): compute engagement per kind from status histories over the last 60 days (acted, dismissed, expired-unseen). Lower the kind's effective score by its dismiss/expire rate and raise it by its act rate; never suppress `risk` kinds with high impact entirely. With `fixed`, skip this step.
 7. **Keep** candidates with adjusted score ≥ 0.4, at most ~10 per run (most runs produce 0–5). The brief later shows the top `brief_max`.
 8. **Write** each to `user/inbox/insights.md` (format `system/schemas/formats.md` §3; newest first): ID `I-YYYY-MM-DD-NN`, `new`, score; Insight, Why it matters, Sources, Links, Suggested action, Status history; plus a `- **Kind:** <kind>` line for engagement tracking.
 9. **Create records when warranted** (through `nova-capture`, `provenance: inferred`, sources = the evidence):
    - A pattern or concern likely to cause harm → `risk` (`status: potential`, or `active` if already happening), with likelihood/impact.
    - An important gap that needs an answer → `question`.
    - An opportunity worth keeping → `idea` (`status: seed`).
+   - Recurring work (the same kind of work at least 3 times in 12 months) → a draft playbook plus an `opportunity` insight proposing it (`.claude/skills/nova-triage/reference/playbooks.md` §1).
    Link the insight entry to the new record.
 10. **Project insight.** If an insight is the most important thing about an active project, update that project's `insight` (and `next_step` if the suggested action is better than triage's), with an Updates line.
 11. **Expire** entries `new` for more than 30 days (never seen) → `expired`.
@@ -50,7 +51,7 @@ Surface the few things the user would want to know but hasn't noticed, each with
 |---|---|
 | Shown in a published brief, in chat, or opened from a dashboard discussion | `new` → `seen` |
 | User acts on it, asks to turn it into a record, or the suggested action happens (evidence) | → `acted` |
-| User says it's wrong, not useful, or dismisses it | → `dismissed` (ask briefly why only if it helps tune: "wrong" vs "not now") |
+| User says it's wrong, not useful, or dismisses it | → `dismissed` (ask briefly why only if it helps tune: "wrong" vs "not now"); "wrong" or "not useful" also logs an `insight_noise` feedback line, and "that was useful" an `insight_useful` one (`.claude/skills/nova-triage/reference/learning.md` §1) |
 | `new` for 30 days without being seen | → `expired` |
 Append to Status history with the date (and "(brief)" / "(chat)" where useful). Never delete entries. "Stop suggesting X" from the user: map X to an insight kind (e.g. "stop telling me who's gone quiet" → `quiet_person`), confirm in one line, and ask `nova-settings` to add it to `rhythms.yaml: insights.suppressed_kinds` (`behavior_settings`). Mark matching `new` entries `dismissed`. "Start suggesting X again" removes it the same way.
 

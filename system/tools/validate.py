@@ -50,7 +50,7 @@ AUTONOMY_CLASSES = [
     "shared_records_update", "governance_settings", "send_communication", "share_expose", "destructive",
     "financial_legal_security"]
 BUILTIN_TRIGGERS = ["new_project", "new_key_person", "deadline_approaching", "key_meeting_upcoming",
-                    "commitment_overdue"]
+                    "commitment_overdue", "playbook_start"]
 MOMENTS = ["morning_thoughts", "evening_thoughts", "daily_brief", "weekly_review", "status_updates",
            "goal_progress", "user_health_check", "system_health_check", "automation_review", "reset_goals",
            "role_refresh", "performance_review"]
@@ -1169,6 +1169,7 @@ def check_record(c, path):
                 rep.error(path, "rank must be a whole number from 1 (most important), or null")
             elif fm.get("status") != "active":
                 rep.warn(path, "rank is set on a goal that isn't active; clear it and renumber the active goals")
+        check_field_formats(c, path, fm, expected)
         for k, kind in DATE_FIELDS.get(expected, {}).items():
             v = fm.get(k)
             if v is None:
@@ -1204,6 +1205,68 @@ def check_record(c, path):
     for target in sorted(set(t.strip() for t in WIKI_RE.findall(body))):
         if not c.record_exists(target):
             rep.warn(path, "body link [[%s]] does not exist" % target)
+
+
+LINK_ONLY_RE = re.compile(r"^\[\[[a-z]+/[a-z0-9][a-z0-9-]*\]\]$")
+EMAIL_RE = re.compile(r"^[^@\sA-Z]+@[^@\sA-Z]+\.[^@\sA-Z]+$")
+FIX_HINT = " (system/tools/normalize.py --fix can fix this)"
+
+
+STEP_WHEN_RE = re.compile(r"^[+-]\d+d$")
+
+
+def steps_problem(v):
+    """None if v is a valid playbook steps list (system/schemas/playbook.md), else a description."""
+    if not isinstance(v, list):
+        return "must be a list of steps"
+    for i, s in enumerate(v):
+        if isinstance(s, str):
+            continue
+        if not isinstance(s, dict) or not isinstance(s.get("step"), str):
+            return "item %d must be text or a mapping with 'step'" % (i + 1)
+        extra = set(s) - {"step", "when", "draft", "to"}
+        if extra:
+            return "item %d has unknown keys %s" % (i + 1, ", ".join(sorted(extra)))
+        if s.get("when") is not None and not STEP_WHEN_RE.match(str(s["when"])):
+            return "item %d: when must look like -30d or +2d" % (i + 1)
+        if s.get("draft") is not None and s["draft"] not in ("email", "message"):
+            return "item %d: draft must be email or message" % (i + 1)
+    return None
+
+
+def check_field_formats(c, path, fm, rtype):
+    """Enforce schema.yaml field_formats (ref, refs, list, emails, bool, int, date, dt) and lowercase enums."""
+    rep, schema = c.rep, c.load_schema()
+    ff = schema.get("field_formats") or {}
+    formats = dict(ff.get("common") or {})
+    formats.update(ff.get(rtype) or {})
+    for k, kind in formats.items():
+        v = fm.get(k)
+        if v is None:
+            continue
+        bad = None
+        if kind == "ref" and not (isinstance(v, str) and LINK_ONLY_RE.match(v)):
+            bad = "must be one [[folder/slug]] link"
+        elif kind == "refs" and not (isinstance(v, list) and all(isinstance(x, str) and LINK_ONLY_RE.match(x) for x in v)):
+            bad = "must be a list of [[folder/slug]] links"
+        elif kind == "list" and not isinstance(v, list):
+            bad = "must be a list"
+        elif kind == "emails" and not (isinstance(v, list) and all(isinstance(x, str) and EMAIL_RE.match(x) for x in v)):
+            bad = "must be a list of lowercase email addresses"
+        elif kind == "bool" and not isinstance(v, bool):
+            bad = "must be true or false"
+        elif kind == "int" and (isinstance(v, bool) or not isinstance(v, int)):
+            bad = "must be a whole number"
+        elif kind == "date" and not is_date(v):
+            bad = "must be YYYY-MM-DD"
+        elif kind == "dt" and not (is_date(v) or is_datetime(v)):
+            bad = "must be YYYY-MM-DD or an ISO datetime"
+        elif kind == "steps":
+            bad = steps_problem(v)
+        if bad:
+            rep.error(path, "%s %s (got %r)%s" % (k, bad, v, FIX_HINT))
+    if isinstance(fm.get("aliases"), list) and len(fm["aliases"]) != len(set(map(str, fm["aliases"]))):
+        rep.warn(path, "aliases has duplicates" + FIX_HINT)
 
 
 def setup_step5_done(c):
@@ -1258,6 +1321,54 @@ def check_user(c):
             elif not f.startswith("."):
                 rep.warn(os.path.join(fpath, f), "non-markdown file in a knowledge folder")
     check_goal_ranks(c)
+    idir = c.p("user", "inbox")
+    for f in listdir(idir):
+        if f in INBOX_STATUSES:
+            check_inbox(c, os.path.join(idir, f))
+    for f in listdir(os.path.join(idir, "archive")):
+        if f.endswith(".md"):
+            check_inbox(c, os.path.join(idir, "archive", f))
+
+
+INBOX_STATUSES = {
+    "approvals.md": ["pending", "approved", "rejected", "executed", "expired"],
+    "insights.md": ["new", "seen", "acted", "dismissed", "expired"],
+    "questions.md": ["open", "answered", "dismissed"],
+}
+INBOX_OPEN = {"pending", "approved", "new", "seen", "open"}
+ENTRY_RE = re.compile(r"^## ([AIQ]-\d{4}-\d{2}-\d{2}-\d+) · ([a-z_]+)", re.M)
+
+
+def check_inbox(c, path):
+    """Inbox and inbox-archive files: valid statuses, a counts block that matches (formats.md §3)."""
+    rep = c.rep
+    base = os.path.basename(path)
+    m = re.match(r"^\d{4}-\d{2}-(approvals|insights|questions)\.md$", base)
+    name = m.group(1) + ".md" if m else base
+    allowed = INBOX_STATUSES.get(name)
+    if not allowed:
+        rep.warn(path, "unexpected file in the inbox archive (expected YYYY-MM-<approvals|insights|questions>.md)")
+        return
+    fm, body = read_frontmatter(path, rep)
+    if fm is None:
+        return
+    actual = dict((s, 0) for s in allowed)
+    for eid, status in ENTRY_RE.findall(body or ""):
+        if status not in allowed:
+            rep.error(path, "%s: status %r is not one of %s" % (eid, status, ", ".join(allowed)))
+            continue
+        actual[status] += 1
+        if m and status in INBOX_OPEN:
+            rep.error(path, "%s is still %s; only resolved entries belong in the archive" % (eid, status))
+    counts = fm.get("counts")
+    if counts is None:
+        rep.warn(path, "no counts block (formats.md §3); maintenance adds it")
+    elif not isinstance(counts, dict):
+        rep.error(path, "counts must be a mapping of status to number")
+    else:
+        wrong = ["%s %s (file has %d)" % (s, counts.get(s, 0), n) for s, n in actual.items() if (counts.get(s) or 0) != n]
+        if wrong:
+            rep.error(path, "counts don't match the entries: " + ", ".join(wrong))
 
 
 def check_goal_ranks(c):
@@ -1289,6 +1400,8 @@ def check_path(c, path):
         return
     if rel.startswith("user/knowledge/") and rel.endswith(".md") and "/_" not in rel:
         check_record(c, p)
+    elif re.match(r"^user/inbox/(archive/)?[^/]+\.md$", rel):
+        check_inbox(c, p)
     elif rel.startswith("user/settings/") and rel.endswith(".yaml"):
         check_settings_file(c, p)
     elif rel.startswith("system/templates/settings/") and rel.endswith(".yaml"):

@@ -59,8 +59,8 @@
     { "text": "Closed: Send hiring plan outline to Jordan, sent Oct 12 ([[commitments/send-hiring-plan-outline]])." }
   ],
   "insights": [
-    { "id": "I-2026-10-12-03", "text": "Three customers raised the onboarding import bug this month.", "why": "It relates to the open risk on Support Revamp and your Q4 retention goal.", "suggested_action": "Raise it at Thursday's product sync.", "refs": [{ "id": "risks/onboarding-import-failures", "title": "Onboarding import failures" }, { "id": "goals/2026-q4-retention", "title": "Q4 retention" }] },
-    { "id": "I-2026-10-12-04", "text": "No decision is recorded on SSO pricing, raised two weeks ago.", "why": "Sam will likely ask about it on today's renewal call.", "suggested_action": "Decide a holding answer before 10:00.", "refs": [{ "id": "questions/sso-pricing", "title": "How do we price SSO?" }] }
+    { "id": "I-2026-10-12-03", "text": "Three customers raised the onboarding import bug this month.", "why": "It relates to the open risk on Support Revamp and your Q4 retention goal.", "suggested_action": "Raise it at Thursday's product sync.", "draft": null, "refs": [{ "id": "risks/onboarding-import-failures", "title": "Onboarding import failures" }, { "id": "goals/2026-q4-retention", "title": "Q4 retention" }] },
+    { "id": "I-2026-10-12-04", "text": "No decision is recorded on SSO pricing, raised two weeks ago.", "why": "Sam will likely ask about it on today's renewal call.", "suggested_action": "Email Sam a holding answer on SSO pricing before the 10:00 call.", "draft": { "to": "Sam Okafor", "where": "Outlook drafts" }, "refs": [{ "id": "questions/sso-pricing", "title": "How do we price SSO?" }] }
   ],
   "drafts": [
     { "title": "Contract review: quick check-in", "to": "Dana Ruiz", "where": "Outlook drafts", "why": "Follow-up on the MSA review, six days overdue.", "ref": { "id": "commitments/dana-msa-review", "title": "Dana reviews the enterprise MSA" } },

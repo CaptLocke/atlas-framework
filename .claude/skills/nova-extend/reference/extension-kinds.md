@@ -39,7 +39,7 @@ All paths are relative to `user/extensions/` (the registry `path`). Outlines: `s
 ## playbook
 - **Path:** `playbooks/<slug>.md`, the runnable procedure (frontmatter `type: playbook-extension`, `name`, `record: "[[playbooks/<slug>]]"`, `automatable: true|false`; sections Purpose, When, Steps, Outputs, Guardrails).
 - **Wiring:** create or update the knowledge record `user/knowledge/playbooks/<slug>.md` (playbook schema) so recall finds it, linking to the extension file; if it should run on a schedule or event, also create a job or trigger that runs it.
-- **Note:** a playbook the user only wants remembered (not run) is just a knowledge record via `nova-capture`; no extension needed.
+- **Note:** a playbook record alone already runs as a checklist with pre-drafted messages and missed-step flags (`.claude/skills/nova-triage/reference/playbooks.md`); no extension needed for that. Use an extension only when a playbook needs work a checklist can't do (pulling data, building a document on a schedule).
 
 ## Registry entry (example, fictional)
 ```yaml

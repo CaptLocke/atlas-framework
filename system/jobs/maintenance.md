@@ -25,19 +25,21 @@ None beyond sync. Maintenance does not read connectors.
 - `user/inbox/` (approvals, insights, questions, `drop/`), `user/journal/`, `user/.state/cursors.yaml` (`journal`).
 
 ## Steps
-1. **Validate.** Run `system/tools/validate.py` over `user/` if available; use its findings as the work list.
+1. **Normalize, then validate.** Run `python3 system/tools/normalize.py --fix` (every record: references, lists, emails, dates, booleans, enum spelling), commit the fixes on their own (`Nova-Reason: normalize field formats`), then run `system/tools/validate.py --user` and use its findings as the work list.
 1a. **Routine environment check** (`nova-health`, the "Routine environment" row of `reference/system-health.md`): read the run reports from the last 8 days in `user/logs/runs/` (this run included) and find any routine run whose `nova_context` isn't `routine` (missing field counts). For each routine affected, add or update the high-severity known issue `routine-env-missing` in `user/.state/health.yaml` naming the routine; close an open one when that routine's runs since the issue opened all show `routine`.
 2. **Index rebuild** (`nova-health`, maintenance mode): regenerate every `user/knowledge/_index/` file from the records (`system/schemas/formats.md` §5), including registered user types' folders, `hot.md`, `people-map.md`, and `archive.md`.
 3. **Link repair:** fix links that point to a superseded record (point to the successor), to a renamed alias, or to a missing path when the intended target is unambiguous. Ambiguous broken links become a `questions.md` entry.
 4. **Obvious dedupes** (`merge_supersede`): same email (people), same domain (organizations), identical commitments from the same source. Follow the merge procedure in `system/rules/knowledge.md`. Anything less than obvious becomes a question, never a merge.
 5. **Journal sweep:** journal days with sections not in `processed` are left for the next `ingest` (check that the `journal` cursor will not skip them; move it back if it would). **Inbox sweep:** files lingering in `user/inbox/drop/` and open questions answered in a later chat are noted for ingest or closed.
 6. **Expiry:** approvals `pending` for more than 14 days → `expired`; insights `new` for more than 30 days → `expired`. Add a dated status-history line; never delete entries. Away pauses the clock: while away is active (`system/jobs/README.md`), expire nothing; afterwards, extend each item's limit by the number of away days that fell after it was created (count from `away.start` to `away.end`, or to today for an open-ended away). If away has already been cleared, use the away period recorded in the catch-up brief (`user/work/briefs/*-catch-up.md`).
+6a. **Inbox archive:** move entries resolved more than 14 days ago to `user/inbox/archive/YYYY-MM-<name>.md` and recompute `counts` in every inbox file, adding the block where it's missing (`system/schemas/formats.md` §3). Runs during away too (it only moves resolved entries).
 7. Commit (one commit for indexes, one for record fixes, one for inbox).
 8. **Republish** (`nova-dashboards`, `dashboards_refresh`) every dashboard whose contract lists `maintenance` in `republished_by` (the Records page), from the freshly rebuilt indexes. Skip it in `mode: light`.
 
 ## Outputs
 - Regenerated `user/knowledge/_index/*.md`; repaired and merged records with Updates lines.
 - `user/inbox/approvals.md` and `insights.md` status changes; questions for ambiguous cases.
+- Resolved inbox entries moved to `user/inbox/archive/`; `counts` blocks current.
 - The republished Records dashboard.
 
 ## Early exit
