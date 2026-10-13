@@ -8,7 +8,7 @@ Find the problem that matches what you see. Each fix is a few steps. If none of 
 
 1. **Check you're signed in to GitHub.** The button only appears when you're signed in. Look for your profile picture in the top-right corner; if you see **Sign in** instead, sign in and reload the page.
 2. **Make the browser window wider.** On narrow windows the button can move or hide.
-3. **Use the direct link instead:** [github.com/new?template_owner=CaptLocke&template_name=atlas-framework](https://github.com/new?template_owner=CaptLocke&template_name=atlas-framework). It opens the "Create a new repository" form with the Atlas template already chosen. Continue from step 5 of [Step 2](02-create-your-atlas.md).
+3. **Use the direct link instead:** [github.com/CaptLocke/atlas-framework/generate](https://github.com/CaptLocke/atlas-framework/generate). It opens the "Create a new repository" form with the Atlas template already chosen. Continue from step 5 of [Step 2](02-create-your-atlas.md).
 4. **Don't use Fork.** A fork of a public repository is public, which isn't safe for your Atlas.
 
 ---

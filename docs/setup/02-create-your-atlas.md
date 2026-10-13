@@ -33,7 +33,7 @@ You'll make your own private copy of Atlas from the Atlas template. Your copy is
 You now have your own Atlas. You'll see a list of files and folders; you don't need to open or change any of them. Atlas looks after them.
 
 > **If it looks different:**
-> - **No "Use this template" button?** Make sure you're signed in. If your browser window is narrow, the button may have moved; try making the window wider. You can also open this link directly, which takes you straight to step 5: [github.com/new?template_owner=CaptLocke&template_name=atlas-framework](https://github.com/new?template_owner=CaptLocke&template_name=atlas-framework). More help: [Troubleshooting](troubleshooting.md#i-cant-find-use-this-template).
+> - **No "Use this template" button?** Make sure you're signed in. If your browser window is narrow, the button may have moved; try making the window wider. You can also open this link directly, which takes you straight to step 5: [github.com/CaptLocke/atlas-framework/generate](https://github.com/CaptLocke/atlas-framework/generate). More help: [Troubleshooting](troubleshooting.md#i-cant-find-use-this-template).
 > - **You see "Fork" but not "Use this template"?** Don't use Fork. Forks of a public repository are public. Use the direct link above instead.
 > - **The page asks you to choose between "Public" and "Private" in a drop-down** rather than with round buttons: choose **Private**.
 
