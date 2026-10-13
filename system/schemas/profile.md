@@ -5,7 +5,7 @@ folder: user/profile/
 ---
 # Schema: profile
 
-The profile is who the user is and how they want Nova to behave. It is core configuration, and it links to knowledge.
+The profile is who the user is and how they want Atlas to behave. It is core configuration, and it links to knowledge.
 
 ## Files
 | File | Holds |
@@ -14,7 +14,7 @@ The profile is who the user is and how they want Nova to behave. It is core conf
 | `working-style.md` | How they plan, focus, prioritize, and like work organized |
 | `communication-style.md` | How they like to receive information (length, format, numbers-first vs narrative), meeting habits |
 | `thinking-style.md` | How they reason and decide (data-led, intuitive, collaborative), what they want challenged |
-| `preferences.md` | Likes and dislikes about their work; standing behavior preferences for Nova ("never draft to my CEO without asking"); `## Triage rules` and `## Insight rules` learned from the user's corrections once confirmed (`.claude/skills/nova-triage/reference/learning.md`) |
+| `preferences.md` | Likes and dislikes about their work; standing behavior preferences for Atlas ("never draft to my CEO without asking"); `## Triage rules` and `## Insight rules` learned from the user's corrections once confirmed (`.claude/skills/atlas-triage/reference/learning.md`) |
 | `voice-personal.md` | Personal voice guide (see below) |
 | `voice-house.md` | Company/house voice guide (see below) |
 | `design-system.md` | Company design system (see below) |
@@ -37,7 +37,7 @@ Profile content is a list of statements, one per line, each tagged:
 ```
 Tag grammar: `[<provenance> · <status> <date> · <evidence links>]`
 - **provenance:** `stated` (user said it), `observed` (seen in their behavior or edits), `researched` (public information), `uploaded` (from a document they provided).
-- **status:** `confirmed` (user agreed or stated it) or `proposed` (awaiting confirmation; lives in `user/inbox/questions.md` until confirmed, see `nova-review` user health check). Only `confirmed` and `stated` lines may be relied on as fact.
+- **status:** `confirmed` (user agreed or stated it) or `proposed` (awaiting confirmation; lives in `user/inbox/questions.md` until confirmed, see `atlas-review` user health check). Only `confirmed` and `stated` lines may be relied on as fact.
 - **evidence:** optional source links.
 
 Group statements under `##` headings within each file. Never record protected or sensitive personal attributes (health, religion, etc.) in the profile.
@@ -68,7 +68,7 @@ Built at setup from writing samples, sent email (if connected), and research; re
 ## Document patterns (title slides, one-pagers, memos)
 ## Do / Don't
 ```
-Used by `nova-write` for deliverables and by `nova-dashboards` for theming.
+Used by `atlas-write` for deliverables and by `atlas-dashboards` for theming.
 
 ## Attestation
-The user's permission to store work data is recorded in `user/settings/nova.yaml: attestation` (see `settings.md`), not in the profile.
+The user's permission to store work data is recorded in `user/settings/atlas.yaml: attestation` (see `settings.md`), not in the profile.

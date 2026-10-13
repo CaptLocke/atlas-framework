@@ -24,10 +24,10 @@ Tool names vary; always verify from the live tool list. Guide: `system/connector
 - If listing has no date filter, page newest-first and stop at the first already-filed meeting.
 
 ## Known quirks
-- **Vendor action items are suggestions.** Re-check each against the transcript and Nova's commitment test (`system/rules/knowledge.md`); many are vague or misattributed.
+- **Vendor action items are suggestions.** Re-check each against the transcript and Atlas's commitment test (`system/rules/knowledge.md`); many are vague or misattributed.
 - Bot-based notetakers join only meetings they were invited to or that are on a connected calendar; notes-app style tools (user-typed notes enhanced by AI) mix the user's own notes with transcript: treat the user's typed notes as `provenance: stated`.
 - The same meeting may also be transcribed by Zoom or Teams: file one Source per meeting (prefer the transcript with reliable speaker names) and link both URIs if useful.
-- Some tools auto-email summaries to all attendees; that is a vendor setting the user controls, not Nova.
+- Some tools auto-email summaries to all attendees; that is a vendor setting the user controls, not Atlas.
 - Free tiers may limit transcript history or hide full transcripts.
 
 ## Risk-sensitive tools
@@ -37,4 +37,4 @@ Tool names vary; always verify from the live tool list. Guide: `system/connector
 - `write`: push notes to CRM or task tool (that is `shared_records_update` or `tasks_manage`, propose).
 
 ## Fallback
-"Export the transcript or notes (*Download* / *Export* as text or PDF) and put it in your **Nova Drop** folder, or set the tool to email you summaries."
+"Export the transcript or notes (*Download* / *Export* as text or PDF) and put it in your **Atlas Drop** folder, or set the tool to email you summaries."

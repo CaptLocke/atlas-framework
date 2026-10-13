@@ -1,3 +1,3 @@
-# Fire-once record for triggers. Copied to user/.state/triggers.yaml by nova-setup.
-# Written only by Nova. Format: system/schemas/formats.md §1.
+# Fire-once record for triggers. Copied to user/.state/triggers.yaml by atlas-setup.
+# Written only by Atlas. Format: system/schemas/formats.md §1.
 fired: []

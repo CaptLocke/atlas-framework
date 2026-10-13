@@ -6,7 +6,7 @@ folder: user/knowledge/sources/
 # Schema: source
 
 ## What it is
-Where information came from. Every fact in Nova traces to a source.
+Where information came from. Every fact in Atlas traces to a source.
 
 ## Fields (in addition to `_common.md`)
 | Field | Type | Required | Values / notes |
@@ -43,7 +43,7 @@ Once a source's facts are in records, its full body is rarely needed, but its po
 2. Replace the body with a short summary (the frontmatter `summary`, plus up to 5 key facts in one line each, and nothing a data rule restricts). Add an **Extracted into** list of the records that cite it, and one last line: `Full text: commit <sha> (git show <sha>:user/knowledge/sources/<slug>.md), or open the original: <origin_uri>`.
 3. Set `retention: summary`, `compacted_on: <today>`, `full_text_commit: <sha>`, and `updated`. Keep `## Updates` as it is.
 
-**Getting the full text back:** prefer the original in the connected tool (`origin_uri`), which is current and authoritative. Otherwise restore it from `full_text_commit`. Restoring for one answer is a read; writing it back into the record is `user_content_edit` (propose). A purge (`nova-memory`) removes the history copy too, as intended.
+**Getting the full text back:** prefer the original in the connected tool (`origin_uri`), which is current and authoritative. Otherwise restore it from `full_text_commit`. Restoring for one answer is a read; writing it back into the record is `user_content_edit` (propose). A purge (`atlas-memory`) removes the history copy too, as intended.
 
 ## Capture guidance
 One source per email thread, meeting, document, page, drop, deliverable, or journal day. Body holds a summary and key excerpts (if `retention` allows). Binary files are never copied into the repo by default.

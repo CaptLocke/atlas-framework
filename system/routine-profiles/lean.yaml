@@ -1,11 +1,11 @@
-# Nova automation profile: Lean
+# Atlas automation profile: Lean
 # Suggested for: Claude Pro.
 # Approx. runs: ~1.3 per day (1 nightly run every day + 2 weekly runs).
 # One evening run prepares everything for the next morning. The first chat of
 # the day also runs a quick catch-up ingest if the last ingest is over 3 hours old.
-# Schedules are cron in the user's time zone (user/settings/nova.yaml: timezone),
+# Schedules are cron in the user's time zone (user/settings/atlas.yaml: timezone),
 # minutes off the hour to avoid delayed starts. One schedule per routine.
-# nova-setup copies this file to user/settings/routines.yaml when the user picks it.
+# atlas-setup copies this file to user/settings/routines.yaml when the user picks it.
 profile: lean
 routines:
   - name: nightly-cycle

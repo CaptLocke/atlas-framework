@@ -8,11 +8,11 @@ name: extensions
 Everything in `user/extensions/` and its registry.
 
 ## The rule
-User extensions are part of Nova. They are loaded from the registry, read on demand, survive every update, and can never weaken governance.
+User extensions are part of Atlas. They are loaded from the registry, read on demand, survive every update, and can never weaken governance.
 
 ## Loading
 1. At session start read `user/extensions/registry.yaml`.
-2. Treat each entry as available: skills and jobs can be invoked, triggers are evaluated with the built-ins, types get their own knowledge folder and index, dashboards are rendered by `nova-dashboards`, playbooks are knowledge.
+2. Treat each entry as available: skills and jobs can be invoked, triggers are evaluated with the built-ins, types get their own knowledge folder and index, dashboards are rendered by `atlas-dashboards`, playbooks are knowledge.
 3. Read an extension's file only when it's relevant (progressive disclosure).
 4. Never copy extension files into `.claude/` or `system/`.
 
@@ -23,7 +23,7 @@ User extensions are part of Nova. They are loaded from the registry, read on dem
 4. **Two extensions overriding the same component:** the newer (`created`) wins; flag it.
 
 ## Compatibility
-`requires_nova` uses semver ranges (`>=1.0`, `^1.2`). After each update, `nova-health` checks every extension: incompatible ranges and changed overridden components are reported with a suggested fix.
+`requires_atlas` uses semver ranges (`>=1.0`, `^1.2`). After each update, `atlas-health` checks every extension: incompatible ranges and changed overridden components are reported with a suggested fix.
 
 ## Creating extensions
-Only via `nova-extend` (autonomy class `extensions_create`). Files use the outlines in `system/guide/authoring.md`. A user job that needs a schedule is either added to an existing routine's job list or gets a new routine (`nova-settings`).
+Only via `atlas-extend` (autonomy class `extensions_create`). Files use the outlines in `system/guide/authoring.md`. A user job that needs a schedule is either added to an existing routine's job list or gets a new routine (`atlas-settings`).

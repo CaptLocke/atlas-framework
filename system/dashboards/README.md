@@ -4,9 +4,9 @@ version: 1.0.0
 ---
 # Dashboards
 
-Dashboards are browsable pages Nova keeps up to date. Each one is a **published Claude artifact**: a private, self-contained HTML page built from a template in this folder with the data embedded at render time. Dashboards are views only; every change happens in chat, where Nova updates the underlying records and republishes.
+Dashboards are browsable pages Atlas keeps up to date. Each one is a **published Claude artifact**: a private, self-contained HTML page built from a template in this folder with the data embedded at render time. Dashboards are views only; every change happens in chat, where Atlas updates the underlying records and republishes.
 
-The `nova-dashboards` skill owns rendering and publishing. This folder holds what it renders from: one **template** (`<name>.html`) and one **data contract** (`<name>.contract.md`) per dashboard.
+The `atlas-dashboards` skill owns rendering and publishing. This folder holds what it renders from: one **template** (`<name>.html`) and one **data contract** (`<name>.contract.md`) per dashboard.
 
 ## The dashboards
 | Dashboard | Template | Contract | Republished by | Page budget |
@@ -19,39 +19,39 @@ The `nova-dashboards` skill owns rendering and publishing. This folder holds wha
 | Decisions & Risks | `decisions-risks.html` | `decisions-risks.contract.md` | `weekly-review` | 300 KB |
 | Control Center | `control-center.html` | `control-center.contract.md` | `daily-brief`, `monthly` | 200 KB |
 | About You | `about-you.html` | `about-you.contract.md` | `monthly`, `quarterly` | 200 KB |
-| Nova Guide | `nova-guide.html` | `nova-guide.contract.md` | `update-check` (after an update is applied) | 250 KB |
+| Atlas Guide | `atlas-guide.html` | `atlas-guide.contract.md` | `update-check` (after an update is applied) | 250 KB |
 | Records | `records.html` | `records.contract.md` | `maintenance`, `weekly-review` | 1500 KB |
 | Project page (on request) | `project-page.html` | `project-page.contract.md` | created in chat; then `triage`, `weekly-review` while listed | 250 KB |
 
-Any chat may also republish any dashboard after changing the records it shows (`dashboards_refresh: auto`). `nova-setup` publishes all ten for the first time. A dashboard added by an update is published at the user's next chat (`nova-dashboards`, Publish).
+Any chat may also republish any dashboard after changing the records it shows (`dashboards_refresh: auto`). `atlas-setup` publishes all ten for the first time. A dashboard added by an update is published at the user's next chat (`atlas-dashboards`, Publish).
 
 Shared files:
-- `_base.css`: canonical base styles. **Every template inlines it verbatim** inside `<style id="nova-base">`.
-- `_base.js`: canonical runtime helpers (DOM builder, date formatting, record IDs, sections, filters, theme toggle). **Every template inlines it verbatim** inside `<script id="nova-base-js">`.
+- `_base.css`: canonical base styles. **Every template inlines it verbatim** inside `<style id="atlas-base">`.
+- `_base.js`: canonical runtime helpers (DOM builder, date formatting, record IDs, sections, filters, theme toggle). **Every template inlines it verbatim** inside `<script id="atlas-base-js">`.
 - After editing either file, run `python3 system/tests/dashboards/render.py --sync`, then `render.py --check`. Templates must never drift from the canonical copies.
 
 ## Template anatomy
 ```html
-<style id="nova-base">…_base.css…</style>
-<style id="nova-page">…page styles…</style>
-<style id="nova-theme">{{NOVA_THEME_CSS}}</style>
+<style id="atlas-base">…_base.css…</style>
+<style id="atlas-page">…page styles…</style>
+<style id="atlas-theme">{{ATLAS_THEME_CSS}}</style>
 …
 <div id="app"></div>
-<script id="nova-data" type="application/json">{{NOVA_DATA}}</script>
-<script id="nova-base-js">…_base.js…</script>
-<script id="nova-page-js">…renders the page from the data…</script>
+<script id="atlas-data" type="application/json">{{ATLAS_DATA}}</script>
+<script id="atlas-base-js">…_base.js…</script>
+<script id="atlas-page-js">…renders the page from the data…</script>
 ```
 Each template contains each placeholder **exactly once**. No other text is substituted.
 
 **Refresh marker.** Every page shows, at the top, when it was refreshed and by what (`N.refreshed()` in `_base.js`, from `meta.generated_at` and `meta.generated_by`). If the page is older than its contract's `stale_after_hours` when it is opened, the marker adds "May be out of date". This is the one place a page compares against the viewer's clock (everything else uses `meta.as_of`). Templates get it through `N.masthead`; never remove it.
 
-## How a page is rendered (`nova-dashboards`)
+## How a page is rendered (`atlas-dashboards`)
 1. Read the contract. Build one JSON object exactly as it specifies, from the listed source files. Every list is sorted, filtered, and capped as the contract says.
 2. Fill the common `meta` envelope (below).
 3. **Check size.** `size_budget_kb` is the size of the **whole rendered page** (template ≈ 35–40 KB plus the embedded data), measured after embedding. Serialize the JSON (compact, UTF-8); if the page would exceed the budget, apply the contract's truncation rules (drop from the low-priority end of each list, shorten long text fields), record what was dropped in `meta.truncated`, and repeat until it fits.
 4. **Escape for embedding.** In the serialized JSON replace `<` with `<`, `>` with `>`, `&` with `&`, and U+2028/U+2029 with ` `/` `. The result is still valid JSON and can never close the script element.
 5. **Theme.** Build the theme CSS (below). Remove any `</` sequence from it.
-6. Replace `{{NOVA_DATA}}` with the escaped JSON and `{{NOVA_THEME_CSS}}` with the theme CSS (or an empty string). Nothing else in the template changes.
+6. Replace `{{ATLAS_DATA}}` with the escaped JSON and `{{ATLAS_THEME_CSS}}` with the theme CSS (or an empty string). Nothing else in the template changes.
 7. Publish: first time in chat (setup), then republish to the URL stored in `user/settings/dashboards.yaml` and set `last_published`. Project pages store their URL under `project_pages`.
 
 `system/tests/dashboards/render.py` implements steps 4 to 6 exactly; use it as the reference.
@@ -69,7 +69,7 @@ Every dashboard's JSON has a `meta` object:
   "timezone": "America/Los_Angeles",
   "locale": "en-US",
   "user_display_name": "Maya Chen",
-  "nova_version": "1.0.0",
+  "atlas_version": "1.0.0",
   "record_base_url": null,
   "nav": [{ "name": "work-board", "title": "Work Board", "url": "https://claude.ai/artifact/…" }],
   "notices": [{ "level": "warn", "text": "Your Outlook connection expired…" }],
@@ -82,28 +82,28 @@ Every dashboard's JSON has a `meta` object:
 | `schema_version` | yes | `1` for this release. Bump in the contract when the shape changes incompatibly. |
 | `title` | no | Page title; defaults to the dashboard name. Project pages use the project title. |
 | `generated_at` | yes | Render time, ISO 8601 with offset in the user's time zone. Shown at the top of every page as the refresh marker ("Refreshed Tue, Oct 13, 6:04 AM by the nightly cycle run") and in the footer. |
-| `generated_by` | no | `chat` or `routine:<name>` (as in the commit `Nova-Actor`). Shown in the refresh marker ("by the nightly cycle run", "in chat"). |
-| `stale_after_hours` | no | Copied from the contract's frontmatter `stale_after_hours`. When the page is older than this when someone opens it, the refresh marker adds "May be out of date". Omitted for pages that are never stale (Nova Guide). |
+| `generated_by` | no | `chat` or `routine:<name>` (as in the commit `Atlas-Actor`). Shown in the refresh marker ("by the nightly cycle run", "in chat"). |
+| `stale_after_hours` | no | Copied from the contract's frontmatter `stale_after_hours`. When the page is older than this when someone opens it, the refresh marker adds "May be out of date". Omitted for pages that are never stale (Atlas Guide). |
 | `as_of` | yes | The calendar day the view is for (`YYYY-MM-DD`). For the brief rendered the night before with `target: tomorrow`, this is tomorrow. All "today", "overdue", and "in N days" wording is computed against it, never against the viewer's clock. |
-| `timezone` | yes | `user/settings/nova.yaml: timezone`. Datetimes are displayed in it. |
+| `timezone` | yes | `user/settings/atlas.yaml: timezone`. Datetimes are displayed in it. |
 | `locale` | no | BCP 47 tag for date formatting. Default `en-US` (see gaps in the contract notes). |
-| `user_display_name` | no | `nova.yaml: user_display_name`. |
-| `nova_version` | no | `nova.yaml: installed_version`. |
-| `record_base_url` | no | `null` by default. If set (e.g. `https://github.com/<repo>/blob/main/user/knowledge/`, from `nova.yaml: repo`), record IDs become links to the record file. Leave `null` unless the user asks; the ID text alone is enough to ask Nova. |
+| `user_display_name` | no | `atlas.yaml: user_display_name`. |
+| `atlas_version` | no | `atlas.yaml: installed_version`. |
+| `record_base_url` | no | `null` by default. If set (e.g. `https://github.com/<repo>/blob/main/user/knowledge/`, from `atlas.yaml: repo`), record IDs become links to the record file. Leave `null` unless the user asks; the ID text alone is enough to ask Atlas. |
 | `nav` | no | Links to the other dashboards, from `dashboards.yaml` entries that have a `url`. Only `https://` links render. |
 | `notices` | no | Up to 3 short lines shown above the content: open `high` known issues from `user/.state/health.yaml` that affect this page's data (e.g. a disconnected source), and staleness (the readiness check found an upstream job stale). `level`: `info`, `warn`, or `error`. |
-| `truncated` | no | Map of list key → number of items left out. The page shows "N more not shown here. Ask Nova in chat to see them." under that list. Keys are top-level list names unless the contract says otherwise. |
+| `truncated` | no | Map of list key → number of items left out. The page shows "N more not shown here. Ask Atlas in chat to see them." under that list. Keys are top-level list names unless the contract says otherwise. |
 
 ## Data rules for every contract
 - **Plain text only.** Every string is plain text; never HTML or Markdown. Mentions of records may appear inline as `[[type/slug]]`; the page renders them as record IDs. Templates render all text with `textContent`, so content can never inject markup or script (N7).
-- **References** are `{ "id": "<type>/<slug>", "title": "<record title>" }`. Every item that maps to a record carries its `id`, and the page shows the ID next to the title so the user can ask Nova about it.
+- **References** are `{ "id": "<type>/<slug>", "title": "<record title>" }`. Every item that maps to a record carries its `id`, and the page shows the ID next to the title so the user can ask Atlas about it.
 - **Dates** are `YYYY-MM-DD` (calendar days) or ISO 8601 datetimes with offset. The page formats them.
 - **Never include** `notes_private`, phone numbers, email addresses, secrets, or content whose data-rule handling is `ignore` or `pointer`. Use `summary` text for `summary` handling. Excluded records (`data-rules.yaml: exclusions`) never appear. Archived and superseded records are left out unless the contract says otherwise.
 - **Absent vs empty:** use `null` for unknown single values and `[]` for empty lists. Pages handle both.
 - **Insights** on People, Decisions & Risks, Goals, Work Board, and the brief come from `user/inbox/insights.md` (status `new` or `seen`) and from record `insight` fields; each carries its reasoning.
 
 ## Theming contract
-The theme comes from `user/profile/design-system.md` (`system/schemas/profile.md`). `nova-dashboards` writes **only** these custom properties, on `:root`:
+The theme comes from `user/profile/design-system.md` (`system/schemas/profile.md`). `atlas-dashboards` writes **only** these custom properties, on `:root`:
 
 | Property | From the design system | Fallback |
 |---|---|---|

@@ -1,4 +1,4 @@
-"""Nova hooks: shared context detection and helpers (build plan H-2).
+"""Atlas hooks: shared context detection and helpers (build plan H-2).
 
 Imported by actions.py, paths.py and git.py; not registered as a hook itself.
 
@@ -18,7 +18,7 @@ https://code.claude.com/docs/en/tools-reference, checked 2026-10-12):
   unanchored JavaScript regexes ("mcp__.*").
 
 Policy (system/rules/governance.md):
-- Routines are identified by a marker: NOVA_CONTEXT=routine (case-insensitive,
+- Routines are identified by a marker: ATLAS_CONTEXT=routine (case-insensitive,
   trimmed) means routine; anything else (missing, empty, "chat", other
   values) means chat. Rationale: Claude Code routines run in cloud
   environments that can set the variable reliably, while the chat surfaces
@@ -39,10 +39,10 @@ import re
 import subprocess
 import sys
 
-TMP_DIR = ".nova-tmp"
-APPROVAL = ".nova-tmp/approval.json"
-UPDATE_LOCK = ".nova-tmp/update.lock"
-PURGE_LOCK = ".nova-tmp/purge.lock"
+TMP_DIR = ".atlas-tmp"
+APPROVAL = ".atlas-tmp/approval.json"
+UPDATE_LOCK = ".atlas-tmp/update.lock"
+PURGE_LOCK = ".atlas-tmp/purge.lock"
 GOVERNANCE_FILES = (
     "user/settings/governance.yaml",
     "user/settings/data-rules.yaml",
@@ -51,7 +51,7 @@ GOVERNANCE_FILES = (
 # Maximum lifetimes (minutes) from system/schemas/formats.md section 2, plus
 # one minute of clock slack. A record claiming to live longer is invalid.
 MAX_MINUTES = {"approval": 2 + 1, "update": 30 + 1, "purge": 15 + 1}
-DEFAULT_UPSTREAM = "CaptLocke/nova"
+DEFAULT_UPSTREAM = "CaptLocke/atlas-framework"
 DEFAULT_OWNED_PATHS = ["CLAUDE.md", "README.md", "LICENSE", "CHANGELOG.md", ".gitignore", "docs/", ".claude/",
                        "system/"]
 
@@ -60,7 +60,7 @@ _CACHE = {}
 
 class State:
     """Per-call state the error handler consults (fail-closed decisions)."""
-    hook = "nova"
+    hook = "atlas"
     context = "routine"
     locked = False      # set once the call is known to be a locked action
     raw = None          # raw stdin text (for failsafe.py)
@@ -71,7 +71,7 @@ STATE = State()
 
 # --------------------------------------------------------------- decisions
 def block(message):
-    sys.stderr.write("Nova guard (%s): %s\n" % (STATE.hook, message))
+    sys.stderr.write("Atlas guard (%s): %s\n" % (STATE.hook, message))
     sys.stderr.flush()
     sys.exit(2)
 
@@ -80,7 +80,7 @@ def ask(message):
     out = {"hookSpecificOutput": {
         "hookEventName": "PreToolUse",
         "permissionDecision": "ask",
-        "permissionDecisionReason": "Nova guard (%s): %s" % (STATE.hook, message),
+        "permissionDecisionReason": "Atlas guard (%s): %s" % (STATE.hook, message),
     }}
     sys.stdout.write(json.dumps(out))
     sys.stdout.flush()
@@ -89,15 +89,15 @@ def ask(message):
 
 def allow(warning=None):
     if warning:
-        sys.stderr.write("Nova guard (%s) warning: %s\n" % (STATE.hook, warning))
+        sys.stderr.write("Atlas guard (%s) warning: %s\n" % (STATE.hook, warning))
     sys.exit(0)
 
 
 # --------------------------------------------------------------- context
-def nova_context():
-    """'routine' only when NOVA_CONTEXT is 'routine' (case-insensitive,
+def atlas_context():
+    """'routine' only when ATLAS_CONTEXT is 'routine' (case-insensitive,
     trimmed); otherwise 'chat' (routines carry the marker, chats can't)."""
-    return "routine" if os.environ.get("NOVA_CONTEXT", "").strip().lower() == "routine" else "chat"
+    return "routine" if os.environ.get("ATLAS_CONTEXT", "").strip().lower() == "routine" else "chat"
 
 
 def project_dir(payload):
@@ -340,7 +340,7 @@ def run(hook_name, handler):
     The handler ends by calling block(), ask() or allow(); returning normally
     means allow."""
     STATE.hook = hook_name
-    STATE.context = nova_context()
+    STATE.context = atlas_context()
     try:
         raw = sys.stdin.read()
         STATE.raw = raw

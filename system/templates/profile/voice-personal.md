@@ -1,7 +1,7 @@
 ---
 type: profile
 part: voice-personal
-updated: null                  # set by nova-setup when first written
+updated: null                  # set by atlas-setup when first written
 ---
 # Personal voice
 

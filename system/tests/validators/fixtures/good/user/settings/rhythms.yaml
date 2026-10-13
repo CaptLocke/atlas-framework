@@ -1,4 +1,4 @@
-# Rhythms, triggers, away mode. Copied to user/settings/rhythms.yaml by nova-setup (step 10).
+# Rhythms, triggers, away mode. Copied to user/settings/rhythms.yaml by atlas-setup (step 10).
 # Format: system/schemas/settings.md. Triggers: system/triggers.md.
 work_hours: { days: [mon, tue, wed, thu, fri], start: "08:00", end: "18:00" }
 moments:
@@ -25,7 +25,7 @@ triggers:
 insights:
   brief_max: 3
   engagement: adaptive           # adaptive | fixed
-away:                            # set by nova-away; all null when not away
+away:                            # set by atlas-away; all null when not away
   start: null                    # YYYY-MM-DD (first day away)
   end: null                      # YYYY-MM-DD (last day away)
   set_on: null

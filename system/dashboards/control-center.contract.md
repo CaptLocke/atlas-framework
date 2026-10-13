@@ -9,7 +9,7 @@ stale_after_hours: 36
 # Dashboard: control-center
 
 ## Purpose
-Nova's own status, in plain words: known issues and how to fix them, actions waiting for approval, questions from Nova, each automation (schedule, last run and result, next run), per-job results, connection health, recent runs, recent activity, suspicious content Nova ignored, and version/update and health-check status. Changing anything (pausing, rescheduling, approving) happens in chat.
+Atlas's own status, in plain words: known issues and how to fix them, actions waiting for approval, questions from Atlas, each automation (schedule, last run and result, next run), per-job results, connection health, recent runs, recent activity, suspicious content Atlas ignored, and version/update and health-check status. Changing anything (pausing, rescheduling, approving) happens in chat.
 
 Republished by `daily-brief` (each cycle) and `monthly` (after health checks and the automation review). `update-check` should also republish it after applying an update, and a chat that approves or answers items may republish it.
 
@@ -25,9 +25,9 @@ Republished by `daily-brief` (each cycle) and `monthly` (after health checks and
   "approvals": [ { "id": "A-2026-10-12-01", "action": "Send follow-up to Dana Ruiz", "why": "…",
                    "prepared": "Outlook draft \"Contract review: quick check-in\"", "requested_by": "routine:nightly-cycle",
                    "requested_on": "2026-10-12", "expires_on": "2026-10-26", "status": "pending" } ],
-  "questions": [ { "id": "Q-2026-10-13-01", "kind": "action", "text": "Update your Nova Project's instructions …",
-                   "how": "In the Claude app, open the Nova Project, replace its instructions, and save.",
-                   "copy_text": "This Project is my Nova (Nova bootstrap 3). …", "asked": "2026-10-13" },
+  "questions": [ { "id": "Q-2026-10-13-01", "kind": "action", "text": "Update your Atlas Project's instructions …",
+                   "how": "In the Claude app, open the Atlas Project, replace its instructions, and save.",
+                   "copy_text": "This Project is my Atlas (Atlas bootstrap 3). …", "asked": "2026-10-13" },
                  { "id": "Q-2026-10-12-02", "kind": "profile", "text": "…", "proposed_change": "…", "asked": "2026-10-12" } ],
   "routines": [ { "name": "nightly-cycle", "title": "Nightly cycle", "schedule": "7 20 * * *",
                   "schedule_text": "Every day at 8:07 PM", "model": "strongest", "enabled": true, "paused": false,
@@ -66,7 +66,7 @@ Full example: `system/tests/dashboards/control-center.json`.
 | `routines[].enabled` | `false` if the platform routine is known to be off (e.g. GitHub access lapsed > 72 h, recorded as a known issue); else `true` |
 | `routines[].paused`, `jobs[].paused` | `user/settings/rhythms.yaml: paused` |
 | `routines[].last_run`, `runs[]` | Newest run reports `user/logs/runs/YYYY-MM/<routine>-*.md` (frontmatter `started, finished, status`; one-line summary from its table) |
-| `routines[].next_run` | Next fire time of `schedule` in `nova.yaml: timezone` after `generated_at` |
+| `routines[].next_run` | Next fire time of `schedule` in `atlas.yaml: timezone` after `generated_at` |
 | `jobs[]` | `user/.state/jobs.yaml` (`last_success, last_status`); `detail` from the latest run report row for the job |
 | `away` | `rhythms.yaml: away` (`active` when today is within `start`–`end`) |
 | `known_issues[]` | `user/.state/health.yaml: known_issues` with `status` not resolved |
@@ -75,10 +75,10 @@ Full example: `system/tests/dashboards/control-center.json`.
 | `connections[]` | `user/settings/connectors.yaml` (`connector, categories, available_in_routines`), health from the latest run reports' "Connector health" and `health.yaml`; `last_seen` from `user/.state/cursors.yaml`; fallbacks from `sources.yaml: fallbacks`. The GitHub connection is listed from the last successful push |
 | `activity[]` | `user/logs/activity/YYYY-MM.md`, newest first |
 | `suspicious[]` | "Suspicious content flagged" sections of run reports from the last 14 days |
-| `system` | `nova.yaml` (`installed_version, data_version`), `health.yaml` (`last_user_check, last_system_check`), `jobs.yaml: update-check.last_checked_version` and the latest upstream release seen by `update-check` |
+| `system` | `atlas.yaml` (`installed_version, data_version`), `health.yaml` (`last_user_check, last_system_check`), `jobs.yaml: update-check.last_checked_version` and the latest upstream release seen by `update-check` |
 
 ## Rendering notes
-- Section order: action needed (open `action` questions, only if any, each with its `how` and `copy_text` ready to copy), known issues, approvals, questions (the rest), automations, jobs, connections, recent runs, activity, suspicious content (only if any), Nova itself. Empty sections say so plainly ("No known issues").
+- Section order: action needed (open `action` questions, only if any, each with its `how` and `copy_text` ready to copy), known issues, approvals, questions (the rest), automations, jobs, connections, recent runs, activity, suspicious content (only if any), Atlas itself. Empty sections say so plainly ("No known issues").
 - Sorting: issues by severity (high, medium, low) then `since`; approvals and questions newest first, except open `action` questions, which come first, oldest first; routines in `routines.yaml` order; jobs in pipeline order (ingest, triage, intelligence, email-drafts, meeting-prep, daily-brief, weekly-review, status-updates, monthly, quarterly, maintenance, update-check, then user jobs); activity and runs newest first.
 - Caps: `activity` 25 (last 7 days), `runs` 10, `approvals` 20, `questions` 20 (`action` entries never cut), `suspicious` 10, `known_issues` 20. Record left-out counts in `meta.truncated`.
 - Never show approval draft bodies, suspicious content text beyond a one-line description, or any secret. Activity summaries follow `formats.md` §4 (no sensitive content).

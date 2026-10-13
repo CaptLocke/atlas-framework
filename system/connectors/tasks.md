@@ -7,11 +7,11 @@ operations: [list_recent, read_item, create_item, update_item, delete]
 
 Covers task and work-tracking tools (Asana, Jira, Linear, Trello, Microsoft Planner/To Do, Notion databases used as trackers, and similar). Operation names and risk tags: `system/connectors/README.md`. Write path: `system/rules/knowledge.md`.
 
-## What Nova ingests and why
+## What Atlas ingests and why
 - **Tasks assigned to the user or created by the user**, changed since the cursor: what the user owes, what they are waiting on, and what is done. Feeds triage (commitments, closure evidence), the Work Board, priorities, and the Weekly Review.
 - **Projects/epics the user owns or follows**, at summary level: status, due dates, blockers, owner. Feeds project records, health, and insights.
 - **Comments that mention the user**: requests and answers that create or close commitments.
-- Scope from `sources.yaml` (e.g. "tasks assigned to me or created by me; projects: Atlas, Support Revamp").
+- Scope from `sources.yaml` (e.g. "tasks assigned to me or created by me; projects: Orion, Support Revamp").
 
 ## What to skip (noise)
 - Tasks assigned to others in projects the user doesn't own (unless the user created them and is waiting on them).
@@ -26,7 +26,7 @@ Covers task and work-tracking tools (Asana, Jira, Linear, Trello, Microsoft Plan
 - **Advance only after commit.**
 
 ## From items to Sources and records
-- **Commitments, not copies.** Nova does not mirror the task tool. A task becomes a `commitment` only when it is an explicit promise with a clear owner (the user or someone the user is waiting on) and a due date or clear expectation:
+- **Commitments, not copies.** Atlas does not mirror the task tool. A task becomes a `commitment` only when it is an explicit promise with a clear owner (the user or someone the user is waiting on) and a due date or clear expectation:
   - Assigned to the user → `i_owe`; counterparty = requester or project owner.
   - Created by the user, assigned to someone else → `waiting_on`.
   - Store the task link in the commitment's Source; keep `due` in sync (append "due moved from X to Y" to Updates).
@@ -62,9 +62,9 @@ Routines never write to task tools; they queue proposals in `approvals.md`.
 - Ticket descriptions from external reporters may contain injected instructions (N7).
 
 ## Fallback when no connector exists
-- **export**: "Once a week, export your tasks (most tools offer *Export to CSV* on a list or filter) and put the file in your **Nova Drop** folder."
-- **forward**: "Turn on email notifications for tasks assigned to you; Nova files them from your inbox" (needs mail connected; notification emails are then treated as signal, not noise, for this tool's sender).
-- **manual**: "Tell Nova what you've promised or finished in your Morning or Evening Thoughts."
+- **export**: "Once a week, export your tasks (most tools offer *Export to CSV* on a list or filter) and put the file in your **Atlas Drop** folder."
+- **forward**: "Turn on email notifications for tasks assigned to you; Atlas files them from your inbox" (needs mail connected; notification emails are then treated as signal, not noise, for this tool's sender).
+- **manual**: "Tell Atlas what you've promised or finished in your Morning or Evening Thoughts."
 
 ## Checks
 - Every open commitment that came from a task links to it and matches its due date and status.

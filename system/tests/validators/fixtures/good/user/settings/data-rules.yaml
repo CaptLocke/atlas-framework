@@ -1,4 +1,4 @@
-# Data rules. Copied to user/settings/data-rules.yaml by nova-setup (step 9).
+# Data rules. Copied to user/settings/data-rules.yaml by atlas-setup (step 9).
 # PROTECTED (N6): changes only in chat with the user's explicit confirmation.
 # Conservative defaults. Handling: ignore | pointer | summary | full.
 # Format: system/schemas/settings.md; applied per system/rules/governance.md (N11).

@@ -9,7 +9,7 @@ stale_after_hours: 192
 # Dashboard: records
 
 ## Purpose
-Everything Nova has filed, in one place to browse and search: people, organizations, projects, goals, commitments, decisions, events, risks, questions, ideas, topics, playbooks, sources, and any record types the user added. Each record shows its type, status, summary, when it last changed, and what it links to. Filters: record type, Current / Closed / All, and a search box over names, summaries, aliases, and links.
+Everything Atlas has filed, in one place to browse and search: people, organizations, projects, goals, commitments, decisions, events, risks, questions, ideas, topics, playbooks, sources, and any record types the user added. Each record shows its type, status, summary, when it last changed, and what it links to. Filters: record type, Current / Closed / All, and a search box over names, summaries, aliases, and links.
 
 It is a finder, not an editor. To change a record, the user mentions its ID in chat.
 
@@ -65,7 +65,7 @@ Full example: `system/tests/dashboards/records.json`.
 | topic | `scope`, trimmed |
 | playbook | trigger, trimmed, "Last used <date>" |
 | source | kind label, "From <connector>" if any, occurred or captured date |
-| user types | up to 3 of the type's own fields that best identify the record (Nova's judgment, the same 3 for every record of that type) |
+| user types | up to 3 of the type's own fields that best identify the record (Atlas's judgment, the same 3 for every record of that type) |
 
 ## Sources (file → field)
 | Field | Source |
@@ -84,5 +84,5 @@ Full example: `system/tests/dashboards/records.json`.
 - Search matches title, summary, aliases, record ID, facts, and link titles, case-insensitive, all words must match.
 - The type filter is a drop-down with counts; Current / Closed / All is a segmented control. Both remember the last choice.
 - Text limits: `summary` 240 characters, each fact 60, `title` 140.
-- Caps and truncation, in this order until the page fits the budget: (1) shorten `summary` to 120 characters; (2) drop `links` beyond 3; (3) drop closed records, oldest `updated` first; (4) drop current sources, oldest first; (5) drop other current records, oldest first. Record each dropped record under `meta.truncated.records`. The page shows "N more not shown here. Ask Nova in chat to see them."
-- When `summary.restricted` > 0, a muted line under the filters reads "N records are hidden by your data rules. Ask Nova in chat about them." When `summary.archived` > 0, a second line reads "N archived records aren't shown. Ask Nova in chat to see them."
+- Caps and truncation, in this order until the page fits the budget: (1) shorten `summary` to 120 characters; (2) drop `links` beyond 3; (3) drop closed records, oldest `updated` first; (4) drop current sources, oldest first; (5) drop other current records, oldest first. Record each dropped record under `meta.truncated.records`. The page shows "N more not shown here. Ask Atlas in chat to see them."
+- When `summary.restricted` > 0, a muted line under the filters reads "N records are hidden by your data rules. Ask Atlas in chat about them." When `summary.archived` > 0, a second line reads "N archived records aren't shown. Ask Atlas in chat to see them."

@@ -1,7 +1,7 @@
-"""Nova hooks: last-resort decision when a hook can't run its normal logic.
+"""Atlas hooks: last-resort decision when a hook can't run its normal logic.
 
 Used by the entry point of actions.py, paths.py and git.py when importing
-context.py / shell.py fails or anything escapes nova.run(). Standard library
+context.py / shell.py fails or anything escapes atlas.run(). Standard library
 only and self-contained, so it works even when the other hook modules are
 broken. It never exits with a code other than 0 or 2: Claude Code treats any
 other exit code as a NON-blocking error (https://code.claude.com/docs/en/hooks),
@@ -9,8 +9,8 @@ which would let the call through.
 
 Decision:
 1. Upstream product repo (origin = system/manifest.yaml upstream, default
-   CaptLocke/nova): allow (maintainers develop Nova here).
-2. Routine (NOVA_CONTEXT=routine, case-insensitive): block.
+   CaptLocke/atlas-framework): allow (maintainers develop Atlas here).
+2. Routine (ATLAS_CONTEXT=routine, case-insensitive): block.
 3. Chat (anything else, including missing): allow only clearly harmless calls (MCP tools whose names start with a
    read verb and contain no risky word; file writes under user/ outside the
    governance files; shell commands with no risky word). Block everything else.
@@ -21,7 +21,7 @@ import re
 import subprocess
 import sys
 
-DEFAULT_UPSTREAM = "captlocke/nova"
+DEFAULT_UPSTREAM = "captlocke/atlas-framework"
 RISKY_NAME = re.compile(
     r"(send|reply|repl|forward|post|publish|invite|respond|rsvp|comment|accept|decline|share|permission|grant|"
     r"delete|trash|remove|purge|cancel|destroy|erase|wipe|pay|purchase|charge|sign|password|credential|token|"
@@ -31,7 +31,7 @@ READ_FIRST = re.compile(r"^(?:[a-z0-9]+_)?(get|list|search|read|fetch|find|query
 RISKY_SHELL = re.compile(
     r"(\brm\b|\bmv\b|\bcp\b|\bgit\b|\bgh\b|>|\btee\b|\bsed\b|\bperl\b|\bunlink\b|\bshred\b|\bfind\b|\bdd\b|"
     r"\btruncate\b|\bunzip\b|\btar\b|\bchmod\b|\bln\b|\bcurl\b|\bwget\b|\bpython|\bnode\b|\bbash\b|\bsh\b|"
-    r"\beval\b|system/|\.claude|\.git|governance|data-rules|connectors\.yaml|\.nova-tmp)")
+    r"\beval\b|system/|\.claude|\.git|governance|data-rules|connectors\.yaml|\.atlas-tmp)")
 GOVERNANCE = ("user/settings/governance.yaml", "user/settings/data-rules.yaml", "user/settings/connectors.yaml")
 
 
@@ -96,15 +96,15 @@ def fail_safe(hook, exc, raw=None):
         if _upstream(proj):
             os._exit(0)
         detail = "%s: %s" % (type(exc).__name__, exc)
-        routine = os.environ.get("NOVA_CONTEXT", "").strip().lower() == "routine"
+        routine = os.environ.get("ATLAS_CONTEXT", "").strip().lower() == "routine"
         if not routine and _harmless(payload, proj):
-            sys.stderr.write("Nova guard (%s) warning: hook failed (%s); allowed because this is a chat and "
-                             "the call looks harmless. Record a known issue for nova-health.\n" % (hook, detail))
+            sys.stderr.write("Atlas guard (%s) warning: hook failed (%s); allowed because this is a chat and "
+                             "the call looks harmless. Record a known issue for atlas-health.\n" % (hook, detail))
             sys.stderr.flush()
             os._exit(0)
-        sys.stderr.write("Nova guard (%s): the hook could not run (%s), so this call is blocked to stay safe. "
-                         "The hook files may be damaged: record a known issue (nova-health can restore "
-                         "system files through nova-update); do not try to work around the guard.\n"
+        sys.stderr.write("Atlas guard (%s): the hook could not run (%s), so this call is blocked to stay safe. "
+                         "The hook files may be damaged: record a known issue (atlas-health can restore "
+                         "system files through atlas-update); do not try to work around the guard.\n"
                          % (hook, detail))
         sys.stderr.flush()
     except BaseException:

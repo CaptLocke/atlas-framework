@@ -12,7 +12,7 @@ An outcome the user or their organization is working toward.
 | Field | Type | Required | Values / notes |
 |---|---|---|---|
 | `horizon` | enum | no | quarter, half, year, multi_year |
-| `period` | text | no | e.g. `2026-Q4`; quarters follow the company's fiscal year (`nova.yaml: company`) |
+| `period` | text | no | e.g. `2026-Q4`; quarters follow the company's fiscal year (`atlas.yaml: company`) |
 | `metric` | text | no | How progress is measured. |
 | `target` | text | no |  |
 | `current` | text | no | Latest measured value with date. |
@@ -21,13 +21,13 @@ An outcome the user or their organization is working toward.
 | `rank` | integer | no | The user's order of importance among active goals: 1 = most important. Set only by the user (§Ranking). `null` or missing = unranked. |
 
 ## Ranking
-The user ranks their **active** goals so priorities across Nova follow what matters most to them, not just which goals exist.
+The user ranks their **active** goals so priorities across Atlas follow what matters most to them, not just which goals exist.
 - **When:** at setup (step 8, right after confirming goals), at the quarterly goal reset (when drafts become active), and any time in chat ("make retention my top goal", "rank my goals", "hiring matters more than the launch now").
-- **Who sets it:** only the user. Nova may suggest an order (from manager priorities, decisions, or what the user says), but writes `rank` only after the user confirms it. Every rank change gets an Updates line (`rank 2 → 1, per the user`) and is `provenance: stated`.
+- **Who sets it:** only the user. Atlas may suggest an order (from manager priorities, decisions, or what the user says), but writes `rank` only after the user confirms it. Every rank change gets an Updates line (`rank 2 → 1, per the user`) and is `provenance: stated`.
 - **Shape:** ranks are 1, 2, 3, … with no gaps or ties. When one goal moves, renumber the others to keep that order. When a goal leaves `active` (achieved, missed, dropped), clear its `rank` and close the gap.
 - **Partial ranking is fine.** The user may rank only their top one or two; the rest stay unranked.
 - **A new active goal** starts unranked. If other goals are ranked, add one question to `user/inbox/questions.md` (kind `other`): "Where does <goal> rank among your goals?"
-- **Effect:** triage scales the goal-link boost by rank (`.claude/skills/nova-triage/reference/signals.md` §Priority rubric), and the Goals dashboard lists active goals in rank order. A rank change in chat is followed by a full priority pass (`nova-triage`) so the brief and Work Board reflect it.
+- **Effect:** triage scales the goal-link boost by rank (`.claude/skills/atlas-triage/reference/signals.md` §Priority rubric), and the Goals dashboard lists active goals in rank order. A rank change in chat is followed by a full priority pass (`atlas-triage`) so the brief and Work Board reflect it.
 
 ## Status vocabulary
 draft, active, achieved, missed, dropped
@@ -36,4 +36,4 @@ draft, active, achieved, missed, dropped
 Typically links to: projects, decisions, people.
 
 ## Capture guidance
-Create during setup, quarterly goal reset, or when the user states a goal. Priorities across Nova are ranked against active goals, weighted by the user's `rank` (§Ranking).
+Create during setup, quarterly goal reset, or when the user states a goal. Priorities across Atlas are ranked against active goals, weighted by the user's `rank` (§Ranking).

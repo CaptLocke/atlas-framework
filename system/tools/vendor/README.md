@@ -4,7 +4,7 @@ name: vendor
 ---
 # Vendored libraries
 
-Nova's hooks (`.claude/hooks/`) and validator (`system/tools/validate.py`) use only the Python 3 standard library plus the packages in this folder, so they run in any cloud session without installing anything.
+Atlas's hooks (`.claude/hooks/`) and validator (`system/tools/validate.py`) use only the Python 3 standard library plus the packages in this folder, so they run in any cloud session without installing anything.
 
 | Package | Version | Source | License |
 |---|---|---|---|

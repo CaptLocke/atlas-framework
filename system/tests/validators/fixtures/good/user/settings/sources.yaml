@@ -6,4 +6,4 @@ ingest:
 fallbacks:
   - category: crm
     method: forward
-    instructions: "Forward deal update emails to yourself with [nova] in the subject."
+    instructions: "Forward deal update emails to yourself with [atlas] in the subject."

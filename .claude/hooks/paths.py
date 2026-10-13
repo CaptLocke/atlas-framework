@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Nova hook: protected paths, N5 and N6 (build plan H-4).
+"""Atlas hook: protected paths, N5 and N6 (build plan H-4).
 
 Registered in .claude/settings.json as a PreToolUse hook for file tools
 (matcher "Write|Edit|MultiEdit|NotebookEdit") and shell commands
@@ -14,12 +14,12 @@ $CLAUDE_PROJECT_DIR is the project root. Shared policy: context.py.
 
 What it enforces (system/rules/governance.md, system/schemas/formats.md s2):
 - N5: writes to system/manifest.yaml owned_paths only while
-  .nova-tmp/update.lock exists and is unexpired (any context).
+  .atlas-tmp/update.lock exists and is unexpired (any context).
 - N6: writes to user/settings/{governance,data-rules,connectors}.yaml are
   blocked in routines; in chats they need an approval record with action
   governance_settings for this exact tool whose target is the file's
   repo-relative path, consumed on use. Creating a governance file that does
-  not exist yet (nova-setup copying the defaults) is allowed in any context
+  not exist yet (atlas-setup copying the defaults) is allowed in any context
   without a record; a leftover record naming that path is deleted.
 - Approval records and purge locks can't be created in routines (they are
   chat-only by definition); nothing writes inside .git/.
@@ -35,7 +35,7 @@ try:
 except BaseException as _fe:  # failsafe.py itself is broken: block
     def fail_safe(hook, exc, raw=None, _fe=_fe):
         try:
-            sys.stderr.write("Nova guard (%s): hook files are damaged (%s; %s); blocked.\n" % (hook, exc, _fe))
+            sys.stderr.write("Atlas guard (%s): hook files are damaged (%s; %s); blocked.\n" % (hook, exc, _fe))
         finally:
             os._exit(2)
 
@@ -47,7 +47,7 @@ def _raw_stdin():
 
 sys.excepthook = lambda _t, _e, _tb: fail_safe("paths", _e, _raw_stdin())
 try:
-    import context as nova  # noqa: E402
+    import context as atlas  # noqa: E402
     import shell  # noqa: E402
 except BaseException as _imp:  # includes SystemExit raised while importing
     fail_safe("paths", _imp, _raw_stdin())
@@ -70,7 +70,7 @@ def bash_targets(payload, proj):
     command = (payload.get("tool_input") or {}).get("command")
     if not isinstance(command, str) or not command.strip():
         return []
-    base = nova.session_cwd(payload, proj)
+    base = atlas.session_cwd(payload, proj)
     out = []
     for seg in shell.segments(command, base):
         writes, deletes = shell.write_targets(seg)
@@ -90,88 +90,88 @@ def bash_targets(payload, proj):
 
 
 def check(rels, tool_name, proj, ctx):
-    owned = nova.owned_paths(proj)
+    owned = atlas.owned_paths(proj)
     owned_hits, gov_hits, tmp_hits, git_hits = [], [], [], []
     for rel, kind in rels:
         if rel == ".git" or rel.startswith(".git/"):
             git_hits.append(rel)
-        if any(nova.overlaps(rel, e) for e in owned):
+        if any(atlas.overlaps(rel, e) for e in owned):
             owned_hits.append(rel or ".")
         # a write names the file it changes; a delete of a parent folder also
         # removes the governance files inside it
-        if (rel in nova.GOVERNANCE_FILES) or (kind == "delete" and any(
-                nova.overlaps(rel, g) for g in nova.GOVERNANCE_FILES)):
+        if (rel in atlas.GOVERNANCE_FILES) or (kind == "delete" and any(
+                atlas.overlaps(rel, g) for g in atlas.GOVERNANCE_FILES)):
             gov_hits.append(rel or ".")
-        if kind == "write" and rel in (nova.APPROVAL, nova.PURGE_LOCK):
+        if kind == "write" and rel in (atlas.APPROVAL, atlas.PURGE_LOCK):
             tmp_hits.append(rel)
 
     if git_hits:
-        nova.block("Writing inside .git/ (%s) is not allowed; use git commands, and never change "
+        atlas.block("Writing inside .git/ (%s) is not allowed; use git commands, and never change "
                    "the repo's remotes or history (N8)." % ", ".join(sorted(set(git_hits))))
 
     if tmp_hits and ctx != "chat":
-        nova.block("Approval records and purge locks can only be created in a chat with the user "
+        atlas.block("Approval records and purge locks can only be created in a chat with the user "
                    "(%s). In a routine, queue the action in user/inbox/approvals.md instead."
                    % ", ".join(sorted(set(tmp_hits))))
 
     if owned_hits:
-        ok, why = nova.valid_lock(proj, "update")
+        ok, why = atlas.valid_lock(proj, "update")
         if not ok:
-            nova.block("%s %s system-owned (system/manifest.yaml: owned_paths) and only change through "
-                       "nova-update while .nova-tmp/update.lock is valid (N5): %s. Put user changes in "
-                       "user/ (extensions go in user/extensions/ via nova-extend). If a system file looks "
-                       "broken, record it for nova-health / nova-update instead of editing it."
+            atlas.block("%s %s system-owned (system/manifest.yaml: owned_paths) and only change through "
+                       "atlas-update while .atlas-tmp/update.lock is valid (N5): %s. Put user changes in "
+                       "user/ (extensions go in user/extensions/ via atlas-extend). If a system file looks "
+                       "broken, record it for atlas-health / atlas-update instead of editing it."
                        % (", ".join(sorted(set(owned_hits))[:5]),
                           "is" if len(set(owned_hits)) == 1 else "are", why))
 
     if gov_hits:
         files = ", ".join(sorted(set(gov_hits)))
-        affected = [g for g in nova.GOVERNANCE_FILES
-                    if any(nova.overlaps(h if h != "." else "", g) for h in gov_hits)]
+        affected = [g for g in atlas.GOVERNANCE_FILES
+                    if any(atlas.overlaps(h if h != "." else "", g) for h in gov_hits)]
         existing = [g for g in affected if os.path.exists(os.path.join(proj, g))]
         if not existing:
-            # First creation (nova-setup copying the defaults) is allowed in any
+            # First creation (atlas-setup copying the defaults) is allowed in any
             # context; never leave a record behind that names these paths.
-            nova.discard_stale_approval(proj, set(affected))
-            nova.allow()
-        nova.STATE.locked = True
+            atlas.discard_stale_approval(proj, set(affected))
+            atlas.allow()
+        atlas.STATE.locked = True
         if ctx != "chat":
-            nova.block("%s can only change in a chat, after the user explicitly confirms (N6). This is a "
-                       "routine (NOVA_CONTEXT=routine): queue the proposed change in "
+            atlas.block("%s can only change in a chat, after the user explicitly confirms (N6). This is a "
+                       "routine (ATLAS_CONTEXT=routine): queue the proposed change in "
                        "user/inbox/approvals.md instead." % files)
-        rec, why = nova.approval_matches(proj, tool_name, {"governance_settings"}, targets=set(existing))
+        rec, why = atlas.approval_matches(proj, tool_name, {"governance_settings"}, targets=set(existing))
         if rec is None:
-            nova.block("%s is protected (N6) and needs an approval record: %s. Locked action: state the "
-                       "exact change, get the user's explicit yes, then write .nova-tmp/approval.json with "
+            atlas.block("%s is protected (N6) and needs an approval record: %s. Locked action: state the "
+                       "exact change, get the user's explicit yes, then write .atlas-tmp/approval.json with "
                        "action 'governance_settings', tool '%s' and target '%s' (system/schemas/formats.md "
                        "section 2; system/rules/governance.md) and retry."
                        % (files, why, tool_name, existing[0]))
-        nova.consume_approval(proj)
-    nova.allow()
+        atlas.consume_approval(proj)
+    atlas.allow()
 
 
 def main(payload, proj, ctx):
     tool_name = payload.get("tool_name") or ""
     rels = []
     if tool_name in FILE_TOOLS:
-        base = nova.session_cwd(payload, proj)
+        base = atlas.session_cwd(payload, proj)
         for p in file_targets(payload):
-            rel = nova.rel_to_project(p, base, proj)
+            rel = atlas.rel_to_project(p, base, proj)
             if rel is not None:
                 rels.append((rel, "write"))
     elif tool_name in ("Bash", "Monitor"):
         for word, cwd, kind in bash_targets(payload, proj):
-            rel = nova.rel_to_project(word, cwd, proj)
+            rel = atlas.rel_to_project(word, cwd, proj)
             if rel is not None:
                 rels.append((rel, kind))
     if rels:
         check(rels, tool_name, proj, ctx)
-    nova.allow()
+    atlas.allow()
 
 
 if __name__ == "__main__":
     try:
-        nova.run("paths", main)
+        atlas.run("paths", main)
     except SystemExit as _exit:
         if _exit.code in (0, 2, None):
             raise

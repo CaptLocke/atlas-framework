@@ -51,7 +51,7 @@ class OwnedPaths(HookTestCase):
                     "rm -rf system/jobs",
                     "cd system && echo x > kernel.md",
                     "bash -c 'echo x > system/kernel.md'",
-                    "unzip -o nova-1.1.0.zip",
+                    "unzip -o atlas-1.1.0.zip",
                     "git checkout -- system/kernel.md",
                     "touch docs/new.md"):
             self.assertBlocked(self.bash("paths", cmd, "routine"), "owned")
@@ -60,7 +60,7 @@ class OwnedPaths(HookTestCase):
         for cmd in ("cat system/kernel.md", "grep -r foo system/", "cp system/templates/x.yaml user/x.yaml",
                     "echo x > user/work/briefs/2026-10-12.md", "ls -la", "git status",
                     "python3 system/tools/validate.py --all 2>&1 | tail -5",
-                    "unzip -o release.zip -d /tmp/nova-release",
+                    "unzip -o release.zip -d /tmp/atlas-release",
                     "echo done >/dev/null 2>&1"):
             self.assertAllowed(self.bash("paths", cmd, "routine"))
 
@@ -69,13 +69,13 @@ class OwnedPaths(HookTestCase):
         self.assertBlocked(self.bash("paths", "cp -r /tmp/release/system .", "routine"), "owned")
 
     def test_broken_manifest_fails_closed_in_routine(self):
-        self.write("system/manifest.yaml", "upstream: CaptLocke/nova\nowned_paths: [\n")
+        self.write("system/manifest.yaml", "upstream: CaptLocke/atlas-framework\nowned_paths: [\n")
         self.assertBlocked(self.write_call("user/work/x.md"), "internal error")
         self.assertAllowed(self.write_call("user/work/x.md", context="chat"))
 
     def test_bash_owned_with_lock_allowed(self):
         self.update_lock()
-        self.assertAllowed(self.bash("paths", "unzip -o nova-1.1.0.zip && cp -r x/system .", "routine"))
+        self.assertAllowed(self.bash("paths", "unzip -o atlas-1.1.0.zip && cp -r x/system .", "routine"))
 
     def test_git_internals_blocked(self):
         self.update_lock()
@@ -115,7 +115,7 @@ class GovernanceFiles(HookTestCase):
         self.assertBlocked(self.gov_write("chat"), "governance_settings")
         self.approval("Edit", "governance_settings", target="user/settings/governance.yaml")
         self.assertAllowed(self.gov_write("chat"))
-        self.assertFalse(os.path.exists(self.path(".nova-tmp/approval.json")))
+        self.assertFalse(os.path.exists(self.path(".atlas-tmp/approval.json")))
         self.assertBlocked(self.gov_write("chat"))
 
     def test_governance_record_wrong_tool_or_action(self):
@@ -149,13 +149,13 @@ class GovernanceFiles(HookTestCase):
         os.remove(self.path("user/settings/governance.yaml"))
         self.approval("Write", "send_communication", target="user/inbox/approvals.md")
         self.assertAllowed(self.gov_write("chat", tool="Write"))
-        self.assertTrue(os.path.exists(self.path(".nova-tmp/approval.json")))
+        self.assertTrue(os.path.exists(self.path(".atlas-tmp/approval.json")))
 
     def test_first_creation_removes_stale_record_for_that_path(self):
         os.remove(self.path("user/settings/governance.yaml"))
         self.approval("Write", "governance_settings", target="user/settings/governance.yaml")
         self.assertAllowed(self.gov_write("routine", tool="Write"))
-        self.assertFalse(os.path.exists(self.path(".nova-tmp/approval.json")))
+        self.assertFalse(os.path.exists(self.path(".atlas-tmp/approval.json")))
 
     def test_other_settings_not_protected(self):
         r = self.run_hook("paths", "Write", {"file_path": self.path("user/settings/rhythms.yaml")}, "routine")
@@ -164,19 +164,19 @@ class GovernanceFiles(HookTestCase):
 
 class TransientRecords(HookTestCase):
     def test_routine_cannot_create_approval_or_purge_lock(self):
-        for rel in (".nova-tmp/approval.json", ".nova-tmp/purge.lock"):
+        for rel in (".atlas-tmp/approval.json", ".atlas-tmp/purge.lock"):
             r = self.run_hook("paths", "Write", {"file_path": self.path(rel), "content": "{}"}, "routine")
             self.assertBlocked(r, "chat")
-        self.assertBlocked(self.bash("paths", "echo '{}' > .nova-tmp/approval.json", "ROUTINE"))
+        self.assertBlocked(self.bash("paths", "echo '{}' > .atlas-tmp/approval.json", "ROUTINE"))
         # missing context = chat: records can be written
-        self.assertAllowed(self.bash("paths", "echo '{}' > .nova-tmp/approval.json", None))
+        self.assertAllowed(self.bash("paths", "echo '{}' > .atlas-tmp/approval.json", None))
 
     def test_chat_can_create_records_and_routine_update_lock(self):
-        r = self.run_hook("paths", "Write", {"file_path": self.path(".nova-tmp/approval.json")}, "chat")
+        r = self.run_hook("paths", "Write", {"file_path": self.path(".atlas-tmp/approval.json")}, "chat")
         self.assertAllowed(r)
-        r = self.run_hook("paths", "Write", {"file_path": self.path(".nova-tmp/update.lock")}, "routine")
+        r = self.run_hook("paths", "Write", {"file_path": self.path(".atlas-tmp/update.lock")}, "routine")
         self.assertAllowed(r)
-        self.assertAllowed(self.bash("paths", "mkdir -p .nova-tmp && rm -f .nova-tmp/approval.json", "routine"))
+        self.assertAllowed(self.bash("paths", "mkdir -p .atlas-tmp && rm -f .atlas-tmp/approval.json", "routine"))
 
 
 if __name__ == "__main__":

@@ -36,4 +36,4 @@ Tool names vary; always verify from the live tool list. Guide: `system/connector
 - `security`: service accounts, keys, IAM roles.
 
 ## Fallback
-"Export the result of your usual query or dashboard (CSV) into your **Nova Drop** folder, or tell Nova the number in chat."
+"Export the result of your usual query or dashboard (CSV) into your **Atlas Drop** folder, or tell Atlas the number in chat."

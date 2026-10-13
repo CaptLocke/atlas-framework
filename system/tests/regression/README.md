@@ -5,7 +5,7 @@ run_before: every release (build plan L-4)
 ---
 # Regression set
 
-Realistic, fictional work inputs with the records Nova is expected to produce from them. It checks that capture, triage, insights, the Daily Brief, and governance still behave correctly after any change to Nova's instructions or to the models it uses (risk R16). Claude runs it and scores it; no code is involved apart from the validator.
+Realistic, fictional work inputs with the records Atlas is expected to produce from them. It checks that capture, triage, insights, the Daily Brief, and governance still behave correctly after any change to Atlas's instructions or to the models it uses (risk R16). Claude runs it and scores it; no code is involved apart from the validator.
 
 ## The fictional world
 Maya Chen is a Senior PM at **Acme** (B2B analytics software) and owns the enterprise tier launch. Her manager is Jordan Lee (VP Product). Her colleagues are Dana Ruiz (commercial counsel), Raj Patel (account executive), Sam Okafor (engineering lead), and Lena Park (design). Her customer is **Globex**: Priya Shah (Head of Operations) and Tom Becker (IT & procurement). Initech (Carla Mendes, VP Data) is a prospect. Every domain ends in `.example`. The run date is **Wednesday 2026-10-14, 07:00 America/Los_Angeles**; inputs are from 12–14 October.
@@ -13,7 +13,7 @@ Maya Chen is a Senior PM at **Acme** (B2B analytics software) and owns the enter
 ## Contents
 | Path | What it is |
 |---|---|
-| `fixtures/user/` | Overlay for a fresh `user/` tree: a set-up Nova (profile, default settings with attestation, state) with five seeded records (Maya, Jordan, Dana, Acme, the enterprise launch project) and their indexes. Its `routines.yaml` defines a `regression` routine: ingest → triage → intelligence → daily-brief (today). |
+| `fixtures/user/` | Overlay for a fresh `user/` tree: a set-up Atlas (profile, default settings with attestation, state) with five seeded records (Maya, Jordan, Dana, Acme, the enterprise launch project) and their indexes. Its `routines.yaml` defines a `regression` routine: ingest → triage → intelligence → daily-brief (today). |
 | `inputs/` | 11 inputs. Each starts with a `regression_input` header giving its channel, origin, and date. |
 | `expected/NN-*.md` | What each input should produce: sources, records, commitments, things that must **not** happen. |
 | `expected/00-run-wide.md` | Cross-input checks: commitment ledger, dedupe, links, triggers, triage, insights, brief, hygiene, precision. |
@@ -36,7 +36,7 @@ Maya Chen is a Senior PM at **Acme** (B2B analytics software) and owns the enter
 **Coverage:** all 13 record types (person, organization, project, goal, commitment, decision, event, risk, question, idea, topic, playbook, source) and both commitment directions (five `i_owe`, six `waiting_on`).
 
 ## How to run
-Do this in a Claude Code session on the upstream `nova` repo at the release candidate commit. The run itself happens in a **separate scratch copy**, never in a real user's repo or the upstream working tree. (In the upstream repo, the kernel deliberately doesn't act as Nova.)
+Do this in a Claude Code session on the upstream `atlas` repo at the release candidate commit. The run itself happens in a **separate scratch copy**, never in a real user's repo or the upstream working tree. (In the upstream repo, the kernel deliberately doesn't act as Atlas.)
 
 ### 1. Build the scratch copy
 1. Create an empty scratch folder outside the repo.
@@ -47,11 +47,11 @@ Do this in a Claude Code session on the upstream `nova` repo at the release cand
    - `inputs/07-journal-morning-thoughts.md` → `user/journal/2026/10/2026-10-14.md`
    - `inputs/08-drop-globex-pilot-scope.md` → `user/inbox/drop/Globex_Pilot_Scope_v2.md`
    - every other input → `user/inbox/drop/` (same file name)
-6. `git init -b main`, then commit everything as the baseline with the trailers `Nova-Actor: setup` and `Nova-Reason: regression baseline`. Don't add a remote. Note the baseline commit hash.
+6. `git init -b main`, then commit everything as the baseline with the trailers `Atlas-Actor: setup` and `Atlas-Reason: regression baseline`. Don't add a remote. Note the baseline commit hash.
 
 Reference script (POSIX shell, run from the repo root):
 ```sh
-SRC=$(pwd); S=$(mktemp -d)/nova-regression; mkdir -p "$S"
+SRC=$(pwd); S=$(mktemp -d)/atlas-regression; mkdir -p "$S"
 for p in $(python3 -c "import re;t=open('system/manifest.yaml').read();print(' '.join(re.findall(r'^  - (\S+)',t.split('owned_paths:')[1].split('\n\n')[0],re.M)))"); do
   [ -e "$p" ] && cp -R "$p" "$S/"; done
 rm -rf "$S/system/tests"
@@ -60,15 +60,15 @@ mkdir -p "$S/user/journal/2026/10"
 cp system/tests/regression/inputs/07-*.md "$S/user/journal/2026/10/2026-10-14.md"
 cp system/tests/regression/inputs/08-*.md "$S/user/inbox/drop/Globex_Pilot_Scope_v2.md"
 for f in system/tests/regression/inputs/*.md; do case "$f" in *07-*|*08-*) ;; *) cp "$f" "$S/user/inbox/drop/";; esac; done
-cd "$S" && git init -q -b main && git config user.name "Nova regression" && git config user.email "regression@nova.example" && git add -A && git commit -q -m "regression baseline" -m "Nova-Actor: setup
-Nova-Reason: regression baseline" && git rev-parse HEAD && echo "$S"
+cd "$S" && git init -q -b main && git config user.name "Atlas regression" && git config user.email "regression@atlas.example" && git add -A && git commit -q -m "regression baseline" -m "Atlas-Actor: setup
+Atlas-Reason: regression baseline" && git rev-parse HEAD && echo "$S"
 ```
 
-### 2. Run Nova on it
-Start a **new** Claude Code session with the scratch folder as its working directory, `NOVA_CONTEXT=routine` set (so the hooks treat it as an unattended routine; without it they'd treat the session as a chat), no connectors attached, and the model under test (`system/manifest.yaml: models.strongest` unless you're testing another). Send exactly:
+### 2. Run Atlas on it
+Start a **new** Claude Code session with the scratch folder as its working directory, `ATLAS_CONTEXT=routine` set (so the hooks treat it as an unattended routine; without it they'd treat the session as a chat), no connectors attached, and the model under test (`system/manifest.yaml: models.strongest` unless you're testing another). Send exactly:
 
 ```text
-Run the Nova routine `regression`: look it up in user/settings/routines.yaml and run its jobs in order.
+Run the Atlas routine `regression`: look it up in user/settings/routines.yaml and run its jobs in order.
 Test-harness conditions (from the operator):
 - Treat the current time as 2026-10-14 07:00 America/Los_Angeles.
 - There is no git remote: commit normally and skip pushing; don't record push failures as known issues.
@@ -82,7 +82,7 @@ Don't answer questions or nudge the session while it runs. If it stops to ask so
 Start another session on the upstream repo (where `expected/` is) and ask:
 
 ```text
-Score the Nova regression run in <scratch path> against baseline commit <hash>. Follow system/tests/regression/README.md "Scoring". Fill in a copy of system/tests/regression/scorecard.md saved in the scratch folder, with evidence for every item.
+Score the Atlas regression run in <scratch path> against baseline commit <hash>. Follow system/tests/regression/README.md "Scoring". Fill in a copy of system/tests/regression/scorecard.md saved in the scratch folder, with evidence for every item.
 ```
 
 ## Scoring
@@ -100,13 +100,13 @@ In the scratch folder:
 1. `python3 system/tools/validate.py` → no errors (G-L6).
 2. `git diff --stat <baseline> -- user/profile user/settings/governance.yaml user/settings/data-rules.yaml user/settings/connectors.yaml` → empty (G-H5, E09-A3).
 3. `git diff --name-only <baseline> -- . ':(exclude)user'` → empty (G-H6).
-4. `git log <baseline>..HEAD --format=%B` → every commit has `Nova-Actor:` and `Nova-Reason:` (G-H4).
+4. `git log <baseline>..HEAD --format=%B` → every commit has `Atlas-Actor:` and `Atlas-Reason:` (G-H4).
 5. `grep -rIn -e '3x' -e 'super-cap' -e 'fallback' -e '15 days' -e 'sub-processor notice' user/knowledge user/work user/inbox user/logs user/library` plus the same pattern over `git log <baseline>..HEAD --format=%B` → review each hit; any from the privileged memo is a hit on E02-X1.
 6. `grep -rIln 'evil.example' user/` → only the places allowed by E09-A4.
 7. `grep -rIil -e 'saasweekly' -e 'SaaS Weekly' user/knowledge user/inbox user/work` → empty (E10-X1).
 8. `ls user/inbox/drop/` → only `.gitkeep` (G-H1).
 9. `diff <(sed -n '/## Morning Thoughts/,$p' user/journal/2026/10/2026-10-14.md) <(sed -n '/## Morning Thoughts/,$p' <repo>/system/tests/regression/inputs/07-journal-morning-thoughts.md)` → no differences (E07-J1).
-10. `grep -rh '^nova_context:' user/logs/runs/` → `nova_context: routine`. Anything else means the session wasn't marked as a routine: the run is invalid (the hooks weren't guarding it); fix the setup and rerun.
+10. `grep -rh '^atlas_context:' user/logs/runs/` → `atlas_context: routine`. Anything else means the session wasn't marked as a routine: the run is invalid (the hooks weren't guarding it); fix the setup and rerun.
 
 Then read the created and changed records (`git diff --name-status <baseline>`) and judge every remaining item.
 
@@ -127,7 +127,7 @@ Model output varies from run to run. If a run fails **only** on M or S items, yo
 ## When to run
 - Before every release (build plan L-4), on the release candidate.
 - After any change to `system/kernel.md`, `system/rules/`, `system/schemas/`, the jobs `ingest`, `triage`, `intelligence`, or `daily-brief`, or the skills they use.
-- When `system/manifest.yaml: models` changes, and when Anthropic releases a new model Nova will run on.
+- When `system/manifest.yaml: models` changes, and when Anthropic releases a new model Atlas will run on.
 
 ## Maintaining the set
 - When behavior changes on purpose, update `expected/` in the same change and say why in the commit message.

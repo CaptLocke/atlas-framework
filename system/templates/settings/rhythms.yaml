@@ -1,4 +1,4 @@
-# Rhythms, triggers, away mode. Copied to user/settings/rhythms.yaml by nova-setup at step 5; adjusted at step 10.
+# Rhythms, triggers, away mode. Copied to user/settings/rhythms.yaml by atlas-setup at step 5; adjusted at step 10.
 # Format: system/schemas/settings.md. Triggers: system/triggers.md.
 work_hours: { days: [mon, tue, wed, thu, fri], start: "08:00", end: "18:00" }
 moments:
@@ -26,11 +26,11 @@ insights:
   brief_max: 3
   engagement: adaptive           # adaptive | fixed
   suppressed_kinds: []           # insight kinds the user turned off
-meetings:                        # which calendar events Nova shows and preps (filter: system/schemas/settings.md)
+meetings:                        # which calendar events Atlas shows and preps (filter: system/schemas/settings.md)
   all_day: include               # include | skip (deadlines and milestones always show)
   tentative: include             # include | skip
   not_responded: include         # include | skip (invitations not yet answered)
-away:                            # set by nova-away; all null when not away
+away:                            # set by atlas-away; all null when not away
   start: null                    # YYYY-MM-DD (first day away)
   end: null                      # YYYY-MM-DD (last day away, inclusive); null while away = until the user says they are back
   set_on: null

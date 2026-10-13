@@ -2,7 +2,7 @@
 type: job
 name: monthly
 model: strongest
-skills: [nova-review, nova-health]
+skills: [atlas-review, atlas-health]
 ---
 # Job: monthly
 
@@ -26,10 +26,10 @@ Period check above. If `maintenance` hasn't succeeded in the last 8 days, run it
 - `user/inbox/` (approvals, insights engagement, questions), `user/.state/health.yaml`, `user/profile/`, `user/settings/`, `user/extensions/registry.yaml`.
 
 ## Steps
-1. **Goal Progress** (`nova-review`, monthly mode): progress on each active goal with evidence for and against, and what needs attention. Update goal `current` where evidence supports it (`records_write`).
-2. **User Health Check** (`nova-health`, user mode): stale records, orphans, duplicates, superseded facts, broken links, unprocessed journal/inbox items, profile proposals and guide drift, settings sanity. Auto-fix only what `system/rules/knowledge.md` allows (rebuild indexes, fix links, merge obvious duplicates, close clearly finished items); everything else becomes questions.
-3. **System Health Check** (`nova-health`, system mode): routine run failures, connector auth, hooks present, schema validity (`system/tools/validate.py`), system files unmodified, extension compatibility, repo size. Update `health.yaml` (`last_user_check`, `last_system_check`, `known_issues`).
-4. **Automation Review** (`nova-review`): what each job did last month (from run reports), what was used or ignored (insight and draft engagement), cost signals (items and duration), suggested schedule or profile changes. Then the **learning pass** (`.claude/skills/nova-triage/reference/learning.md` §2): turn consistent feedback into at most 3 rule proposals. Compute the success indicators into `health.yaml: indicators` (`period: <P−1>`).
+1. **Goal Progress** (`atlas-review`, monthly mode): progress on each active goal with evidence for and against, and what needs attention. Update goal `current` where evidence supports it (`records_write`).
+2. **User Health Check** (`atlas-health`, user mode): stale records, orphans, duplicates, superseded facts, broken links, unprocessed journal/inbox items, profile proposals and guide drift, settings sanity. Auto-fix only what `system/rules/knowledge.md` allows (rebuild indexes, fix links, merge obvious duplicates, close clearly finished items); everything else becomes questions.
+3. **System Health Check** (`atlas-health`, system mode): routine run failures, connector auth, hooks present, schema validity (`system/tools/validate.py`), system files unmodified, extension compatibility, repo size. Update `health.yaml` (`last_user_check`, `last_system_check`, `known_issues`).
+4. **Automation Review** (`atlas-review`): what each job did last month (from run reports), what was used or ignored (insight and draft engagement), cost signals (items and duration), suggested schedule or profile changes. Then the **learning pass** (`.claude/skills/atlas-triage/reference/learning.md` §2): turn consistent feedback into at most 3 rule proposals. Compute the success indicators into `health.yaml: indicators` (`period: <P−1>`).
 5. Write `user/work/reports/<P−1>.md` (`type: report`, `date`, `sources`) with one section per moment run.
 6. Queue questions (profile proposals, ambiguous merges, records to archive, suggested routine changes) in `user/inbox/questions.md`; proposed settings changes go to `user/inbox/approvals.md` as `behavior_settings`.
 7. Republish every dashboard whose contract (`system/dashboards/*.contract.md`) lists `monthly` in `republished_by`. Set `jobs.yaml: monthly.period_done` to P. Commit.
@@ -44,7 +44,7 @@ Period not due or already done → `early_exit` (no reads beyond `jobs.yaml`). A
 
 ## Guardrails
 - Profile changes are `profile_update` (propose): write proposals, never edit the profile. Settings changes are `behavior_settings` (propose): queue.
-- Never restore or modify system files from a routine outside `nova-update`; record a known issue instead.
+- Never restore or modify system files from a routine outside `atlas-update`; record a known issue instead.
 - Indicators stay local; nothing leaves the repo.
 
 ## Run report

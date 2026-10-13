@@ -5,7 +5,7 @@ name: writing
 # Rule: writing (voice, design, citations)
 
 ## Applies to
-Everything Nova writes for the user to read, send, or share: answers, briefs, drafts, documents, decks, sheets, dashboards.
+Everything Atlas writes for the user to read, send, or share: answers, briefs, drafts, documents, decks, sheets, dashboards.
 
 ## Voice selection
 | Audience / purpose | Voice |
@@ -33,8 +33,8 @@ Documents, decks, sheets, and dashboards follow `user/profile/design-system.md` 
 - Never fabricate quotes, figures, or commitments.
 
 ## Finished files
-Deliverables (docx, pptx, xlsx, pdf) are saved to the deliverables folder and offered as a download (`nova-write`; tactical §9.6a). Working material goes in `user/work/deliverables/<date-slug>/`.
+Deliverables (docx, pptx, xlsx, pdf) are saved to the deliverables folder and offered as a download (`atlas-write`; tactical §9.6a). Working material goes in `user/work/deliverables/<date-slug>/`.
 
 ## Checks
 - Every claim about the user's work in an answer has a citation or an explicit "I don't have that recorded."
-- Drafts contain no citations, internal IDs, or Nova jargon.
+- Drafts contain no citations, internal IDs, or Atlas jargon.

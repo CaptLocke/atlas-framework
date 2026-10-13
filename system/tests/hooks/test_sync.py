@@ -10,7 +10,7 @@ import unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from hook_support import HookTestCase, sh  # noqa: E402
 
-TRAILERS = "Nova-Actor: chat\nNova-Reason: test"
+TRAILERS = "Atlas-Actor: chat\nAtlas-Reason: test"
 
 
 class SyncCase(HookTestCase):
@@ -20,7 +20,7 @@ class SyncCase(HookTestCase):
 
     def setUp(self):
         super().setUp()
-        self.outside = tempfile.mkdtemp(prefix="nova-remote-")   # outside the work tree
+        self.outside = tempfile.mkdtemp(prefix="atlas-remote-")   # outside the work tree
         self.addCleanup(shutil.rmtree, self.outside, True)
         self.remote = os.path.join(self.outside, "remote.git")
         sh(["git", "init", "-q", "--bare", "-b", "main", self.remote], self.outside)
@@ -79,7 +79,7 @@ class SessionStart(SyncCase):
         ctx = self.start()
         self.assertIn("FAILED", ctx)
         self.assertIn("git pull --rebase", ctx)
-        with open(self.path(".nova-tmp/sync.log")) as f:
+        with open(self.path(".atlas-tmp/sync.log")) as f:
             self.assertIn("sync_start.failed", f.read())
 
     def test_conflict_is_aborted_and_reported(self):
@@ -93,14 +93,14 @@ class SessionStart(SyncCase):
     def test_push_access_confirmed(self):
         ctx = self.start()
         self.assertIn("push access confirmed", ctx)
-        self.assertTrue(ctx.startswith("Nova boot:"), ctx)
+        self.assertTrue(ctx.startswith("Atlas boot:"), ctx)
 
     def test_boot_line_names_kernel_version(self):
-        self.write("system/manifest.yaml", "name: Nova\nkernel_version: 7\nupstream: CaptLocke/nova\n")
+        self.write("system/manifest.yaml", "name: Atlas\nkernel_version: 7\nupstream: CaptLocke/atlas-framework\n")
         sh(["git", "add", "-A"], self.root)
         sh(["git", "commit", "-q", "-m", "kv\n\n" + TRAILERS], self.root)
         sh(["git", "push", "-q", "origin", "main"], self.root)
-        self.assertIn("nova-kernel-7", self.start())
+        self.assertIn("atlas-kernel-7", self.start())
 
     def test_read_only_attachment_is_reported(self):
         # fetch still works, but pushes go to a remote that refuses them
@@ -109,7 +109,7 @@ class SessionStart(SyncCase):
         self.assertIn("synced", ctx)
         self.assertIn("CAN'T PUSH", ctx)
         self.assertIn("write", ctx)
-        with open(self.path(".nova-tmp/sync.log")) as f:
+        with open(self.path(".atlas-tmp/sync.log")) as f:
             self.assertIn("sync_start.read_only", f.read())
 
     def test_not_on_main(self):
@@ -134,8 +134,8 @@ class StopGuard(SyncCase):
         self.write("user/knowledge/people/dana-ruiz.md", "changed\n")
         out = self.stop()
         self.assertEqual(out.get("decision"), "block")
-        self.assertIn("Unsaved Nova changes", out["reason"])
-        self.assertIn("Nova-Actor/Nova-Reason", out["reason"])
+        self.assertIn("Unsaved Atlas changes", out["reason"])
+        self.assertIn("Atlas-Actor/Atlas-Reason", out["reason"])
         self.assertIn("dana-ruiz.md", out["reason"])
 
     def test_untracked_file_blocks(self):
@@ -151,7 +151,7 @@ class StopGuard(SyncCase):
         self.assertEqual(self.stop(), {})
 
     def test_ignored_paths_do_not_block(self):
-        self.write(".nova-tmp/approval.json", "{}")
+        self.write(".atlas-tmp/approval.json", "{}")
         self.write("user/inbox/drop/upload.pdf", "x")
         self.write("cache/__pycache__/x.pyc", "x")
         self.assertEqual(self.stop(), {})
@@ -188,7 +188,7 @@ class StopGuard(SyncCase):
         self.assertEqual(self.stop().get("decision"), "block")
         os.remove(self.path("user/work/new.md"))
         self.assertEqual(self.stop(), {})
-        self.assertFalse(os.path.exists(self.path(".nova-tmp/sync_guard.json")))
+        self.assertFalse(os.path.exists(self.path(".atlas-tmp/sync_guard.json")))
 
     def test_counter_is_per_session(self):
         self.write("user/work/new.md", "x\n")
@@ -216,7 +216,7 @@ class StopGuard(SyncCase):
 
 class SyncUpstreamBypass(SyncCase):
     def test_upstream_repo_is_untouched(self):
-        sh(["git", "remote", "set-url", "origin", "https://github.com/CaptLocke/nova.git"], self.root)
+        sh(["git", "remote", "set-url", "origin", "https://github.com/CaptLocke/atlas-framework.git"], self.root)
         self.write("user/work/new.md", "x\n")
         self.commit_local()
         r = self.run_event("sync_start", "SessionStart", {"source": "startup"})

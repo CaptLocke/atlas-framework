@@ -26,7 +26,7 @@ active, inactive
 Typically links to: people, projects, topics, risks.
 
 ## Employer
-The user's employer (`kind: employer`) is the company profile Nova works from. Built at setup (steps 6–8: website, LinkedIn, uploads, research, then confirmation) and refreshed at the quarterly role refresh. Frontmatter: `domain` (primary email domain), `industry`, `website`, `size`, `headquarters`. The full list of email domains and the fiscal year live in `user/settings/nova.yaml: company`. Body sections, in this order, each line tagged with provenance and citations like profile statements (`system/schemas/profile.md`):
+The user's employer (`kind: employer`) is the company profile Atlas works from. Built at setup (steps 6–8: website, LinkedIn, uploads, research, then confirmation) and refreshed at the quarterly role refresh. Frontmatter: `domain` (primary email domain), `industry`, `website`, `size`, `headquarters`. The full list of email domains and the fiscal year live in `user/settings/atlas.yaml: company`. Body sections, in this order, each line tagged with provenance and citations like profile statements (`system/schemas/profile.md`):
 - `## What they do`: products or services, and the customers or segments they serve.
 - `## Business model`: how the company makes money.
 - `## Locations`: headquarters and main offices or markets.

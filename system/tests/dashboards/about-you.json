@@ -9,7 +9,7 @@
     "timezone": "America/Los_Angeles",
     "locale": "en-US",
     "user_display_name": "Maya Chen",
-    "nova_version": "1.0.0",
+    "atlas_version": "1.0.0",
     "record_base_url": null,
     "nav": [],
     "notices": [],
@@ -56,7 +56,7 @@
           { "text": "Wants assumptions in pricing work challenged.", "provenance": "stated", "status": "confirmed", "date": "2026-09-14", "evidence": [] }
         ] }
       ] },
-    { "part": "preferences", "title": "Preferences", "path": "user/profile/preferences.md", "updated": "2026-09-20", "description": "Standing instructions for Nova.",
+    { "part": "preferences", "title": "Preferences", "path": "user/profile/preferences.md", "updated": "2026-09-20", "description": "Standing instructions for Atlas.",
       "groups": [
         { "heading": "Standing instructions", "statements": [
           { "text": "Never draft to the CEO without asking first.", "provenance": "stated", "status": "confirmed", "date": "2026-09-14", "evidence": [] },

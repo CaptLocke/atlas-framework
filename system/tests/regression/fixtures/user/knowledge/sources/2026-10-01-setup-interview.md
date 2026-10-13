@@ -1,8 +1,8 @@
 ---
 id: sources/2026-10-01-setup-interview
 type: source
-title: Nova setup interview
-summary: Maya's answers during Nova setup about her role, manager, colleagues, and responsibilities.
+title: Atlas setup interview
+summary: Maya's answers during Atlas setup about her role, manager, colleagues, and responsibilities.
 status: processed
 created: 2026-10-01
 updated: 2026-10-01

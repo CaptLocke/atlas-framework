@@ -1,12 +1,12 @@
-# Set up Nova
+# Set up Atlas
 
-**Nova gives you a memory for your work, and an assistant that keeps it moving.** It remembers what was said, decided, and promised, with links back to where it came from. It keeps track of what you owe and what you're waiting on, prepares you for meetings, and drafts your routine writing in your own voice. While you're offline it brings in new email, meetings, and messages, so a short Daily Brief is waiting for you each morning. It never sends, shares, or deletes anything without asking you first.
+**Atlas gives you a memory for your work, and an assistant that keeps it moving.** It remembers what was said, decided, and promised, with links back to where it came from. It keeps track of what you owe and what you're waiting on, prepares you for meetings, and drafts your routine writing in your own voice. While you're offline it brings in new email, meetings, and messages, so a short Daily Brief is waiting for you each morning. It never sends, shares, or deletes anything without asking you first.
 
-This guide gets you from nothing to a working Nova. You do **four short steps** yourself, then Nova takes over in conversation and does the rest with you.
+This guide gets you from nothing to a working Atlas. You do **four short steps** yourself, then Atlas takes over in conversation and does the rest with you.
 
 You don't need to be technical. Every step is one small action, with a picture of what you should see. If something on your screen looks different, each step has a note for that.
 
-**Total time:** about 20 minutes for the four steps below, then 30 to 45 minutes chatting with Nova. You can stop at any point and pick up where you left off.
+**Total time:** about 20 minutes for the four steps below, then 30 to 45 minutes chatting with Atlas. You can stop at any point and pick up where you left off.
 
 ---
 
@@ -17,17 +17,17 @@ You don't need to be technical. Every step is one small action, with a picture o
 - **An email address** you can open now, for a free GitHub account.
 - **A phone** with an authenticator app (recommended, for extra account security in step 1).
 
-That's all. Nova costs nothing beyond your Claude plan.
+That's all. Atlas costs nothing beyond your Claude plan.
 
 ---
 
 ## Before you start: where your information lives
 
-Nova keeps everything it learns about your work in a **private GitHub repository**. Think of it as a private folder in the cloud that only you can see. GitHub is a widely used service for storing files safely, with a full history of every change.
+Atlas keeps everything it learns about your work in a **private GitHub repository**. Think of it as a private folder in the cloud that only you can see. GitHub is a widely used service for storing files safely, with a full history of every change.
 
-- **It's private.** Only you can open it. You'll choose "Private" in step 2, and Nova checks that it stays that way.
+- **It's private.** Only you can open it. You'll choose "Private" in step 2, and Atlas checks that it stays that way.
 - **It's yours.** Everything is stored as plain, readable text. You can read it, download it, or take it elsewhere at any time.
-- **You confirm permission first.** Because Nova will store information about your work, it will ask you to confirm that you're allowed to keep work information in your own private repository. If you're not sure, check with your manager or IT team before you continue. Nova brings nothing in until you've confirmed.
+- **You confirm permission first.** Because Atlas will store information about your work, it will ask you to confirm that you're allowed to keep work information in your own private repository. If you're not sure, check with your manager or IT team before you continue. Atlas brings nothing in until you've confirmed.
 
 ---
 
@@ -36,11 +36,11 @@ Nova keeps everything it learns about your work in a **private GitHub repository
 | Step | What you'll do | Time |
 |---|---|---|
 | [1. Create a free GitHub account](01-github-account.md) | Sign up and turn on two-factor authentication | 5 to 10 min |
-| [2. Create your Nova](02-create-your-nova.md) | Make your own private copy of Nova | 2 to 3 min |
-| [3. Connect GitHub to Claude](03-connect-github.md) | Let Claude open your Nova, and nothing else | 3 to 5 min |
-| [4. Create the Nova Project in Claude](04-create-the-nova-project.md) | Make a "Nova" Project, paste a short note, say "Set up Nova" | 5 min |
+| [2. Create your Atlas](02-create-your-atlas.md) | Make your own private copy of Atlas | 2 to 3 min |
+| [3. Connect GitHub to Claude](03-connect-github.md) | Let Claude open your Atlas, and nothing else | 3 to 5 min |
+| [4. Create the Atlas Project in Claude](04-create-the-atlas-project.md) | Make a "Atlas" Project, paste a short note, say "Set up Atlas" | 5 min |
 
-Then: [What happens next](05-what-happens-next.md) (Nova guides you from here).
+Then: [What happens next](05-what-happens-next.md) (Atlas guides you from here).
 
 Stuck? See [Troubleshooting](troubleshooting.md).
 
@@ -48,7 +48,7 @@ Stuck? See [Troubleshooting](troubleshooting.md).
 
 ## A few words that will come up
 
-- **Repository** (or "repo"): the private storage space on GitHub where your Nova lives.
-- **Template:** the original Nova that you copy to make your own. Your copy is completely separate; nobody else can see it.
-- **Project:** a workspace inside the Claude app. You'll make one called "Nova" and have all your Nova chats there.
-- **Connector:** a link between Claude and one of your tools, such as your email or calendar. Nova helps you set these up later.
+- **Repository** (or "repo"): the private storage space on GitHub where your Atlas lives.
+- **Template:** the original Atlas that you copy to make your own. Your copy is completely separate; nobody else can see it.
+- **Project:** a workspace inside the Claude app. You'll make one called "Atlas" and have all your Atlas chats there.
+- **Connector:** a link between Claude and one of your tools, such as your email or calendar. Atlas helps you set these up later.

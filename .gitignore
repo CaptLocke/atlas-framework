@@ -1,5 +1,5 @@
-# Nova: transient, single-use files (approval records, locks). Never committed.
-.nova-tmp/
+# Atlas: transient, single-use files (approval records, locks). Never committed.
+.atlas-tmp/
 # OS and editor clutter
 .DS_Store
 Thumbs.db

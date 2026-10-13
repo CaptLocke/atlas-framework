@@ -1,10 +1,10 @@
-/* Nova dashboard base styles.
+/* Atlas dashboard base styles.
    CANONICAL COPY. Every template in system/dashboards/*.html inlines this file
-   verbatim inside <style id="nova-base">. Edit this file, then run
+   verbatim inside <style id="atlas-base">. Edit this file, then run
    `python3 system/tests/dashboards/render.py --sync` to copy it into the
    templates, and `--check` to confirm they match.
 
-   Theming: nova-dashboards fills <style id="nova-theme"> with --brand-* values
+   Theming: atlas-dashboards fills <style id="atlas-theme"> with --brand-* values
    from user/profile/design-system.md. Nothing here sets --brand-*, so an empty
    theme block falls back to the neutral defaults below. */
 
@@ -154,7 +154,7 @@ button, input, select { font: inherit; color: inherit; }
   .item-aside { text-align: left; justify-items: start; display: flex; flex-wrap: wrap; gap: .4rem; }
 }
 
-/* Record IDs: always visible so the user can ask Nova about the record. */
+/* Record IDs: always visible so the user can ask Atlas about the record. */
 .rid { font-family: var(--font-id); font-size: .76rem; color: var(--ink-2); background: var(--surface-2); padding: .05em .4em; border-radius: 4px; -webkit-user-select: all; user-select: all; overflow-wrap: anywhere; justify-self: start; }
 a.rid { text-decoration: none; }
 a.rid:hover { color: var(--accent); }

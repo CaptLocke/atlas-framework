@@ -9,4 +9,4 @@ updated: 2026-10-01
 provenance: stated
 relationship: self
 ---
-The owner of this Nova.
+The owner of this Atlas.

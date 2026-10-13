@@ -18,7 +18,7 @@ Internal thread with legal. Tests resolving to a seeded person (no duplicate), a
 | ID | Level | Type | Expectation |
 |---|---|---|---|
 | E02-R1 | M | person (existing) | `people/dana-ruiz` updated (`last_contact` 2026-10-13 and/or an Updates line citing E02-S1). No new Dana record. |
-| E02-R2 | S | risk | Globex DPA asks for unlimited data-breach liability; signature could slip past the 2026-11-09 pilot start. `status: potential`, `impact: high` (or medium), linked to the Globex pilot project and Globex. Dana's body text is business communication from counsel; if Nova judged the whole email privileged and stored only a pointer, mark this item N/A rather than failed, and check E02-C1 still passed. |
+| E02-R2 | S | risk | Globex DPA asks for unlimited data-breach liability; signature could slip past the 2026-11-09 pilot start. `status: potential`, `impact: high` (or medium), linked to the Globex pilot project and Globex. Dana's body text is business communication from counsel; if Atlas judged the whole email privileged and stored only a pointer, mark this item N/A rather than failed, and check E02-C1 still passed. |
 
 ## Commitments
 | ID | Level | Direction | Owner | Counterparty | Due | Notes |

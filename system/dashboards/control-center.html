@@ -5,14 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <title>Control Center</title>
-<style id="nova-base">
-/* Nova dashboard base styles.
+<style id="atlas-base">
+/* Atlas dashboard base styles.
    CANONICAL COPY. Every template in system/dashboards/*.html inlines this file
-   verbatim inside <style id="nova-base">. Edit this file, then run
+   verbatim inside <style id="atlas-base">. Edit this file, then run
    `python3 system/tests/dashboards/render.py --sync` to copy it into the
    templates, and `--check` to confirm they match.
 
-   Theming: nova-dashboards fills <style id="nova-theme"> with --brand-* values
+   Theming: atlas-dashboards fills <style id="atlas-theme"> with --brand-* values
    from user/profile/design-system.md. Nothing here sets --brand-*, so an empty
    theme block falls back to the neutral defaults below. */
 
@@ -162,7 +162,7 @@ button, input, select { font: inherit; color: inherit; }
   .item-aside { text-align: left; justify-items: start; display: flex; flex-wrap: wrap; gap: .4rem; }
 }
 
-/* Record IDs: always visible so the user can ask Nova about the record. */
+/* Record IDs: always visible so the user can ask Atlas about the record. */
 .rid { font-family: var(--font-id); font-size: .76rem; color: var(--ink-2); background: var(--surface-2); padding: .05em .4em; border-radius: 4px; -webkit-user-select: all; user-select: all; overflow-wrap: anywhere; justify-self: start; }
 a.rid { text-decoration: none; }
 a.rid:hover { color: var(--accent); }
@@ -218,7 +218,7 @@ a.rid:hover { color: var(--accent); }
   a { color: inherit; text-decoration: none; }
 }
 </style>
-<style id="nova-page">
+<style id="atlas-page">
 .state { display: inline-flex; align-items: center; gap: .45rem; font-weight: 600; font-size: .9rem; white-space: nowrap; }
 .state::before { content: ""; width: .6rem; height: .6rem; border-radius: 50%; background: var(--tone, var(--muted)); }
 .state[data-tone="ok"] { --tone: var(--ok); }
@@ -248,15 +248,15 @@ a.rid:hover { color: var(--accent); }
 .copy button { margin-top: .45rem; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: .2rem .8rem; cursor: pointer; font-size: .85rem; }
 .copy button:hover { border-color: var(--accent); }
 </style>
-<style id="nova-theme">{{NOVA_THEME_CSS}}</style>
+<style id="atlas-theme">{{ATLAS_THEME_CSS}}</style>
 </head>
 <body>
 <div id="app"></div>
-<script id="nova-data" type="application/json">{{NOVA_DATA}}</script>
-<script id="nova-base-js">
-/* Nova dashboard runtime.
+<script id="atlas-data" type="application/json">{{ATLAS_DATA}}</script>
+<script id="atlas-base-js">
+/* Atlas dashboard runtime.
    CANONICAL COPY. Every template inlines this file verbatim inside
-   <script id="nova-base-js">. Edit here, then run
+   <script id="atlas-base-js">. Edit here, then run
    `python3 system/tests/dashboards/render.py --sync`.
 
    Safety: dashboard data comes from emails, documents, and meetings, so it is
@@ -265,7 +265,7 @@ a.rid:hover { color: var(--accent); }
    only for UI conveniences (theme, remembered filter) and is optional. */
 (function () {
   "use strict";
-  var N = (window.Nova = {});
+  var N = (window.Atlas = {});
   N.meta = {};
 
   var LABELS = {
@@ -330,13 +330,13 @@ a.rid:hover { color: var(--accent); }
 
   /* ---- Browser storage (optional; never required) ---- */
   N.store = {
-    get: function (k) { try { return window.localStorage.getItem("nova:" + k); } catch (e) { return null; } },
-    set: function (k, v) { try { window.localStorage.setItem("nova:" + k, v); } catch (e) { /* ignore */ } }
+    get: function (k) { try { return window.localStorage.getItem("atlas:" + k); } catch (e) { return null; } },
+    set: function (k, v) { try { window.localStorage.setItem("atlas:" + k, v); } catch (e) { /* ignore */ } }
   };
 
   /* ---- Data ---- */
   N.load = function () {
-    var node = document.getElementById("nova-data");
+    var node = document.getElementById("atlas-data");
     var raw = node ? node.textContent.trim() : "";
     if (!raw || raw.indexOf("{{") === 0) return null;
     try { return JSON.parse(raw); } catch (e) { return null; }
@@ -402,10 +402,10 @@ a.rid:hover { color: var(--accent); }
     if (base && /^https:\/\//.test(base) && /^[a-z]+\/[a-z0-9][a-z0-9-]*$/.test(id)) {
       return h("a", { class: "rid", href: base + id + ".md", target: "_blank", rel: "noopener noreferrer", title: "Open the record file" }, text);
     }
-    return h("code", { class: "rid", title: "Record ID: mention it in chat to ask Nova about it" }, text);
+    return h("code", { class: "rid", title: "Record ID: mention it in chat to ask Atlas about it" }, text);
   };
   /* A file path in the user's repository (not a record), e.g. a prep note or profile file. */
-  N.path = function (p) { return p ? h("code", { class: "rid", title: "File in your Nova repository" }, p) : null; };
+  N.path = function (p) { return p ? h("code", { class: "rid", title: "File in your Atlas repository" }, p) : null; };
   /* A ref is {id, title}. Renders the title followed by its ID. */
   N.ref = function (r, opts) {
     if (!r) return null;
@@ -441,7 +441,7 @@ a.rid:hover { color: var(--accent); }
   N.more = function (key) {
     var n = (N.meta.truncated || {})[key];
     if (!n) return null;
-    return h("p", { class: "more" }, n + " more not shown here. Ask Nova in chat to see them.");
+    return h("p", { class: "more" }, n + " more not shown here. Ask Atlas in chat to see them.");
   };
   N.total = function (key, shown) { return shown + ((N.meta.truncated || {})[key] || 0); };
 
@@ -569,7 +569,7 @@ a.rid:hover { color: var(--accent); }
     var nav = N.list(N.meta.nav).filter(function (n) { return n && n.url && /^https:\/\//.test(n.url); });
     return h("header", { class: "mast" },
       h("div", { class: "mast-top" },
-        h("p", { class: "mast-who" }, star(), N.meta.user_display_name ? "Nova for " + N.meta.user_display_name : "Nova"),
+        h("p", { class: "mast-who" }, star(), N.meta.user_display_name ? "Atlas for " + N.meta.user_display_name : "Atlas"),
         N.refreshed()),
       h("h1", null, o.title),
       o.subtitle ? h("p", { class: "mast-sub" }, o.subtitle) : null,
@@ -577,7 +577,7 @@ a.rid:hover { color: var(--accent); }
       o.stats && o.stats.length ? h("ul", { class: "mast-stats" }, o.stats.map(function (s) {
         return h("li", null, h("b", null, String(s[0])), s[1]);
       })) : null,
-      nav.length ? h("nav", { class: "mast-nav", "aria-label": "Other Nova pages" }, nav.map(function (n) {
+      nav.length ? h("nav", { class: "mast-nav", "aria-label": "Other Atlas pages" }, nav.map(function (n) {
         return h("a", { href: n.url, target: "_blank", rel: "noopener noreferrer", "aria-current": n.name === N.meta.dashboard ? "page" : null }, n.title || n.name);
       })) : null);
   };
@@ -585,8 +585,8 @@ a.rid:hover { color: var(--accent); }
   N.footer = function () {
     var at = N.meta.generated_at;
     return h("footer", { class: "foot" },
-      h("p", null, (at ? "Refreshed " + N.dateY(at) + ", " + N.time(at) : "Not refreshed yet") + " · Ask Nova in chat to change anything"),
-      h("p", { class: "chips" }, N.meta.nova_version ? h("span", null, "Nova " + N.meta.nova_version) : null, N.themeButton()));
+      h("p", null, (at ? "Refreshed " + N.dateY(at) + ", " + N.time(at) : "Not refreshed yet") + " · Ask Atlas in chat to change anything"),
+      h("p", { class: "chips" }, N.meta.atlas_version ? h("span", null, "Atlas " + N.meta.atlas_version) : null, N.themeButton()));
   };
 
   /* Render a page. build(data, main) appends sections to main and may return masthead options. */
@@ -600,13 +600,13 @@ a.rid:hover { color: var(--accent); }
     var mastOpts = { title: N.meta.title || defaults.title };
     if (!data) {
       mastOpts.subtitle = "Waiting for data";
-      main.appendChild(N.empty("This page has no data yet. Ask Nova in chat to refresh it."));
+      main.appendChild(N.empty("This page has no data yet. Ask Atlas in chat to refresh it."));
     } else {
       try {
         var extra = build(data, main) || {};
         for (var k in extra) mastOpts[k] = extra[k];
       } catch (e) {
-        main.appendChild(h("div", { class: "error-box", role: "alert" }, "Part of this page couldn't be displayed. Ask Nova in chat to refresh it."));
+        main.appendChild(h("div", { class: "error-box", role: "alert" }, "Part of this page couldn't be displayed. Ask Atlas in chat to refresh it."));
         if (window.console) console.error(e);
       }
     }
@@ -624,9 +624,9 @@ a.rid:hover { color: var(--accent); }
   };
 })();
 </script>
-<script id="nova-page-js">
+<script id="atlas-page-js">
 (function () {
-  var N = window.Nova, h = N.h, L = N.list;
+  var N = window.Atlas, h = N.h, L = N.list;
   var RUN_TONE = { ok: "ok", early_exit: "ok", partial: "warn", failed: "danger", skipped_away: null, skipped_paused: null, never_run: null };
   var SEV_TONE = { high: "danger", medium: "warn", low: null };
   var CONN = { ok: ["Connected", "ok"], issue: ["Needs attention", "danger"], unknown: ["Not checked yet", null], fallback: ["No connector (manual)", null] };
@@ -658,7 +658,7 @@ a.rid:hover { color: var(--accent); }
 
     if (acts.length) {
       main.appendChild(N.section({ id: "actions", title: "Action needed",
-        note: "Only you can do these. Nova keeps them here, and at the top of your Daily Brief, until they're done. Tell Nova in chat when you've done one.",
+        note: "Only you can do these. Atlas keeps them here, and at the top of your Daily Brief, until they're done. Tell Atlas in chat when you've done one.",
         body: N.items(acts.map(function (q) {
           return N.item({ tone: "warn", title: q.text, text: q.how || null,
             extra: q.copy_text ? copyBlock(q.copy_text) : null,
@@ -667,11 +667,11 @@ a.rid:hover { color: var(--accent); }
     }
 
     main.appendChild(N.section({ id: "issues", title: "Known issues", count: N.total("known_issues", issues.length), key: "known_issues",
-      note: "Problems Nova found that may need you.",
+      note: "Problems Atlas found that may need you.",
       body: N.items(issues.map(function (i) {
         return N.item({ tone: SEV_TONE[i.severity] || "muted", title: i.summary, aside: [N.chip(N.label(i.severity), SEV_TONE[i.severity]), h("span", null, "Since " + N.date(i.since))],
           extra: i.fix ? h("p", { class: "fix" }, h("b", null, "To fix: "), N.rich(i.fix)) : null });
-      }), "No known issues. Everything Nova checks is working.") }));
+      }), "No known issues. Everything Atlas checks is working.") }));
 
     main.appendChild(N.section({ id: "approvals", title: "Waiting for your OK", count: N.total("approvals", asks.length), key: "approvals",
       note: "Nothing here happens until you say yes in chat. Requests expire after 14 days.",
@@ -681,7 +681,7 @@ a.rid:hover { color: var(--accent); }
           aside: [h("span", null, a.id), h("span", null, "Asked " + N.date(a.requested_on)), a.expires_on ? h("span", null, "Expires " + N.date(a.expires_on)) : null] });
       }), "Nothing is waiting for approval.") }));
 
-    main.appendChild(N.section({ id: "questions", title: "Questions from Nova", count: N.total("questions", qs.length), key: "questions",
+    main.appendChild(N.section({ id: "questions", title: "Questions from Atlas", count: N.total("questions", qs.length), key: "questions",
       note: "Answer in chat whenever it suits you.",
       body: N.items(qs.map(function (q) {
         return N.item({ tone: "accent", title: q.text, text: q.proposed_change ? "Proposed: " + q.proposed_change : null,
@@ -689,7 +689,7 @@ a.rid:hover { color: var(--accent); }
       }), "No open questions.") }));
 
     main.appendChild(N.section({ id: "automations", title: "Automations", count: routines.length,
-      note: d.profile ? "Your " + N.label(d.profile).toLowerCase() + " automation profile. Ask Nova in chat to pause, reschedule, or change one." : null,
+      note: d.profile ? "Your " + N.label(d.profile).toLowerCase() + " automation profile. Ask Atlas in chat to pause, reschedule, or change one." : null,
       body: N.items(routines.map(function (r) {
         var lr = r.last_run || {};
         var st = lr.status || "never_run";
@@ -716,7 +716,7 @@ a.rid:hover { color: var(--accent); }
 
     var conns = L(d.connections);
     main.appendChild(N.section({ id: "connections", title: "Connections", count: conns.length,
-      note: "The tools Nova reads from and drafts in.",
+      note: "The tools Atlas reads from and drafts in.",
       body: N.items(conns.map(function (c) {
         var s = CONN[c.status] || CONN.unknown;
         return N.item({ tone: s[1] || "muted", title: c.name,
@@ -735,7 +735,7 @@ a.rid:hover { color: var(--accent); }
 
     var act = L(d.activity);
     main.appendChild(N.section({ id: "activity", title: "Recent activity", count: N.total("activity", act.length), key: "activity",
-      note: "Every change Nova made, newest first.",
+      note: "Every change Atlas made, newest first.",
       body: act.length ? h("div", { class: "items", style: "padding:.4rem 1rem" }, h("ul", { class: "log" }, act.map(function (a) {
         return h("li", null, h("time", { datetime: a.at }, N.dateTime(a.at)),
           h("div", null, h("p", null, N.rich(a.summary)), h("p", { class: "actor" }, [a.actor, a.action].filter(Boolean).join(", "))));
@@ -743,13 +743,13 @@ a.rid:hover { color: var(--accent); }
 
     var flagged = L(d.suspicious);
     if (flagged.length) {
-      main.appendChild(N.section({ id: "flagged", title: "Suspicious content", note: "Instructions found inside emails or documents. Nova ignored them.",
+      main.appendChild(N.section({ id: "flagged", title: "Suspicious content", note: "Instructions found inside emails or documents. Atlas ignored them.",
         body: N.items(flagged.map(function (f) { return N.item({ tone: "warn", title: f.summary, meta: [N.dateTime(f.at), f.source ? N.rid(f.source) : null] }); })) }));
     }
 
     var sys = d.system || {};
     var up = sys.update || {};
-    main.appendChild(N.section({ id: "system", title: "Nova itself",
+    main.appendChild(N.section({ id: "system", title: "Atlas itself",
       body: [N.facts([["Version", sys.installed_version], ["Latest release", up.latest_version ? up.latest_version + (up.available ? " (update available)" : "") : null],
         ["Last checked for updates", up.last_checked ? N.date(up.last_checked) : null], ["Your health check", sys.last_user_check ? N.date(sys.last_user_check) : null],
         ["System health check", sys.last_system_check ? N.date(sys.last_system_check) : null], ["Data format", sys.data_version != null ? "Version " + sys.data_version : null]]),

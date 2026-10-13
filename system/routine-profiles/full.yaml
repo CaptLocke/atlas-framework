@@ -1,13 +1,13 @@
-# Nova automation profile: Full
+# Atlas automation profile: Full
 # Suggested for: Claude Max 20x (or a Team/Enterprise seat with a high allowance).
 # Approx. runs: ~23 per day (about 28 on weekdays, 10 on weekend days, + weekly).
 # Near-real-time: ingest hourly in work hours and every 4 hours outside them,
 # insights every 3 hours and triage + drafts every 2 hours in work hours.
-# Schedules are cron in the user's time zone (user/settings/nova.yaml: timezone),
+# Schedules are cron in the user's time zone (user/settings/atlas.yaml: timezone),
 # minutes off the hour to avoid delayed starts. One schedule per routine.
 #
 # WORK HOURS: the hours below assume the default work hours in
-# user/settings/rhythms.yaml (Mon-Fri, 08:00-18:00). nova-setup (and nova-settings
+# user/settings/rhythms.yaml (Mon-Fri, 08:00-18:00). atlas-setup (and atlas-settings
 # when work hours change) rewrites the hour fields of ingest-work, intelligence,
 # triage-drafts, ingest-offhours, and ingest-weekend to match the user's hours.
 #
@@ -15,7 +15,7 @@
 #   ingest-offhours  every day at 0:07, 4:07, 20:07 (nights, all week)
 #   ingest-weekend   weekends at 8:07, 12:07, 16:07 (daytime on Sat/Sun)
 # Together they give "every 4 hours outside work hours" with no overlap.
-# nova-setup copies this file to user/settings/routines.yaml when the user picks it.
+# atlas-setup copies this file to user/settings/routines.yaml when the user picks it.
 profile: full
 routines:
   - name: ingest-work

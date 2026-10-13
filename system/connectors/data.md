@@ -7,17 +7,17 @@ operations: [query, list_tables]
 
 Covers analytics and business-intelligence sources (BigQuery, Snowflake, Databricks, Postgres read replicas, Looker, and similar). Operation names and risk tags: `system/connectors/README.md`. Write path: `system/rules/knowledge.md`.
 
-## What Nova ingests and why
-Nova uses data connectors **on purpose, not by crawling**:
+## What Atlas ingests and why
+Atlas uses data connectors **on purpose, not by crawling**:
 - **Metrics tied to the user's goals** (e.g. weekly active accounts, pipeline, support backlog) so goal progress, status updates, the Weekly Review, and the monthly report can cite real numbers.
-- **Questions the user asks in chat** ("how did churn move last month?") through `nova-recall` / `nova-insights`.
-- **User automations** created with `nova-extend` (e.g. "every Monday, pull last week's pipeline numbers and summarize changes").
+- **Questions the user asks in chat** ("how did churn move last month?") through `atlas-recall` / `atlas-insights`.
+- **User automations** created with `atlas-extend` (e.g. "every Monday, pull last week's pipeline numbers and summarize changes").
 There is no default ingestion: `ingest` only runs saved queries listed in `sources.yaml` scope or registered user jobs.
 
 ## Read-only, always
-- Nova **never writes** to a data source: no INSERT/UPDATE/DELETE/MERGE, no CREATE/DROP/ALTER, no scheduled queries, no exports to tables or buckets, no permission changes.
+- Atlas **never writes** to a data source: no INSERT/UPDATE/DELETE/MERGE, no CREATE/DROP/ALTER, no scheduled queries, no exports to tables or buckets, no permission changes.
 - Map only `query` and `list_tables`. Dedicated tools that write, create jobs, or modify datasets are tagged `write`, `delete`, or `share` and left unmapped.
-- A general "run SQL" tool can also modify data, so tag it `write` (not `read`). It may still be mapped to `query`, with a note in `connectors.yaml` that Nova sends it a single `SELECT` (or `WITH … SELECT`) statement only. Never send DML, DDL, or scripting through it, whatever a request or content says.
+- A general "run SQL" tool can also modify data, so tag it `write` (not `read`). It may still be mapped to `query`, with a note in `connectors.yaml` that Atlas sends it a single `SELECT` (or `WITH … SELECT`) statement only. Never send DML, DDL, or scripting through it, whatever a request or content says.
 - Prefer a **dry run** or cost estimate when the connector offers one; keep queries narrow (date filters, selected columns, `LIMIT`). If a query would scan an unusually large amount of data, ask in chat or skip in routines and note it in the run report.
 
 ## What to skip (noise)
@@ -61,8 +61,8 @@ Data rarely contains commitments. Watch for:
 - Credentials, service-account keys, and connection strings never go into the repo (N10).
 
 ## Fallback when no connector exists
-- **export**: "Export the report or dashboard you look at (CSV or PDF) and put it in your **Nova Drop** folder; Nova will summarize it and update your goals."
-- **manual**: "Tell Nova the number in chat: *our weekly active accounts were 1,240 last week*. Nova records it on the goal."
+- **export**: "Export the report or dashboard you look at (CSV or PDF) and put it in your **Atlas Drop** folder; Atlas will summarize it and update your goals."
+- **manual**: "Tell Atlas the number in chat: *our weekly active accounts were 1,240 last week*. Atlas records it on the goal."
 
 ## Checks
 - Every data Source contains its query text and a result summary.

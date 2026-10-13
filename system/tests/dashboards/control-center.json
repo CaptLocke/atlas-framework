@@ -9,7 +9,7 @@
     "timezone": "America/Los_Angeles",
     "locale": "en-US",
     "user_display_name": "Maya Chen",
-    "nova_version": "1.0.0",
+    "atlas_version": "1.0.0",
     "record_base_url": null,
     "nav": [],
     "notices": [],
@@ -19,15 +19,15 @@
   "profile": "lean",
   "away": { "active": false, "start": null, "end": null },
   "known_issues": [
-    { "id": "conn-outlook-auth", "severity": "high", "since": "2026-10-10", "summary": "Outlook connection expired", "fix": "In Claude, open Settings, then Connectors, and reconnect Outlook. Nova will catch up on mail automatically.", "status": "open" },
-    { "id": "drop-folder-large-file", "severity": "low", "since": "2026-10-11", "summary": "A 48 MB file in Nova Drop was too large to copy", "fix": "Nothing to do: Nova kept a pointer to it. Split it if you want the content read.", "status": "open" }
+    { "id": "conn-outlook-auth", "severity": "high", "since": "2026-10-10", "summary": "Outlook connection expired", "fix": "In Claude, open Settings, then Connectors, and reconnect Outlook. Atlas will catch up on mail automatically.", "status": "open" },
+    { "id": "drop-folder-large-file", "severity": "low", "since": "2026-10-11", "summary": "A 48 MB file in Atlas Drop was too large to copy", "fix": "Nothing to do: Atlas kept a pointer to it. Split it if you want the content read.", "status": "open" }
   ],
   "approvals": [
     { "id": "A-2026-10-12-01", "action": "Send follow-up to Dana Ruiz", "why": "Her MSA review is six days overdue ([[commitments/dana-msa-review]]).", "prepared": "Outlook draft \"Contract review: quick check-in\"", "requested_by": "routine:nightly-cycle", "requested_on": "2026-10-12", "expires_on": "2026-10-26", "status": "pending" },
     { "id": "A-2026-10-09-02", "action": "Put a focus block on your calendar Wednesday 9:30 to 11:30", "why": "Time to review the Q4 roadmap draft before it's due.", "prepared": null, "requested_by": "routine:weekly", "requested_on": "2026-10-09", "expires_on": "2026-10-23", "status": "pending" }
   ],
   "questions": [
-    { "id": "Q-2026-10-13-01", "kind": "action", "text": "Update your Nova Project's instructions (Nova was updated to 1.1.0).", "how": "In the Claude app, open the Nova Project, replace its instructions with the text below, and save.", "copy_text": "This Project is my Nova (Nova bootstrap 3). At the start of every conversation:\n1. Attach my GitHub repository maya-chen/nova with write (push) access and sync it.\n2. Follow the CLAUDE.md file in that repository.\nNever ask me to commit, push, or merge.", "proposed_change": null, "asked": "2026-10-13" },
+    { "id": "Q-2026-10-13-01", "kind": "action", "text": "Update your Atlas Project's instructions (Atlas was updated to 1.1.0).", "how": "In the Claude app, open the Atlas Project, replace its instructions with the text below, and save.", "copy_text": "This Project is my Atlas (Atlas bootstrap 3). At the start of every conversation:\n1. Attach my GitHub repository maya-chen/atlas with write (push) access and sync it.\n2. Follow the CLAUDE.md file in that repository.\nNever ask me to commit, push, or merge.", "proposed_change": null, "asked": "2026-10-13" },
     { "id": "Q-2026-10-12-02", "kind": "profile", "text": "You shortened my last four drafts by about half. Should I default to shorter emails?", "proposed_change": "voice-personal.md: Keep emails under about 120 words", "asked": "2026-10-12" },
     { "id": "Q-2026-10-11-01", "kind": "relationship", "text": "Is Elena Petrova on your team or in Sales?", "proposed_change": null, "asked": "2026-10-11" }
   ],
@@ -46,7 +46,7 @@
       "next_run": "2026-10-18T03:07:00-07:00" }
   ],
   "jobs": [
-    { "name": "ingest", "title": "Bring in new information", "last_status": "partial", "last_success": "2026-10-09T20:09:12-07:00", "detail": "Calendar, Zoom and Nova Drop read; Outlook skipped", "paused": false },
+    { "name": "ingest", "title": "Bring in new information", "last_status": "partial", "last_success": "2026-10-09T20:09:12-07:00", "detail": "Calendar, Zoom and Atlas Drop read; Outlook skipped", "paused": false },
     { "name": "triage", "title": "Triage commitments", "last_status": "ok", "last_success": "2026-10-12T20:14:40-07:00", "detail": "22 reviewed, 2 closed, 1 slipped", "paused": false },
     { "name": "intelligence", "title": "Look for insights", "last_status": "ok", "last_success": "2026-10-12T20:19:02-07:00", "detail": "3 new insights", "paused": false },
     { "name": "email-drafts", "title": "Draft emails", "last_status": "ok", "last_success": "2026-10-12T20:22:30-07:00", "detail": "2 drafts", "paused": false },
@@ -62,10 +62,10 @@
   "connections": [
     { "name": "Outlook", "connector": "outlook", "categories": ["mail", "calendar"], "status": "issue", "available_in_routines": true, "last_seen": "2026-10-09T20:07:00-07:00", "note": "Sign-in expired Oct 10. Reconnect it in Settings, then Connectors." },
     { "name": "Zoom", "connector": "zoom", "categories": ["meetings"], "status": "ok", "available_in_routines": true, "last_seen": "2026-10-12T17:30:00-07:00", "note": null },
-    { "name": "Google Drive", "connector": "google-drive", "categories": ["files"], "status": "ok", "available_in_routines": true, "last_seen": "2026-10-12T20:07:00-07:00", "note": "Nova Drop and Nova Deliverables folders." },
+    { "name": "Google Drive", "connector": "google-drive", "categories": ["files"], "status": "ok", "available_in_routines": true, "last_seen": "2026-10-12T20:07:00-07:00", "note": "Atlas Drop and Atlas Deliverables folders." },
     { "name": "Slack", "connector": "slack", "categories": ["messaging"], "status": "unknown", "available_in_routines": null, "last_seen": null, "note": "Connected today; the next automation run will confirm it works unattended." },
-    { "name": "GitHub (your Nova repository)", "connector": "github", "categories": ["other"], "status": "ok", "available_in_routines": true, "last_seen": "2026-10-12T20:31:58-07:00", "note": null },
-    { "name": "CRM", "connector": null, "categories": ["crm"], "status": "fallback", "available_in_routines": null, "last_seen": null, "note": "No CRM connected. Forward deal updates to yourself with [nova] in the subject." }
+    { "name": "GitHub (your Atlas repository)", "connector": "github", "categories": ["other"], "status": "ok", "available_in_routines": true, "last_seen": "2026-10-12T20:31:58-07:00", "note": null },
+    { "name": "CRM", "connector": null, "categories": ["crm"], "status": "fallback", "available_in_routines": null, "last_seen": null, "note": "No CRM connected. Forward deal updates to yourself with [atlas] in the subject." }
   ],
   "runs": [
     { "routine": "nightly-cycle", "started": "2026-10-12T20:07:03-07:00", "status": "partial", "duration_min": 25, "summary": "37 items in, 14 filed; 3 insights; 2 drafts; brief for Oct 13.", "report": "user/logs/runs/2026-10/nightly-cycle-20261012-2007.md" },

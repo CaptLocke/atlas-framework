@@ -6,10 +6,10 @@ checked: "2026-10: Anthropic help center (Google Workspace connectors); tool nam
 ---
 # Hint: Google Drive
 
-Tool names vary; always verify from the live tool list. Guide: `system/connectors/files.md` (Nova Drop and deliverables folder).
+Tool names vary; always verify from the live tool list. Guide: `system/connectors/files.md` (Atlas Drop and deliverables folder).
 
 ## Likely categories
-`files`. Good choice for both the **Nova Drop** folder and the **deliverables** folder.
+`files`. Good choice for both the **Atlas Drop** folder and the **deliverables** folder.
 
 ## Typical operations
 | Operation | What to look for |
@@ -25,13 +25,13 @@ Tool names vary; always verify from the live tool list. Guide: `system/connector
 
 ## Cursor ideas
 - Scoped folders: modified-time filter (e.g. "modifiedTime > `<ISO time>`") plus the parent filter.
-- Nova Drop: list the folder's direct children; the move to `Processed` is the real guard.
+- Atlas Drop: list the folder's direct children; the move to `Processed` is the real guard.
 
 ## Known quirks
-- **Use folder IDs, not names**: Drive allows duplicate folder names. Record `folder_id` in `nova.yaml` at setup; search for an existing "Nova Drop" before creating one.
+- **Use folder IDs, not names**: Drive allows duplicate folder names. Record `folder_id` in `atlas.yaml` at setup; search for an existing "Atlas Drop" before creating one.
 - Saving Claude-generated files may require code execution / file creation to be enabled in Claude settings; if upload fails, deliver as download.
 - Text is extracted from files; images inside documents may not be processed.
-- Shared drives and shortcuts behave differently from My Drive: create Nova folders in My Drive.
+- Shared drives and shortcuts behave differently from My Drive: create Atlas folders in My Drive.
 - Moving a file into a shared folder changes who can see it (see risk).
 
 ## Risk-sensitive tools
@@ -40,4 +40,4 @@ Tool names vary; always verify from the live tool list. Guide: `system/connector
 - `write`: create folder, upload, move (within the user's own folders), copy, rename, edit content.
 
 ## Fallback
-No drive connected: drops by chat attachment; deliverables as downloads (`nova.yaml` connectors set to `null`).
+No drive connected: drops by chat attachment; deliverables as downloads (`atlas.yaml` connectors set to `null`).

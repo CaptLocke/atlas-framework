@@ -1,6 +1,6 @@
-/* Nova dashboard runtime.
+/* Atlas dashboard runtime.
    CANONICAL COPY. Every template inlines this file verbatim inside
-   <script id="nova-base-js">. Edit here, then run
+   <script id="atlas-base-js">. Edit here, then run
    `python3 system/tests/dashboards/render.py --sync`.
 
    Safety: dashboard data comes from emails, documents, and meetings, so it is
@@ -9,7 +9,7 @@
    only for UI conveniences (theme, remembered filter) and is optional. */
 (function () {
   "use strict";
-  var N = (window.Nova = {});
+  var N = (window.Atlas = {});
   N.meta = {};
 
   var LABELS = {
@@ -74,13 +74,13 @@
 
   /* ---- Browser storage (optional; never required) ---- */
   N.store = {
-    get: function (k) { try { return window.localStorage.getItem("nova:" + k); } catch (e) { return null; } },
-    set: function (k, v) { try { window.localStorage.setItem("nova:" + k, v); } catch (e) { /* ignore */ } }
+    get: function (k) { try { return window.localStorage.getItem("atlas:" + k); } catch (e) { return null; } },
+    set: function (k, v) { try { window.localStorage.setItem("atlas:" + k, v); } catch (e) { /* ignore */ } }
   };
 
   /* ---- Data ---- */
   N.load = function () {
-    var node = document.getElementById("nova-data");
+    var node = document.getElementById("atlas-data");
     var raw = node ? node.textContent.trim() : "";
     if (!raw || raw.indexOf("{{") === 0) return null;
     try { return JSON.parse(raw); } catch (e) { return null; }
@@ -146,10 +146,10 @@
     if (base && /^https:\/\//.test(base) && /^[a-z]+\/[a-z0-9][a-z0-9-]*$/.test(id)) {
       return h("a", { class: "rid", href: base + id + ".md", target: "_blank", rel: "noopener noreferrer", title: "Open the record file" }, text);
     }
-    return h("code", { class: "rid", title: "Record ID: mention it in chat to ask Nova about it" }, text);
+    return h("code", { class: "rid", title: "Record ID: mention it in chat to ask Atlas about it" }, text);
   };
   /* A file path in the user's repository (not a record), e.g. a prep note or profile file. */
-  N.path = function (p) { return p ? h("code", { class: "rid", title: "File in your Nova repository" }, p) : null; };
+  N.path = function (p) { return p ? h("code", { class: "rid", title: "File in your Atlas repository" }, p) : null; };
   /* A ref is {id, title}. Renders the title followed by its ID. */
   N.ref = function (r, opts) {
     if (!r) return null;
@@ -185,7 +185,7 @@
   N.more = function (key) {
     var n = (N.meta.truncated || {})[key];
     if (!n) return null;
-    return h("p", { class: "more" }, n + " more not shown here. Ask Nova in chat to see them.");
+    return h("p", { class: "more" }, n + " more not shown here. Ask Atlas in chat to see them.");
   };
   N.total = function (key, shown) { return shown + ((N.meta.truncated || {})[key] || 0); };
 
@@ -313,7 +313,7 @@
     var nav = N.list(N.meta.nav).filter(function (n) { return n && n.url && /^https:\/\//.test(n.url); });
     return h("header", { class: "mast" },
       h("div", { class: "mast-top" },
-        h("p", { class: "mast-who" }, star(), N.meta.user_display_name ? "Nova for " + N.meta.user_display_name : "Nova"),
+        h("p", { class: "mast-who" }, star(), N.meta.user_display_name ? "Atlas for " + N.meta.user_display_name : "Atlas"),
         N.refreshed()),
       h("h1", null, o.title),
       o.subtitle ? h("p", { class: "mast-sub" }, o.subtitle) : null,
@@ -321,7 +321,7 @@
       o.stats && o.stats.length ? h("ul", { class: "mast-stats" }, o.stats.map(function (s) {
         return h("li", null, h("b", null, String(s[0])), s[1]);
       })) : null,
-      nav.length ? h("nav", { class: "mast-nav", "aria-label": "Other Nova pages" }, nav.map(function (n) {
+      nav.length ? h("nav", { class: "mast-nav", "aria-label": "Other Atlas pages" }, nav.map(function (n) {
         return h("a", { href: n.url, target: "_blank", rel: "noopener noreferrer", "aria-current": n.name === N.meta.dashboard ? "page" : null }, n.title || n.name);
       })) : null);
   };
@@ -329,8 +329,8 @@
   N.footer = function () {
     var at = N.meta.generated_at;
     return h("footer", { class: "foot" },
-      h("p", null, (at ? "Refreshed " + N.dateY(at) + ", " + N.time(at) : "Not refreshed yet") + " · Ask Nova in chat to change anything"),
-      h("p", { class: "chips" }, N.meta.nova_version ? h("span", null, "Nova " + N.meta.nova_version) : null, N.themeButton()));
+      h("p", null, (at ? "Refreshed " + N.dateY(at) + ", " + N.time(at) : "Not refreshed yet") + " · Ask Atlas in chat to change anything"),
+      h("p", { class: "chips" }, N.meta.atlas_version ? h("span", null, "Atlas " + N.meta.atlas_version) : null, N.themeButton()));
   };
 
   /* Render a page. build(data, main) appends sections to main and may return masthead options. */
@@ -344,13 +344,13 @@
     var mastOpts = { title: N.meta.title || defaults.title };
     if (!data) {
       mastOpts.subtitle = "Waiting for data";
-      main.appendChild(N.empty("This page has no data yet. Ask Nova in chat to refresh it."));
+      main.appendChild(N.empty("This page has no data yet. Ask Atlas in chat to refresh it."));
     } else {
       try {
         var extra = build(data, main) || {};
         for (var k in extra) mastOpts[k] = extra[k];
       } catch (e) {
-        main.appendChild(h("div", { class: "error-box", role: "alert" }, "Part of this page couldn't be displayed. Ask Nova in chat to refresh it."));
+        main.appendChild(h("div", { class: "error-box", role: "alert" }, "Part of this page couldn't be displayed. Ask Atlas in chat to refresh it."));
         if (window.console) console.error(e);
       }
     }

@@ -2,7 +2,7 @@
 type: job
 name: triage
 model: strongest
-skills: [nova-triage]
+skills: [atlas-triage]
 ---
 # Job: triage
 
@@ -25,13 +25,13 @@ If `ingest` has not succeeded in the last 24 hours and is not earlier in this ro
 - Active goals (`user/knowledge/goals/`), calendar for the next 14 days (events records), `rhythms.yaml: triggers`.
 
 ## Steps
-1. Invoke `nova-triage` in the requested mode with the window "since last triage success".
+1. Invoke `atlas-triage` in the requested mode with the window "since last triage success".
 2. Catch: scan new sources for explicit promises not yet recorded; create commitments per `system/rules/knowledge.md` (direction `i_owe` or `waiting_on` only). Vague intentions become questions.
 3. Close: mark `done` only on evidence (sent message, delivered file, user's word, source showing completion), with `completed_on` and an Updates line citing the evidence.
 4. Prioritize (full mode only): set `priority` against active goals, deadlines, and who is waiting; set a one-line `insight` and `next_step`.
 5. Dedupe obvious duplicate commitments (`merge_supersede`); ambiguous ones become questions.
-6. Evaluate triggers: `playbook_start` (start or propose runs for active playbooks, `.claude/skills/nova-triage/reference/playbooks.md` §2), `commitment_overdue` (set `status: slipped`; flag for the brief; for `waiting_on`, create a follow-up draft via `nova-write` and a pending approval entry to send it) and `deadline_approaching` (due within `days`, default 3: mark for the next brief's "Due soon"; the day before, mark for the top). Fire once per key.
-7. If commitments changed and this routine does not run `daily-brief` later, republish (`nova-dashboards`, `dashboards_refresh`) every dashboard whose contract (`system/dashboards/*.contract.md`) lists `triage` in `republished_by`.
+6. Evaluate triggers: `playbook_start` (start or propose runs for active playbooks, `.claude/skills/atlas-triage/reference/playbooks.md` §2), `commitment_overdue` (set `status: slipped`; flag for the brief; for `waiting_on`, create a follow-up draft via `atlas-write` and a pending approval entry to send it) and `deadline_approaching` (due within `days`, default 3: mark for the next brief's "Due soon"; the day before, mark for the top). Fire once per key.
+7. If commitments changed and this routine does not run `daily-brief` later, republish (`atlas-dashboards`, `dashboards_refresh`) every dashboard whose contract (`system/dashboards/*.contract.md`) lists `triage` in `republished_by`.
 
 ## Outputs
 - Updated commitment records (and new ones), index lines, `user/.state/triggers.yaml`.

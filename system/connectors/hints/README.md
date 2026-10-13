@@ -3,10 +3,10 @@ type: connector-hints-index
 ---
 # Known-connector hints
 
-Short notes on common connectors that help `nova-connectors` map them faster: which categories they usually cover, what their tools tend to look like, how to set cursors, known quirks, and which tools to tag as risky.
+Short notes on common connectors that help `atlas-connectors` map them faster: which categories they usually cover, what their tools tend to look like, how to set cursors, known quirks, and which tools to tag as risky.
 
 ## Hints are optional accelerators
-- **Mapping must never depend on a hint.** The procedure in `system/connectors/README.md` and `nova-connectors` (read the live tool list, classify, probe read-only, tag risk, record) works for any connector, with or without a hint.
+- **Mapping must never depend on a hint.** The procedure in `system/connectors/README.md` and `atlas-connectors` (read the live tool list, classify, probe read-only, tag risk, record) works for any connector, with or without a hint.
 - **The live tool list always wins.** Tool names, parameters, and capabilities vary by connector version, vendor, plan, and the user's organization settings. If a hint disagrees with what the session actually exposes, follow the session and note the difference in the run report or health check.
 - **Hints never lower a risk tag.** Tag every tool from its live name and description using the rules in `system/connectors/README.md`. A hint may only point out tools that deserve a *riskier* tag than their name suggests.
 - Tool names in hints are examples of what to look for, not facts, unless a line says it was observed (with date).

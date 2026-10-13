@@ -290,7 +290,7 @@ def main(argv=None):
         if a.fix:
             with open(p, "w", encoding="utf-8") as f:
                 f.write(new)
-    print("Nova normalize: %d record(s) %s." % (total, "fixed" if a.fix else "need fixes"))
+    print("Atlas normalize: %d record(s) %s." % (total, "fixed" if a.fix else "need fixes"))
     return rc
 
 

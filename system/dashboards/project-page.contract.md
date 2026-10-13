@@ -48,7 +48,7 @@ Full example: `system/tests/dashboards/project-page.json`. `meta.title` = the pr
 | Field | Source |
 |---|---|
 | `project` | The project record: frontmatter fields; `description` = paragraphs of the body above `## Updates`; `organizations`, `topics` = `links` groups |
-| `people[]` | Project `links.people` plus owners/deciders/attendees of the records below; `project_role` = a short role Nova infers from the records (owner, sponsor, reviewer…) or the person's `role` |
+| `people[]` | Project `links.people` plus owners/deciders/attendees of the records below; `project_role` = a short role Atlas infers from the records (owner, sponsor, reviewer…) or the person's `role` |
 | `commitments[]` | Commitments linking the project, `status: open|slipped` |
 | `risks[]` | Risks linking the project: `potential`, `active`, and `resolved` in the last 90 days |
 | `decisions[]` | Decisions linking the project, not superseded, newest first |

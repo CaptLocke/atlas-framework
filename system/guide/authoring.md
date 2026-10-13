@@ -1,10 +1,10 @@
 ---
 type: authoring-guide
-audience: Nova maintainers and anyone writing system files or extensions
+audience: Atlas maintainers and anyone writing system files or extensions
 ---
-# Authoring Nova files
+# Authoring Atlas files
 
-Every Nova instruction file follows one of the outlines below so files read consistently, stay short, and load cheaply. Instructions describe **outcomes and checks**, not brittle phrasing.
+Every Atlas instruction file follows one of the outlines below so files read consistently, stay short, and load cheaply. Instructions describe **outcomes and checks**, not brittle phrasing.
 
 ## General rules
 - Markdown with YAML frontmatter. Sentence case headings. Plain language.
@@ -17,7 +17,7 @@ Every Nova instruction file follows one of the outlines below so files read cons
 ## Skill outline (`.claude/skills/<name>/SKILL.md`)
 ```markdown
 ---
-name: nova-<name>
+name: atlas-<name>
 description: <one sentence: what it does and when to use it, including typical user phrases>
 ---
 # <Title>
@@ -41,7 +41,7 @@ description: <one sentence: what it does and when to use it, including typical u
 type: job
 name: <job>
 model: fast | strongest
-skills: [nova-..., ...]
+skills: [atlas-..., ...]
 ---
 # Job: <name>
 ## Purpose

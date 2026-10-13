@@ -2,7 +2,7 @@
 type: job
 name: status-updates
 model: strongest
-skills: [nova-status-update]
+skills: [atlas-status-update]
 ---
 # Job: status-updates
 
@@ -30,7 +30,7 @@ During away (run date within away, `system/jobs/README.md`), exit with `skipped_
 
 ## Steps
 1. For each audience, skip if a status draft for this ISO week exists and nothing relevant changed since.
-2. Invoke `nova-status-update` for that audience: what moved, decisions, risks and asks, next week; finished and ready to send, no citations in the draft; list sources separately in the file.
+2. Invoke `atlas-status-update` for that audience: what moved, decisions, risks and asks, next week; finished and ready to send, no citations in the draft; list sources separately in the file.
 3. Write `user/work/status/YYYY-MM-DD-<audience-slug>.md` (`type: status`, `date`, `sources`).
 4. If a mail connector with `mail.create_draft` is available and `drafts_create` is `auto`, also create an email draft to that audience and add a pending `send_communication` entry to `user/inbox/approvals.md` pointing to it.
 5. Commit.

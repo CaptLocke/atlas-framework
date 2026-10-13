@@ -45,7 +45,7 @@ Every knowledge record is one markdown file at `user/knowledge/<folder>/<slug>.m
 - **Update** by editing fields, refreshing `updated`, and appending to Updates.
 - **Supersede** when a record is replaced wholesale: new record sets `supersedes`, old sets `superseded_by` and keeps its content.
 - **Archive** with `archived: true`.
-- **Forget / purge** only through `nova-memory` with approval (`system/rules/knowledge.md`).
+- **Forget / purge** only through `atlas-memory` with approval (`system/rules/knowledge.md`).
 
 ## Minimal valid example
 ```markdown

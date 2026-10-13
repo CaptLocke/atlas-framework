@@ -1,4 +1,4 @@
-"""Shared helpers for Nova hook tests: build a throwaway Nova repo and run a
+"""Shared helpers for Atlas hook tests: build a throwaway Atlas repo and run a
 hook script against it exactly as Claude Code would (JSON on stdin, env vars).
 
 Fake secrets used in tests are assembled at runtime so no file in the repo
@@ -14,7 +14,7 @@ import unittest
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 HOOKS = os.path.join(REPO, ".claude", "hooks")
-USER_ORIGIN = "https://github.com/example-user/nova.git"
+USER_ORIGIN = "https://github.com/example-user/atlas.git"
 
 
 def iso(minutes):
@@ -30,12 +30,12 @@ def sh(args, cwd, check=True):
 
 
 class HookTestCase(unittest.TestCase):
-    """Each test gets a fresh git repo that looks like a user's Nova repo."""
+    """Each test gets a fresh git repo that looks like a user's Atlas repo."""
 
     origin = USER_ORIGIN
 
     def setUp(self):
-        self.tmp = tempfile.mkdtemp(prefix="nova-hooktest-")
+        self.tmp = tempfile.mkdtemp(prefix="atlas-hooktest-")
         self.root = os.path.realpath(self.tmp)
         shutil.copytree(HOOKS, os.path.join(self.root, ".claude", "hooks"),
                         ignore=shutil.ignore_patterns("__pycache__"))
@@ -48,17 +48,17 @@ class HookTestCase(unittest.TestCase):
                   "user/knowledge/_index", "docs"):
             os.makedirs(os.path.join(self.root, d), exist_ok=True)
         self.write("user/knowledge/people/dana-ruiz.md", "---\nid: people/dana-ruiz\n---\n")
-        self.write(".gitignore", ".nova-tmp/\n__pycache__/\n")
+        self.write(".gitignore", ".atlas-tmp/\n__pycache__/\n")
         for f in ("CLAUDE.md", "README.md", "LICENSE", "CHANGELOG.md"):
             self.write(f, "x\n")
         sh(["git", "init", "-q", "-b", "main"], self.root)
         sh(["git", "config", "user.email", "test@example.com"], self.root)
-        sh(["git", "config", "user.name", "Nova Test"], self.root)
+        sh(["git", "config", "user.name", "Atlas Test"], self.root)
         sh(["git", "config", "commit.gpgsign", "false"], self.root)
         if self.origin:
             sh(["git", "remote", "add", "origin", self.origin], self.root)
         sh(["git", "add", "-A"], self.root)
-        sh(["git", "commit", "-q", "-m", "init\n\nNova-Actor: setup\nNova-Reason: test"], self.root)
+        sh(["git", "commit", "-q", "-m", "init\n\nAtlas-Actor: setup\nAtlas-Reason: test"], self.root)
 
     def tearDown(self):
         shutil.rmtree(self.tmp, ignore_errors=True)
@@ -80,15 +80,15 @@ class HookTestCase(unittest.TestCase):
         rec = {"action": action, "tool": tool, "target": target,
                "user_confirmation": "yes, do it", "created": iso(0), "expires": iso(minutes)}
         rec.update(extra)
-        self.write_json(".nova-tmp/approval.json", rec)
+        self.write_json(".atlas-tmp/approval.json", rec)
 
     def update_lock(self, minutes=30):
-        self.write_json(".nova-tmp/update.lock", {"by": "nova-update", "version_from": "1.0.0",
+        self.write_json(".atlas-tmp/update.lock", {"by": "atlas-update", "version_from": "1.0.0",
                                                   "version_to": "1.1.0", "created": iso(0),
                                                   "expires": iso(minutes)})
 
     def purge_lock(self, minutes=15):
-        self.write_json(".nova-tmp/purge.lock", {"by": "nova-memory",
+        self.write_json(".atlas-tmp/purge.lock", {"by": "atlas-memory",
                                                  "targets": ["user/knowledge/people/dana-ruiz.md"],
                                                  "user_confirmation": "yes, permanently erase",
                                                  "created": iso(0), "expires": iso(minutes)})
@@ -100,9 +100,9 @@ class HookTestCase(unittest.TestCase):
     def run_hook(self, hook, tool_name, tool_input, context="chat", cwd=None):
         env = dict(os.environ)
         env["CLAUDE_PROJECT_DIR"] = self.root
-        env.pop("NOVA_CONTEXT", None)
+        env.pop("ATLAS_CONTEXT", None)
         if context is not None:
-            env["NOVA_CONTEXT"] = context
+            env["ATLAS_CONTEXT"] = context
         payload = {"session_id": "test", "transcript_path": "/dev/null",
                    "cwd": cwd or self.root, "permission_mode": "default",
                    "hook_event_name": "PreToolUse", "tool_name": tool_name,
@@ -116,9 +116,9 @@ class HookTestCase(unittest.TestCase):
         """Run a non-tool hook (SessionStart, Stop) with its event payload."""
         env = dict(os.environ)
         env["CLAUDE_PROJECT_DIR"] = self.root
-        env.pop("NOVA_CONTEXT", None)
+        env.pop("ATLAS_CONTEXT", None)
         if context is not None:
-            env["NOVA_CONTEXT"] = context
+            env["ATLAS_CONTEXT"] = context
         payload = {"session_id": "test", "transcript_path": "/dev/null", "cwd": self.root,
                    "permission_mode": "default", "hook_event_name": event}
         payload.update(extra or {})

@@ -39,4 +39,4 @@ Tool names vary; always verify from the live tool list. Guide: `system/connector
 - `write`: create event on the user's own calendar with no guests (holds, focus time).
 
 ## Fallback
-*Settings → Import & export → Export* (.ics) into Nova Drop, or tell Nova in Morning Thoughts.
+*Settings → Import & export → Export* (.ics) into Atlas Drop, or tell Atlas in Morning Thoughts.

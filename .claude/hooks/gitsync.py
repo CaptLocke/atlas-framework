@@ -1,4 +1,4 @@
-"""Nova hooks: shared helpers for the sync hooks (sync_start.py, sync_guard.py).
+"""Atlas hooks: shared helpers for the sync hooks (sync_start.py, sync_guard.py).
 
 Standard library only. Not registered as a hook itself. Every function here
 returns a value instead of raising for ordinary git failures; callers still
@@ -12,8 +12,8 @@ import subprocess
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 BRANCH = "main"                                  # system/rules/sync.md: push origin HEAD:main
-IGNORED_PREFIXES = (".nova-tmp/", "user/inbox/drop/")
-LOG = ".nova-tmp/sync.log"
+IGNORED_PREFIXES = (".atlas-tmp/", "user/inbox/drop/")
+LOG = ".atlas-tmp/sync.log"
 GIT_ENV = {"GIT_TERMINAL_PROMPT": "0", "GIT_ASKPASS": "", "SSH_ASKPASS": "", "GIT_EDITOR": "true",
            "GIT_SEQUENCE_EDITOR": "true", "LC_ALL": "C"}
 
@@ -90,9 +90,9 @@ def now_iso():
 
 
 def log(proj, event, message):
-    """Append one line to .nova-tmp/sync.log (git-ignored). Never raises."""
+    """Append one line to .atlas-tmp/sync.log (git-ignored). Never raises."""
     try:
-        os.makedirs(os.path.join(proj, ".nova-tmp"), exist_ok=True)
+        os.makedirs(os.path.join(proj, ".atlas-tmp"), exist_ok=True)
         with open(os.path.join(proj, LOG), "a", encoding="utf-8") as f:
             f.write("%s %s %s\n" % (now_iso(), event, one_line(message, 500)))
     except Exception:
@@ -200,7 +200,7 @@ def health_issue(proj, issue_id, summary, fix):
     if not (isinstance(check, dict) and any(isinstance(i, dict) and i.get("id") == issue_id
                                             for i in check.get("known_issues") or [])):
         return False
-    tmp = path + ".nova-tmp"
+    tmp = path + ".atlas-tmp"
     with open(tmp, "w", encoding="utf-8") as f:
         f.write(new)
     os.replace(tmp, path)

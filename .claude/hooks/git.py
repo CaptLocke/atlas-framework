@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Nova hook: git history, secrets and attribution, N8 / N10 / N12 (build plan H-5).
+"""Atlas hook: git history, secrets and attribution, N8 / N10 / N12 (build plan H-5).
 
 Registered in .claude/settings.json as a PreToolUse hook for shell commands
 (matcher "Bash|Monitor").
@@ -15,7 +15,7 @@ What it enforces (system/rules/governance.md, system/rules/sync.md):
   `--interactive` / `--root`, filter-branch, filter-repo, `replace`,
   `update-ref`, `reflog expire|delete`, `gc --prune`, and `commit --amend` of
   a commit that is already pushed. Sole exception: a valid
-  .nova-tmp/purge.lock in a chat (the nova-memory purge procedure).
+  .atlas-tmp/purge.lock in a chat (the atlas-memory purge procedure).
   Also blocks changing the `origin` remote (it decides the upstream bypass).
 - N8: deleting tags (`git tag -d`, push of :refs/tags/...) only under a valid
   update lock or a purge lock in a chat; deleting branches on origin
@@ -23,10 +23,10 @@ What it enforces (system/rules/governance.md, system/rules/sync.md):
   branch that exists on origin) only under a purge lock in a chat.
 - N9: blocks `gh repo edit --visibility` and non-GET `gh api` calls touching
   collaborators, invitations or visibility.
-- N12: `git commit` must carry `Nova-Actor:` and `Nova-Reason:` trailers
+- N12: `git commit` must carry `Atlas-Actor:` and `Atlas-Reason:` trailers
   (parsed from -m/--message, -F/--file and heredocs). When the message source
   can't be determined (editor, -C/-c, -F - without a heredoc) the commit is
-  allowed with a warning. Routines may not commit as `Nova-Actor: chat`.
+  allowed with a warning. Routines may not commit as `Atlas-Actor: chat`.
 - N10: before a commit, scans added lines of the staged diff (plus unstaged
   and untracked files when the same command runs `git add` or `commit -a`)
   for secret patterns and blocks if any are found.
@@ -43,7 +43,7 @@ try:
 except BaseException as _fe:  # failsafe.py itself is broken: block
     def fail_safe(hook, exc, raw=None, _fe=_fe):
         try:
-            sys.stderr.write("Nova guard (%s): hook files are damaged (%s; %s); blocked.\n" % (hook, exc, _fe))
+            sys.stderr.write("Atlas guard (%s): hook files are damaged (%s; %s); blocked.\n" % (hook, exc, _fe))
         finally:
             os._exit(2)
 
@@ -55,13 +55,13 @@ def _raw_stdin():
 
 sys.excepthook = lambda _t, _e, _tb: fail_safe("git", _e, _raw_stdin())
 try:
-    import context as nova  # noqa: E402
+    import context as atlas  # noqa: E402
     import shell  # noqa: E402
 except BaseException as _imp:  # includes SystemExit raised while importing
     fail_safe("git", _imp, _raw_stdin())
 
 # Patterns are assembled from parts so this file never contains a literal
-# secret-shaped string (it is committed into every Nova repo).
+# secret-shaped string (it is committed into every Atlas repo).
 SECRET_PATTERNS = [
     ("AWS access key ID", r"\b(?:AK" + r"IA|AS" + r"IA)[0-9A-Z]{16}\b"),
     ("AWS secret access key", r"(?i)aws_secret_access_key\s*[=:]\s*['\"]?[A-Za-z0-9/+=]{40}"),
@@ -265,22 +265,22 @@ def commit_message(args, cwd, bodies):
 
 
 def check_trailers(message, ctx):
-    actor = re.search(r"(?mi)^Nova-Actor:[ \t]*(.*?)[ \t]*$", message)
-    reason = re.search(r"(?mi)^Nova-Reason:[ \t]*(\S.*)$", message)
-    missing = [n for n, m in (("Nova-Actor", actor), ("Nova-Reason", reason)) if not m]
+    actor = re.search(r"(?mi)^Atlas-Actor:[ \t]*(.*?)[ \t]*$", message)
+    reason = re.search(r"(?mi)^Atlas-Reason:[ \t]*(\S.*)$", message)
+    missing = [n for n, m in (("Atlas-Actor", actor), ("Atlas-Reason", reason)) if not m]
     if missing:
-        nova.block("commit message is missing the %s trailer%s (N12). End the message with:\n"
-                   "  Nova-Actor: chat | routine:<routine-name> | update | setup\n"
-                   "  Nova-Reason: <why, one line>\n"
-                   "  Nova-Records: <ids or paths, or ->\n(format: system/rules/sync.md)"
+        atlas.block("commit message is missing the %s trailer%s (N12). End the message with:\n"
+                   "  Atlas-Actor: chat | routine:<routine-name> | update | setup\n"
+                   "  Atlas-Reason: <why, one line>\n"
+                   "  Atlas-Records: <ids or paths, or ->\n(format: system/rules/sync.md)"
                    % (" and ".join(missing), "s" if len(missing) > 1 else ""))
     value = actor.group(1).strip()
     if not ACTOR_RE.match(value):
-        nova.block("Nova-Actor %r is not valid; use chat, routine:<routine-name>, update or setup "
+        atlas.block("Atlas-Actor %r is not valid; use chat, routine:<routine-name>, update or setup "
                    "(system/rules/sync.md)." % value)
     if ctx != "chat" and value == "chat":
-        nova.block("this session is marked as a routine (NOVA_CONTEXT=routine), so it cannot commit as "
-                   "'Nova-Actor: chat'. Use 'Nova-Actor: routine:<routine-name>' with the name of the "
+        atlas.block("this session is marked as a routine (ATLAS_CONTEXT=routine), so it cannot commit as "
+                   "'Atlas-Actor: chat'. Use 'Atlas-Actor: routine:<routine-name>' with the name of the "
                    "routine being run (system/rules/sync.md).")
 
 
@@ -335,8 +335,8 @@ def scan_for_secrets(cwd, include_worktree):
 def main(payload, proj, ctx):
     command = (payload.get("tool_input") or {}).get("command")
     if not isinstance(command, str) or not re.search(r"\bgit\b|\bgh\b", command):
-        nova.allow()
-    base = nova.session_cwd(payload, proj)
+        atlas.allow()
+    base = atlas.session_cwd(payload, proj)
     bodies = shell.heredoc_bodies(command)
     purge_ok = None
     staged_by_command = False
@@ -345,8 +345,8 @@ def main(payload, proj, ctx):
         if seg.name == "gh":
             change = gh_change(seg.argv)
             if change:
-                nova.STATE.locked = True
-                nova.block("%s is not allowed: the Nova repo stays private and no collaborators are added "
+                atlas.STATE.locked = True
+                atlas.block("%s is not allowed: the Atlas repo stays private and no collaborators are added "
                            "(N9). If the user wants this, they change it themselves in GitHub." % change)
             continue
         if seg.name != "git":
@@ -359,41 +359,41 @@ def main(payload, proj, ctx):
 
         identity = remote_change(sub, args)
         if identity:
-            nova.STATE.locked = True
-            nova.block("%s is not allowed: the origin remote identifies this Nova repo and must not "
-                       "change (N8/N9). If the repo moved, tell the user; nova-health can help." % identity)
+            atlas.STATE.locked = True
+            atlas.block("%s is not allowed: the origin remote identifies this Atlas repo and must not "
+                       "change (N8/N9). If the repo moved, tell the user; atlas-health can help." % identity)
         deletion = ref_deletion(sub, args, cwd)
         if deletion:
             what, kind = deletion
-            ok_update, _ = nova.valid_lock(proj, "update")
-            ok_purge, _ = nova.valid_lock(proj, "purge")
+            ok_update, _ = atlas.valid_lock(proj, "update")
+            ok_purge, _ = atlas.valid_lock(proj, "purge")
             ok_purge = ok_purge and ctx == "chat"
             allowed = (kind == "tag" and (ok_update or ok_purge)) or (kind == "branch" and ok_purge)
             if not allowed:
-                nova.STATE.locked = True
-                nova.block("%s deletes history references, which Nova never does (N8)%s." % (
-                    what, ": tags may only be removed by nova-update (update lock) or a confirmed purge "
+                atlas.STATE.locked = True
+                atlas.block("%s deletes history references, which Atlas never does (N8)%s." % (
+                    what, ": tags may only be removed by atlas-update (update lock) or a confirmed purge "
                           "(purge lock, chat)" if kind == "tag" else
                     ": only a user-confirmed purge in a chat may delete branches that exist on origin"))
         reason = rewrite_reason(sub, args, cwd)
         if reason:
             if purge_ok is None:
-                ok, why = nova.valid_lock(proj, "purge")
+                ok, why = atlas.valid_lock(proj, "purge")
                 if ok and ctx != "chat":
-                    ok, why = False, "a purge lock never counts in a routine (NOVA_CONTEXT=routine)"
+                    ok, why = False, "a purge lock never counts in a routine (ATLAS_CONTEXT=routine)"
                 purge_ok, purge_why = ok, why
             if not purge_ok:
-                nova.STATE.locked = True
-                nova.block("%s rewrites history, which Nova never does (N8). Undo changes with a forward "
+                atlas.STATE.locked = True
+                atlas.block("%s rewrites history, which Atlas never does (N8). Undo changes with a forward "
                            "revert commit instead (system/rules/sync.md). The only exception is a "
-                           "user-confirmed purge through nova-memory in a chat, while "
-                           ".nova-tmp/purge.lock is valid (%s)." % (reason, purge_why))
+                           "user-confirmed purge through atlas-memory in a chat, while "
+                           ".atlas-tmp/purge.lock is valid (%s)." % (reason, purge_why))
 
         if sub == "commit":
             message, why = commit_message(args, cwd, bodies)
             if message is None:
                 warnings.append("could not read the commit message (%s); make sure it has "
-                                "Nova-Actor and Nova-Reason trailers" % why)
+                                "Atlas-Actor and Atlas-Reason trailers" % why)
             else:
                 check_trailers(message, ctx)
             include_wt = staged_by_command or "--" in args or any(
@@ -402,17 +402,17 @@ def main(payload, proj, ctx):
                 for a in args)
             found = scan_for_secrets(cwd, include_wt)
             if found:
-                nova.STATE.locked = True
-                nova.block("possible secrets in this commit (N10): %s. Remove them from the files "
+                atlas.STATE.locked = True
+                atlas.block("possible secrets in this commit (N10): %s. Remove them from the files "
                            "(store a pointer such as 'password kept in the user's password manager' "
                            "instead), unstage, and commit again. Never commit passwords, tokens or keys."
                            % "; ".join(found[:8]))
-    nova.allow("; ".join(warnings) if warnings else None)
+    atlas.allow("; ".join(warnings) if warnings else None)
 
 
 if __name__ == "__main__":
     try:
-        nova.run("git", main)
+        atlas.run("git", main)
     except SystemExit as _exit:
         if _exit.code in (0, 2, None):
             raise

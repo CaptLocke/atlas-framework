@@ -38,13 +38,13 @@ class ActionsRoutine(HookTestCase):
     def test_send_blocked_in_routine_even_with_record(self):
         self.approval(SEND, "send_communication")
         self.assertBlocked(self.run_hook("actions", SEND, {}, context="routine"))
-        self.assertTrue(os.path.exists(self.path(".nova-tmp/approval.json")))
+        self.assertTrue(os.path.exists(self.path(".atlas-tmp/approval.json")))
 
     def test_routine_marker_is_case_insensitive(self):
         self.approval(SEND, "send_communication")
         for marker in ("ROUTINE", " Routine ", "routine\n"):
             self.assertBlocked(self.run_hook("actions", SEND, {}, context=marker), "routine")
-        self.assertTrue(os.path.exists(self.path(".nova-tmp/approval.json")))
+        self.assertTrue(os.path.exists(self.path(".atlas-tmp/approval.json")))
 
     def test_missing_or_other_context_is_chat(self):
         # missing, empty, 'chat' and other values all mean chat: a locked
@@ -55,7 +55,7 @@ class ActionsRoutine(HookTestCase):
             self.assertNotIn("routine", r.stderr.split("approval")[0])
             self.approval(SEND, "send_communication")
             self.assertAllowed(self.run_hook("actions", SEND, {}, context=ctx))
-            self.assertFalse(os.path.exists(self.path(".nova-tmp/approval.json")))
+            self.assertFalse(os.path.exists(self.path(".atlas-tmp/approval.json")))
 
     def test_security_blocked_without_context(self):
         self.approval("mcp__bank__make_payment", "send_communication")
@@ -112,7 +112,7 @@ class ActionsChat(HookTestCase):
     def test_send_in_chat_with_record_allowed_once(self):
         self.approval(SEND, "send_communication")
         self.assertAllowed(self.run_hook("actions", SEND, {}, context="chat"))
-        self.assertFalse(os.path.exists(self.path(".nova-tmp/approval.json")), "record must be consumed")
+        self.assertFalse(os.path.exists(self.path(".atlas-tmp/approval.json")), "record must be consumed")
         self.assertBlocked(self.run_hook("actions", SEND, {}, context="chat"))
 
     def test_expired_record_blocked(self):
@@ -126,7 +126,7 @@ class ActionsChat(HookTestCase):
     def test_record_for_other_tool_blocked(self):
         self.approval("mcp__outlook__other_tool", "send_communication")
         self.assertBlocked(self.run_hook("actions", SEND, {}, context="chat"), "not")
-        self.assertTrue(os.path.exists(self.path(".nova-tmp/approval.json")))
+        self.assertTrue(os.path.exists(self.path(".atlas-tmp/approval.json")))
 
     def test_record_for_wrong_action_blocked(self):
         self.approval(SEND, "destructive")
@@ -154,7 +154,7 @@ class ActionsChat(HookTestCase):
         self.assertBlocked(self.bash("actions", cmd, "chat"))
         self.approval("Bash", "destructive")
         self.assertAllowed(self.bash("actions", cmd, "chat"))
-        self.assertFalse(os.path.exists(self.path(".nova-tmp/approval.json")))
+        self.assertFalse(os.path.exists(self.path(".atlas-tmp/approval.json")))
 
     def test_malformed_connectors_falls_back_to_patterns(self):
         self.connectors("connectors: [unclosed\n")
@@ -163,14 +163,14 @@ class ActionsChat(HookTestCase):
 
     def test_garbage_stdin_fails_closed_in_routine(self):
         import subprocess
-        env = dict(os.environ, CLAUDE_PROJECT_DIR=self.root, NOVA_CONTEXT="routine")
+        env = dict(os.environ, CLAUDE_PROJECT_DIR=self.root, ATLAS_CONTEXT="routine")
         r = subprocess.run(["python3", self.path(".claude/hooks/actions.py")], input="not json",
                            capture_output=True, text=True, env=env)
         self.assertEqual(r.returncode, 2)
 
 
 class UpstreamBypass(HookTestCase):
-    origin = "git@github.com:CaptLocke/nova.git"
+    origin = "git@github.com:CaptLocke/atlas-framework.git"
 
     def test_everything_allowed_in_upstream_repo(self):
         self.connectors(CONNECTORS)
@@ -183,16 +183,16 @@ class UpstreamBypass(HookTestCase):
         self.assertAllowed(self.bash("git", "git commit -m 'no trailers'", "routine"))
 
     def test_https_and_proxy_forms(self):
-        for url in ("https://github.com/captlocke/nova", "https://github.com/CaptLocke/nova.git/",
-                    "ssh://git@github.com/CaptLocke/nova.git",
-                    "http://local_proxy@127.0.0.1:41231/git/CaptLocke/nova"):
+        for url in ("https://github.com/captlocke/atlas-framework", "https://github.com/CaptLocke/atlas-framework.git/",
+                    "ssh://git@github.com/CaptLocke/atlas-framework.git",
+                    "http://local_proxy@127.0.0.1:41231/git/CaptLocke/atlas-framework"):
             import subprocess
             subprocess.run(["git", "remote", "set-url", "origin", url], cwd=self.root, check=True)
             self.assertAllowed(self.run_hook("actions", SEND, {}, context="routine"))
 
     def test_similar_name_is_not_upstream(self):
         import subprocess
-        for url in ("https://github.com/CaptLocke/nova-fork", "https://github.com/someone/nova"):
+        for url in ("https://github.com/CaptLocke/atlas-framework-fork", "https://github.com/someone/atlas"):
             subprocess.run(["git", "remote", "set-url", "origin", url], cwd=self.root, check=True)
             self.assertBlocked(self.run_hook("actions", "mcp__x__send_message", {}, context="routine"))
 
@@ -207,7 +207,7 @@ class NoManifest(HookTestCase):
     def test_missing_manifest_upstream_fallback(self):
         import subprocess
         os.remove(self.path("system/manifest.yaml"))
-        subprocess.run(["git", "remote", "set-url", "origin", "https://github.com/CaptLocke/nova.git"],
+        subprocess.run(["git", "remote", "set-url", "origin", "https://github.com/CaptLocke/atlas-framework.git"],
                        cwd=self.root, check=True)
         self.assertAllowed(self.run_hook("actions", "mcp__x__send_message", {}, context="routine"))
 
@@ -332,7 +332,7 @@ class ImportFailure(HookTestCase):
     def test_broken_modules_in_upstream_repo_allow(self):
         import subprocess
         self.break_module("context")
-        subprocess.run(["git", "remote", "set-url", "origin", "git@github.com:CaptLocke/nova.git"],
+        subprocess.run(["git", "remote", "set-url", "origin", "git@github.com:CaptLocke/atlas-framework.git"],
                        cwd=self.root, check=True)
         self.assertAllowed(self.run_hook("actions", "mcp__mail__send_message", {}, "routine"))
 

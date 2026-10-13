@@ -7,5 +7,5 @@ dashboards:
   decisions-risks: { url: null, last_published: null }
   control-center: { url: null, last_published: null }
   about-you: { url: null, last_published: null }
-  nova-guide: { url: null, last_published: null }
+  atlas-guide: { url: null, last_published: null }
 project_pages: {}

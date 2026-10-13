@@ -7,11 +7,11 @@ operations: [list_recent, read_item, search, list_sent, create_draft, update_dra
 
 Operation names and risk tags: `system/connectors/README.md`. Write path: `system/rules/knowledge.md`. Autonomy: `system/rules/governance.md`.
 
-## What Nova ingests and why
+## What Atlas ingests and why
 - **Threads the user is part of** (inbox and sent) since the cursor. Email is where most commitments, decisions, and requests arrive; it feeds information capture, triage (commitments), email drafts (threads awaiting a reply), recall, and meeting prep.
-- **Sent mail** (`list_sent`): evidence that an `i_owe` commitment was delivered, new promises the user made in writing, and examples for learning the user's voice (`nova-write`).
+- **Sent mail** (`list_sent`): evidence that an `i_owe` commitment was delivered, new promises the user made in writing, and examples for learning the user's voice (`atlas-write`).
 - **Threads that need a reply**: mark them for `email-drafts` (a question or request addressed to the user, no reply from the user yet, not automated).
-- **Internal vs external:** senders and recipients on `nova.yaml: company.email_domains` are colleagues (people linked to the employer); everyone else is external (link them to their own organization by domain).
+- **Internal vs external:** senders and recipients on `atlas.yaml: company.email_domains` are colleagues (people linked to the employer); everyone else is external (link them to their own organization by domain).
 - Scope comes from `user/settings/sources.yaml` (`scope:`, e.g. "inbox and sent; skip folders: Archive/Newsletters"). Exclusions come only from `data-rules.yaml`.
 
 ## What to skip (noise)
@@ -57,7 +57,7 @@ Apply handling at the write step; when unsure, choose the more conservative opti
 ## Write operations and autonomy
 | Operation | Autonomy class | Notes |
 |---|---|---|
-| `create_draft`, `update_draft` | `drafts_create` (auto) | Replies and follow-ups from `email-drafts`, `nova-write`, `nova-report-issue`. Drafts stay unsent. |
+| `create_draft`, `update_draft` | `drafts_create` (auto) | Replies and follow-ups from `email-drafts`, `atlas-write`, `atlas-report-issue`. Drafts stay unsent. |
 | `send` (send, reply, forward) | `send_communication` 🔒 | Chat only, approval-record procedure. Routines leave a draft and queue an approval. |
 | `label` (label, move, archive, mark read/spam) | `own_items_organize` (propose) | Never needed for ingestion. |
 | `delete` (trash, delete) | `destructive` 🔒 | Never part of any job. |
@@ -69,9 +69,9 @@ Apply handling at the write step; when unsure, choose the more conservative opti
 
 ## Fallback when no connector exists
 Record in `sources.yaml: fallbacks` with one of:
-- **forward** (another mail account is connected): "Forward important work emails to your connected address with **[nova]** in the subject. Nova files them on the next run."
-- **drop**: "In Outlook or Gmail, choose *Print → Save as PDF* (or *Save as*) for an important thread and put the file in your **Nova Drop** folder, or attach it in a Nova chat."
-- **manual**: "Paste the email into a Nova chat and say *file this*."
+- **forward** (another mail account is connected): "Forward important work emails to your connected address with **[atlas]** in the subject. Atlas files them on the next run."
+- **drop**: "In Outlook or Gmail, choose *Print → Save as PDF* (or *Save as*) for an important thread and put the file in your **Atlas Drop** folder, or attach it in an Atlas chat."
+- **manual**: "Paste the email into an Atlas chat and say *file this*."
 Remind the user in the Control Center that email capture is partial until a mail connector is added.
 
 ## Checks

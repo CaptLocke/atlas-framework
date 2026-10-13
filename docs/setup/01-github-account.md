@@ -2,11 +2,11 @@
 
 **Time:** 5 to 10 minutes · **You'll need:** your email, and your phone for the last part
 
-GitHub is where your private Nova will live. The account is free, and you won't need to learn how GitHub works: Nova handles all of that for you.
+GitHub is where your private Atlas will live. The account is free, and you won't need to learn how GitHub works: Atlas handles all of that for you.
 
-> **Already have a GitHub account?** You can use it. Skip to [Turn on two-factor authentication](#turn-on-two-factor-authentication) to check it's on, then go to [Step 2](02-create-your-nova.md).
+> **Already have a GitHub account?** You can use it. Skip to [Turn on two-factor authentication](#turn-on-two-factor-authentication) to check it's on, then go to [Step 2](02-create-your-atlas.md).
 >
-> **Thinking of using a work GitHub account?** Use a personal account unless your company has told you to use a work one. Your Nova should belong to you.
+> **Thinking of using a work GitHub account?** Use a personal account unless your company has told you to use a work one. Your Atlas should belong to you.
 
 ---
 
@@ -20,7 +20,7 @@ GitHub is where your private Nova will live. The account is free, and you won't 
 
 3. **Create a password** and click **Continue**. Use a strong password you don't use anywhere else. A password manager can create and remember one for you.
 
-4. **Choose a username** and click **Continue**. This appears in your Nova's web address, so something simple like `maya-chen` works well. Write it down: you'll need it in step 4.
+4. **Choose a username** and click **Continue**. This appears in your Atlas's web address, so something simple like `maya-chen` works well. Write it down: you'll need it in step 4.
 
 5. **Answer the "Would you like to receive product updates" question** however you like, then complete the short puzzle GitHub shows to check you're a person.
 
@@ -30,7 +30,7 @@ GitHub is where your private Nova will live. The account is free, and you won't 
 
    ![GitHub asking for the code it sent to your email](images/github-verify-email.png)
 
-8. **If GitHub asks a few questions about you or offers paid plans**, you can skip them. Look for **Skip personalization**, **Continue for free**, or **Free**. You never need a paid GitHub plan for Nova.
+8. **If GitHub asks a few questions about you or offers paid plans**, you can skip them. Look for **Skip personalization**, **Continue for free**, or **Free**. You never need a paid GitHub plan for Atlas.
 
    ![GitHub offering plans, with the free option or "Skip personalization" to choose](images/github-free-plan.png)
 
@@ -42,7 +42,7 @@ You now have a GitHub account.
 
 ## Turn on two-factor authentication
 
-**Strongly recommended.** Your Nova will hold information about your work, so protect your GitHub account with a second check when you sign in. GitHub may also require this within a few weeks of signing up, so doing it now saves a step later.
+**Strongly recommended.** Your Atlas will hold information about your work, so protect your GitHub account with a second check when you sign in. GitHub may also require this within a few weeks of signing up, so doing it now saves a step later.
 
 You'll need an **authenticator app** on your phone, such as Google Authenticator, Microsoft Authenticator, or 1Password. Install one first if you don't have one.
 
@@ -68,4 +68,4 @@ Done. From now on, signing in to GitHub asks for your password and a code from y
 
 ---
 
-**Next:** [Step 2: Create your Nova](02-create-your-nova.md)
+**Next:** [Step 2: Create your Atlas](02-create-your-atlas.md)
