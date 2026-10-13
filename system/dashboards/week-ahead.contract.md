@@ -45,10 +45,10 @@ Full example: `system/tests/dashboards/week-ahead.json`. `days` always has 7 ent
 ## Sources (file → field)
 | Field | Source |
 |---|---|
-| `events[]` | Event records with `start` in the range and `status: scheduled`, `kind` not `deadline`: `id, title, kind, start, end, location, attendees`; `prep.path` = `prep` |
+| `events[]` | Event records with `start` in the range, `status: scheduled`, `kind` not `deadline`, and shown by the meeting filter (`rhythms.yaml: meetings`, rule in `system/schemas/settings.md`): `id, title, kind, start, end, location, attendees`; `prep.path` = `prep` |
 | `prep.status` | `ready` if `prep` is set; `planned` if the meeting meets `key_meeting_upcoming` (`system/triggers.md`) and has no note yet but `meeting-prep` will run before it; `none` if it meets it and no run will; else `not_needed` |
 | `due[]` | Commitments (`open|slipped`) with `due` in the range, both directions; deadline events (`kind: deadline`) in the range |
-| `focus[]` | Computed by `nova-brief`: gaps of ≥ 90 minutes inside `rhythms.yaml: work_hours` on work days, matched to the highest-priority `i_owe` work due within the week; at most 1 per day, 4 per week; respects `user/profile/working-style.md` and `preferences.md` (e.g. no Friday afternoons) |
+| `focus[]` | Computed by `nova-brief`: gaps of ≥ 90 minutes inside `rhythms.yaml: work_hours` on work days, matched to the highest-priority `i_owe` work due within the week; at most 1 per day, 4 per week; respects `user/profile/working-style.md` and `preferences.md` (e.g. no Friday afternoons); meetings hidden by the meeting filter still count as busy |
 | `meeting_hours`, `summary` | Sums over `events[]` (all-day items excluded) |
 | `work_day`, `work_hours_per_day` | `rhythms.yaml: work_hours` (`days`, `start`, `end`) |
 | `headline` | One line from `nova-brief` |

@@ -102,6 +102,14 @@ Pause any automation or moment, for a while or until you say so.
 - "Stop the evening thoughts reminder."
 - "Resume everything."
 
+## Which meetings Nova shows
+Choose whether your brief, Week Ahead, and meeting prep include all-day events, meetings you've tentatively accepted, and invitations you haven't answered yet. All are included unless you say otherwise. Nova still keeps track of skipped meetings, so one shows up as soon as you accept it, and deadlines and milestones on your calendar always show.
+
+**Try:**
+- "Hide all-day events from my brief."
+- "Skip meetings I've only tentatively accepted."
+- "Don't show invites I haven't answered."
+
 ## Changing your automation profile
 Lean, Standard, or Full (see **Automations**). Nova suggests one for your Claude plan; if your usage suggests a different one, the monthly automation review will say so.
 

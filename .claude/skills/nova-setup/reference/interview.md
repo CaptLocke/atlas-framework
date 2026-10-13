@@ -58,7 +58,7 @@ Record in `nova.yaml: company`: `website`, `email_domains`, `fiscal_year_start_m
 - Each file goes through `nova-capture` as a drop (Source record, data rules, originals to `user/library/` if allowed and under 10 MB).
 - **Voice guides:** fill the outline in `system/schemas/profile.md` (Summary, Tone, Structure and length, Vocabulary, Openings and sign-offs, Formatting habits, Examples with source links, Don't). Personal voice from their own writing; house voice from company writing, or from the website if nothing was attached.
 - **Design system:** from a brand guide or template if attached; otherwise derive from the website (colors with hex for light and dark, typography with web-safe fallbacks, logo saved to `user/profile/assets/`, layout, chart palette order, do/don't).
-- **Records:** org charts → people with `relationship`, `org`, `role`, and reporting links; strategy docs → goals, projects, topics, decisions (`provenance: observed`, cited to the upload's Source).
+- **Records:** org charts → people with `relationship` (per `system/schemas/person.md` §Relationships), `org`, `role`, and reporting links; strategy docs → goals, projects, topics, decisions (`provenance: observed`, cited to the upload's Source).
 - Mark profile lines `[uploaded · confirmed <today> · [[sources/...]]]` once the user agrees with the summary in step 8.
 - If mail is connected later (step 9), offer once to refine the personal voice from recent sent mail (`mail.list_sent`), as proposals.
 
@@ -76,7 +76,7 @@ Ask only what the material didn't answer, one per message, in this order of valu
 | # | Ask | Default if skipped | Writes to |
 |---|---|---|---|
 | 1 | Who's your manager? (name, and email if handy) | none | person record `relationship: manager`; `profile.md` link |
-| 2 | Who are the 3–5 people you work with most? How do you know them (team, customer, partner)? | Learned from mail/calendar later | person records; `profile.md` ## Key people |
+| 2 | Who are the 3–5 people you work with most? How do you know them (team, customer, prospect, partner, board)? | Learned from mail/calendar later | person records with `relationship` chosen per `system/schemas/person.md` §Relationships; `profile.md` ## Key people |
 | 3 | What are you trying to achieve this quarter or year? | Draft from research and documents; confirm at quarterly reset | goal records (`status: active`, `horizon`, `period`); `profile.md` ## Current goals |
 | 4 | What big projects or initiatives are you on right now? | Discovered by ingest | project records |
 | 5 | What does your job involve day to day? (only if research and LinkedIn didn't make it clear) | Suggested responsibilities from research | `profile.md` ## Responsibilities |

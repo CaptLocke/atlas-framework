@@ -29,7 +29,7 @@ Covers customer relationship systems (Salesforce, HubSpot, and similar). Operati
 ## From items to Sources and records
 - Each CRM object maps to Nova records, linked to a **Source** that points back to the CRM record (`origin_uri` = record URL):
   - Account → `organization` (`kind: customer | prospect | partner`; dedupe by domain).
-  - Contact → `person` (dedupe by email; `relationship: customer` etc.).
+  - Contact → `person` (dedupe by email). `relationship` follows the account's organization `kind` (`system/schemas/person.md` §Relationships): open-opportunity accounts with no closed-won deal → `prospect`, paying accounts → `customer`, partner accounts → `partner`.
   - Opportunity/deal → a `project` (scale `task_group` or `project`) linked to the organization, or a registered user type such as `deal` if the user created one (`user/extensions/registry.yaml`).
   - Next steps / tasks → commitments when owned by the user or promised by the customer.
 - One Source per CRM record (created the first time it is filed); later changes append to the same Source's Updates ("Stage: Proposal → Negotiation").

@@ -27,8 +27,8 @@ Tool names vary; always verify from the live tool list. Guide: `system/connector
 
 ## Known quirks
 - Event types: skip **focus time**, **out of office** (keep as context only), and **working location** entries.
-- All-day events have dates, not times; treat them as deadlines/milestones only if the title says so.
-- The user's own `responseStatus` tells whether they accepted or declined.
+- All-day events have dates, not times (`start.date` instead of `start.dateTime`): set `all_day: true`; treat them as deadlines/milestones only if the title says so.
+- The user's own attendee entry (`self: true`) has `responseStatus`: `accepted` → accepted, `tentative` → tentative, `needsAction` → not_responded, `declined` → declined. If the user is the organizer (`organizer.self: true`), or the event has no attendees, use `organizer`.
 - Shared calendars the user can see (team calendars, a manager's) appear in calendar lists: ingest only the user's primary calendar unless scope says otherwise.
 - Descriptions often contain Meet links and dial-in PINs: never store PINs (N10).
 

@@ -3,6 +3,7 @@ moments:
   morning_thoughts: on
   daily_brief: sometimes
 insights: { brief_max: lots, engagement: random }
+meetings: { all_day: hide, tentative: skip }
 away: { start: 2026-11-10, end: 2026-11-01, set_on: null }
 paused:
   - { job: make-coffee, until: soon }

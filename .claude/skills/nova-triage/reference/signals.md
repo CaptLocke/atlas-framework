@@ -16,7 +16,7 @@ For `waiting_on`: the counterparty's message delivering it, or a Source showing 
 ## Priority rubric
 Score each open commitment, then map: high (top ~20%), medium, low.
 1. **Goal link:** linked (directly or via its project) to an active goal → strong boost; to the user's manager's stated priorities → boost.
-2. **Who's waiting:** manager, executive, or customer counterparty → boost; internal peer → neutral.
+2. **Who's waiting** (counterparty `relationship`, `system/schemas/person.md` §Relationships): `manager`, `board`, `customer`, or a senior `stakeholder` → boost; `prospect` in an active deal → boost; `peer`, `report`, `vendor`, `partner`, `external` → neutral.
 3. **Time:** due within 3 days or already slipped → boost; no date → neutral.
 4. **Consequence:** blocks others (others' commitments or a decision depend on it), or affects revenue, legal, or launch dates → boost.
 5. **Effort hint:** quick wins (<30 min) due soon can be raised to clear them.

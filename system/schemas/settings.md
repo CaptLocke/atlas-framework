@@ -184,12 +184,23 @@ insights:
   brief_max: 3
   engagement: adaptive                  # adaptive | fixed
   suppressed_kinds: []                  # insight kinds the user turned off, e.g. [idea] ("stop suggesting ideas in the brief")
+meetings:                               # which calendar events Nova shows and preps; optional, every key defaults to include
+  all_day: include                      # include | skip: all-day events (holidays, conference days, OOO notices)
+  tentative: include                    # include | skip: meetings the user tentatively accepted
+  not_responded: include                # include | skip: invitations the user hasn't answered yet
 away:                                   # set by nova-away; null when not away
   start: null                           # YYYY-MM-DD, first day away
   end: null                             # YYYY-MM-DD, LAST day away (inclusive); null while away = away until the user says they're back
   set_on: null
 paused: []                              # e.g. [{ job: weekly-review, until: 2026-11-01 }, { moment: evening_thoughts, until: null }]
 ```
+
+**Meeting filter (`meetings`).** A missing block or key means `include`, so older files behave as before. An event is **shown** unless one of these applies:
+- `all_day: skip` and the event is all-day, **except** deadline and milestone events (`kind: deadline | milestone`), which always show under Due.
+- `tentative: skip` and the event record's `response` is `tentative`.
+- `not_responded: skip` and `response` is `not_responded`.
+
+Events the user organizes (`response: organizer`) and accepted events are always shown; declined events are already skipped at ingestion (`system/connectors/calendar.md`). A skipped event is still recorded in knowledge, so it appears normally once the user accepts it. It is left out of the Daily Brief's Today, Week Ahead's events and meeting hours, meeting prep, and the `key_meeting_upcoming` trigger. Focus suggestions still avoid its time, so Nova never suggests focus time on top of a meeting the user may attend. Changing the filter is `behavior_settings`.
 
 ## routines.yaml
 ```yaml

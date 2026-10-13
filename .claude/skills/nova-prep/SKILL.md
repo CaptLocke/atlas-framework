@@ -25,7 +25,7 @@ Walk into every important conversation already knowing the history, the open ite
 
 ### A. Which meetings get prep (job)
 1. **Away/paused.** If away is active or `meeting-prep` is paused, stop (job records the skip). In chat, prep on request always works.
-2. List events for the target window. Prep a meeting when it meets `key_meeting_upcoming` (a `one_on_one`, external attendees, or ≥1 linked open commitment or decision) or is one the user asked to always prep (`preferences.md`, e.g. "always prep board and steering meetings"). Skip holds, focus blocks, personal items, all-hands, declined events, and meetings that already have a current prep note (re-prep only if attendees, time, or linked items changed since).
+2. List events for the target window. Prep a meeting when it meets `key_meeting_upcoming` (a `one_on_one`, external attendees, or ≥1 linked open commitment or decision) or is one the user asked to always prep (`preferences.md`, e.g. "always prep board and steering meetings"). Skip holds, focus blocks, personal items, all-hands, declined events, events hidden by the meeting filter (`rhythms.yaml: meetings`, unless the user asks for that meeting by name), and meetings that already have a current prep note (re-prep only if attendees, time, or linked items changed since).
 3. For each `key_meeting_upcoming` match, check `user/.state/triggers.yaml` (key = event start); record the firing after the note exists.
 
 ### B. Build a meeting prep note

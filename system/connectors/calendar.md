@@ -30,11 +30,12 @@ Calendars change in place, so the cursor is a **range**, not a "last seen" point
 - **Advance only after commit:** set `synced_through` to the end of the window once every event in it is filed and committed.
 
 ## From items to Sources and records
-- **Event record** per meaningful meeting (`kind: meeting | one_on_one | deadline | milestone`; `status: scheduled | held | cancelled`; `start`, `end`, `attendees`, `series`). A 1:1 is two attendees including the user, or a series named like one.
+- **Event record** per meaningful meeting (`kind: meeting | one_on_one | deadline | milestone`; `status: scheduled | held | cancelled`; `start`, `end`, `attendees`, `series`, `all_day`, `response`). `response` is the user's own RSVP mapped to `organizer | accepted | tentative | not_responded | declined` (the connector hint lists each tool's raw values); refresh it on every sync, since people accept late. A 1:1 is two attendees including the user, or a series named like one.
 - **Source**: one per meeting occurrence (`kind: meeting`) when there is content (agenda, description, attached notes); a bare invite with no content needs only the event record with `origin_uri` in its source. When a transcript arrives (meetings category), it attaches to the same Source.
 - Link the event to people, the organization (external domains), and the project or topic it serves (infer from title and attendees; uncertain → leave unlinked, never guess wildly).
 - Moved events: update `start`/`end` and append a line to Updates. Cancelled: `status: cancelled`, keep the record.
 - Past the end time with no cancellation → `status: held` (triage or meetings ingestion may add `outcomes`).
+- **Meeting filter.** `rhythms.yaml: meetings` (all-day, tentative, not responded) decides what is *shown and prepped*, not what is recorded: file the event either way. The rule is in `system/schemas/settings.md` (Meeting filter).
 
 ## Commitment and decision cues
 Calendars rarely contain commitments directly. Look in descriptions and agendas for:
@@ -70,4 +71,5 @@ Without a calendar connector, meeting prep only covers meetings Nova learns abou
 ## Checks
 - No event records for holds, focus time, or excluded series.
 - Every event in the synced window has the right status; no duplicate events for one occurrence.
+- Every calendar-sourced event has `response` set, and it matches the calendar as of the last sync.
 - No calendar write happens in a routine.
