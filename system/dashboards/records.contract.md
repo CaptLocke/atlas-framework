@@ -46,7 +46,7 @@ Full example: `system/tests/dashboards/records.json`.
 | `facts` | Up to 3 short strings, chosen per type (below). Plain text, each ≤ 60 characters. |
 | `links` | Up to 8 linked records as references, most important first (people and projects before sources). |
 
-**Closed statuses** (`current: false`): commitment `done`, `dropped`; project `done`, `cancelled`; goal `achieved`, `missed`, `dropped`; decision `reversed`, `superseded`; event `held`, `cancelled`; risk `resolved`; question `answered`, `dropped`; idea `adopted`, `parked`, `dropped`; topic `dormant`; playbook `retired`; person and organization `inactive`; source `processed` is **current** (sources are reference material). For user types, statuses that clearly mean finished (done, closed, won, lost, cancelled, and the like) count as closed; anything else counts as current.
+**Closed statuses** (`current: false`): `system/schemas/schema.yaml: closed_statuses`, except that a source with status `processed` stays **current** on this page (sources are reference material). For user types, statuses that clearly mean finished (done, closed, won, lost, cancelled, and the like) count as closed; anything else counts as current.
 
 **Facts per type:**
 | Type | Facts (in order, skip empty ones) |

@@ -18,6 +18,9 @@ Each release's "What's new" section is shown to users in the Nova Guide and thei
 - **Nova learns from your corrections.** When you keep dropping the same kind of "commitment", reranking the same kind of work, or dismissing the same kind of insight, Nova suggests a rule and follows it once you agree. The monthly report shows what it learned.
 - **Playbooks.** Nova notices work you repeat and offers to save it as a playbook. When one starts, it sets up the checklist with dates, drafts the messages as each step comes due, and flags steps that are missed or out of order.
 - **Insights come with the draft.** When an insight suggests messaging someone, the draft is already waiting in your mail.
+- **Focus time for what you owe.** When something you owe is due soon and your calendar is filling up, Nova offers to block time for it (a private hold, only after you say yes).
+- **Templates for things you make often.** Nova offers to turn a recurring deliverable into a template, so every edition is consistent and quicker.
+- Nova checks itself at the start of each chat (instructions, kernel, sync, saving) and only speaks up if something's wrong. If your Project instructions are out of date, it shows you the current text once, ready to copy.
 
 ### Under the hood
 - `rhythms.yaml: meetings` (`all_day`, `tentative`, `not_responded`: `include | skip`), optional with `include` defaults; the filter rule lives in `system/schemas/settings.md` and is referenced by the brief, Week Ahead, meeting prep, `nova-prep`, and `key_meeting_upcoming`. Validator checks the block.
@@ -31,6 +34,11 @@ Each release's "What's new" section is shown to users in the Nova Guide and thei
 - Insight drafts: `Draft for:` / `Draft:` lines on insight entries; `email-drafts` drafts for the top `brief_max` insights; the brief shows "Draft ready".
 - Inbox lifecycle: a `counts` block in each inbox file's frontmatter, kept by every writer and checked by the validator; `maintenance` moves entries resolved more than 14 days ago to `user/inbox/archive/YYYY-MM-<name>.md`. History readers (insight engagement, monthly review) include the archive.
 - Field formats: `schema.yaml: field_formats` declares ref/refs/list/emails/date/dt/bool/int/steps per field; the validator enforces them; new `system/tools/normalize.py` fixes mechanical problems in place (bare IDs, scalar lists, email case, enum spelling, date-only fields), run on write and by `maintenance`.
+- `hot.md` capped at 75 lines: only live, non-closed records (no sources, people, organizations); validator enforces it. New `schema.yaml: closed_statuses` shared by the hot index, the Records page, and the validator.
+- Boot check: `system/kernel.md` carries `nova-kernel-2`, `manifest.yaml` gains `kernel_version` and `bootstrap_version` (validated against the kernel and the bootstrap stub, now "Nova bootstrap 2"); `sync_start.py` emits one "Nova boot:" line; kernel §2 step 0 verifies kernel, sync, push, and Project instructions, and reports only failures.
+- Source compaction (`source.md` §Compaction): maintenance replaces long bodies of processed sources (30+ days, full retention, >2 KB, not linked from open items) with a summary, an "Extracted into" list, and `full_text_commit`; paths and links never change. Text search skips `sources/` below L4.
+- Commitments gain `effort` (`quick | hour | half_day | day`); new built-in trigger `focus_time_needed` proposes a focus block (`own_calendar_manage`, propose) when free time before a due date is under 2× the effort (`.claude/skills/nova-triage/reference/focus-time.md`).
+- Deliverable templates in `user/work/templates/<slug>.md` (formats.md §7), detected from 3+ similar deliverables in 6 months, used by `nova-write` and status updates; validator checks them.
 - All changes are additive: no migration and no `data_version` change. Existing inbox files without a `counts` block get a warning until the next `maintenance` run adds it.
 
 ## 1.0.0

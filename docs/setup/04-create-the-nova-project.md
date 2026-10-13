@@ -33,7 +33,7 @@ A **Project** is a workspace in Claude. You'll make one called "Nova" and give i
    - **Windows:** select the text and press **Ctrl C**.
 
    ```text
-   This Project is my Nova. At the start of every conversation:
+   This Project is my Nova (Nova bootstrap 2). At the start of every conversation:
    1. Attach my GitHub repository YOUR-USERNAME/YOUR-REPO with write (push) access and sync it.
    2. Follow the CLAUDE.md file in that repository.
    Never ask me to commit, push, or merge.

@@ -181,7 +181,13 @@ nova_context: routine   # the NOVA_CONTEXT value observed at the start of the ru
 Regenerable; never edited by hand.
 - `<folder>.md` (e.g. `people.md`): one line per non-archived record:
   `- [[people/dana-ruiz]] | Dana Ruiz | aliases: dana@acme.com, D. Ruiz | active | 2026-10-12 | Acme's legal counsel; reviewing the MSA.`
-- `hot.md`: records updated in the last 14 days plus open commitments due within 14 days, grouped by type, same line format.
+- `hot.md`: what's live right now, for session start (L0). **At most 75 lines**, same line format, grouped by type in this order: commitments, events, goals, projects, risks, questions, decisions, ideas, playbooks, topics, then user types. It includes only records that are **not closed** (`schema.yaml: closed_statuses`), not archived, and not superseded, and that are one of:
+  - open or slipped commitments due within 14 days, or slipped;
+  - scheduled events in the next 7 days;
+  - active goals;
+  - other records updated in the last 14 days.
+
+  **Never in hot:** sources, people, and organizations (they are one lookup away in `sources.md`, `people.md`, `people-map.md`, and `organizations.md`), and anything done, processed, or held. If more than 75 qualify, keep in this order and drop the rest: slipped commitments, commitments by due date, events by start, ranked then unranked active goals, then everything else by most recent `updated`. The last line reads `- … <N> more: see the type indexes` when anything was dropped.
 - `people-map.md`: `- [[people/dana-ruiz]] | Dana Ruiz | Acme (customer) | legal counsel | aliases`.
 - `archive.md`: archived records, same line format.
 
@@ -217,8 +223,38 @@ source: "[[sources/2026-10-12-journal]]"
 | Accomplishments | Appended to the relevant goal's `accomplishments` field and `user/work/accomplishments.md` (running list; line format in `.claude/skills/nova-review/reference/weekly.md`) |
 | Deliverable working files | `user/work/deliverables/<YYYY-MM-DD-slug>/` (markdown/data used to build it; the finished binary goes to the deliverables folder per `.claude/skills/nova-write/reference/deliverables.md`) |
 | Project page data | rendered on request; no file |
+| Deliverable template | `user/work/templates/<slug>.md` (below) |
 
 Each output has frontmatter `type: <brief|prep|review|status|report|performance>`, `date`, and `sources`, plus as relevant: `generated` (timestamp), `window_start`/`window_end`, `period`, `kind: catch-up`, `audience`, `subject`. Section structure: Daily Brief and catch-up brief per `.claude/skills/nova-brief/reference/`; reviews and reports per `.claude/skills/nova-review/reference/`; prep notes per `.claude/skills/nova-prep/reference/templates.md`.
+
+### Deliverable templates (`user/work/templates/<slug>.md`)
+A reusable shape for something the user produces again and again: the weekly status email, the monthly board update, the QBR deck, the month-end close summary. `nova-write` uses a matching active template, so every edition is consistent and faster to make.
+```markdown
+---
+type: template
+name: monthly-board-update
+title: Monthly board update
+status: active                 # draft (proposed by Nova) | active | retired
+kind: doc                      # email | message | doc | deck | sheet
+used_for: The update Maya sends the board in the first week of each month
+audience: ["[[people/jordan-lee]]"]   # optional
+cadence: monthly               # optional: weekly | biweekly | monthly | quarterly | ad hoc
+examples: ["[[sources/2026-09-03-board-update]]", "[[sources/2026-10-02-board-update]]"]   # past editions it was learned from
+base_file: null                # optional: the user's own file template (library path or drive link) to build on
+updated: 2026-10-12
+---
+## Structure
+1. **Headline** (2 sentences): the month in one line, then the one thing the board should know.
+   - Pull from: the monthly report's summary; goal progress.
+2. **Metrics**: table of ARR, net retention, burn, runway (this month, last month, change).
+   - Pull from: the finance sheet named in the last edition; never estimate missing numbers, mark them [needed].
+…
+## Voice and format
+- House voice; numbers first; under 2 pages; same section order every month.
+## Notes
+- Last edition's open items are carried into "Follow-ups" (the user asked for this on 2026-10-02).
+```
+Rules: one file per recurring deliverable; only the user's confirmation makes a `draft` template `active`; edits the user makes to an edition are proposed back into the template with the same learning rule as voice (`nova-write` §6). Templates never store data values, only where to get them.
 
 ## 8. Extensions registry (`user/extensions/registry.yaml`)
 ```yaml

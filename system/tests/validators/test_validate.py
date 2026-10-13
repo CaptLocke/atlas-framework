@@ -236,6 +236,44 @@ class SetupAndLeniency(TempRepo):
         self.write("user/inbox/archive/2026-10-approvals.md", arch.replace("executed: 1", "executed: 0").replace("pending: 0", "pending: 1") + entry % ("pending", "pending"))
         self.assertError(run_validate(self.root, "--user"), "2026-10-approvals.md", "only resolved entries")
 
+    def test_deliverable_template(self):
+        t = ("---\ntype: template\nname: board-update\ntitle: Board update\nstatus: %s\nkind: doc\n"
+             "used_for: Monthly board update\nexamples: [\"[[sources/2026-10-12-pricing-sync]]\"]\n---\n## Structure\n1. Headline\n")
+        self.write("user/work/templates/board-update.md", t % "active")
+        self.assertEqual(self.errors(run_validate(self.root, "--user")), [])
+        self.write("user/work/templates/board-update.md", t % "live")
+        self.assertError(run_validate(self.root, "--user"), "board-update.md", "status must be")
+
+    def test_compacted_source_keeps_its_way_back(self):
+        rel = "user/knowledge/sources/2026-10-12-pricing-sync.md"
+        text = self.read(rel)
+        self.assertIn("retention: summary", text)
+        self.write(rel, text.replace("retention: summary", "retention: summary\ncompacted_on: 2026-11-12\nfull_text_commit: 4f2a9c1"))
+        self.assertEqual(self.errors(run_validate(self.root, "--user")), [])
+        self.write(rel, text.replace("retention: summary", "retention: full\ncompacted_on: 2026-11-12"))
+        r = run_validate(self.root, "--user")
+        self.assertError(r, "pricing-sync.md", "retention summary or pointer")
+        self.assertError(r, "pricing-sync.md", "needs full_text_commit")
+
+    def test_commitment_effort(self):
+        rel = "user/knowledge/commitments/send-pricing-feedback.md"
+        text = self.read(rel)
+        self.write(rel, text.replace("\n---\n", "\neffort: half_day\n---\n", 1))
+        self.assertEqual(self.errors(run_validate(self.root, "--user")), [])
+        self.write(rel, text.replace("\n---\n", "\neffort: ages\n---\n", 1))
+        self.assertError(run_validate(self.root, "--user"), "send-pricing-feedback.md", "effort 'ages'")
+
+    def test_hot_index_stays_hot(self):
+        line = "- [[%s]] | T | aliases: | %s | 2026-10-10 | s.\n"
+        self.write("user/knowledge/_index/hot.md", "## projects\n" + line % ("projects/enterprise-launch", "active"))
+        self.assertEqual(self.errors(run_validate(self.root, "--user")), [])
+        self.write("user/knowledge/_index/hot.md", line % ("people/dana-ruiz", "active"))
+        self.assertError(run_validate(self.root, "--user"), "hot.md", "never go in hot.md")
+        self.write("user/knowledge/_index/hot.md", line % ("commitments/send-pricing-feedback", "done"))
+        self.assertError(run_validate(self.root, "--user"), "hot.md", "closed records never")
+        self.write("user/knowledge/_index/hot.md", "".join(line % ("projects/p-%d" % i, "active") for i in range(76)))
+        self.assertError(run_validate(self.root, "--user"), "hot.md", "at most 75")
+
     def test_playbook_steps(self):
         head = ("---\nid: playbooks/renewal\ntype: playbook\ntitle: Renewal\nsummary: Renewal steps.\nstatus: active\n"
                 "created: 2026-10-01\nupdated: 2026-10-01\ntrigger: A renewal is 60 days out\nanchor: the renewal date\n"

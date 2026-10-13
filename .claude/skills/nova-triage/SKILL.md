@@ -16,7 +16,7 @@ Keep the user's commitments honest and their priorities clear: nothing promised 
 - Commitments: `_index/commitments.md` filtered to `open` and `slipped`; open the records.
 - Recent evidence since `jobs.yaml: triage.last_success` (chat: since the last triage or 7 days): Sources captured in that window, `mail.list_sent`, `tasks.list_recent` (completed tasks), the user's statements in chat and journal.
 - Active goals (with `rank`) and projects; `people-map.md` (who is the manager, key stakeholders).
-- Calendar for the next 14 days (events records) for due-date context.
+- Calendar for the next 14 days (events records) for due-date context; `calendar.list_range` for free time when `focus_time_needed` is evaluated.
 - `rhythms.yaml: triggers` (each trigger's `enabled`, `deadline_approaching.days`), `away` (`end: null` = open-ended), `paused`; `user/.state/triggers.yaml`.
 - Active playbook runs (projects linked to a playbook) and their step commitments: `reference/playbooks.md`.
 - Signal guide: `reference/signals.md`. Learned rules: `user/profile/preferences.md` `## Triage rules` (how they're learned: `reference/learning.md`).
@@ -29,7 +29,7 @@ Keep the user's commitments honest and their priorities clear: nothing promised 
 4a. **Apply triage rules** from `preferences.md ## Triage rules` to closing, dropping, and priority; name the rule where it changes an outcome.
 5. **Drop or move.** If evidence shows it's no longer wanted (cancelled meeting, decision reversed) → `status: dropped` with reason; if a new date was agreed → update `due`, keep "was X, now Y" in Updates.
 6. **Slipped.** Open items past `due` → `status: slipped` (this is the `commitment_overdue` condition; see step 9). A slipped item that gets done → `done`.
-7. **Priority** (skip in `mode: light` except for new commitments). Set `priority` high/medium/low against goals first (weighted by each goal's `rank`), then urgency and people (`reference/signals.md` § Priority). Due-less items get a suggested date in `next_step`, not in `due`.
+7. **Priority** (skip in `mode: light` except for new commitments). Set `priority` high/medium/low against goals first (weighted by each goal's `rank`), then urgency and people (`reference/signals.md` § Priority). Due-less items get a suggested date in `next_step`, not in `due`. Estimate `effort` for open `i_owe` items that lack one (`reference/focus-time.md` §1).
 8. **Insight and next step.**
    - Every open or slipped commitment: `insight` (one line: why it matters or may slip, grounded in evidence) and `next_step` (one concrete action with a time). Refresh only when stale or circumstances changed.
    - **Aging waiting-on:** compute days waiting (since created, or since the last follow-up recorded in Updates). Aging = past due, or no movement for more than 5 business days, or due within 2 days with no sign of progress. Say so in `insight` and suggest the follow-up channel in `next_step` (person's `cadence`/habits if known).
@@ -38,6 +38,7 @@ Keep the user's commitments honest and their priorities clear: nothing promised 
    - In `mode: light`: only for commitments created or changed in this run.
 9. **Triggers** (`system/triggers.md`; check and record in `user/.state/triggers.yaml`, key = due date):
    - `deadline_approaching`: open `i_owe` commitments and deadline events due within `days` (default 3) → mark for the brief's "Due soon"; the day before, mark as top-of-brief and Work Board (via `priority: high`).
+   - `focus_time_needed`: `i_owe` work due soon with too little free time before it → propose a focus block, or say no slot fits (`reference/focus-time.md`).
    - `commitment_overdue`: slipped items → flag for the brief. If `waiting_on`, triage does **not** draft in routines:
      1. Mark the commitment for follow-up (`next_step` says a follow-up is due).
      2. Add an `approvals.md` entry (`send_communication`, "send follow-up to <owner>", linking the commitment) **only if** no `pending` entry already links that commitment; `Prepared:` says "follow-up draft to be created by email-drafts".

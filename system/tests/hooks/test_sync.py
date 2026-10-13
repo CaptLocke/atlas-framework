@@ -91,7 +91,16 @@ class SessionStart(SyncCase):
         self.assertFalse(os.path.exists(self.path(".git/rebase-apply")))
 
     def test_push_access_confirmed(self):
-        self.assertIn("push access confirmed", self.start())
+        ctx = self.start()
+        self.assertIn("push access confirmed", ctx)
+        self.assertTrue(ctx.startswith("Nova boot:"), ctx)
+
+    def test_boot_line_names_kernel_version(self):
+        self.write("system/manifest.yaml", "name: Nova\nkernel_version: 7\nupstream: CaptLocke/nova\n")
+        sh(["git", "add", "-A"], self.root)
+        sh(["git", "commit", "-q", "-m", "kv\n\n" + TRAILERS], self.root)
+        sh(["git", "push", "-q", "origin", "main"], self.root)
+        self.assertIn("nova-kernel-7", self.start())
 
     def test_read_only_attachment_is_reported(self):
         # fetch still works, but pushes go to a remote that refuses them

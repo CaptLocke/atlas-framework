@@ -41,11 +41,12 @@ types:
   commitment:
     folder: commitments
     required: [direction, owner, counterparty, due]
-    fields: [direction, owner, counterparty, due, origin, priority, insight, next_step, completed_on]
+    fields: [direction, owner, counterparty, due, origin, priority, effort, insight, next_step, completed_on]
     enums:
       status: [open, done, dropped, slipped]
       direction: [i_owe, waiting_on]
       priority: [high, medium, low]
+      effort: [quick, hour, half_day, day]
   decision:
     folder: decisions
     fields: [decided_on, deciders, rationale, alternatives, reversible, revisit_on]
@@ -88,12 +89,29 @@ types:
   source:
     folder: sources
     required: [kind, captured_on, retention]
-    fields: [kind, origin_uri, connector, captured_on, occurred_on, participants, retention, file_pointer, flags]
+    fields: [kind, origin_uri, connector, captured_on, occurred_on, participants, retention, file_pointer, flags, compacted_on, full_text_commit]
     enums:
       status: [captured, processed]
       kind: [email, meeting, message, doc, web, data, record, manual, journal, file, deliverable]
       flags: [suspicious]
       retention: [full, summary, pointer]
+
+# Statuses that mean a record is finished. Used by the hot index (formats.md §5), the Records
+# dashboard (current vs closed), and the validator. Types not listed have no closed status.
+closed_statuses:
+  person: [inactive]
+  organization: [inactive]
+  project: [done, cancelled]
+  goal: [achieved, missed, dropped]
+  commitment: [done, dropped]
+  decision: [reversed, superseded]
+  event: [held, cancelled]
+  risk: [resolved]
+  question: [answered, dropped]
+  idea: [adopted, parked, dropped]
+  topic: [dormant]
+  playbook: [retired]
+  source: [processed]
 
 # Field formats, used by system/tools/validate.py (errors) and system/tools/normalize.py (fixes).
 #   ref   = one "[[folder/slug]]" link          refs  = list of links
@@ -115,7 +133,7 @@ field_formats:
   idea: { origin: ref }
   topic: {}
   playbook: { steps: steps, last_used: date, automatable: bool, auto_start: bool }
-  source: { participants: refs, connector: text, captured_on: date, occurred_on: dt, flags: list }
+  source: { participants: refs, connector: text, captured_on: date, occurred_on: dt, flags: list, compacted_on: date }
 
 autonomy_levels: [auto, propose, approve, never]
 locked_classes:
