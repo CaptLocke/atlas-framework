@@ -4,6 +4,7 @@ name: daily-brief
 template: daily-brief.html
 republished_by: [daily-brief]
 size_budget_kb: 120
+stale_after_hours: 36
 ---
 # Dashboard: daily-brief
 

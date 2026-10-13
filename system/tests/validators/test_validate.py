@@ -263,6 +263,13 @@ class SetupAndLeniency(TempRepo):
         self.write(rel, text.replace("\n---\n", "\neffort: ages\n---\n", 1))
         self.assertError(run_validate(self.root, "--user"), "send-pricing-feedback.md", "effort 'ages'")
 
+    def test_contract_stale_after_hours(self):
+        rel = "system/dashboards/goals.contract.md"
+        text = self.read(rel)
+        self.assertIn("stale_after_hours: 192", text)
+        self.write(rel, text.replace("stale_after_hours: 192", "stale_after_hours: weekly"))
+        self.assertError(run_validate(self.root, "--system"), "goals.contract.md", "stale_after_hours must be")
+
     def test_hot_index_stays_hot(self):
         line = "- [[%s]] | T | aliases: | %s | 2026-10-10 | s.\n"
         self.write("user/knowledge/_index/hot.md", "## projects\n" + line % ("projects/enterprise-launch", "active"))

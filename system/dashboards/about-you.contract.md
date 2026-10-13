@@ -4,6 +4,7 @@ name: about-you
 template: about-you.html
 republished_by: [monthly, quarterly]
 size_budget_kb: 200
+stale_after_hours: 768
 ---
 # Dashboard: about-you
 

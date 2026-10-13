@@ -4,6 +4,7 @@ name: goals
 template: goals.html
 republished_by: [weekly-review, monthly, quarterly]
 size_budget_kb: 200
+stale_after_hours: 192
 ---
 # Dashboard: goals
 

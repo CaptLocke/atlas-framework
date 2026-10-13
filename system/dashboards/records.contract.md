@@ -4,6 +4,7 @@ name: records
 template: records.html
 republished_by: [maintenance, weekly-review]
 size_budget_kb: 1500
+stale_after_hours: 192
 ---
 # Dashboard: records
 

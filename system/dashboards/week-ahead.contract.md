@@ -4,6 +4,7 @@ name: week-ahead
 template: week-ahead.html
 republished_by: [daily-brief, weekly-review]
 size_budget_kb: 150
+stale_after_hours: 36
 ---
 # Dashboard: week-ahead
 

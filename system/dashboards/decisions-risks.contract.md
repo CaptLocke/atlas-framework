@@ -4,6 +4,7 @@ name: decisions-risks
 template: decisions-risks.html
 republished_by: [weekly-review]
 size_budget_kb: 300
+stale_after_hours: 192
 ---
 # Dashboard: decisions-risks
 

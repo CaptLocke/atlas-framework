@@ -22,6 +22,8 @@ Each release's "What's new" section is shown to users in the Nova Guide and thei
 - **Templates for things you make often.** Nova offers to turn a recurring deliverable into a template, so every edition is consistent and quicker.
 - Nova checks itself at the start of each chat (instructions, kernel, sync, saving) and only speaks up if something's wrong. If your Project instructions are out of date, it shows you the current text once, ready to copy.
 
+- Every dashboard now shows at the top when it was last refreshed and by what, and flags "May be out of date" when a page is older than it should be.
+
 ### Under the hood
 - `rhythms.yaml: meetings` (`all_day`, `tentative`, `not_responded`: `include | skip`), optional with `include` defaults; the filter rule lives in `system/schemas/settings.md` and is referenced by the brief, Week Ahead, meeting prep, `nova-prep`, and `key_meeting_upcoming`. Validator checks the block.
 - Event schema: new optional `all_day` (boolean) and `response` (`organizer | accepted | tentative | not_responded | declined`), mapped from Google Calendar and Outlook in the connector hints.
@@ -39,6 +41,7 @@ Each release's "What's new" section is shown to users in the Nova Guide and thei
 - Source compaction (`source.md` §Compaction): maintenance replaces long bodies of processed sources (30+ days, full retention, >2 KB, not linked from open items) with a summary, an "Extracted into" list, and `full_text_commit`; paths and links never change. Text search skips `sources/` below L4.
 - Commitments gain `effort` (`quick | hour | half_day | day`); new built-in trigger `focus_time_needed` proposes a focus block (`own_calendar_manage`, propose) when free time before a due date is under 2× the effort (`.claude/skills/nova-triage/reference/focus-time.md`).
 - Deliverable templates in `user/work/templates/<slug>.md` (formats.md §7), detected from 3+ similar deliverables in 6 months, used by `nova-write` and status updates; validator checks them.
+- Refresh marker: `N.refreshed()` in `_base.js` (masthead, all templates via `render.py --sync`) from `meta.generated_at` / `generated_by`; contracts gain optional `stale_after_hours` (daily pages 36, weekly 192, About You 768, none for Nova Guide), copied into `meta` by `nova-dashboards` and checked by the validator. The footer says "Refreshed" too.
 - All changes are additive: no migration and no `data_version` change. Existing inbox files without a `counts` block get a warning until the next `maintenance` run adds it.
 
 ## 1.0.0

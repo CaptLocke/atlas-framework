@@ -4,6 +4,7 @@ name: work-board
 template: work-board.html
 republished_by: [daily-brief, triage]
 size_budget_kb: 300
+stale_after_hours: 36
 ---
 # Dashboard: work-board
 

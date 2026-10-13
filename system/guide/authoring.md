@@ -116,6 +116,7 @@ name: <name>
 template: <name>.html
 republished_by: [<job>, ...]
 size_budget_kb: <n>
+stale_after_hours: <n>   # optional: hours after which the refresh marker says "May be out of date"; omit if the page never goes stale
 ---
 # Dashboard: <name>
 ## Purpose
