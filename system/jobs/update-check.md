@@ -28,7 +28,7 @@ Runs during away; patch and minor updates apply as usual and "What's new" waits 
 
 ## Steps
 1. Invoke `atlas-update` in check mode: find the newest upstream release. If it is not newer than `system/VERSION`, record `last_checked_version` and exit `ok`.
-2. Classify the release (patch, minor, major; `system/migrations/README.md` and tactical semver rules).
+2. Classify the release by semver against the installed version: **major** if the first number changed, the release notes mark a breaking change, or a pending migration is non-additive or needs user input (`system/migrations/README.md`); otherwise **minor** if the second number changed (additive features); otherwise **patch** (fixes only). With several releases pending, classify each one on its own.
 3. **Patch/minor** with `updates_minor: auto`: invoke `atlas-update` in apply mode (rollback tag, update lock, replace owned paths, run pending migrations in order, validate, commit, push, "What's new"). On failure it restores with a forward revert commit and records a known issue.
 4. **Major**, or `updates_minor` not `auto`: prepare only. Add a pending entry to `user/inbox/approvals.md` (`updates_major` or `updates_minor`) with the version, a plain-language summary, and any questions the migrations will ask. The user applies it in chat.
 5. If `manifest.yaml: models` changed in the applied release, update routine model settings if the platform allows; otherwise add a `setup` question with copy-paste instructions.

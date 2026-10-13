@@ -1,7 +1,7 @@
 ---
 type: test-suite
 name: regression
-run_before: every release (build plan L-4)
+run_before: every release
 ---
 # Regression set
 
@@ -125,7 +125,7 @@ Also record two trend numbers in the scorecard (they're tracked, not gated): **r
 Model output varies from run to run. If a run fails **only** on M or S items, you may rerun from a fresh scratch copy. The release then needs **two consecutive passing runs**. A gate failure or an X hit is never rerun away: find the cause and fix it first.
 
 ## When to run
-- Before every release (build plan L-4), on the release candidate.
+- Before every release, on the release candidate.
 - After any change to `system/kernel.md`, `system/rules/`, `system/schemas/`, the jobs `ingest`, `triage`, `intelligence`, or `daily-brief`, or the skills they use.
 - When `system/manifest.yaml: models` changes, and when Anthropic releases a new model Atlas will run on.
 

@@ -33,7 +33,7 @@ Documents, decks, sheets, and dashboards follow `user/profile/design-system.md` 
 - Never fabricate quotes, figures, or commitments.
 
 ## Finished files
-Deliverables (docx, pptx, xlsx, pdf) are saved to the deliverables folder and offered as a download (`atlas-write`; tactical §9.6a). Working material goes in `user/work/deliverables/<date-slug>/`.
+Deliverables (docx, pptx, xlsx, pdf) are saved to the deliverables folder and offered as a download (`atlas-write`, `reference/deliverables.md`). Working material goes in `user/work/deliverables/<date-slug>/`.
 
 ## Checks
 - Every claim about the user's work in an answer has a citation or an explicit "I don't have that recorded."

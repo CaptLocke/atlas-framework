@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Atlas hook: protected paths, N5 and N6 (build plan H-4).
+"""Atlas hook: protected paths, N5 and N6.
 
 Registered in .claude/settings.json as a PreToolUse hook for file tools
 (matcher "Write|Edit|MultiEdit|NotebookEdit") and shell commands

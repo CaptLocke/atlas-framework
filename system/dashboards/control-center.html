@@ -749,13 +749,23 @@ a.rid:hover { color: var(--accent); }
 
     var sys = d.system || {};
     var up = sys.update || {};
-    var mig = sys.notes_import;
-    var migText = !mig ? null : mig.status === "complete" ? "Done: " + mig.processed + " notes from " + mig.source_system + (mig.skipped ? ", " + mig.skipped + " skipped" : "")
-      : mig.status === "undone" ? "Undone" : (mig.processed || 0) + " of " + (mig.total || 0) + " notes from " + mig.source_system;
+    var imp = sys.notes_import;
+    var impText = null;
+    if (imp) {
+      var from = imp.source_system ? " from " + imp.source_system : "";
+      var done = imp.processed || 0;
+      var plural = function (n) { return n + (n === 1 ? " note" : " notes"); };
+      if (imp.status === "complete") impText = "Done: " + plural(done) + " brought in" + from + (imp.skipped ? ", " + imp.skipped + " skipped" : "");
+      else if (imp.status === "undone") impText = "Undone: the notes" + from + " were taken back out";
+      else if (imp.status === "planned") impText = "Getting ready to bring in your notes" + from;
+      else if (imp.status === "sampling") impText = "Checking a few sample notes" + from + " with you first";
+      else if (imp.total) impText = "In progress: " + done + " of " + plural(imp.total) + from;
+      else impText = "In progress: " + plural(done) + from + " so far";
+    }
     main.appendChild(N.section({ id: "system", title: "Atlas itself",
       body: [N.facts([["Version", sys.installed_version], ["Latest release", up.latest_version ? up.latest_version + (up.available ? " (update available)" : "") : null],
         ["Last checked for updates", up.last_checked ? N.date(up.last_checked) : null], ["Your health check", sys.last_user_check ? N.date(sys.last_user_check) : null],
-        ["System health check", sys.last_system_check ? N.date(sys.last_system_check) : null], ["Data format", sys.data_version != null ? "Version " + sys.data_version : null], ["Import", migText]]),
+        ["System health check", sys.last_system_check ? N.date(sys.last_system_check) : null], ["Data format", sys.data_version != null ? "Version " + sys.data_version : null], ["Import", impText]]),
         up.available && up.notes ? h("p", { class: "item-insight", style: "margin-top:.75rem" }, N.rich(up.notes)) : null] }));
 
     var failing = routines.filter(function (r) { var s = (r.last_run || {}).status; return s === "failed" || s === "partial"; }).length;

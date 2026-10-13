@@ -10,15 +10,11 @@ A **Project** is a workspace in Claude. You'll make one called "Atlas" and give 
 
 1. **In the Claude desktop app, click Projects** in the left-hand sidebar.
 
-   ![The Claude app sidebar, with Projects near the top](images/claude-projects-sidebar.png)
-
 2. **Click Create project** (or **New project**).
 
 3. **Type `Atlas` as the name.** You can leave the description empty.
 
 4. **Click Create project.**
-
-   ![The create project form in Claude, with the name "Atlas" typed in](images/claude-new-project.png)
 
 > **If it looks different:** if you don't see Projects in the sidebar, the sidebar may be collapsed. Click the sidebar icon at the top-left of the window to open it. On a narrow window, Projects may be under a menu (☰).
 
@@ -55,8 +51,6 @@ A **Project** is a workspace in Claude. You'll make one called "Atlas" and give 
 
 5. **Click Save.**
 
-   ![The Atlas Project page, with the instructions box open and the note pasted in](images/claude-project-instructions.png)
-
 > **Don't worry about getting it perfect.** During setup, Atlas shows you a ready-made copy of these instructions with your Atlas's address already filled in. If anything differs, Atlas will ask you to paste its version in place of this one.
 
 ---
@@ -70,8 +64,6 @@ A **Project** is a workspace in Claude. You'll make one called "Atlas" and give 
    ```text
    Set up Atlas
    ```
-
-   ![A new chat inside the Atlas Project, with "Set up Atlas" typed in the message box](images/claude-first-chat.png)
 
 3. **Wait a moment.** The first time, Claude opens your Atlas and gets ready, which can take up to a minute. Atlas then greets you and starts setting things up with you.
 

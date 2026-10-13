@@ -1,4 +1,4 @@
-"""Atlas hooks: shared context detection and helpers (build plan H-2).
+"""Atlas hooks: shared context detection and helpers.
 
 Imported by actions.py, paths.py and git.py; not registered as a hook itself.
 

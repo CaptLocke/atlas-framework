@@ -14,4 +14,4 @@ A release zip is the zip-delivery alternative to fetching from the upstream repo
 1. Create the zip from the owned paths only, preserving folder structure from the repo root.
 2. Verify: unzip into an empty folder and confirm no `user/` path exists and `system/VERSION` matches the tag.
 
-**Applying a zip:** the user attaches it in an Atlas chat and says "update Atlas from this"; `atlas-update` applies it with the same procedure as an upstream update (tactical §13.2).
+**Applying a zip:** the user attaches it in an Atlas chat and says "update Atlas from this"; `atlas-update` applies it with the same procedure as an upstream update (`atlas-update` §D).

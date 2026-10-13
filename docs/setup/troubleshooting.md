@@ -8,7 +8,7 @@ Find the problem that matches what you see. Each fix is a few steps. If none of 
 
 1. **Check you're signed in to GitHub.** The button only appears when you're signed in. Look for your profile picture in the top-right corner; if you see **Sign in** instead, sign in and reload the page.
 2. **Make the browser window wider.** On narrow windows the button can move or hide.
-3. **Use the direct link instead:** [github.com/new?template_owner=CaptLocke&template_name=atlas](https://github.com/new?template_owner=CaptLocke&template_name=atlas). It opens the "Create a new repository" form with the Atlas template already chosen. Continue from step 5 of [Step 2](02-create-your-atlas.md).
+3. **Use the direct link instead:** [github.com/CaptLocke/atlas-framework/generate](https://github.com/CaptLocke/atlas-framework/generate). It opens the "Create a new repository" form with the Atlas template already chosen. Continue from step 5 of [Step 2](02-create-your-atlas.md).
 4. **Don't use Fork.** A fork of a public repository is public, which isn't safe for your Atlas.
 
 ---
@@ -22,8 +22,6 @@ Fix this before you go any further. It takes a minute and nothing is lost.
 3. **Scroll to the very bottom** of the General page, to the **Danger Zone**.
 4. **Click Change visibility**, then **Change to private** (or **Make private**).
 5. **Confirm** by following GitHub's prompts. It may ask you to type the repository name and your password or a phone code.
-
-   ![Repository settings, Danger Zone, with the "Change visibility" button](images/github-change-visibility.png)
 
 6. **Check** that the label next to your repository name now says **Private**.
 
@@ -43,8 +41,6 @@ Claude says it can't find, attach, or access your repository. Work through these
    2. Next to **Claude**, click **Configure**.
    3. Under **Repository access**, make sure **Only select repositories** is chosen and your Atlas is listed. If it isn't, add it with **Select repositories**.
    4. Click **Save**.
-
-   ![GitHub settings for the Claude app, with Repository access showing your Atlas repository selected](images/github-app-configure.png)
 
 5. **Reinstall the app if Claude isn't listed.** Go to [github.com/apps/claude/installations/select_target](https://github.com/apps/claude/installations/select_target) and follow [Step 3, Part A](03-connect-github.md#part-a-give-claude-access-to-your-atlas-repository-in-your-browser) again.
 6. **Start a fresh chat** in the Atlas Project and say **`Start Atlas`**.
@@ -82,7 +78,6 @@ Atlas's automations run in the cloud in an **environment** (a small behind-the-s
    2. Open the automation Atlas named (they're called **Atlas · …**, for example **Atlas · nightly-cycle**).
    3. Find its **Environment** setting and choose **Atlas routine**. Save.
 3. **If there's no "Atlas routine" environment:** open **Settings** and look for **Environments** (or **Cloud environments**). Create one named **Atlas routine** and add one variable: name `ATLAS_CONTEXT` (capitals, with an underscore), value `routine` (lower case, no spaces or quotes). Save, then go back to step 2.
-   ![The environment settings, with an environment named "Atlas routine" and the variable ATLAS_CONTEXT set to routine](images/claude-environment-atlas-routine.png)
 
 4. **Tell Atlas "Done"**. Atlas runs the automation once as a test and checks it used the right environment.
 

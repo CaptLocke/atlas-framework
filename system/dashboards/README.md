@@ -120,7 +120,7 @@ Rules: only `--brand-*` declarations; colors as hex; font names as CSS family li
 Pages support light and dark (`prefers-color-scheme`), a viewer-chosen theme (`<html data-theme="light|dark">`, set by the footer button), phone widths down to 320 px with 16 px gutters and no horizontal scroll, keyboard focus states, and printing (filters hidden, black on white).
 
 ## Republish constraints (why templates look the way they do)
-Routines republish unattended only when an artifact is **private, page-only, and has no connector grants** (tactical §9.1, §12). So every template:
+Routines republish unattended only when an artifact is **private, page-only, and has no connector grants**: anything else can change what the page reads or who can see it, so it needs the user in a chat. So every template:
 - is a single self-contained file: inline CSS and JS, no external scripts, stylesheets, fonts, or images;
 - makes no network or connector calls and asks Claude nothing at view time;
 - reads all data from the embedded JSON; nothing is fetched live;

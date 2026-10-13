@@ -1,4 +1,4 @@
-"""Tests for system/tools/validate.py (T-2).
+"""Tests for system/tools/validate.py.
 
 Each test builds a temporary repo: a copy of this repo's system/ and .claude/
 plus fixture user files from fixtures/good or fixtures/bad, then runs the

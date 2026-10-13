@@ -29,7 +29,7 @@ Deliver new versions without ever risking the user's data. Only the paths in `sy
 5. **Decide by governance** (`system/rules/governance.md`): patch/minor follow `updates_minor` (default `auto`), major follows `updates_major` (default `propose`). `propose` in a routine → queue an entry in `user/inbox/approvals.md` (action `updates_major: apply Atlas 2.0.0`, with the What's new summary, any Action needed lines, and any questions the migrations will ask) and stop. In chat → summarize what changes and ask. Away mode: patch/minor proceed; major waits for a chat.
 
 ### B. Apply one release
-Follow these steps exactly (tactical §13.2); commands in `reference/procedure.md`.
+Follow these steps exactly, in order; commands in `reference/procedure.md`.
 1. **Preflight:** clean working tree (commit pending user work first), pull, no existing `.atlas-tmp/update.lock` (if one exists and is expired, remove it and record a known issue; if live, stop: another update is running).
 2. **Rollback point:** tag the current commit `pre-update-<installed version>` and push the tag. If the tag exists from an earlier attempt at the same version, reuse it.
 3. **Lock:** write `.atlas-tmp/update.lock` (`system/schemas/formats.md` §2: `by: atlas-update`, `version_from`, `version_to`, `created`, `expires` = +30 minutes). Refresh `expires` if a long migration needs it; never let it lapse mid-write.

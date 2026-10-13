@@ -49,7 +49,7 @@ skipped: []
 notes: { 4: "Project created; stub pasted" }
 ```
 
-### import.yaml (only while a import exists)
+### import.yaml (only while an import exists)
 Written only by the import (`.claude/skills/atlas-capture/reference/import.md`) and its undo (`atlas-memory` §G). Created once the attestation is recorded; `route` is added when chosen.
 ```yaml
 id: 2026-10-14-obsidian

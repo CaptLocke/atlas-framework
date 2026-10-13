@@ -4,7 +4,7 @@ version: 1.0.0
 ---
 # Templates
 
-Starter files for the user half. `atlas-setup` copies every template to its destination in `user/` at setup step 5 (steps: tactical §16 and `.claude/skills/atlas-setup/`); later steps fill them in. Templates are system-owned and replaced on update; the copies in `user/` belong to the user and are never overwritten by updates (only migrations change them).
+Starter files for the user half. `atlas-setup` copies every template to its destination in `user/` at setup step 5 (steps: `.claude/skills/atlas-setup/SKILL.md`); later steps fill them in. Templates are system-owned and replaced on update; the copies in `user/` belong to the user and are never overwritten by updates (only migrations change them).
 
 **Copy rules**
 - Copy only when the destination does not exist. Never overwrite a user file; if a destination exists (resumed or repeated setup), keep it and fill in missing keys only.
@@ -14,7 +14,7 @@ Starter files for the user half. `atlas-setup` copies every template to its dest
 
 **Step 5 (attestation) copies every template below**, so a complete, valid `user/` exists before anything else happens: all settings (including the default `governance.yaml` and conservative `data-rules.yaml`), the profile starters, the inbox, state, and log starters, and the extensions registry. Nothing is ingested until the attestation in `atlas.yaml` is recorded at the same step. Later steps fill or adjust the copies; they never re-copy.
 
-| Template | Destination | Filled or adjusted at (tactical §16) | Later maintained by |
+| Template | Destination | Filled or adjusted at (setup step) | Later maintained by |
 |---|---|---|---|
 | `state/setup.yaml` | `user/.state/setup.yaml` | after every step | `atlas-setup` |
 | `state/cursors.yaml` | `user/.state/cursors.yaml` | 12 (first pass) | `ingest` |

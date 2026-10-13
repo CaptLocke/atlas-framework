@@ -14,10 +14,10 @@ python3 -m unittest discover -s system/tests -t system/tests
 ## Hook and validator tests
 
 ### What they cover
-| Folder | Covers | Build plan |
-|---|---|---|
-| `hooks/` | `.claude/hooks/actions.py` (N1-N4), `paths.py` (N5, N6), `git.py` (N8, N10, N12), the upstream bypass and context detection in `context.py`, `failsafe.py`, and the sync hooks `sync_start.py` (SessionStart) and `sync_guard.py` (Stop) in `test_sync.py` | T-1 (H-1..H-6) |
-| `validators/` | `system/tools/validate.py`: record frontmatter, settings files, registry, manifest, VERSION, skills, jobs, profiles, dashboard contracts, migrations, settings templates; field formats (`schema.yaml: field_formats`) and a `normalize.py --fix` round trip; plus a check that this repository itself validates | T-2 |
+| Folder | Covers |
+|---|---|
+| `hooks/` | `.claude/hooks/actions.py` (N1-N4), `paths.py` (N5, N6), `git.py` (N8, N10, N12), the upstream bypass and context detection in `context.py`, `failsafe.py`, and the sync hooks `sync_start.py` (SessionStart) and `sync_guard.py` (Stop) in `test_sync.py` |
+| `validators/` | `system/tools/validate.py`: record frontmatter, settings files, registry, manifest, VERSION, skills, jobs, profiles, dashboard contracts, migrations, settings templates; field formats (`schema.yaml: field_formats`) and a `normalize.py --fix` round trip; plus a check that this repository itself validates |
 
 ### How to run
 ```
