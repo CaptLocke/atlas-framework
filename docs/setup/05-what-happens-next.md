@@ -8,7 +8,7 @@ From here on, you just talk to Atlas. It asks questions, explains what it's doin
 
 ## 1. A quick welcome
 
-Atlas tells you, in a few lines, what it will do for you, and then asks one question: **are you coming from another notes app, product, or framework** (such as Notion, Obsidian, or a "second brain" setup)? If you are, Atlas will bring your notes in during setup (step 5 below). If not, just say no.
+Atlas tells you, in a few lines, what it will do for you, and then asks one question: **are you coming from another notes app, product, or framework** (such as Notion, Obsidian, or a "second brain" setup)? If you are, Atlas will bring your notes in during setup (section 3 below). If not, just say no.
 
 ## 2. Your permission
 
@@ -16,31 +16,33 @@ Atlas explains, in plain words, that what it learns about your work will be kept
 
 Atlas will ask you to confirm again each quarter, and if you change jobs or roles.
 
-If you're bringing notes in, Atlas also asks whether any of them come from a previous employer or are personal notes you'd rather leave out, and whether there are folders to skip. Anything you exclude is never read.
+## 3. Bringing in your notes (if you have them)
 
-## 3. Sharing what you have
+If you're coming from another notes app, this comes next, before anything else, because your own notes usually tell Atlas the most.
 
-Atlas reads before it asks. In one message it asks for:
-- **your company's website**;
-- **your LinkedIn profile**, if you'd like (the easiest way: on your LinkedIn profile, click **More → Save to PDF**, then attach the file);
-- **any documents you have handy**, all optional: a few emails or memos you've written, something your company published, a brand guide or slide template, an org chart, strategy or planning documents, recent reports;
-- **your old notes**, if you're bringing them in. If you use a cloud drive (Atlas can connect it for you now), Atlas creates an **Atlas Import** folder there with two folders inside: **1 About me** (notes about you, your role, and how you work) and **2 Notes and records** (everything else). Put your notes there. Or attach your app's export in the chat, zipped or not, or have Atlas pick up the folder from your computer. Atlas then shows you how it plans to sort them and checks with you before reading on.
+- **Where to put them.** If you use a cloud drive (Atlas can connect it for you now), Atlas creates an **Atlas Import** folder there with two folders inside: **1 About me** (notes about you, your role, and how you work) and **2 Notes and records** (everything else). Put your notes there. Or attach your app's export in the chat, zipped or not, or have Atlas pick up the folder from your computer.
+- **What to leave out.** Once your notes are in place, Atlas lists the folders it found and asks whether any hold a previous employer's material or personal notes, and whether to skip any. Anything you exclude is never read.
+- **How it sorts them.** Atlas shows you how it plans to sort your notes and checks with you. Then it brings in five sample notes and shows what each became, so you can check it's working the way you want. Then it works through the rest in batches, with a short progress line now and then.
 
-Attach whatever you have and skip the rest. You can add more in any chat later.
-
-## 4. Checking what Atlas learned
-
-Atlas reads your material and looks up public information about your company (what it does, its customers, competitors, size, recent news), then shows you what it found, a short section at a time, so you can correct anything. Notes from your **1 About me** folder go into this too, so there are fewer questions. After that it asks only what it still needs to know, usually who your manager and key people are, your current goals, and how you like to work and receive information. Every question has a default, and you can skip any of them.
-
-## 5. Bringing in your notes (if you have them)
-
-Atlas first brings in five sample notes and shows you what each became, so you can check it's sorting them the way you want. Then it works through the rest in batches, with a short progress line now and then. It finishes this before connecting your other tools, so your first Daily Brief starts from your full history.
-
+Along the way:
 - **Your old notes are never changed.** Atlas only reads them, once. Afterwards you can keep or delete them.
 - **Old to-dos:** open ones from the last 60 days stay live; older ones are filed as history, and Atlas asks once whether any are still open.
 - **At the end** you get one short list to check (possible duplicate people, items that may still be open, notes it wasn't sure how to file) and a summary of what came in.
 - **If you run out of time** or close the chat, nothing is lost. In your next chat Atlas carries on from where it stopped.
 - **Changed your mind?** Say "Undo the import" at any time and Atlas takes it all back out.
+
+## 4. Sharing what you have
+
+Atlas reads before it asks. In one message it asks for whatever your notes didn't already cover:
+- **your company's website**;
+- **your LinkedIn profile**, if you'd like (the easiest way: on your LinkedIn profile, click **More → Save to PDF**, then attach the file);
+- **any documents you have handy**, all optional: a few emails or memos you've written, something your company published, a brand guide or slide template, an org chart, strategy or planning documents, recent reports.
+
+Attach whatever you have and skip the rest. You can add more in any chat later.
+
+## 5. Checking what Atlas learned
+
+Atlas reads your material and looks up public information about your company (what it does, its customers, competitors, size, recent news), then shows you what it found, including what it learned from your notes, a short section at a time, so you can correct anything. After that it asks only what it still needs to know, usually who your manager and key people are, your current goals, and how you like to work and receive information. Every question has a default, and you can skip any of them.
 
 ## 6. Connecting your tools
 
