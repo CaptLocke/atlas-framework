@@ -3,7 +3,7 @@ name: Atlas
 version: 1.0.0            # must match system/VERSION
 data_version: 1           # user data format version this release expects (see system/migrations/)
 min_plan: pro             # minimum Claude plan
-support_email: nova.issue.report@gmail.com   # issue reports (atlas-report-issue)
+support_email: atlas.framework.support@gmail.com # issue reports (atlas-report-issue)
 upstream: CaptLocke/atlas-framework  # public repo releases are fetched from
 kernel_version: 2         # must equal the boot marker in system/kernel.md (atlas-kernel-<N>)
 bootstrap_version: 2      # must equal "Atlas bootstrap <N>" in system/templates/bootstrap-stub.md
