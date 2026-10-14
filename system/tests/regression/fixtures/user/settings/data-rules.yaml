@@ -1,0 +1,9 @@
+categories:
+  confidential: pointer
+  pii: summary
+  phi: pointer
+  financial: summary
+  legal_privileged: ignore
+custom: []
+exclusions:
+  - "messaging: channel:#random"

@@ -1,0 +1,11 @@
+ingest: []
+fallbacks:
+  - category: mail
+    method: drop
+    instructions: "Regression run: email threads arrive as files in user/inbox/drop/."
+  - category: meetings
+    method: drop
+    instructions: "Regression run: transcripts arrive as files in user/inbox/drop/."
+  - category: messaging
+    method: drop
+    instructions: "Regression run: chat threads arrive as files in user/inbox/drop/."

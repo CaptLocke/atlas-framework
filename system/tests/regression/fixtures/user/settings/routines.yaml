@@ -1,0 +1,11 @@
+profile: custom
+routines:
+  - name: regression
+    schedule: "7 20 * * *"              # never actually scheduled; the harness runs it on demand
+    model: strongest
+    routine_id: null
+    jobs:
+      - ingest
+      - triage
+      - intelligence
+      - { job: daily-brief, target: today }

@@ -1,0 +1,7 @@
+jobs:
+  ingest: { last_success: "2026-10-12T20:09:12-07:00", last_status: ok }
+  triage: { last_success: "2026-10-12T20:14:40-07:00", last_status: ok }
+  intelligence: { last_success: "2026-10-12T20:19:02-07:00", last_status: ok }
+  daily-brief: { last_success: "2026-10-12T20:25:31-07:00", last_status: ok, last_target: "2026-10-13" }
+  monthly: { last_success: "2026-10-01T20:30:00-07:00", last_status: ok, period_done: "2026-10" }
+  quarterly: { last_success: "2026-10-01T20:31:00-07:00", last_status: ok, period_done: "2026-Q4" }

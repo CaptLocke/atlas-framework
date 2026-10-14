@@ -1,0 +1,2 @@
+## projects
+- [[projects/enterprise-launch]] | Enterprise tier launch | aliases: enterprise launch, enterprise tier, ENT | active | 2026-10-01 | Launch of Acme's enterprise tier (SSO, admin console, per-seat pricing); beta targeted for Nov 2.
