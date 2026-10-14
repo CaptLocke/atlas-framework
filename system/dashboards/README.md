@@ -59,6 +59,8 @@ Each template contains each placeholder **exactly once**. No other text is subst
 | Control Center | As of date | Whether Atlas is running well, and the one thing that needs the user if any |
 | Atlas Guide | "Everything Atlas can do, and how to ask" | How to talk to Atlas, or what's new after an update |
 
+**Links.** A link on a dashboard only ever opens another dashboard: the nav row under the header, and the name of another dashboard where a page's own wording mentions one (`N.pageLink`). Pages have no jump-to-section links.
+
 **Refresh marker.** Every page shows, at the top, when it was refreshed (`N.refreshed()` in `_base.js`, from `meta.generated_at`). A signal dot in front of it is green while the page is current. If the page is older than its contract's `stale_after_hours` when it is opened, the dot turns amber and the marker adds "May be out of date" (grey before the first refresh). This is the one place a page compares against the viewer's clock (everything else uses `meta.as_of`). Templates get it through `N.masthead`; never remove it.
 
 ## How a page is rendered (`atlas-dashboards`)
@@ -108,7 +110,7 @@ Every dashboard's JSON has a `meta` object:
 | `user_display_name` | no | `atlas.yaml: user_display_name`. |
 | `atlas_version` | no | `atlas.yaml: installed_version`. |
 | `record_base_url` | no | `null` by default. If set (e.g. `https://github.com/<repo>/blob/main/user/knowledge/`, from `atlas.yaml: repo`), record titles become links to the record file. Leave `null` unless the user asks; the ID text alone is enough to ask Atlas. |
-| `nav` | no | Links to the other dashboards, from `dashboards.yaml` entries that have a `url`. Only `https://` links render. |
+| `nav` | no | Every dashboard in `dashboards.yaml` that has a `url`, including this one (it shows as the current page). Pages list them in one fixed order, so every page shows the same row. Only `https://` links render. |
 | `notices` | no | Up to 3 short lines shown above the content, each as a tinted alert with an icon and a label ("Needs attention:" for `warn`, "Problem:" for `error`, "Note:" for `info`): open `high` known issues from `user/.state/health.yaml` that affect this page's data (e.g. a disconnected source), and staleness (the readiness check found an upstream job stale). `level`: `info`, `warn`, or `error`. |
 | `truncated` | no | Map of list key → number of items left out. The page shows "N more not shown here. Ask Atlas in chat to see them." under that list. Keys are top-level list names unless the contract says otherwise. |
 

@@ -421,6 +421,7 @@ a.rid:hover { color: var(--accent); }
      becomes the record's readable name. */
   N.rich = function (text) {
     if (text == null) return null;
+    if (typeof text !== "string") return text;  /* already built nodes (e.g. text with a page link) */
     var M = "\\[\\[[a-z]+\\/[a-z0-9][a-z0-9-]*\\]\\]";
     return String(text)
       .replace(new RegExp("\\s*\\(\\s*" + M + "(?:\\s*[,;]\\s*" + M + ")*\\s*\\)", "g"), "")
@@ -567,10 +568,27 @@ a.rid:hover { color: var(--accent); }
       stale ? N.chip("May be out of date", "warn") : null);
   };
 
+  /* Links on a page only ever open another dashboard: the nav row, and names of other pages in text.
+     NAV_ORDER fixes the order so every page lists them the same way. */
+  var NAV_ORDER = ["daily-brief", "work-board", "week-ahead", "goals", "people", "decisions-risks", "records", "about-you", "control-center", "atlas-guide"];
+  N.navLinks = function () {
+    return N.list(N.meta.nav).filter(function (n) { return n && n.url && /^https:\/\//.test(n.url); })
+      .sort(function (a, b) {
+        var ia = NAV_ORDER.indexOf(a.name), ib = NAV_ORDER.indexOf(b.name);
+        return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+      });
+  };
+  /* The name of another dashboard, linked when its URL is known (plain text otherwise). */
+  N.pageLink = function (name, text) {
+    var n = N.navLinks().filter(function (x) { return x.name === name; })[0];
+    text = text || (n && n.title) || name;
+    return n && n.name !== N.meta.dashboard ? h("a", { href: n.url, target: "_blank", rel: "noopener noreferrer" }, text) : text;
+  };
+
   /* Every page's header: title, subtitle, headline (meta.headline, else the page's own lede), stat cards.
      opts: {title, subtitle, lede, stats:[[value,label]]} */
   N.masthead = function (o) {
-    var nav = N.list(N.meta.nav).filter(function (n) { return n && n.url && /^https:\/\//.test(n.url); });
+    var nav = N.navLinks();
     return h("header", { class: "mast" },
       h("div", { class: "mast-top" },
         h("p", { class: "mast-who" }, logo(), "Atlas"),

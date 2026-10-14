@@ -227,7 +227,6 @@ a.rid:hover { color: var(--accent); }
 }
 </style>
 <style id="atlas-page">
-.toc { display: flex; flex-wrap: wrap; gap: .4rem 1.25rem; margin: 0 0 1.25rem; padding: 0; list-style: none; font-size: .95rem; }
 .guide-search { margin-bottom: 1.5rem; }
 .guide-search .search { max-width: 32rem; }
 .entries { display: grid; gap: .9rem; }
@@ -427,6 +426,7 @@ details.older .entries { margin-top: .9rem; }
      becomes the record's readable name. */
   N.rich = function (text) {
     if (text == null) return null;
+    if (typeof text !== "string") return text;  /* already built nodes (e.g. text with a page link) */
     var M = "\\[\\[[a-z]+\\/[a-z0-9][a-z0-9-]*\\]\\]";
     return String(text)
       .replace(new RegExp("\\s*\\(\\s*" + M + "(?:\\s*[,;]\\s*" + M + ")*\\s*\\)", "g"), "")
@@ -573,10 +573,27 @@ details.older .entries { margin-top: .9rem; }
       stale ? N.chip("May be out of date", "warn") : null);
   };
 
+  /* Links on a page only ever open another dashboard: the nav row, and names of other pages in text.
+     NAV_ORDER fixes the order so every page lists them the same way. */
+  var NAV_ORDER = ["daily-brief", "work-board", "week-ahead", "goals", "people", "decisions-risks", "records", "about-you", "control-center", "atlas-guide"];
+  N.navLinks = function () {
+    return N.list(N.meta.nav).filter(function (n) { return n && n.url && /^https:\/\//.test(n.url); })
+      .sort(function (a, b) {
+        var ia = NAV_ORDER.indexOf(a.name), ib = NAV_ORDER.indexOf(b.name);
+        return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+      });
+  };
+  /* The name of another dashboard, linked when its URL is known (plain text otherwise). */
+  N.pageLink = function (name, text) {
+    var n = N.navLinks().filter(function (x) { return x.name === name; })[0];
+    text = text || (n && n.title) || name;
+    return n && n.name !== N.meta.dashboard ? h("a", { href: n.url, target: "_blank", rel: "noopener noreferrer" }, text) : text;
+  };
+
   /* Every page's header: title, subtitle, headline (meta.headline, else the page's own lede), stat cards.
      opts: {title, subtitle, lede, stats:[[value,label]]} */
   N.masthead = function (o) {
-    var nav = N.list(N.meta.nav).filter(function (n) { return n && n.url && /^https:\/\//.test(n.url); });
+    var nav = N.navLinks();
     return h("header", { class: "mast" },
       h("div", { class: "mast-top" },
         h("p", { class: "mast-who" }, logo(), "Atlas"),
@@ -678,12 +695,8 @@ details.older .entries { margin-top: .9rem; }
   N.page({ title: "Atlas Guide" }, function (d, main) {
     var sections = L(d.sections), news = L(d.whats_new);
     var all = [];
-    var tocItems = [];
-    if (news.length) tocItems.push(["whats-new", "What's new"]);
-    sections.forEach(function (s) { tocItems.push(["s-" + s.id, s.title]); });
     var noMatch = h("p", { class: "empty nomatch", hidden: true }, "Nothing in the guide matches. Ask Atlas in chat instead; it can explain anything here.");
     main.appendChild(h("div", { class: "no-print" },
-      h("nav", { "aria-label": "Guide sections" }, h("ul", { class: "toc" }, tocItems.map(function (t) { return h("li", null, h("a", { href: "#" + t[0] }, t[1])); }))),
       h("div", { class: "guide-search" }, N.search("Search the guide", function (q) {
         var shown = 0;
         all.forEach(function (a) { var ok = !q || a._text.indexOf(q) !== -1; a.hidden = !ok; shown += ok ? 1 : 0; });
