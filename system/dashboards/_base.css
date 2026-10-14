@@ -105,7 +105,7 @@ button, input, select { font: inherit; color: inherit; }
 .signal { width: .55rem; height: .55rem; border-radius: 50%; flex: none; background: var(--ok); box-shadow: 0 0 0 .2rem color-mix(in srgb, var(--ok) 22%, transparent); }
 .signal[data-state="stale"] { background: var(--warn); box-shadow: 0 0 0 .2rem color-mix(in srgb, var(--warn) 22%, transparent); }
 .signal[data-state="none"] { background: var(--ink-2); box-shadow: none; }
-.mast-who svg { width: 2rem; height: 2rem; fill: var(--star); flex: none; }
+.mast-who svg { width: 2.75rem; height: 2.75rem; fill: var(--star); flex: none; }
 .mast h1 { font-size: clamp(2.1rem, 6vw, 3.4rem); letter-spacing: -0.015em; font-weight: 600; }
 .mast-sub { font-family: var(--font-heading); font-size: clamp(1.1rem, 2.6vw, 1.4rem); color: var(--ink-2); margin-top: .35rem; }
 .mast-lede { max-width: var(--measure); margin-top: 1rem; font-size: 1.05rem; }
