@@ -34,6 +34,7 @@ This is the one place that says how an Atlas release is made. Other files (`syst
 2. **Set it** in `system/VERSION` and `system/manifest.yaml: version` (they must match).
 3. **Changelog:** rename `## Unreleased` to `## <version> (YYYY-MM-DD)`; check every user-visible change has a What's new line and every user step has an Action needed line.
 4. **Checks:** run the three commands above. The validator also confirms the changelog has a section for the version.
+   Then run the **regression suite** on the release candidate (`system/tests/regression/README.md`, from this branch) and fill in its scorecard. Every gate item must pass.
 5. **Merge** the release pull request to `main`.
 6. **Tag** the merge commit and push the tag: `git tag v<version> && git push origin v<version>`. This is what makes the release visible to every user's `update-check`. Never move or delete a pushed tag.
 7. **Zip:** build `atlas-<version>.zip` (`system/tools/build-zip.md`) and attach it to a GitHub release for the tag, with the What's new and Action needed lines as the release notes.
