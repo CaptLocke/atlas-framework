@@ -345,6 +345,21 @@
       h("p", { class: "chips" }, N.themeButton()));
   };
 
+  /* Notices: a label and an icon per level, so a warning reads as one at a glance. */
+  var NOTICE = { warn: "Needs attention:", error: "Problem:", info: "Note:" };
+  var NOTICE_ICON = {
+    warn: ["M12 3.5 2.5 20h19L12 3.5z", "M12 10v4.5", "M12 17.4v.1"],
+    error: ["M12 2.75a9.25 9.25 0 1 0 0 18.5 9.25 9.25 0 0 0 0-18.5z", "M12 7.5v6", "M12 16.6v.1"],
+    info: ["M12 2.75a9.25 9.25 0 1 0 0 18.5 9.25 9.25 0 0 0 0-18.5z", "M12 11v5.5", "M12 7.6v.1"]
+  };
+  function noticeIcon(level) {
+    var ns = "http://www.w3.org/2000/svg";
+    var svg = document.createElementNS(ns, "svg");
+    svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("aria-hidden", "true"); svg.setAttribute("class", "notice-icon");
+    NOTICE_ICON[level].forEach(function (d) { var p = document.createElementNS(ns, "path"); p.setAttribute("d", d); svg.appendChild(p); });
+    return svg;
+  }
+
   /* Render a page. build(data, main) appends sections to main and may return masthead options. */
   N.page = function (defaults, build) {
     var data = N.load();
@@ -372,7 +387,10 @@
       h("div", { class: "wrap" },
         N.masthead(mastOpts),
         notices.length ? h("ul", { class: "notices", "aria-label": "Notices" }, notices.map(function (n) {
-          return h("li", { class: "notice", "data-level": n.level || "warn" }, N.rich(n.text));
+          var level = NOTICE[n.level] ? n.level : "warn";
+          return h("li", { class: "notice", "data-level": level, role: level === "error" ? "alert" : null },
+            noticeIcon(level),
+            h("p", null, h("b", null, NOTICE[level] + " "), N.rich(n.text)));
         })) : null,
         main,
         N.footer())

@@ -109,7 +109,7 @@ Every dashboard's JSON has a `meta` object:
 | `atlas_version` | no | `atlas.yaml: installed_version`. |
 | `record_base_url` | no | `null` by default. If set (e.g. `https://github.com/<repo>/blob/main/user/knowledge/`, from `atlas.yaml: repo`), record titles become links to the record file. Leave `null` unless the user asks; the ID text alone is enough to ask Atlas. |
 | `nav` | no | Links to the other dashboards, from `dashboards.yaml` entries that have a `url`. Only `https://` links render. |
-| `notices` | no | Up to 3 short lines shown above the content: open `high` known issues from `user/.state/health.yaml` that affect this page's data (e.g. a disconnected source), and staleness (the readiness check found an upstream job stale). `level`: `info`, `warn`, or `error`. |
+| `notices` | no | Up to 3 short lines shown above the content, each as a tinted alert with an icon and a label ("Needs attention:" for `warn`, "Problem:" for `error`, "Note:" for `info`): open `high` known issues from `user/.state/health.yaml` that affect this page's data (e.g. a disconnected source), and staleness (the readiness check found an upstream job stale). `level`: `info`, `warn`, or `error`. |
 | `truncated` | no | Map of list key → number of items left out. The page shows "N more not shown here. Ask Atlas in chat to see them." under that list. Keys are top-level list names unless the contract says otherwise. |
 
 ## Data rules for every contract
