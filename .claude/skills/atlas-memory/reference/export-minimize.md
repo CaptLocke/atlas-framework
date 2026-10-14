@@ -15,7 +15,7 @@ zip -j -q ".atlas-tmp/export/atlas-export-$(date +%Y-%m-%d).zip" .atlas-tmp/expo
 6. Delete `.atlas-tmp/export/` after delivery. Log: `chat · export · user/ exported (<size>)`.
 
 ## Minimize mode
-Purpose: reduce what is stored at rest (R3: employer policy concerns, a new employer, personal preference) by converting full content to summaries or pointers.
+Purpose: reduce what is stored at rest (for example, employer policy concerns, a new employer, or personal preference) by converting full content to summaries or pointers.
 
 ### Choose scope (with the user)
 Offer clear options with counts:

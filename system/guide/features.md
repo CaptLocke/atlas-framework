@@ -91,7 +91,7 @@ When you do the same kind of work again and again (renewals, onboarding a new hi
 - "Add a step to the onboarding playbook: send the welcome pack."
 
 ## Your Daily Brief
-Every morning, a short brief answers: what's on today, what to prepare, what's due or slipping, what changed overnight, what you're waiting on, and your top priorities. It includes up to three insights, drafts ready for review, and anything waiting for your approval. It's built to read in two minutes.
+Every morning, a short brief answers: what's on today, what to prepare, anything only you can do, your top priorities, what's due or slipping, and what you're waiting on. It includes up to three insights, drafts ready for review, and anything waiting for your approval. It's built to read in two minutes.
 
 **Try:**
 - "What's on today?"

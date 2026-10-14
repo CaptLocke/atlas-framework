@@ -49,7 +49,7 @@ Full example: `system/tests/dashboards/daily-brief.json`.
 
 | Field | Notes |
 |---|---|
-| `brief.kind` | `daily` or `catch-up`. For `catch-up`, `brief.away` = `{ "start", "end" }` and `since_last_night` holds the "While you were away" summary lines (`[{ "text" }]`): the catch-up brief file's "What happened" bullets, most important first. Daily briefs omit it. |
+| `brief.kind` | `daily` or `catch-up`. For `catch-up`, `brief.away` = `{ "start", "end" }` and `while_away` holds the "While you were away" summary lines (`[{ "text" }]`): the catch-up brief file's "What happened" bullets, most important first. Daily briefs omit it. |
 | `brief.headline` | One sentence summarizing the day, in the user's communication style. |
 | `prep.status` | `ready` (prep note exists), `planned` (meeting-prep will create one before the meeting), `none` (meaningful meeting without prep), `not_needed`. |
 | `due[].status` | `open` or `slipped`. |
@@ -60,7 +60,7 @@ Full example: `system/tests/dashboards/daily-brief.json`.
 ## Sources (file → field)
 | Field | Source |
 |---|---|
-| `brief.*`, `priorities`, `since_last_night` (catch-up only) | The brief file `user/work/briefs/<as_of>.md` (or `-catch-up.md`) written by `atlas-brief` in the same run; `priorities[].ref` and `[[…]]` mentions are the record IDs cited there |
+| `brief.*`, `priorities`, `while_away` (catch-up briefs only) | The brief file `user/work/briefs/<as_of>.md` (or `-catch-up.md`) written by `atlas-brief` in the same run; `priorities[].ref` and `[[…]]` mentions are the record IDs cited there |
 | `today[]` | Event records (`user/knowledge/events/`) with `start` on `as_of`, `status: scheduled`, and shown by the meeting filter (`rhythms.yaml: meetings`, rule in `system/schemas/settings.md`): `id, title, kind, start, end, all_day, location, attendees` (→ person refs); `prep.path` = event `prep`; `prep.summary` = first line of the prep note's suggested agenda |
 | `due[]` | Commitments, `direction: i_owe`, `status: open|slipped`, `due` ≤ `as_of` + `rhythms.yaml: triggers.deadline_approaching.days` (default 3): `id, title, direction, status, due, priority, counterparty, next_step` |
 | `waiting_on[]` | Commitments, `direction: waiting_on`, `status: open|slipped`; `since` = `created` |
@@ -74,6 +74,6 @@ Full example: `system/tests/dashboards/daily-brief.json`.
 ## Rendering notes
 - Order on the page: action needed (if any), while you were away (catch-up only), top priorities (numbered: they are ranked), today, due and slipping, waiting on others, needs you (if any), worth knowing (if any), drafts ready (if any). Every section has a one-line description under its title and no count. The brief file's "What changed" and "Since last night" sections are not shown on the page.
 - Sorting: `priorities` in rank order (3 to 5 items); `today` by `start`, all-day items last; `due` overdue first, then by `due`, then priority; `waiting_on` slipped first, then by `due` (nulls last).
-- Caps (then `meta.truncated`): `today` 15, `due` 10, `waiting_on` 8, `drafts` 8, `approvals` 5, `questions` 3, `since_last_night` 8 (catch-up). `actions` is never capped. The brief file keeps the full lists.
+- Caps (then `meta.truncated`): `today` 15, `due` 10, `waiting_on` 8, `drafts` 8, `approvals` 5, `questions` 3, `while_away` 8 (catch-up). `actions` is never capped. The brief file keeps the full lists.
 - Text limits: `headline` 200 characters, `why`/`next_step`/`summary` 240.
-- The page is typically under 15 KB of data; the budget only matters after long away periods (catch-up), where `since_last_night` is truncated first.
+- The page is typically under 15 KB of data; the budget only matters after long away periods (catch-up), where `while_away` is truncated first.

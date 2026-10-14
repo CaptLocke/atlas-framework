@@ -46,7 +46,7 @@ Follow `reference/system-health.md`:
 7. **Repo size** and growth; record and index sizes.
 8. **Attestation due:** `atlas.yaml: attestation.reconfirm_due` reached → known issue and a quarterly-style re-confirmation question (`atlas-review` role refresh handles it in chat).
 9. **GitHub connection:** push works; repository still private and without collaborators (N9) where the session can check.
-10. **Updates:** installed vs latest release (R12).
+10. **Updates:** installed vs latest release.
 11. **Smoke test** of platform dependencies (repo push, connector read, hooks fire, artifact republish) → `health.yaml: smoke_test`.
 12. **Audits:** every locked action in the activity log has an approval entry and a matching user confirmation; no routine performed a locked action; governance files changed only in chat commits; data-rule spot checks (N11) and suspicious-content follow-ups (N7).
 Set `health.yaml: last_system_check`.

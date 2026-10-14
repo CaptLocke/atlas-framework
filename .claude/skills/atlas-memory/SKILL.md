@@ -13,7 +13,7 @@ The user owns their knowledge. Every record can be viewed, corrected, superseded
 - **Forget:** "Forget that", "Forget everything about the Initech deal", "Don't keep anything about my health appointment".
 - **Purge:** "Permanently erase…", "Remove it from history too".
 - **Export:** "Export my Atlas", "Give me a copy of everything".
-- **Minimize:** "Store less", "Keep only summaries of customer emails", employer policy concerns, after a role or employer change (R3).
+- **Minimize:** "Store less", "Keep only summaries of customer emails", employer policy concerns, after a role or employer change.
 - **Chat only** for forget, purge, minimize, and any data-rules change. Jobs never invoke these. `atlas-health` may propose archiving; this skill performs it.
 
 ## Inputs

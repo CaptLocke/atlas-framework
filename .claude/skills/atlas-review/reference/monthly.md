@@ -47,7 +47,7 @@ Signals for "used vs ignored":
 - Approvals: approved/rejected/expired (`approvals.md` and the month's archive file).
 - Prep notes and status drafts: referenced or edited in chat, sent status updates.
 - Briefs: the user's chat activity on brief days (no tracking beyond the repo).
-Suggestions (each a one-line proposal with reason): turn off or reduce something ignored; change a schedule to when the user actually works; switch profile if runs are long/heavy for the plan (R2) or if the user wants fresher information; fix a recurring failure. Queue each in `approvals.md` as a `behavior_settings` proposal (or `questions.md` when it's a choice), never applied by this skill.
+Suggestions (each a one-line proposal with reason): turn off or reduce something ignored; change a schedule to when the user actually works; switch profile if runs are long/heavy for the plan or if the user wants fresher information; fix a recurring failure. Queue each in `approvals.md` as a `behavior_settings` proposal (or `questions.md` when it's a choice), never applied by this skill.
 
 ## What Atlas learned
 Run the learning pass (`.claude/skills/atlas-triage/reference/learning.md` §2) over the last 60 days. Report rules confirmed this month, proposals queued (max 3, as `questions.md` entries), and `feedback` counts by signal against last month, in one short table. If nothing reached a pattern: "Nothing new learned this month."
