@@ -12,7 +12,58 @@
   "user_display_name": "Maya Chen",
   "atlas_version": "1.0.0",
   "record_base_url": null,
-  "nav": [{"name": "daily-brief", "title": "Daily Brief", "url": "https://claude.ai/artifact/example-daily-brief"}, {"name": "work-board", "title": "Work Board", "url": "https://claude.ai/artifact/example-work-board"}, {"name": "week-ahead", "title": "Week Ahead", "url": "https://claude.ai/artifact/example-week-ahead"}, {"name": "goals", "title": "Goals", "url": "https://claude.ai/artifact/example-goals"}, {"name": "people", "title": "People", "url": "https://claude.ai/artifact/example-people"}, {"name": "decisions-risks", "title": "Decisions & Risks", "url": "https://claude.ai/artifact/example-decisions-risks"}, {"name": "records", "title": "Records", "url": "https://claude.ai/artifact/example-records"}, {"name": "about-you", "title": "About You", "url": "https://claude.ai/artifact/example-about-you"}, {"name": "control-center", "title": "Control Center", "url": "https://claude.ai/artifact/example-control-center"}, {"name": "atlas-guide", "title": "Atlas Guide", "url": "https://claude.ai/artifact/example-atlas-guide"}],
+  "nav": [
+   {
+    "name": "daily-brief",
+    "title": "Daily Brief",
+    "url": "https://claude.ai/artifact/example-daily-brief"
+   },
+   {
+    "name": "work-board",
+    "title": "Work Board",
+    "url": "https://claude.ai/artifact/example-work-board"
+   },
+   {
+    "name": "week-ahead",
+    "title": "Week Ahead",
+    "url": "https://claude.ai/artifact/example-week-ahead"
+   },
+   {
+    "name": "goals",
+    "title": "Goals",
+    "url": "https://claude.ai/artifact/example-goals"
+   },
+   {
+    "name": "people",
+    "title": "People",
+    "url": "https://claude.ai/artifact/example-people"
+   },
+   {
+    "name": "decisions-risks",
+    "title": "Decisions & Risks",
+    "url": "https://claude.ai/artifact/example-decisions-risks"
+   },
+   {
+    "name": "records",
+    "title": "Records",
+    "url": "https://claude.ai/artifact/example-records"
+   },
+   {
+    "name": "about-you",
+    "title": "About You",
+    "url": "https://claude.ai/artifact/example-about-you"
+   },
+   {
+    "name": "control-center",
+    "title": "Control Center",
+    "url": "https://claude.ai/artifact/example-control-center"
+   },
+   {
+    "name": "atlas-guide",
+    "title": "Atlas Guide",
+    "url": "https://claude.ai/artifact/example-atlas-guide"
+   }
+  ],
   "notices": [],
   "truncated": {}
  },
@@ -121,7 +172,44 @@
      "id": "projects/enterprise-launch",
      "title": "Enterprise launch"
     }
-   ]
+   ],
+   "details": [
+    {
+     "label": "Role",
+     "value": "VP Product"
+    },
+    {
+     "label": "Organization",
+     "value": "Acme"
+    },
+    {
+     "label": "Relationship",
+     "value": "Manager"
+    },
+    {
+     "label": "Cadence",
+     "value": "Weekly 1:1, Mondays"
+    },
+    {
+     "label": "First met",
+     "value": "Oct 1, 2026"
+    }
+   ],
+   "body": [
+    {
+     "heading": null,
+     "text": "Maya's manager since she joined the platform team. Owns the product roadmap and signs off on pricing."
+    },
+    {
+     "heading": "How Jordan works",
+     "text": "- Prefers numbers first, then the story.\n- Decides in the Monday 1:1; brings questions in writing beforehand."
+    },
+    {
+     "heading": "Open with Jordan",
+     "text": "- Maya owes pricing feedback by Oct 13.\n- Hiring plan for a second PM is in review."
+    }
+   ],
+   "body_truncated": false
   },
   {
    "id": "people/dana-ruiz",
@@ -145,7 +233,32 @@
      "id": "organizations/acme",
      "title": "Acme"
     }
-   ]
+   ],
+   "details": [
+    {
+     "label": "Role",
+     "value": "Commercial Counsel"
+    },
+    {
+     "label": "Organization",
+     "value": "Acme"
+    },
+    {
+     "label": "Relationship",
+     "value": "Peer"
+    }
+   ],
+   "body": [
+    {
+     "heading": null,
+     "text": "Reviews customer contracts, DPAs, and the enterprise MSA. Usually replies within two days; faster by phone."
+    },
+    {
+     "heading": "History",
+     "text": "Sep 30: Agreed to send MSA redlines within a week.\nOct 9: Hasn't replied; flagged as slipped."
+    }
+   ],
+   "body_truncated": false
   },
   {
    "id": "people/sam-okafor",
@@ -245,7 +358,52 @@
      "id": "organizations/globex",
      "title": "Globex"
     }
-   ]
+   ],
+   "details": [
+    {
+     "label": "Health",
+     "value": "At risk"
+    },
+    {
+     "label": "Status",
+     "value": "Active"
+    },
+    {
+     "label": "Owner",
+     "value": "Maya Chen"
+    },
+    {
+     "label": "Target",
+     "value": "Dec 15, 2026"
+    },
+    {
+     "label": "Serves",
+     "value": "Launch the enterprise tier"
+    },
+    {
+     "label": "Stakeholders",
+     "value": "Jordan Lee, Dana Ruiz"
+    },
+    {
+     "label": "Started",
+     "value": "Sep 2, 2026"
+    }
+   ],
+   "body": [
+    {
+     "heading": null,
+     "text": "Ship the enterprise tier: SSO, audit logs, per-seat pricing, and the contract package, so sales can close the first pilots by end of Q4."
+    },
+    {
+     "heading": "Status",
+     "text": "Pricing is decided (per seat, 50-seat minimum). Legal review of the MSA is now the critical path and is six days late."
+    },
+    {
+     "heading": "Next steps",
+     "text": "- Call Dana before Thursday's review.\n- Confirm Globex pilot scope for Nov 9.\n- Draft the launch checklist with Support."
+    }
+   ],
+   "body_truncated": false
   },
   {
    "id": "projects/vendor-shortlist",
@@ -361,7 +519,48 @@
      "id": "projects/enterprise-launch",
      "title": "Enterprise launch"
     }
-   ]
+   ],
+   "details": [
+    {
+     "label": "Direction",
+     "value": "Waiting on Dana Ruiz"
+    },
+    {
+     "label": "Owner",
+     "value": "Dana Ruiz"
+    },
+    {
+     "label": "For",
+     "value": "Maya Chen"
+    },
+    {
+     "label": "Due",
+     "value": "Oct 7, 2026"
+    },
+    {
+     "label": "Priority",
+     "value": "High"
+    },
+    {
+     "label": "Project",
+     "value": "Enterprise launch"
+    },
+    {
+     "label": "Status",
+     "value": "Slipped"
+    }
+   ],
+   "body": [
+    {
+     "heading": null,
+     "text": "Dana owes redlines on the enterprise MSA before the Globex pilot can start."
+    },
+    {
+     "heading": "History",
+     "text": "Sep 30: Dana agreed in the contracts sync.\nOct 7: Due date passed.\nOct 9: Follow-up draft prepared in Outlook; not sent yet."
+    }
+   ],
+   "body_truncated": false
   },
   {
    "id": "commitments/share-q3-metrics",
@@ -399,7 +598,40 @@
      "id": "projects/enterprise-launch",
      "title": "Enterprise launch"
     }
-   ]
+   ],
+   "details": [
+    {
+     "label": "Decided",
+     "value": "Oct 10, 2026"
+    },
+    {
+     "label": "Decided by",
+     "value": "Jordan Lee, Maya Chen"
+    },
+    {
+     "label": "Project",
+     "value": "Enterprise launch"
+    },
+    {
+     "label": "Status",
+     "value": "Made"
+    }
+   ],
+   "body": [
+    {
+     "heading": null,
+     "text": "The enterprise tier is priced per seat with a 50-seat minimum."
+    },
+    {
+     "heading": "Why",
+     "text": "Usage pricing was too hard for customers to forecast, and three of eight customers in the research asked for per-seat pricing."
+    },
+    {
+     "heading": "Alternatives considered",
+     "text": "- Usage-based pricing (rejected: forecasting).\n- Flat platform fee (rejected: leaves money on the table above 200 seats)."
+    }
+   ],
+   "body_truncated": false
   },
   {
    "id": "events/2026-10-13-brightline-renewal-call",
@@ -425,7 +657,40 @@
      "id": "organizations/brightline-logistics",
      "title": "Brightline Logistics"
     }
-   ]
+   ],
+   "details": [
+    {
+     "label": "Kind",
+     "value": "Meeting"
+    },
+    {
+     "label": "When",
+     "value": "Oct 13, 2026, 10:00 AM"
+    },
+    {
+     "label": "Where",
+     "value": "Zoom"
+    },
+    {
+     "label": "With",
+     "value": "Sam Okafor, Elena Petrova"
+    },
+    {
+     "label": "Prep",
+     "value": "Ready"
+    }
+   ],
+   "body": [
+    {
+     "heading": null,
+     "text": "Renewal check-in with Sam ahead of the November decision."
+    },
+    {
+     "heading": "Plan",
+     "text": "- Lead with the import fix date.\n- Expect a question about SSO pricing; holding answer drafted."
+    }
+   ],
+   "body_truncated": false
   },
   {
    "id": "risks/onboarding-import-failures",
@@ -449,7 +714,40 @@
      "id": "goals/2026-q4-retention",
      "title": "Keep gross retention at 92% or better"
     }
-   ]
+   ],
+   "details": [
+    {
+     "label": "Likelihood",
+     "value": "High"
+    },
+    {
+     "label": "Impact",
+     "value": "High"
+    },
+    {
+     "label": "Owner",
+     "value": "Tomás Herrera"
+    },
+    {
+     "label": "Status",
+     "value": "Active"
+    },
+    {
+     "label": "Goal at risk",
+     "value": "Keep gross retention at 92% or better"
+    }
+   ],
+   "body": [
+    {
+     "heading": null,
+     "text": "CSV imports fail for files over 20 MB. Three customers raised it this month, two of them renewing this quarter."
+    },
+    {
+     "heading": "Mitigation",
+     "text": "- Tomás is estimating a fix (due Oct 14).\n- Support shares a workaround: split files under 20 MB."
+    }
+   ],
+   "body_truncated": false
   },
   {
    "id": "questions/globex-data-residency",
@@ -509,7 +807,24 @@
      "id": "decisions/2026-10-12-enterprise-tier-pricing",
      "title": "Enterprise tier priced per seat"
     }
-   ]
+   ],
+   "details": [
+    {
+     "label": "Scope",
+     "value": "Plans, discounts, packaging"
+    },
+    {
+     "label": "Status",
+     "value": "Active"
+    }
+   ],
+   "body": [
+    {
+     "heading": null,
+     "text": "Everything about how Acme prices its plans and discounts, including the enterprise tier, discount approvals, and packaging changes. Everything about how Acme prices its plans and discounts, including the enterprise tier, discount approvals, and packaging changes. Everything about how Acme prices its plans and discounts, including the enterprise tier, discount approvals, and packaging changes."
+    }
+   ],
+   "body_truncated": true
   },
   {
    "id": "playbooks/renewal-at-risk",
@@ -547,7 +862,27 @@
      "id": "decisions/2026-10-12-enterprise-tier-pricing",
      "title": "Enterprise tier priced per seat"
     }
-   ]
+   ],
+   "details": [
+    {
+     "label": "Kind",
+     "value": "Meeting"
+    },
+    {
+     "label": "From",
+     "value": "Zoom"
+    },
+    {
+     "label": "Occurred",
+     "value": "Oct 10, 2026"
+    },
+    {
+     "label": "Status",
+     "value": "Processed"
+    }
+   ],
+   "body": null,
+   "body_truncated": false
   },
   {
    "id": "deals/acme-renewal",

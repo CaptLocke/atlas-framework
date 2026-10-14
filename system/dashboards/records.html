@@ -239,7 +239,49 @@ a.rid:hover { color: var(--accent); }
 .more-btn { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: .35rem 1rem; cursor: pointer; }
 .more-btn:hover { border-color: var(--accent); }
 .upd { font-variant-numeric: tabular-nums; white-space: nowrap; }
-@media print { .more-wrap, .pick { display: none !important; } }
+/* Record cards open the record panel */
+.items > li.rec { cursor: pointer; transition: background-color .12s; }
+.items > li.rec:hover { background: color-mix(in srgb, var(--accent) 5%, var(--surface)); }
+.rec-open { all: unset; cursor: pointer; font: inherit; color: inherit; }
+.rec-open:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+/* Record panel: a drawer on the right; full screen on phones */
+dialog.rec-panel { position: fixed; inset: 0 0 0 auto; margin: 0; width: min(42rem, 100%); height: 100%; max-height: none; max-width: 100%;
+  border: 0; border-left: 1px solid var(--line); padding: 0; background: var(--surface); color: var(--ink); box-shadow: -10px 0 40px rgba(0, 0, 0, .22); }
+dialog.rec-panel:not([open]) { display: none; }
+dialog.rec-panel::backdrop { background: rgba(20, 18, 12, .45); }
+.rp { height: 100%; overflow-y: auto; overscroll-behavior: contain; }
+.rp-bar { position: sticky; top: 0; z-index: 1; display: flex; justify-content: space-between; align-items: center; gap: .75rem;
+  padding: calc(.75rem + env(safe-area-inset-top, 0px)) 1.5rem .75rem; background: var(--surface); border-bottom: 1px solid var(--line); }
+.rp-bar .chips { flex: 1; min-width: 0; }
+.rp-btn { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: .3rem .85rem; font: inherit; font-size: .88rem; cursor: pointer; }
+.rp-btn:hover { border-color: var(--accent); }
+.rp-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.rp-body { padding: 1.25rem 1.5rem 2.5rem; display: flex; flex-direction: column; gap: 1.35rem; }
+.rp-body h2 { font-size: clamp(1.45rem, 4vw, 1.9rem); line-height: 1.2; margin: 0; text-wrap: balance; }
+.rp-sum { margin: .5rem 0 0; font-size: 1.02rem; }
+.rp-h { font-family: var(--font-heading); font-size: 1.05rem; font-weight: 600; margin: 0 0 .45rem; }
+.rp-details { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: .75rem 1.25rem; margin: 0; }
+.rp-details div { min-width: 0; }
+.rp-details dt { font-size: .78rem; color: var(--ink-2); margin: 0 0 .1rem; }
+.rp-details dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.rp-text { margin: 0; white-space: pre-line; max-width: var(--measure); }
+.rp-cut { margin: 0; font-size: .9rem; color: var(--ink-2); font-style: italic; }
+.rp-links { list-style: none; margin: 0; padding: 0; display: grid; gap: .4rem; }
+.rp-link { all: unset; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: .75rem; width: 100%; padding: .55rem .8rem;
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); cursor: pointer; }
+.rp-link:hover { border-color: var(--accent); }
+.rp-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.rp-link span:first-child { font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.rp-link-off { padding: .55rem .8rem; border: 1px dashed var(--line); border-radius: var(--radius); color: var(--ink-2); }
+.rp-dates { margin: 0; font-size: .86rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.rp-ask { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem .9rem; padding-top: 1.1rem; border-top: 1px solid var(--line); }
+.rp-ask .rp-btn { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.rp-ask p { margin: 0; font-size: .88rem; color: var(--ink-2); }
+.rp-copy { width: 100%; font: inherit; font-size: .88rem; padding: .45rem .6rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); color: var(--ink); }
+html.rp-lock { overflow: hidden; }
+@media (max-width: 640px) { dialog.rec-panel { width: 100%; border-left: 0; } .rp-bar, .rp-body { padding-left: 16px; padding-right: 16px; } }
+@media (prefers-reduced-motion: reduce) { .items > li.rec { transition: none; } }
+@media print { .more-wrap, .pick, dialog.rec-panel { display: none !important; } }
 </style>
 <style id="atlas-theme">{{ATLAS_THEME_CSS}}</style>
 </head>
@@ -688,16 +730,95 @@ a.rid:hover { color: var(--accent); }
     types.forEach(function (t, i) { typeOrder[t.type] = i; });
     var state = { type: "all", scope: "current", sort: "updated", words: [], limit: PAGE };
 
+    var byId = {};
+    records.forEach(function (r) { if (r && r.id) byId[r.id] = r; });
+
+    /* ---- Record panel ---- */
+    var panel = h("dialog", { class: "rec-panel", "aria-labelledby": "rp-title" });
+    var trail = [];
+    var lastFocus = null;
+    function statusChip(r) { return r.status ? N.chip(N.label(r.status), CLOSED_TONE[r.status] || N.tone(r.status)) : null; }
+    function closePanel() {
+      if (panel.open && panel.close) panel.close(); else panel.removeAttribute("open");
+    }
+    panel.addEventListener("close", function () {
+      document.documentElement.classList.remove("rp-lock"); trail = [];
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    });
+    panel.addEventListener("click", function (e) { if (e.target === panel) closePanel(); });
+    function copyRequest(r, where) {
+      var text = "Show me the \u201c" + r.title + "\u201d record (" + r.id + ").";
+      function fallback() {
+        var box = h("input", { class: "rp-copy", type: "text", readonly: true, value: text, "aria-label": "Request to paste in chat" });
+        while (where.firstChild) where.removeChild(where.firstChild);
+        where.appendChild(h("p", null, "Copy this and paste it in your Atlas chat:")); where.appendChild(box);
+        box.focus(); box.select();
+      }
+      try {
+        navigator.clipboard.writeText(text).then(function () {
+          where.textContent = "Copied. Paste it in your Atlas chat to see or change this record.";
+        }, fallback);
+      } catch (e) { fallback(); }
+    }
+    function renderPanel(r) {
+      var linked = L(r.links).filter(Boolean);
+      var details = L(r.details).filter(function (x) { return x && x.label && x.value != null && x.value !== ""; });
+      var body = L(r.body).filter(function (s) { return s && s.text; });
+      var askNote = h("p", { role: "status", "aria-live": "polite" }, "To change this record, ask Atlas in chat.");
+      var dates = [r.created ? "Created " + N.dateY(r.created) : null, r.updated ? "Updated " + N.dateY(r.updated) : null].filter(Boolean).join(" \u00b7 ");
+      var inner = h("div", { class: "rp" },
+        h("div", { class: "rp-bar" },
+          h("p", { class: "chips" }, N.chip(singular(r.type)), statusChip(r)),
+          trail.length > 1 ? h("button", { type: "button", class: "rp-btn", onclick: function () { trail.pop(); renderPanel(trail[trail.length - 1]); } }, "Back") : null,
+          h("button", { type: "button", class: "rp-btn", onclick: closePanel }, "Close")),
+        h("div", { class: "rp-body" },
+          h("div", null, h("h2", { id: "rp-title" }, r.title), r.summary ? h("p", { class: "rp-sum" }, N.rich(r.summary)) : null),
+          details.length ? h("section", null, h("h3", { class: "rp-h" }, "Details"),
+            h("dl", { class: "rp-details" }, details.map(function (x) { return h("div", null, h("dt", null, x.label), h("dd", null, N.rich(String(x.value)))); }))) : null,
+          body.map(function (s) { return h("section", null, s.heading ? h("h3", { class: "rp-h" }, s.heading) : null, h("p", { class: "rp-text" }, N.rich(s.text))); }),
+          r.body_truncated ? h("p", { class: "rp-cut" }, "There's more in this record than fits here. Ask Atlas in chat to see all of it.") : null,
+          linked.length ? h("section", null, h("h3", { class: "rp-h" }, "Linked records"),
+            h("ul", { class: "rp-links" }, linked.map(function (x) {
+              var t = byId[x.id];
+              if (!t) return h("li", null, h("div", { class: "rp-link-off" }, N.name(x)));
+              return h("li", null, h("button", { type: "button", class: "rp-link", onclick: function () { trail.push(t); renderPanel(t); } },
+                h("span", null, t.title), h("span", { class: "chips" }, N.chip(singular(t.type)), statusChip(t))));
+            }))) : null,
+          dates ? h("p", { class: "rp-dates" }, dates) : null,
+          h("div", { class: "rp-ask" },
+            h("button", { type: "button", class: "rp-btn", onclick: function () { copyRequest(r, askNote); } }, "Copy a request for Atlas"),
+            askNote)));
+      while (panel.firstChild) panel.removeChild(panel.firstChild);
+      panel.appendChild(inner);
+      inner.scrollTop = 0;
+      var first = inner.querySelector(".rp-bar button:last-child");
+      if (first) first.focus();
+    }
+    function openRecord(r) {
+      lastFocus = document.activeElement;
+      trail = [r];
+      renderPanel(r);
+      document.documentElement.classList.add("rp-lock");
+      if (!panel.open) { if (panel.showModal) panel.showModal(); else panel.setAttribute("open", ""); }
+    }
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && panel.hasAttribute("open") && !panel.showModal) closePanel(); });
+
     var rows = records.map(function (r) {
       var facts = L(r.facts).filter(Boolean);
       var li = N.item({ tone: r.current ? null : "muted",
-        title: h("span", { class: "rec-title" }, r.title, N.chip(singular(r.type)), r.status ? N.chip(N.label(r.status), CLOSED_TONE[r.status] || N.tone(r.status)) : null),
+        title: h("span", { class: "rec-title" }, h("button", { type: "button", class: "rec-open", "aria-haspopup": "dialog" }, r.title), N.chip(singular(r.type)), statusChip(r)),
         id: r.id,
         text: r.summary,
         meta: facts,
         extra: L(r.links).length ? h("p", { class: "rec-links" }, h("span", { class: "visually-hidden" }, "Linked to: "), N.refs(r.links)) : null,
         aside: [r.updated ? h("span", { class: "upd" }, "Updated " + N.rel(r.updated)) : null] });
       li._r = r;
+      li.classList.add("rec");
+      li.addEventListener("click", function (e) {
+        var sel = window.getSelection && String(window.getSelection());
+        if (sel && sel.length > 2 && !e.target.closest(".rec-open")) return;
+        openRecord(r);
+      });
       li._text = [r.title, r.summary, r.id, L(r.aliases).join(" "), facts.join(" "),
         L(r.links).map(function (x) { return N.name(x); }).join(" "), labelOf[r.type] || r.type].join(" ").toLowerCase();
       return li;
@@ -757,7 +878,7 @@ a.rid:hover { color: var(--accent); }
     if (s.archived) hidden.push(h("p", { class: "sec-note" }, s.archived + " archived " + (s.archived === 1 ? "record isn't" : "records aren't") + " shown. Ask Atlas in chat to see them."));
 
     main.appendChild(N.section({ id: "records", title: "All records", count: N.total("records", records.length), key: "records",
-      note: "Everything Atlas has filed. To change a record, ask Atlas in chat by its name.",
+      note: "Everything Atlas has filed. Select a record to open it. To change one, ask Atlas in chat.",
       body: records.length ? [
         h("div", { class: "controls" },
           N.search("Search names, summaries, and links", function (q) { state.words = q.split(/\s+/).filter(Boolean); reset(); }),
@@ -767,7 +888,7 @@ a.rid:hover { color: var(--accent); }
           select("Type", typeOptions, "all", function (v) { state.type = v; reset(); }),
           select("Sort", [{ value: "updated", label: "Recently updated" }, { value: "name", label: "Name (A–Z)" }, { value: "type", label: "Type" }],
             "updated", function (v) { state.sort = v; reset(); })),
-        hidden, status, list, emptyMsg, h("div", { class: "more-wrap" }, moreBtn)]
+        hidden, status, list, emptyMsg, h("div", { class: "more-wrap" }, moreBtn), panel]
         : [hidden, N.empty("Nothing filed yet. Atlas adds records as it reads your mail, meetings, and notes.")] }));
 
     return { subtitle: "As of " + N.longDate(N.meta.as_of),

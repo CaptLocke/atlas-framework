@@ -11,7 +11,7 @@ stale_after_hours: 192
 ## Purpose
 Everything Atlas has filed, in one place to browse and search: people, organizations, projects, goals, commitments, decisions, events, risks, questions, ideas, topics, playbooks, sources, and any record types the user added. Each record shows its type, status, summary, when it last changed, and what it links to. Filters: record type, Current / Closed / All, and a search box over names, summaries, aliases, and links.
 
-It is a finder, not an editor. To change a record, the user mentions its ID in chat.
+It is a finder, not an editor. Clicking a record opens it in a panel on the page: every field, its links (each opens that record in the panel), and its body text. To change a record, the user asks Atlas in chat; the panel has a button that copies a ready-made request.
 
 Republished by `maintenance` (after indexes are rebuilt) and `weekly-review`. Any chat may republish it on request ("refresh my records page").
 
@@ -30,7 +30,10 @@ Republished by `maintenance` (after indexes are rebuilt) and `weekly-review`. An
       "status": "slipped", "current": true, "updated": "2026-10-09", "created": "2026-09-30",
       "aliases": ["MSA review"],
       "facts": ["Waiting on Dana Ruiz", "Due Oct 7", "High priority"],
-      "links": [ { "id": "people/dana-ruiz", "title": "Dana Ruiz" }, { "id": "projects/enterprise-launch", "title": "Enterprise launch" } ] }
+      "links": [ { "id": "people/dana-ruiz", "title": "Dana Ruiz" }, { "id": "projects/enterprise-launch", "title": "Enterprise launch" } ],
+      "details": [ { "label": "Owner", "value": "Dana Ruiz" }, { "label": "Due", "value": "Oct 7, 2026" }, { "label": "Priority", "value": "High" } ],
+      "body": [ { "heading": "History", "text": "Sep 30: Dana agreed to send redlines within a week.\nOct 9: No reply; Maya plans to call before Thursday's review." } ],
+      "body_truncated": false }
   ]
 }
 ```
@@ -46,6 +49,9 @@ Full example: `system/tests/dashboards/records.json`.
 | `current` | `true` unless the status is closed for that type (below). |
 | `facts` | Up to 3 short strings, chosen per type (below). Plain text, each ≤ 60 characters. |
 | `links` | Up to 8 linked records as references, most important first (people and projects before sources). |
+| `details` | For the record panel: up to 12 `{ label, value }` pairs, every meaningful frontmatter field in a plain label ("Owner", "Due", "Decided by", "Target"), values as display text (dates formatted, references as titles). Same exclusions as everywhere: never `notes_private`, `emails`, `phone`, `location`. |
+| `body` | For the record panel: the record's body as plain text, one `{ heading, text }` per section (`heading` is the section's heading or `null`; `text` keeps line breaks, list items as lines starting with "- ", no Markdown). At most 2,000 characters in all; cut at a sentence or line end and set `body_truncated: true`. Omitted (`null`) for sources (their summary stands in), for records with `summary` handling, and when the body is empty. |
+| `body_truncated` | `true` when `body` was cut; the panel says the rest is in chat. |
 
 **Closed statuses** (`current: false`): `system/schemas/schema.yaml: closed_statuses`, except that a source with status `processed` stays **current** on this page (sources are reference material). For user types, statuses that clearly mean finished (done, closed, won, lost, cancelled, and the like) count as closed; anything else counts as current.
 
@@ -75,8 +81,9 @@ Full example: `system/tests/dashboards/records.json`.
 | `facts` | Per the table above, from the record's own fields (names from linked records' titles) |
 | `links` | The record's `links` groups and frontmatter references (`org`, `owner`, `counterparty`, `goal`, `attendees`), resolved to `{ id, title }`; unresolvable links are left out |
 | `summary`, `types` | Counts over the records above |
-| Left out always | Archived records (`archived: true`) and superseded records (`superseded_by` set); records excluded by `data-rules.yaml: exclusions` (`record:` entries); records whose `sensitivity` maps to handling `ignore` or `pointer` in `data-rules.yaml` (counted in `summary.restricted`); fields `notes_private`, `emails`, `phone`, `location`, and every record body |
-| Summary handling | Records whose `sensitivity` maps to `summary` handling show their `summary` only (it is already written without sensitive detail) and no `facts` |
+| Left out always | Archived records (`archived: true`) and superseded records (`superseded_by` set); records excluded by `data-rules.yaml: exclusions` (`record:` entries); records whose `sensitivity` maps to handling `ignore` or `pointer` in `data-rules.yaml` (counted in `summary.restricted`); fields `notes_private`, `emails`, `phone`, `location`; source bodies (summary only); any `## Private notes` section and any text whose handling is `ignore` or `pointer` |
+| `details`, `body` | The record's frontmatter (labelled per its schema in `system/schemas/<type>.md`) and its body sections, converted to plain text |
+| Summary handling | Records whose `sensitivity` maps to `summary` handling show their `summary` only (it is already written without sensitive detail): no `facts`, `details`, or `body` |
 
 ## Rendering notes
 - Default view: Current, all types, newest `updated` first. Sort options: Recently updated, Name (A–Z), Type.
@@ -84,5 +91,6 @@ Full example: `system/tests/dashboards/records.json`.
 - Search matches title, summary, aliases, record ID, facts, and link titles, case-insensitive, all words must match.
 - The type filter is a drop-down with counts; Current / Closed / All is a segmented control. Both remember the last choice.
 - Text limits: `summary` 240 characters, each fact 60, `title` 140.
-- Caps and truncation, in this order until the page fits the budget: (1) shorten `summary` to 120 characters; (2) drop `links` beyond 3; (3) drop closed records, oldest `updated` first; (4) drop current sources, oldest first; (5) drop other current records, oldest first. Record each dropped record under `meta.truncated.records`. The page shows "N more not shown here. Ask Atlas in chat to see them."
+- Clicking a record (or its title, or Enter on it) opens the record panel: type and status, title, summary, details, body, linked records (those on the page open in the panel, with Back to return), created and updated dates, and "Copy a request for Atlas" (copies `Show me the "<title>" record (<id>).` for pasting into chat). On phones the panel fills the screen. Esc or Close shuts it.
+- Caps and truncation, in this order until the page fits the budget: (1) cut each `body` to 800 characters (`body_truncated: true`); (2) drop `body` from closed records, oldest `updated` first; (3) drop `body` from current records, oldest first; (4) shorten `summary` to 120 characters; (5) drop `links` beyond 3; (6) drop closed records, oldest `updated` first; (7) drop current sources, oldest first; (8) drop other current records, oldest first. Record each dropped record under `meta.truncated.records`. The page shows "N more not shown here. Ask Atlas in chat to see them."
 - When `summary.restricted` > 0, a muted line under the filters reads "N records are hidden by your data rules. Ask Atlas in chat about them." When `summary.archived` > 0, a second line reads "N archived records aren't shown. Ask Atlas in chat to see them."
