@@ -9,9 +9,9 @@ stale_after_hours: 36
 # Dashboard: daily-brief
 
 ## Purpose
-Today at a glance, readable in two minutes: top priorities, today's meetings with prep status, what is due or slipping, who the user is waiting on, what changed overnight, up to three insights, drafts ready to review, and anything that needs the user (actions only they can do, approvals, questions). It is the page view of the brief file `user/work/briefs/YYYY-MM-DD.md`; the brief file and this page are built in the same step and must agree.
+Today at a glance, readable in two minutes: anything only the user can do, top priorities, today's meetings with prep status, what is due or slipping, who the user is waiting on, what needs their answer (approvals, questions), up to three insights, and drafts ready to review. It is the page view of the brief file `user/work/briefs/YYYY-MM-DD.md`; the brief file and this page are built in the same step and must agree.
 
-Also republished by any chat that runs the morning catch-up (kernel §2.3), which adds `since_last_night`. After away mode it renders the catch-up brief (`brief.kind: "catch-up"`).
+Also republished by any chat that runs the morning catch-up (kernel §2.3); what it brings in shows up in the page's own sections (a new commitment under Due and slipping, a moved meeting under Today), not as a separate list. After away mode it renders the catch-up brief (`brief.kind: "catch-up"`), which adds a "While you were away" section.
 
 ## Data (JSON shape embedded in the page)
 Envelope: `meta` as in `system/dashboards/README.md`; `meta.as_of` = the brief's date (tomorrow when built with `target: tomorrow`).
@@ -23,7 +23,6 @@ Envelope: `meta` as in `system/dashboards/README.md`; `meta.as_of` = the brief's
              "headline": "A customer-heavy day: …", "away": null },
   "actions": [ { "id": "Q-2026-10-13-01", "text": "Update your Atlas Project's instructions (Atlas was updated to 1.1.0).",
                  "how": "In the Claude app, open the Atlas Project, replace its instructions, and save.", "copy_text": true } ],
-  "since_last_night": [ { "text": "Sam confirmed the agenda ([[sources/2026-10-13-brightline-agenda-thread]])." } ],
   "priorities": [ { "text": "Send pricing feedback to Jordan", "why": "Due today; Thursday's decision depends on it.",
                     "ref": { "id": "commitments/send-pricing-feedback", "title": "Send pricing feedback to Jordan" } } ],
   "today": [ { "id": "events/2026-10-13-brightline-renewal-call", "title": "Brightline renewal call", "kind": "meeting",
@@ -37,7 +36,6 @@ Envelope: `meta` as in `system/dashboards/README.md`; `meta.as_of` = the brief's
   "waiting_on": [ { "id": "commitments/dana-msa-review", "title": "Dana reviews the enterprise MSA", "direction": "waiting_on",
                     "status": "slipped", "due": "2026-10-07", "since": "2026-09-30",
                     "counterparty": { "id": "people/dana-ruiz", "title": "Dana Ruiz" }, "next_step": "…" } ],
-  "changes": [ { "text": "Decision recorded: … ([[decisions/2026-10-12-enterprise-tier-pricing]])." } ],
   "insights": [ { "id": "I-2026-10-12-03", "text": "…", "why": "…", "suggested_action": "…",
                   "draft": { "to": "Sam Okafor", "where": "Outlook drafts" },
                   "refs": [ { "id": "risks/onboarding-import-failures", "title": "Onboarding import failures" } ] } ],
@@ -51,7 +49,7 @@ Full example: `system/tests/dashboards/daily-brief.json`.
 
 | Field | Notes |
 |---|---|
-| `brief.kind` | `daily` or `catch-up`. For `catch-up`, `brief.away` = `{ "start", "end" }` and `since_last_night` holds the "while you were away" summary lines. |
+| `brief.kind` | `daily` or `catch-up`. For `catch-up`, `brief.away` = `{ "start", "end" }` and `since_last_night` holds the "While you were away" summary lines (`[{ "text" }]`). Daily briefs omit it. |
 | `brief.headline` | One sentence summarizing the day, in the user's communication style. |
 | `prep.status` | `ready` (prep note exists), `planned` (meeting-prep will create one before the meeting), `none` (meaningful meeting without prep), `not_needed`. |
 | `due[].status` | `open` or `slipped`. |
@@ -62,7 +60,7 @@ Full example: `system/tests/dashboards/daily-brief.json`.
 ## Sources (file → field)
 | Field | Source |
 |---|---|
-| `brief.*`, `priorities`, `changes`, `since_last_night` | The brief file `user/work/briefs/<as_of>.md` (or `-catch-up.md`) written by `atlas-brief` in the same run; `priorities[].ref` and `[[…]]` mentions are the record IDs cited there |
+| `brief.*`, `priorities`, `since_last_night` (catch-up only) | The brief file `user/work/briefs/<as_of>.md` (or `-catch-up.md`) written by `atlas-brief` in the same run; `priorities[].ref` and `[[…]]` mentions are the record IDs cited there |
 | `today[]` | Event records (`user/knowledge/events/`) with `start` on `as_of`, `status: scheduled`, and shown by the meeting filter (`rhythms.yaml: meetings`, rule in `system/schemas/settings.md`): `id, title, kind, start, end, all_day, location, attendees` (→ person refs); `prep.path` = event `prep`; `prep.summary` = first line of the prep note's suggested agenda |
 | `due[]` | Commitments, `direction: i_owe`, `status: open|slipped`, `due` ≤ `as_of` + `rhythms.yaml: triggers.deadline_approaching.days` (default 3): `id, title, direction, status, due, priority, counterparty, next_step` |
 | `waiting_on[]` | Commitments, `direction: waiting_on`, `status: open|slipped`; `since` = `created` |
@@ -74,8 +72,8 @@ Full example: `system/tests/dashboards/daily-brief.json`.
 | `meta.notices` | `user/.state/health.yaml` open high-severity issues affecting ingestion; staleness found by the job's readiness check (`user/.state/jobs.yaml`) |
 
 ## Rendering notes
-- Order on the page: action needed (if any), since last night (if any), priorities (numbered: they are ranked), today, due and slipping, waiting on, insights, what changed, drafts, needs you.
-- Sorting: `priorities` in rank order (3 to 5 items); `today` by `start`, all-day items last; `due` overdue first, then by `due`, then priority; `waiting_on` slipped first, then by `due` (nulls last); `changes` most important first.
-- Caps (then `meta.truncated`): `today` 15, `due` 10, `waiting_on` 8, `changes` 10, `drafts` 8, `approvals` 5, `questions` 3, `since_last_night` 8. `actions` is never capped. The brief file keeps the full lists.
+- Order on the page: action needed (if any), while you were away (catch-up only), top priorities (numbered: they are ranked), today, due and slipping, waiting on others, needs you (if any), worth knowing (if any), drafts ready (if any). Every section has a one-line description under its title and no count. The brief file's "What changed" and "Since last night" sections are not shown on the page.
+- Sorting: `priorities` in rank order (3 to 5 items); `today` by `start`, all-day items last; `due` overdue first, then by `due`, then priority; `waiting_on` slipped first, then by `due` (nulls last).
+- Caps (then `meta.truncated`): `today` 15, `due` 10, `waiting_on` 8, `drafts` 8, `approvals` 5, `questions` 3, `since_last_night` 8 (catch-up). `actions` is never capped. The brief file keeps the full lists.
 - Text limits: `headline` 200 characters, `why`/`next_step`/`summary` 240.
-- The page is typically under 15 KB of data; the budget only matters after long away periods (catch-up), where `changes` and `since_last_night` are truncated first.
+- The page is typically under 15 KB of data; the budget only matters after long away periods (catch-up), where `since_last_night` is truncated first.

@@ -16,7 +16,7 @@
     "notices": [
       { "level": "warn", "text": "Your Outlook connection expired on Oct 10, so email since then isn't included. Reconnect Outlook in Settings, then Connectors." }
     ],
-    "truncated": { "changes": 4 }
+    "truncated": {}
   },
   "brief": {
     "date": "2026-10-13",
@@ -27,9 +27,6 @@
   },
   "actions": [
     { "id": "Q-2026-10-13-01", "text": "Update your Atlas Project's instructions (Atlas was updated to 1.1.0).", "how": "In the Claude app, open the Atlas Project, replace its instructions, and save.", "copy_text": true }
-  ],
-  "since_last_night": [
-    { "text": "Sam Okafor confirmed the renewal call agenda and added a question about SSO pricing ([[sources/2026-10-13-brightline-agenda-thread]])." }
   ],
   "priorities": [
     { "text": "Send pricing feedback to Jordan", "why": "Due today, and the enterprise tier decision on Thursday depends on it.", "ref": { "id": "commitments/send-pricing-feedback", "title": "Send pricing feedback to Jordan" } },
@@ -50,12 +47,6 @@
   "waiting_on": [
     { "id": "commitments/dana-msa-review", "title": "Dana reviews the enterprise MSA", "direction": "waiting_on", "status": "slipped", "due": "2026-10-07", "since": "2026-09-30", "counterparty": { "id": "people/dana-ruiz", "title": "Dana Ruiz" }, "next_step": "Dana replies faster to calls; a follow-up draft is ready." },
     { "id": "commitments/tomas-import-estimate", "title": "Tomás sends the import fix estimate", "direction": "waiting_on", "status": "open", "due": "2026-10-14", "since": "2026-10-09", "counterparty": { "id": "people/tomas-herrera", "title": "Tomás Herrera" }, "next_step": null }
-  ],
-  "changes": [
-    { "text": "Decision recorded: enterprise tier will be priced per seat ([[decisions/2026-10-12-enterprise-tier-pricing]])." },
-    { "text": "New risk: onboarding import failures raised by a third customer ([[risks/onboarding-import-failures]])." },
-    { "text": "Priya shared the Q4 roadmap draft for review ([[sources/2026-10-12-q4-roadmap-draft]])." },
-    { "text": "Closed: Send hiring plan outline to Jordan, sent Oct 12 ([[commitments/send-hiring-plan-outline]])." }
   ],
   "insights": [
     { "id": "I-2026-10-12-03", "text": "Three customers raised the onboarding import bug this month.", "why": "It relates to the open risk on Support Revamp and your Q4 retention goal.", "suggested_action": "Raise it at Thursday's product sync.", "draft": null, "refs": [{ "id": "risks/onboarding-import-failures", "title": "Onboarding import failures" }, { "id": "goals/2026-q4-retention", "title": "Q4 retention" }] },

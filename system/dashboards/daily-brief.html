@@ -822,6 +822,8 @@ html.rp-lock { overflow: hidden; }
     var catchUp = b.kind === "catch-up";
     var today = L(d.today), due = L(d.due), waiting = L(d.waiting_on);
 
+    /* Order: action needed, (catch-up only: while you were away), top priorities, today, due and slipping,
+       waiting on others, needs you, worth knowing, drafts ready. Section heads carry a description, no count. */
     var acts = L(d.actions);
     if (acts.length) {
       main.appendChild(N.section({ id: "actions", title: "Action needed",
@@ -833,18 +835,18 @@ html.rp-lock { overflow: hidden; }
         })) }));
     }
 
-    if (L(d.since_last_night).length) {
-      main.appendChild(N.section({ id: "since", title: catchUp ? "While you were away" : "Since last night",
-        note: catchUp ? null : "Picked up when you opened Atlas this morning.", body: notes(d.since_last_night), key: "since_last_night" }));
+    if (catchUp && L(d.since_last_night).length) {
+      main.appendChild(N.section({ id: "away", title: "While you were away", note: "What happened while you were out, most important first.",
+        body: notes(d.since_last_night), key: "since_last_night" }));
     }
 
     main.appendChild(N.section({ id: "priorities", title: "Top priorities", note: "Ranked against your goals, not just due dates.",
       body: L(d.priorities).length ? h("ol", { class: "prio" }, L(d.priorities).map(function (p) {
-        return h("li", null, h("p", { class: "prio-title" }, p.text), p.why ? h("p", { class: "prio-why" }, N.rich(p.why)) : null,
-          p.ref ? N.rid(p.ref.id) : null);
+        return h("li", null, h("p", { class: "prio-title" }, p.text), p.why ? h("p", { class: "prio-why" }, N.rich(p.why)) : null);
       })) : N.empty("No priorities set for today.") }));
 
-    main.appendChild(N.section({ id: "today", title: "Today", count: N.total("today", today.length), key: "today",
+    main.appendChild(N.section({ id: "today", title: "Today", key: "today",
+      note: "Your meetings and deadlines, with whether prep is ready.",
       body: today.length ? h("ul", { class: "items sched" }, today.map(function (e) {
         var prep = e.prep || {};
         var li = N.item({ tone: prep.status === "ready" ? "ok" : (e.kind === "deadline" ? "danger" : null), title: e.title, id: e.id,
@@ -857,7 +859,7 @@ html.rp-lock { overflow: hidden; }
         return li;
       })) : N.empty("No meetings or deadlines today.") }));
 
-    main.appendChild(N.section({ id: "due", title: "Due and slipping", count: N.total("due", due.length), key: "due",
+    main.appendChild(N.section({ id: "due", title: "Due and slipping", key: "due",
       note: "What you owe that is due soon or overdue.",
       body: N.items(due.map(function (c) {
         var late = c.status === "slipped" || (N.daysFromToday(c.due) || 0) < 0;
@@ -867,13 +869,24 @@ html.rp-lock { overflow: hidden; }
           aside: [h("span", null, N.due(c.due)), c.status === "slipped" ? N.status("slipped") : null] });
       }), "Nothing due in the next few days.") }));
 
-    main.appendChild(N.section({ id: "waiting", title: "Waiting on others", count: N.total("waiting_on", waiting.length), key: "waiting_on",
+    main.appendChild(N.section({ id: "waiting", title: "Waiting on others", key: "waiting_on",
+      note: "What other people owe you, and when it's due.",
       body: N.items(waiting.map(function (c) {
         var late = c.status === "slipped" || (c.due && N.daysFromToday(c.due) < 0);
         return N.item({ tone: late ? "warn" : "muted", title: c.title, id: c.id,
           meta: [c.counterparty ? "From " + N.name(c.counterparty) : null, c.since ? "Asked " + N.date(c.since) : null],
           nextStep: c.next_step, aside: [h("span", null, N.due(c.due))] });
       }), "You're not waiting on anyone.") }));
+
+    var asks = L(d.approvals), qs = L(d.questions);
+    if (asks.length || qs.length) {
+      main.appendChild(N.section({ id: "asks", title: "Needs you", note: "Reply in chat to approve, decline, or answer.",
+        body: [N.items(asks.map(function (a) {
+            return N.item({ tone: "warn", title: a.action, text: a.why, aside: [N.status("pending")] });
+          }).concat(qs.map(function (q) {
+            return N.item({ tone: "accent", title: q.text, aside: [N.chip("Question")] });
+          }))), N.more("approvals"), N.more("questions")] }));
+    }
 
     if (L(d.insights).length) {
       main.appendChild(N.section({ id: "insights", title: "Worth knowing", note: "Patterns Atlas noticed, with the reasoning.",
@@ -887,26 +900,11 @@ html.rp-lock { overflow: hidden; }
         })) }));
     }
 
-    main.appendChild(N.section({ id: "changes", title: "What changed", count: N.total("changes", L(d.changes).length), key: "changes",
-      body: L(d.changes).length ? notes(d.changes) : N.empty("Nothing new came in.") }));
-
     if (L(d.drafts).length) {
-      main.appendChild(N.section({ id: "drafts", title: "Drafts ready", note: "Waiting in your email drafts. Nothing has been sent.",
-        count: N.total("drafts", L(d.drafts).length), key: "drafts",
+      main.appendChild(N.section({ id: "drafts", title: "Drafts ready", note: "Waiting in your email drafts. Nothing has been sent.", key: "drafts",
         body: N.items(L(d.drafts).map(function (x) {
           return N.item({ title: x.title, meta: [x.to ? "To " + x.to : null, x.where], text: x.why, id: x.ref && x.ref.id });
         })) }));
-    }
-
-    var asks = L(d.approvals), qs = L(d.questions);
-    if (asks.length || qs.length) {
-      main.appendChild(N.section({ id: "asks", title: "Needs you", note: "Reply in chat to approve, decline, or answer.",
-        count: N.total("approvals", asks.length) + N.total("questions", qs.length),
-        body: [N.items(asks.map(function (a) {
-            return N.item({ tone: "warn", title: a.action, text: a.why, aside: [N.status("pending")] });
-          }).concat(qs.map(function (q) {
-            return N.item({ tone: "accent", title: q.text, aside: [N.chip("Question")] });
-          }))), N.more("approvals"), N.more("questions")] }));
     }
 
     var meetings = today.filter(function (e) { return e.kind !== "deadline"; }).length;

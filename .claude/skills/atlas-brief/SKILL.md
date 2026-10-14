@@ -63,7 +63,7 @@ Give the user a two-minute, trustworthy picture of where they stand: what's on, 
 ### C. "Since last night" (after the morning quick catch-up)
 1. Input: the items `atlas-capture` filed in the quick catch-up ingest.
 2. Append `## Since last night` to today's brief file (create a minimal brief with Today and this section if none exists) with ≤5 bullets: new replies, new commitments, changed or new events today, anything urgent. Link each item.
-3. Republish the Daily Brief dashboard. Tell the user in one line only if something is urgent.
+3. Republish the Daily Brief dashboard. The page has no "Since last night" section: the new items appear in its own sections (Today, Due and slipping, Waiting on others, Needs you). Tell the user in one line only if something is urgent.
 
 ## Outputs
 - `user/work/briefs/YYYY-MM-DD.md`, `user/work/briefs/YYYY-MM-DD-catch-up.md`.

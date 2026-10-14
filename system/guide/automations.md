@@ -16,7 +16,7 @@ One main run each evening, so everything is ready the next morning.
 - **Every evening, around 8:07 pm:** bring in the day's information, triage commitments, look for insights, draft email replies and follow-ups (weekdays), prepare for tomorrow's meetings, run the monthly or quarterly check-in if one is due, and write tomorrow's Daily Brief.
 - **Fridays, around 2:07 pm:** weekly review and status-update drafts.
 - **Sundays, around 3:07 am:** tidy-up and check for Atlas updates.
-- **First chat of each day:** if nothing's been brought in for more than 3 hours, Atlas quickly checks your email and calendar and adds a "Since last night" section to your brief.
+- **First chat of each day:** if nothing's been brought in for more than 3 hours, Atlas quickly checks your email and calendar and updates your brief with anything new.
 
 ## Standard profile (suggested for Claude Max 5x)
 A full morning run plus refreshes through the working day.
