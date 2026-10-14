@@ -66,12 +66,12 @@ Give the user a two-minute, trustworthy picture of where they stand: what's on, 
 3. Republish the Daily Brief dashboard. The page has no "Since last night" section: the new items appear in its own sections (Today, Due and slipping, Waiting on others, Needs you). Tell the user in one line only if something is urgent.
 
 ### D. Week Ahead planning data
-Used by A (the 7 days from the target date) and by `atlas-review`'s Friday weekly review (next Monday to Sunday, rendered with `meta.as_of` = that Monday). Field definitions: `system/dashboards/week-ahead.contract.md`. From event records (events hidden by the meeting filter still count as busy), `rhythms.yaml: work_hours`, open commitments with `effort`, `working-style.md`, and `preferences.md`:
+Used by A and by `atlas-review`'s weekly review. The range is set by `system/dashboards/week-ahead.contract.md` (Purpose, "Which seven days"): next Monday to Sunday once this week's weekly review has run, otherwise the 7 days from the target date. Field definitions: `system/dashboards/week-ahead.contract.md`. From event records (events hidden by the meeting filter still count as busy), `rhythms.yaml: work_hours`, open commitments with `effort`, `working-style.md`, and `preferences.md`:
 1. **Focus suggestions** (`focus[]`): free gaps of at least 90 minutes inside work hours on work days, each matched to the highest-priority `i_owe` work due within the week that isn't already scheduled; at most 1 per day and 4 per week; respect working style and preferences (e.g. no Friday afternoons). Each has `start`, `end`, `label`, and a one-line `reason`. A focus block awaiting approval (`focus_time_needed`) is shown as the suggestion for its slot. Suggestions only: putting a hold on the calendar is `own_calendar_manage` (propose, in chat).
 2. **Time:** each day's `free_hours`; the week's `summary.focus_hours`, `work_due_hours`, and `unsized`.
 3. **Watch-outs** (`watchouts[]`): overloaded days, no-break stretches, double bookings, unprotected deadlines.
 4. **Meetings:** `note` (one line on why it matters or what to raise; from the event's `insight` or the prep note), `project` (the event's first linked project), `prep.summary` (first line of the prep note's suggested agenda) and `prep.todo` (what to prepare, or when `meeting-prep` will write the note).
-5. **Outcomes:** from the latest weekly review covering the week, with `status` refreshed from the linked records; before the first weekly review, propose up to 3 (contract, Sources).
+5. **Outcomes:** from the weekly review whose "next week" contains the range's first day, with `status` refreshed from the linked records; before the first weekly review, propose up to 3 (contract, Sources).
 6. **Headline** (`meta.headline`): one line on the shape of the week.
 Pass all of it to `atlas-dashboards` with the Week Ahead republish.
 

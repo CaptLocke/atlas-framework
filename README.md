@@ -22,7 +22,7 @@ That's it: no other subscriptions, servers, or software.
 
 ## Get started
 
-Follow the **[setup guide](docs/setup/README.md)**. It walks you through three one-time steps, then Atlas takes over in conversation. Most people finish in under an hour, and you can stop and resume at any point.
+Follow the **[setup guide](docs/setup/README.md)**. It walks you through four one-time steps, then Atlas takes over in conversation. Most people finish in under an hour, and you can stop and resume at any point.
 
 ## Your data
 

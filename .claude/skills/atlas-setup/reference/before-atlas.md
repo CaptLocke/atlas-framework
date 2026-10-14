@@ -4,7 +4,7 @@ skill: atlas-setup
 ---
 # Steps 1–4: before Atlas runs, and getting unstuck
 
-Steps 1–4 are done by the user with the illustrated guide in `docs/setup/` (macOS and Windows). This file is what Atlas says when the user is partly through them, comes back stuck, or needs the bootstrap stub again. Keep every answer to one action at a time; wait for "done" before giving the next.
+Steps 1–4 are done by the user with the setup guide in `docs/setup/` (macOS and Windows). This file is what Atlas says when the user is partly through them, comes back stuck, or needs the bootstrap stub again. Keep every answer to one action at a time; wait for "done" before giving the next.
 
 ## The bootstrap stub
 The canonical text is `system/templates/bootstrap-stub.md`; use it exactly, replacing `YOUR-USERNAME/YOUR-REPO` with the user's `<owner>/<repo>` from `git remote get-url origin` (e.g. `https://github.com/maya-chen/atlas.git` → `maya-chen/atlas`). Show it in one copy block. Never paraphrase it here or anywhere else.
@@ -27,7 +27,7 @@ Ask what they see on screen if the fix below doesn't match. Screens change; desc
 ### Step 1: accounts
 - **No GitHub account yet:** go to github.com → **Sign up**; the free plan is all Atlas needs. Use any email; pick a username they don't mind seeing in links.
 - **Verification email didn't arrive:** check spam/promotions; the GitHub sign-up page has "Resend".
-- **Two-factor prompt:** recommended; an authenticator app or text message is fine. It protects their knowledge (R17).
+- **Two-factor prompt:** recommended; an authenticator app or a passkey, as the setup guide describes. It protects their knowledge.
 - **Which Claude plan?** Pro or higher. If they're on Free, Atlas can't run automatic routines; they need to upgrade first.
 
 ### Step 2: repository from the template

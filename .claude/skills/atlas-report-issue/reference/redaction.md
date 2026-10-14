@@ -10,7 +10,7 @@ Goal: the maintainer can understand and reproduce the technical problem; nobody 
 | What | Replace with | Example |
 |---|---|---|
 | People's names (including the user), nicknames, initials | `[PERSON-n]` | "Dana Ruiz" → `[PERSON-1]` |
-| Email addresses | `[EMAIL-n]` | `dana@acme.com` → `[EMAIL-1]` |
+| Email addresses | `[EMAIL-n]` | `dana@acme.example` → `[EMAIL-1]` |
 | Phone numbers, street addresses | `[PHONE]`, `[ADDRESS]` | |
 | Employer, customer, partner, vendor, and team names; email domains | `[ORG-n]` | "Acme" → `[ORG-1]` |
 | Record titles, IDs, and slugs (`people/dana-ruiz`, `projects/orion-migration`) | Keep the type, replace the slug: `people/[RECORD-n]` | `[[projects/orion-migration]]` → `projects/[RECORD-2]` |

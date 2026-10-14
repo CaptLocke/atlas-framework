@@ -16,7 +16,7 @@ Get a non-technical person from "I made the repo" to "my first Daily Brief is wa
 - `user/.state/setup.yaml` (resume point; format `system/schemas/formats.md` §1).
 - `git remote get-url origin` (the user's `<owner>/<repo>`), `system/manifest.yaml`, `system/VERSION`.
 - Starter files: `system/templates/settings/`, `system/templates/profile/`, `system/templates/inbox/`, `system/templates/state/` (and `system/templates/logs/` if present).
-- `system/routine-profiles/<profile>.yaml`, `system/jobs/README.md` (thin-pointer routine prompt), `docs/setup/` (the illustrated guide).
+- `system/routine-profiles/<profile>.yaml`, `system/jobs/README.md` (thin-pointer routine prompt), `docs/setup/` (the setup guide).
 - What the user tells you, attaches, and connects.
 
 ## How to talk during setup

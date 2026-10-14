@@ -49,7 +49,7 @@ Full example: `system/tests/dashboards/atlas-guide.json`. All strings are plain 
 Guide sections in 1.0.0: `features`, `requests`, `automations`, `controls`, `troubleshooting`. Unknown extra guide files are included by `order`; nothing is required for the page to render. Where guide text says "by default", `atlas-dashboards` may personalize it from `routines.yaml` and `governance.yaml` as `system/guide/README.md` allows; any other user detail belongs on the Control Center.
 
 ## Rendering notes
-- Page order: table of contents, search, What's new (latest three releases shown, earlier ones collapsed), then sections in order.
+- Page order: search, What's new (latest three releases shown, earlier ones collapsed), then sections in order.
 - Search matches titles, body, bullets, steps, and examples; sections with no matches are hidden, and an empty result says to ask Atlas in chat.
 - Caps: 5 releases in `whats_new`; 40 items per section; 10 examples per item. Over budget, drop older releases first, then trim `body` paragraphs to 600 characters. `meta.truncated` keys are `whats_new` and `sections.<id>`.
 - Sub-headings deeper than `##` are folded into the parent item's body as paragraphs.

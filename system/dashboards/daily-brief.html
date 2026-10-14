@@ -826,9 +826,9 @@ html.rp-lock { overflow: hidden; }
         })) }));
     }
 
-    if (catchUp && L(d.since_last_night).length) {
+    if (catchUp && L(d.while_away).length) {
       main.appendChild(N.section({ id: "away", title: "While you were away", note: "What happened while you were out, most important first.",
-        body: notes(d.since_last_night), key: "since_last_night" }));
+        body: notes(d.while_away), key: "while_away" }));
     }
 
     main.appendChild(N.section({ id: "priorities", title: "Top priorities", note: "Ranked against your goals, not just due dates.",

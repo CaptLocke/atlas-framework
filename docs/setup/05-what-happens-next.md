@@ -65,7 +65,7 @@ Atlas creates your dashboards: always-up-to-date pages such as your Daily Brief,
 
 ## 9. Your first brief
 
-Atlas looks through your last couple of weeks of work, builds its first picture of your people, projects, and commitments, and prepares your first **Daily Brief**. It arrives by the next morning at the latest.
+Atlas looks through your last couple of weeks of work, builds its first picture of your people, projects, and commitments, and prepares your first **Daily Brief** before you finish: for today if it's still early enough, otherwise for tomorrow morning.
 
 ---
 

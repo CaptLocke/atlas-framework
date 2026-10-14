@@ -10,7 +10,7 @@ Commands are examples for the cloud session's shell. Use `<up>` for `https://git
 ```bash
 git ls-remote --tags --refs <up> 'v*'          # list release tags
 ```
-Parse `refs/tags/vMAJOR.MINOR.PATCH`; skip tags with a pre-release suffix. Compare semver numerically, not as strings (`1.10.0` > `1.9.0`). If the network can't reach GitHub with git, try the GitHub connector or the releases page via web fetch; if all fail, record `update-check` `last_status: failed` and a low-severity known issue after two consecutive failures (R12).
+Parse `refs/tags/vMAJOR.MINOR.PATCH`; skip tags with a pre-release suffix. Compare semver numerically, not as strings (`1.10.0` > `1.9.0`). If the network can't reach GitHub with git, try the GitHub connector or the releases page via web fetch; if all fail, record `update-check` `last_status: failed` and a low-severity known issue after two consecutive failures.
 
 ## Rollback point and lock
 ```bash

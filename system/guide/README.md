@@ -4,7 +4,7 @@ audience: Atlas (atlas-dashboards, atlas-setup, atlas-update) and maintainers
 ---
 # Atlas Guide content
 
-Source content for the **Atlas Guide** dashboard and for answering "what can you do?" / "how do I…?" in chat. Written for the user, in plain language. The setup guide for new users lives in `docs/setup/` (it must work before Atlas exists); the Guide links to it rather than repeating it.
+Source content for the **Atlas Guide** dashboard and for answering "what can you do?" / "how do I…?" in chat. Written for the user, in plain language. The setup guide for new users lives in `docs/setup/` (it must work before Atlas exists); the Guide points to it by name rather than repeating it (dashboard pages link only to other dashboards).
 
 ## Files
 | File | `section` | Holds |

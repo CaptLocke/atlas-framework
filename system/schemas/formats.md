@@ -90,7 +90,7 @@ indicators: { period: 2026-09, time_to_first_brief_hours: 14, cited_answer_share
 ### approval.json (single-use, chat only)
 ```json
 {"action": "send_communication", "tool": "mcp__outlook__send_message",
- "target": "draft AAMk… to jordan@acme.com", "user_confirmation": "yes, send it",
+ "target": "draft AAMk… to jordan@acme.example", "user_confirmation": "yes, send it",
  "created": "2026-10-12T15:02:11-07:00", "expires": "2026-10-12T15:04:11-07:00"}
 ```
 Hooks consume (delete) it on the matching call. One record authorizes one call.
@@ -217,7 +217,7 @@ atlas_context: routine   # the ATLAS_CONTEXT value observed at the start of the 
 ## 5. Indexes (`user/knowledge/_index/`)
 Regenerable; never edited by hand.
 - `<folder>.md` (e.g. `people.md`): one line per non-archived record:
-  `- [[people/dana-ruiz]] | Dana Ruiz | aliases: dana@acme.com, D. Ruiz | active | 2026-10-12 | Acme's legal counsel; reviewing the MSA.`
+  `- [[people/dana-ruiz]] | Dana Ruiz | aliases: dana@acme.example, D. Ruiz | active | 2026-10-12 | Acme's legal counsel; reviewing the MSA.`
 - `hot.md`: what's live right now, for session start (L0). **At most 75 lines**, same line format, grouped by type in this order: commitments, events, goals, projects, risks, questions, decisions, ideas, playbooks, topics, then user types. It includes only records that are **not closed** (`schema.yaml: closed_statuses`), not archived, and not superseded, and that are one of:
   - open or slipped commitments due within 14 days, or slipped;
   - scheduled events in the next 7 days;

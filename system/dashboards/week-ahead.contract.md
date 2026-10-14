@@ -11,7 +11,7 @@ stale_after_hours: 36
 ## Purpose
 A plan for the next seven days, not just a calendar. In order: **This week's outcomes** (3 to 5 things that would make the week a success, tied to goals), **The week at a glance** (a strip of seven days showing meeting load, free focus time, items due, and watch-outs; selecting a day narrows the day list to it) with a **time vs. work** line comparing free focus hours to the effort of what the user owes, **Get ready** (meetings that need preparation), **Watch-outs** (problems with the schedule itself), then **each day**: meetings with prep status, suggested focus time, and what's due. Meetings open in the record panel. Focus suggestions are only suggestions; putting a hold on the calendar is `own_calendar_manage` (propose) and happens in chat.
 
-Republished by `daily-brief` each cycle (the 7 days from the brief's target date) and by `weekly-review` (Friday preview of next week: Monday to Sunday, with `meta.as_of` = that Monday). Both compute the planning data with `atlas-brief` §D.
+Republished by `daily-brief` each cycle and by `weekly-review`. Both compute the planning data with `atlas-brief` §D. **Which seven days:** once this week's weekly review has run (normally Friday), the page shows next Monday to Sunday until that Monday, so the Friday, Saturday, and Sunday briefs keep the preview of next week instead of replacing it; at any other time it shows the 7 days from the brief's target date. `meta.as_of` = `range.start`.
 
 ## Data (JSON shape embedded in the page)
 ```json
@@ -67,7 +67,7 @@ Full example: `system/tests/dashboards/week-ahead.json`. `days` always has 7 ent
 | `summary.meetings`, `summary.meeting_hours` | Count and hours of `events[]` in the range (all-day items excluded) |
 | `summary.deadlines` | Items in `due[]` across the range with `direction: i_owe` or `kind: deadline` (what the user has to deliver); shown as "things due" |
 | `summary.prep_missing` | Events in the range with `prep.status: none` |
-| `outcomes[]` | The latest weekly review covering this week (`user/work/reviews/`, "Suggested priorities for next week"), with `status` refreshed from the linked records each run (`done` when its commitment closed, `at_risk` when it slipped or its project is at risk or off track). Before the first weekly review, `atlas-brief` proposes up to 3 from the top-ranked goals and the `i_owe` work due this week. |
+| `outcomes[]` | The weekly review whose "next week" is the ISO week containing `range.start` (`user/work/reviews/`, "Suggested priorities for next week"), with `status` refreshed from the linked records each run (`done` when its commitment closed, `at_risk` when it slipped or its project is at risk or off track). When no such review exists yet (the first week, or a week the review didn't run), `atlas-brief` proposes up to 3 from the top-ranked goals and the `i_owe` work due in the range. |
 | `focus[]`, `free_hours`, `summary.focus_hours`, `summary.work_due_hours`, `unsized`, `watchouts[]` | `atlas-brief` §D |
 
 ## Rendering notes

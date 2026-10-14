@@ -21,7 +21,7 @@ Documents, decks, sheets, and dashboards follow `user/profile/design-system.md` 
 ## Citations
 - Cite records and sources for every factual claim drawn from knowledge.
 - **In chat and briefs:** inline wiki links after the claim: "Dana is reviewing the MSA ([[commitments/dana-msa-review]])." Group many citations at the end of a paragraph if inline would clutter.
-- **In dashboards:** each item links to its record.
+- **In dashboards:** titles only; pages never show record IDs or link to records (`system/dashboards/README.md`). Every item still carries its record ID in the page data.
 - **In drafts the user will send:** never include citations in the draft itself; list sources for the user separately (one line under the draft).
 - Web facts cite the URL.
 - Never invent a source. If something is your inference, say "I think" or mark `inferred`.
