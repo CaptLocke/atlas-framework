@@ -63,14 +63,15 @@ Each template contains each placeholder **exactly once**. No other text is subst
 
 **Links.** A link on a dashboard only ever opens another dashboard: the nav row under the header, and the name of another dashboard where a page's own wording mentions one (`N.pageLink`), and on Projects, the card of a project that has its own project page. Pages have no jump-to-section links.
 
-**Record panel.** On Records, Commitments, Projects, Decisions & Risks, and People, clicking a card (or its title, or Enter on it) opens the item in a panel (`N.recordPanel`, `N.clickable` in `_base.js`): a drawer on the right, full screen on phones. It shows the type and status, title, summary, **Details** (the fields the card shows plus any `details` the data carries), sections the page adds (next step, mitigation, why, who owes what), the item's `body`, **Linked records** (any linked item that is on the same page opens in the panel, with Back; others are listed by name), the created and updated dates, and "Copy a request for Atlas", which copies a ready-made request to paste into chat. Esc, Close, or a click outside shuts it.
+**Record panel.** On Records, Commitments, Projects, Decisions & Risks, and People, and for meetings on Week Ahead, clicking a card (or its title, or Enter on it) opens the item in a panel (`N.recordPanel`, `N.clickable` in `_base.js`): a drawer on the right, full screen on phones. It shows the type and status, title, summary, **Details** (the fields the card shows plus any `details` the data carries), sections the page adds (next step, mitigation, why, who owes what), the item's `body`, **Linked records** (any linked item that is on the same page opens in the panel, with Back; others are listed by name), the created and updated dates, and "Copy a request for Atlas", which copies a ready-made request to paste into chat (`Show me the "<title>" record (<id>).`; the record ID appears there so Atlas finds the right record, and nowhere else on the page). Esc, Close, or a click outside shuts it.
 
-**Panel data** (optional on every item of those four pages, same rules everywhere):
+**Panel data** (optional on every item those pages open in the panel, same rules everywhere):
 | Field | Rule |
 |---|---|
 | `details` | Up to 12 `{ label, value }` pairs: meaningful frontmatter fields the card doesn't already show, as display text (dates formatted, references as titles). Never `notes_private`, `emails`, `phone`, `location`. |
 | `body` | The record's body as plain text, one `{ heading, text }` per section (`heading` or `null`; line breaks kept, list items as lines starting with "- ", no Markdown), at most 2,000 characters in all, cut at a sentence or line end. `null` for sources, records with `summary` handling, and empty bodies. Never a `## Private notes` section or text whose handling is `ignore` or `pointer`. |
 | `body_truncated` | `true` when `body` was cut; the panel says the rest is in chat. |
+| `summary` | One line shown under the title when the card has no summary of its own (a commitment, a person); plain text, at most 240 characters. |
 | `links` | Extra linked records (`{ id, title }`) beyond the item's own references, most important first, up to 8. |
 | `created`, `updated` | The record's dates, for the panel's dates line. |
 
@@ -104,7 +105,6 @@ Every dashboard's JSON has a `meta` object:
   "locale": "en-US",
   "user_display_name": "Maya Chen",
   "atlas_version": "1.0.0",
-  "record_base_url": null,
   "nav": [{ "name": "commitments", "title": "Commitments", "url": "https://claude.ai/artifact/…" }],
   "notices": [{ "level": "warn", "text": "Your Outlook connection expired…" }],
   "truncated": { "commitments": 14 }
@@ -124,7 +124,6 @@ Every dashboard's JSON has a `meta` object:
 | `locale` | no | BCP 47 tag for date formatting. Default `en-US` (see gaps in the contract notes). |
 | `user_display_name` | no | `atlas.yaml: user_display_name`. |
 | `atlas_version` | no | `atlas.yaml: installed_version`. |
-| `record_base_url` | no | `null` by default. If set (e.g. `https://github.com/<repo>/blob/main/user/knowledge/`, from `atlas.yaml: repo`), record titles become links to the record file. Leave `null` unless the user asks; the ID text alone is enough to ask Atlas. |
 | `nav` | no | Every dashboard in `dashboards.yaml` that has a `url`, including this one (it shows as the current page). Pages list them in one fixed order, so every page shows the same row. Only `https://` links render. |
 | `notices` | no | Up to 3 short lines shown above the content, each as a tinted alert with an icon and a label ("Needs attention:" for `warn`, "Problem:" for `error`, "Note:" for `info`): open `high` known issues from `user/.state/health.yaml` that affect this page's data (e.g. a disconnected source), and staleness (the readiness check found an upstream job stale). `level`: `info`, `warn`, or `error`. |
 | `truncated` | no | Map of list key → number of items left out. The page shows "N more not shown here. Ask Atlas in chat to see them." under that list. Keys are top-level list names unless the contract says otherwise. |

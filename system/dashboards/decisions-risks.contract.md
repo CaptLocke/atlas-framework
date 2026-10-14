@@ -43,7 +43,7 @@ Full example: `system/tests/dashboards/decisions-risks.json`. `rationale: "unkno
 | `risks[]` | `user/knowledge/risks/*.md`: all `potential` and `active`, plus `resolved` updated in the last 90 days: `id, title, summary, status, likelihood, impact, owner, mitigation, updated`; `projects` = `links.projects` |
 | `risks[].insight` | Latest `user/inbox/insights.md` entry linking the risk (status `new|seen`), else `null` |
 | `decisions[]` | `user/knowledge/decisions/*.md`, not superseded: `proposed` (any age) and `made`/`reversed` with `decided_on` in the last 365 days: `id, title, summary, status, decided_on, deciders, rationale, alternatives, reversible, revisit_on`; `projects` = `links.projects` |
-| `insights[]` | `user/inbox/insights.md`, status `new|seen`, linking a decision or risk and not already attached to a risk, max 5 |
+| `insights[]` | `user/inbox/insights.md`, status `new|seen`, linking a decision or risk and not already attached to a risk, max 5: `{ "id", "text", "why", "suggested_action" }` (entry ID, Insight, Why it matters, Suggested action) |
 | `summary` | Counts over the full sets: `issues` (active risks), `open_risks` (potential), `decisions_90d` (made in the last 90 days) |
 
 ## Rendering notes

@@ -171,10 +171,6 @@ button, input, select { font: inherit; color: inherit; }
   .item-aside { text-align: left; justify-items: start; display: flex; flex-wrap: wrap; gap: .4rem; }
 }
 
-/* Record IDs: always visible so the user can ask Atlas about the record. */
-.rid { font-family: var(--font-id); font-size: .76rem; color: var(--ink-2); background: var(--surface-2); padding: .05em .4em; border-radius: 4px; -webkit-user-select: all; user-select: all; overflow-wrap: anywhere; justify-self: start; }
-a.rid { text-decoration: none; }
-a.rid:hover { color: var(--accent); }
 
 /* Chips: short status words. Color always paired with text. */
 .chip { display: inline-block; font-size: .78rem; font-weight: 600; line-height: 1.5; padding: 0 .5rem; border-radius: 999px; border: 1px solid currentColor; color: var(--ink-2); white-space: nowrap; }
@@ -434,16 +430,11 @@ html.rp-lock { overflow: hidden; }
     if (type === "people" || type === "organizations") return s.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
     return s.charAt(0).toUpperCase() + s.slice(1);
   };
-  /* A ref is {id, title}. Renders the title; with record_base_url set, the title links to the record file. */
+  /* A ref is {id, title}. Renders the title as plain text (links on a page only ever open another dashboard). */
   N.ref = function (r) {
     if (!r) return null;
     if (typeof r === "string") r = { id: r };
-    var text = r.title || N.idName(r.id);
-    var base = N.meta.record_base_url;
-    if (base && /^https:\/\//.test(base) && r.id && /^[a-z]+\/[a-z0-9][a-z0-9-]*$/.test(r.id)) {
-      return h("a", { class: "ref", href: base + r.id + ".md", target: "_blank", rel: "noopener noreferrer" }, text);
-    }
-    return h("span", { class: "ref" }, text);
+    return h("span", { class: "ref" }, r.title || N.idName(r.id));
   };
   N.refs = function (list) {
     list = N.list(list);

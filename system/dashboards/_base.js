@@ -151,16 +151,11 @@
     if (type === "people" || type === "organizations") return s.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
     return s.charAt(0).toUpperCase() + s.slice(1);
   };
-  /* A ref is {id, title}. Renders the title; with record_base_url set, the title links to the record file. */
+  /* A ref is {id, title}. Renders the title as plain text (links on a page only ever open another dashboard). */
   N.ref = function (r) {
     if (!r) return null;
     if (typeof r === "string") r = { id: r };
-    var text = r.title || N.idName(r.id);
-    var base = N.meta.record_base_url;
-    if (base && /^https:\/\//.test(base) && r.id && /^[a-z]+\/[a-z0-9][a-z0-9-]*$/.test(r.id)) {
-      return h("a", { class: "ref", href: base + r.id + ".md", target: "_blank", rel: "noopener noreferrer" }, text);
-    }
-    return h("span", { class: "ref" }, text);
+    return h("span", { class: "ref" }, r.title || N.idName(r.id));
   };
   N.refs = function (list) {
     list = N.list(list);

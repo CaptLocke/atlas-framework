@@ -108,7 +108,7 @@ Use `atlas-dashboards` to publish the eleven dashboards privately and save their
 - `user/settings/{atlas,governance,data-rules,connectors,sources,rhythms,routines,dashboards}.yaml`
 - `user/profile/*.md` and `user/profile/assets/`; `user/extensions/registry.yaml`; inbox starters in `user/inbox/`; state starters and `setup.yaml` in `user/.state/`
 - Initial records (employer with its company profile, self, manager, key people, goals, projects, topics) and sources; originals in `user/library/`
-- Cloud-drive folders "Atlas Deliverables" and "Atlas Drop/Processed"; the "Atlas routine" environment and the routines; ten published dashboards
+- Cloud-drive folders "Atlas Deliverables" and "Atlas Drop/Processed"; the "Atlas routine" environment and the routines; eleven published dashboards
 - The first brief at `user/work/briefs/YYYY-MM-DD.md`
 - If importing: `user/.state/import.yaml` (`status: complete`), import sources and the records made from them, the "Atlas Import" drive folder (left untouched) and its data-rule exclusion
 - Activity-log lines and commits with `Atlas-Actor: setup` after every step

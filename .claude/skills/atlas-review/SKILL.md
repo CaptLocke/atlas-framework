@@ -29,7 +29,7 @@ The jobs own scheduling, period bookkeeping in `user/.state/jobs.yaml`, away/pau
 2. Write the sections in `reference/weekly.md`: **Wins · Decisions made · Commitments kept · Commitments slipped · Stalled projects · Aging waiting-on · People to reconnect with · Next week · Suggested priorities**. Every item cites its record. Lead with a 2–3 line summary.
 3. **Accomplishments:** pick the week's real accomplishments (delivered work, decisions driven, milestones, problems solved; not activity). For each, append a short dated entry to the relevant goal's `accomplishments` field (record update with an `## Updates` line) and a line to `user/work/accomplishments.md` (format in `reference/weekly.md`). Don't duplicate an entry already recorded.
 4. Suggested priorities (max 5) are ranked against active goals, then due dates; each with a one-line reason.
-5. Republish the dashboards whose contracts list this job in `republished_by` (`system/dashboards/*.contract.md`) with `atlas-dashboards`; the next brief links the review.
+5. Republish the dashboards whose contracts list this job in `republished_by` (`system/dashboards/*.contract.md`) with `atlas-dashboards`; the next brief links the review. For Week Ahead, first compute its planning data for next week (Monday to Sunday) with `atlas-brief` §D, using this review's suggested priorities as the week's outcomes, and render it with `meta.as_of` = next Monday.
 
 ### Monthly report (previous calendar month)
 1. **Goal progress:** for each active goal: progress vs target (`current`), evidence for and against (accomplishments, linked projects' health, decisions), what needs attention; propose `current` updates the evidence supports (records_write) and status changes (`achieved`/`missed`) as questions.

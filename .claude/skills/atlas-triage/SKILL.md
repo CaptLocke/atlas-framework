@@ -47,14 +47,14 @@ Keep the user's commitments honest and their priorities clear: nothing promised 
      Without a mail connector, `atlas-write` puts the follow-up text in the approvals entry for the user to send.
    - During away: evaluate, set statuses, but do not create drafts or approvals and do not record the trigger as fired; the catch-up brief lists them and they fire on return.
 10. **Write** all record changes with Updates lines; update `_index/commitments.md`, `_index/projects.md`, `hot.md`. Commit (`atlas(routine:<name>): triage …` with `Atlas-Records`) and log one activity line.
-11. **Republish** with `atlas-dashboards` every dashboard whose contract lists `triage` in `republished_by` and whose data changed: the Commitments page, and project pages listed in `dashboards.yaml: project_pages` whose project's records changed in this run (`system/dashboards/project-page.contract.md`).
+11. **Republish** with `atlas-dashboards` every dashboard whose contract lists `triage` in `republished_by` and whose data changed: the Commitments page, the Projects dashboard (when a project's health, status, `insight`, or `next_step` changed), and project pages listed in `dashboards.yaml: project_pages` whose project's records changed in this run (`system/dashboards/project-page.contract.md`).
 11a. **Feedback.** In chat, when the user drops something Atlas created as never a promise, reopens something Atlas closed, or overrides a priority, log a `feedback` line (`reference/learning.md` §1) with the fix.
 12. **Report.** Run-report row: reviewed, created, closed, dropped, slipped, follow-up drafts, questions raised. In chat: answer the user's question (grouped lists, cited), then the one or two things that need them.
 
 ## Outputs
 - Commitment and project records (`status`, `priority`, `insight`, `next_step`, `health`, `completed_on`, Updates).
 - New commitments (via `atlas-capture`), questions in `user/inbox/questions.md`, follow-up approvals in `user/inbox/approvals.md` (drafts themselves come from `atlas-write`).
-- Republished the Commitments page and project pages (`atlas-dashboards`).
+- Republished the Commitments page, the Projects dashboard, and project pages (`atlas-dashboards`).
 - `user/.state/triggers.yaml` entries; index lines; activity-log line; run-report row.
 - Data the Commitments page and brief read directly from records (no separate file).
 
@@ -70,5 +70,5 @@ Keep the user's commitments honest and their priorities clear: nothing promised 
 - Every open/slipped commitment and every active project has a current `insight` and `next_step` (full mode).
 - Every closed commitment cites its evidence in Updates.
 - Every overdue `waiting_on` (not away) has exactly one pending approvals entry and is handed to the email-drafts procedure for its single follow-up draft (marker `follow-up draft created <date>`); the firing is recorded once in `triggers.yaml`.
-- Dashboards listing `triage` (Commitments, changed project pages) are republished.
+- Dashboards listing `triage` (Commitments, Projects, changed project pages) are republished when their data changed.
 - Indexes and the run report reflect the changes; everything is committed.

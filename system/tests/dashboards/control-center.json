@@ -11,7 +11,6 @@
     "locale": "en-US",
     "user_display_name": "Maya Chen",
     "atlas_version": "1.0.0",
-    "record_base_url": null,
     "nav": [{"name": "daily-brief", "title": "Daily Brief", "url": "https://claude.ai/artifact/example-daily-brief"}, {"name": "commitments", "title": "Commitments", "url": "https://claude.ai/artifact/example-commitments"}, {"name": "projects", "title": "Projects", "url": "https://claude.ai/artifact/example-projects"}, {"name": "week-ahead", "title": "Week Ahead", "url": "https://claude.ai/artifact/example-week-ahead"}, {"name": "goals", "title": "Goals", "url": "https://claude.ai/artifact/example-goals"}, {"name": "people", "title": "People", "url": "https://claude.ai/artifact/example-people"}, {"name": "decisions-risks", "title": "Decisions & Risks", "url": "https://claude.ai/artifact/example-decisions-risks"}, {"name": "records", "title": "Records", "url": "https://claude.ai/artifact/example-records"}, {"name": "about-you", "title": "About You", "url": "https://claude.ai/artifact/example-about-you"}, {"name": "control-center", "title": "Control Center", "url": "https://claude.ai/artifact/example-control-center"}, {"name": "atlas-guide", "title": "Atlas Guide", "url": "https://claude.ai/artifact/example-atlas-guide"}],
     "notices": [],
     "truncated": { "activity": 41 }

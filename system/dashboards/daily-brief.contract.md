@@ -49,7 +49,7 @@ Full example: `system/tests/dashboards/daily-brief.json`.
 
 | Field | Notes |
 |---|---|
-| `brief.kind` | `daily` or `catch-up`. For `catch-up`, `brief.away` = `{ "start", "end" }` and `since_last_night` holds the "While you were away" summary lines (`[{ "text" }]`). Daily briefs omit it. |
+| `brief.kind` | `daily` or `catch-up`. For `catch-up`, `brief.away` = `{ "start", "end" }` and `since_last_night` holds the "While you were away" summary lines (`[{ "text" }]`): the catch-up brief file's "What happened" bullets, most important first. Daily briefs omit it. |
 | `brief.headline` | One sentence summarizing the day, in the user's communication style. |
 | `prep.status` | `ready` (prep note exists), `planned` (meeting-prep will create one before the meeting), `none` (meaningful meeting without prep), `not_needed`. |
 | `due[].status` | `open` or `slipped`. |

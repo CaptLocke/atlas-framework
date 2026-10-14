@@ -43,5 +43,5 @@ Full example: `system/tests/dashboards/commitments.json`. `summary` counts cover
 - Sections: Waiting on (`direction: waiting_on`), then I owe (`direction: i_owe`). Each has a one-line description and no count. Each shows its own empty message when it has nothing.
 - Sort within each section: overdue/slipped first (most overdue first), then by `due` ascending, `due: null` last; ties by priority (high → low), then title.
 - Default filter "All"; the viewer's last choice is remembered in browser storage when available.
-- Caps: 200 commitments. When over budget or cap, drop in this order: low-priority commitments with no due date, then commitments due more than 30 days out; record the count in `meta.truncated.commitments`.
+- Caps: 200 commitments. When over budget or cap, drop in this order: low-priority commitments with no due date, then commitments due more than 30 days out; record the counts per section in `meta.truncated.waiting_on` and `meta.truncated.i_owe` (each section shows its own "N more not shown here").
 - Text limits: `insight` and `next_step` 240 characters.

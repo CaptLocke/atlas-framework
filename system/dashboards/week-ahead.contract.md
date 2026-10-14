@@ -11,7 +11,7 @@ stale_after_hours: 36
 ## Purpose
 A plan for the next seven days, not just a calendar. In order: **This week's outcomes** (3 to 5 things that would make the week a success, tied to goals), **The week at a glance** (a strip of seven days showing meeting load, free focus time, items due, and watch-outs; selecting a day narrows the day list to it) with a **time vs. work** line comparing free focus hours to the effort of what the user owes, **Get ready** (meetings that need preparation), **Watch-outs** (problems with the schedule itself), then **each day**: meetings with prep status, suggested focus time, and what's due. Meetings open in the record panel. Focus suggestions are only suggestions; putting a hold on the calendar is `own_calendar_manage` (propose) and happens in chat.
 
-Republished by `daily-brief` each cycle and by `weekly-review` (Friday preview of next week).
+Republished by `daily-brief` each cycle (the 7 days from the brief's target date) and by `weekly-review` (Friday preview of next week: Monday to Sunday, with `meta.as_of` = that Monday). Both compute the planning data with `atlas-brief` §D.
 
 ## Data (JSON shape embedded in the page)
 ```json
@@ -60,12 +60,15 @@ Full example: `system/tests/dashboards/week-ahead.json`. `days` always has 7 ent
 | `events[]` | Event records with `start` in the range, `status: scheduled`, `kind` not `deadline`, and shown by the meeting filter (`rhythms.yaml: meetings`, rule in `system/schemas/settings.md`): `id, title, kind, start, end, location, attendees`; `prep.path` = `prep` |
 | `prep.status` | `ready` if `prep` is set; `planned` if the meeting meets `key_meeting_upcoming` (`system/triggers.md`) and has no note yet but `meeting-prep` will run before it; `none` if it meets it and no run will; else `not_needed` |
 | `due[]` | Commitments (`open|slipped`) with `due` in the range, both directions; deadline events (`kind: deadline`) in the range |
-| `focus[]` | Computed by `atlas-brief`: gaps of ≥ 90 minutes inside `rhythms.yaml: work_hours` on work days, matched to the highest-priority `i_owe` work due within the week; at most 1 per day, 4 per week; respects `user/profile/working-style.md` and `preferences.md` (e.g. no Friday afternoons); meetings hidden by the meeting filter still count as busy; a focus block awaiting approval (`focus_time_needed`) is shown as the suggestion for its slot, with "Waiting for your OK" in `reason` |
-| `meeting_hours`, `summary` | Sums over `events[]` (all-day items excluded) |
+| `meeting_hours` | Sum over the day's `events[]` (all-day items excluded) |
 | `work_day`, `work_hours_per_day` | `rhythms.yaml: work_hours` (`days`, `start`, `end`) |
-| `meta.headline` | One line from `atlas-brief` on the shape of the week |
+| `meta.headline` | One line on the shape of the week (`atlas-brief` §D) |
+| `events[].note`, `events[].project`, `prep.summary`, `prep.todo` | `atlas-brief` §D step 4: `note` from the event's `insight` or prep note; `project` = the event's first `links.projects` entry; `summary` and `todo` from the prep note or the `meeting-prep` schedule |
+| `summary.meetings`, `summary.meeting_hours` | Count and hours of `events[]` in the range (all-day items excluded) |
+| `summary.deadlines` | Items in `due[]` across the range with `direction: i_owe` or `kind: deadline` (what the user has to deliver); shown as "things due" |
+| `summary.prep_missing` | Events in the range with `prep.status: none` |
 | `outcomes[]` | The latest weekly review covering this week (`user/work/reviews/`, "Suggested priorities for next week"), with `status` refreshed from the linked records each run (`done` when its commitment closed, `at_risk` when it slipped or its project is at risk or off track). Before the first weekly review, `atlas-brief` proposes up to 3 from the top-ranked goals and the `i_owe` work due this week. |
-| `free_hours`, `summary.focus_hours`, `summary.work_due_hours`, `unsized`, `watchouts[]` | Computed by `atlas-brief` with the focus suggestions (same calendar and work-hours inputs) |
+| `focus[]`, `free_hours`, `summary.focus_hours`, `summary.work_due_hours`, `unsized`, `watchouts[]` | `atlas-brief` §D |
 
 ## Rendering notes
 - Order: outcomes (if any), the week at a glance (with the time vs. work line when `summary.focus_hours` is set), get ready, watch-outs, then the seven days. Every section has a one-line description and no count.
