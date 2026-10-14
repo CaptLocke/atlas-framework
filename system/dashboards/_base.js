@@ -336,7 +336,7 @@
   };
 
   /* Every page's header: title, subtitle, headline (meta.headline, else the page's own lede), stat cards.
-     opts: {title, subtitle, lede, stats:[[value,label]]} */
+     opts: {title, subtitle, lede, stats:[[value, label or [singular, plural]]]} */
   N.masthead = function (o) {
     var nav = N.navLinks();
     return h("header", { class: "mast" },
@@ -347,7 +347,8 @@
       o.subtitle ? h("p", { class: "mast-sub" }, o.subtitle) : null,
       (N.meta.headline || o.lede) ? h("p", { class: "mast-lede" }, N.rich(N.meta.headline || o.lede)) : null,
       o.stats && o.stats.length ? h("ul", { class: "mast-stats" }, o.stats.map(function (s) {
-        return h("li", { class: "stat" }, h("b", null, String(s[0])), h("span", null, s[1]));
+        var label = Array.isArray(s[1]) ? (Number(s[0]) === 1 ? s[1][0] : s[1][1]) : s[1];  /* [singular, plural] */
+        return h("li", { class: "stat" }, h("b", null, String(s[0])), h("span", null, label));
       })) : null,
       nav.length ? h("nav", { class: "mast-nav", "aria-label": "Other Atlas pages" }, nav.map(function (n) {
         return h("a", { href: n.url, target: "_blank", rel: "noopener noreferrer", "aria-current": n.name === N.meta.dashboard ? "page" : null }, n.title || n.name);

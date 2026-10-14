@@ -43,21 +43,21 @@ Shared files:
 ```
 Each template contains each placeholder **exactly once**. No other text is substituted.
 
-**Page header.** Every page opens the same way (`N.masthead`): the **title**; a **subtitle** (the date, period, or a fixed description of the page); the **headline** (`meta.headline`); then the page's counts as **stat cards**. What each headline leads with:
+**Page header.** Every page opens the same way (`N.masthead`): the **title**; a **subtitle** (the day or week for the Daily Brief and Week Ahead, the project's summary on a project page, and a fixed line saying what the page is for everywhere else; no "As of" dates); the **headline** (`meta.headline`); then the page's counts as **stat cards**. What each headline leads with:
 
 | Dashboard | Subtitle | The headline says |
 |---|---|---|
 | Daily Brief | The day's date (catch-up: the away dates) | The shape of the day and the one or two things that matter most (the brief's own headline) |
-| Work Board | As of date | What's slipping or most at risk among open commitments and projects |
+| Work Board | "Everything you owe, and everything owed to you." | What's slipping or most at risk among open commitments and projects |
 | Week Ahead | The week's dates | Where the week is heavy, and the best window for focused work |
-| Goals | The period | How the top-ranked goals are tracking, and which needs attention |
-| People | As of date | Who needs attention: gone quiet, owed something, or owing something important |
-| Decisions & Risks | As of date | The most serious open risk or issue, and any decision that changes plans |
+| Goals | "What you're working toward, and how it's going." (the period is the first stat card) | How the top-ranked goals are tracking, and which needs attention |
+| People | "The people who matter to your work." | Who needs attention: gone quiet, owed something, or owing something important |
+| Decisions & Risks | "What's been decided, and what could go wrong." | The most serious open risk or issue, and any decision that changes plans |
 | Project page | The project's summary | The project's health and the reason for it |
-| Records | As of date | What changed most recently in what Atlas has filed |
-| About You | "What Atlas believes about you, and why" | What's waiting for the user's confirmation, or what Atlas learned most recently |
-| Control Center | As of date | Whether Atlas is running well, and the one thing that needs the user if any |
-| Atlas Guide | "Everything Atlas can do, and how to ask" | How to talk to Atlas, or what's new after an update |
+| Records | "All your knowledge, in one place." | What changed most recently in what Atlas has filed |
+| About You | "How Atlas sees you, and why." | What's waiting for the user's confirmation, or what Atlas learned most recently |
+| Control Center | "How Atlas is running, and what it needs from you." | Whether Atlas is running well, and the one thing that needs the user if any |
+| Atlas Guide | "Everything Atlas can do, and how to ask." | How to talk to Atlas, or what's new after an update |
 
 **Links.** A link on a dashboard only ever opens another dashboard: the nav row under the header, and the name of another dashboard where a page's own wording mentions one (`N.pageLink`). Pages have no jump-to-section links.
 

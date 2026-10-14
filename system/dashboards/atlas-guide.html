@@ -590,7 +590,7 @@ details.older .entries { margin-top: .9rem; }
   };
 
   /* Every page's header: title, subtitle, headline (meta.headline, else the page's own lede), stat cards.
-     opts: {title, subtitle, lede, stats:[[value,label]]} */
+     opts: {title, subtitle, lede, stats:[[value, label or [singular, plural]]]} */
   N.masthead = function (o) {
     var nav = N.navLinks();
     return h("header", { class: "mast" },
@@ -601,7 +601,8 @@ details.older .entries { margin-top: .9rem; }
       o.subtitle ? h("p", { class: "mast-sub" }, o.subtitle) : null,
       (N.meta.headline || o.lede) ? h("p", { class: "mast-lede" }, N.rich(N.meta.headline || o.lede)) : null,
       o.stats && o.stats.length ? h("ul", { class: "mast-stats" }, o.stats.map(function (s) {
-        return h("li", { class: "stat" }, h("b", null, String(s[0])), h("span", null, s[1]));
+        var label = Array.isArray(s[1]) ? (Number(s[0]) === 1 ? s[1][0] : s[1][1]) : s[1];  /* [singular, plural] */
+        return h("li", { class: "stat" }, h("b", null, String(s[0])), h("span", null, label));
       })) : null,
       nav.length ? h("nav", { class: "mast-nav", "aria-label": "Other Atlas pages" }, nav.map(function (n) {
         return h("a", { href: n.url, target: "_blank", rel: "noopener noreferrer", "aria-current": n.name === N.meta.dashboard ? "page" : null }, n.title || n.name);
@@ -721,7 +722,7 @@ details.older .entries { margin-top: .9rem; }
         key: "sections." + s.id }));
     });
     if (!sections.length && !news.length) main.appendChild(N.empty("The guide is empty. Ask Atlas in chat what it can do."));
-    return { subtitle: "Everything Atlas can do, and how to ask", lede: d.intro,
+    return { subtitle: "Everything Atlas can do, and how to ask.", lede: d.intro,
       stats: d.version ? [[d.version, "installed version"]] : null };
   });
 })();

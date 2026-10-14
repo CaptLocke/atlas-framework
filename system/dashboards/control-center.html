@@ -601,7 +601,7 @@ a.rid:hover { color: var(--accent); }
   };
 
   /* Every page's header: title, subtitle, headline (meta.headline, else the page's own lede), stat cards.
-     opts: {title, subtitle, lede, stats:[[value,label]]} */
+     opts: {title, subtitle, lede, stats:[[value, label or [singular, plural]]]} */
   N.masthead = function (o) {
     var nav = N.navLinks();
     return h("header", { class: "mast" },
@@ -612,7 +612,8 @@ a.rid:hover { color: var(--accent); }
       o.subtitle ? h("p", { class: "mast-sub" }, o.subtitle) : null,
       (N.meta.headline || o.lede) ? h("p", { class: "mast-lede" }, N.rich(N.meta.headline || o.lede)) : null,
       o.stats && o.stats.length ? h("ul", { class: "mast-stats" }, o.stats.map(function (s) {
-        return h("li", { class: "stat" }, h("b", null, String(s[0])), h("span", null, s[1]));
+        var label = Array.isArray(s[1]) ? (Number(s[0]) === 1 ? s[1][0] : s[1][1]) : s[1];  /* [singular, plural] */
+        return h("li", { class: "stat" }, h("b", null, String(s[0])), h("span", null, label));
       })) : null,
       nav.length ? h("nav", { class: "mast-nav", "aria-label": "Other Atlas pages" }, nav.map(function (n) {
         return h("a", { href: n.url, target: "_blank", rel: "noopener noreferrer", "aria-current": n.name === N.meta.dashboard ? "page" : null }, n.title || n.name);
@@ -825,10 +826,10 @@ a.rid:hover { color: var(--accent); }
 
     var failing = routines.filter(function (r) { var s = (r.last_run || {}).status; return s === "failed" || s === "partial"; }).length;
     var st = d.status || {};
-    return { subtitle: "As of " + N.longDate(N.meta.as_of), lede: st.headline || (failing ? failing + " automation needs a look" : "Everything is running"),
+    return { subtitle: "How Atlas is running, and what it needs from you.", lede: st.headline || (failing ? failing + " automation needs a look" : "Everything is running"),
       stats: (acts.length ? [[acts.length, acts.length === 1 ? "action for you" : "actions for you"]] : []).concat([
         [routines.filter(function (r) { return r.enabled !== false; }).length, "automations on"],
-        [N.total("approvals", asks.length), "waiting for your OK"], [N.total("questions", qs.length), "questions"], [issues.length, "known issues"]]) };
+        [N.total("approvals", asks.length), "waiting for your OK"], [N.total("questions", qs.length), ["question", "questions"]], [issues.length, ["known issue", "known issues"]]]) };
   });
 })();
 </script>
