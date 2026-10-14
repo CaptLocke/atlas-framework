@@ -1,3 +1,0 @@
-- [[people/maya-chen]] | Maya Chen | Acme (employer) | self; Senior PM, Enterprise | Maya, maya.chen@acme.example
-- [[people/jordan-lee]] | Jordan Lee | Acme (employer) | manager; VP Product | Jordan, jordan.lee@acme.example
-- [[people/dana-ruiz]] | Dana Ruiz | Acme (employer) | peer; Commercial Counsel | Dana, dana.ruiz@acme.example

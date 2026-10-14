@@ -4,7 +4,7 @@ version: 1.0.0
 ---
 # Tests
 
-Atlas's automated checks. All tests use Python 3 standard library `unittest` plus the vendored YAML parser (`system/tools/vendor/`); nothing needs installing. Run them from the repository root. They must all pass before a release (`docs/maintainers/releasing.md`) and after every update (`atlas-update`, `atlas-health`).
+Atlas's automated checks. All tests use Python 3 standard library `unittest` plus the vendored YAML parser (`system/tools/vendor/`); nothing needs installing. Run them from the repository root. They must all pass before a release (the release checklist, `docs/maintainers/releasing.md` on the upstream repo's `maintainers` branch, which also runs the regression suite kept there) and after every update (`atlas-update`, `atlas-health`).
 
 **Everything at once:**
 ```

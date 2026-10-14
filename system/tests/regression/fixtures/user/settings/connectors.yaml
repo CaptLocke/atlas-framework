@@ -1,2 +1,0 @@
-# Regression run: no live connectors. Inputs arrive as files (see system/tests/regression/README.md).
-connectors: []

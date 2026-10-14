@@ -5,7 +5,7 @@ destination: the user's "Atlas" Project instructions in the Claude app (pasted b
 ---
 # Bootstrap stub (canonical)
 
-The setup guide (`docs/setup/04-create-the-atlas-project.md`) and `atlas-setup` both use exactly this text. `atlas-setup` shows it with the user's repository filled in, ready to copy, so the user never writes it themselves. `Atlas bootstrap <N>` must equal `system/manifest.yaml: bootstrap_version`; bump both whenever this text changes (release checklist: `docs/maintainers/releasing.md`). A higher `bootstrap_version` is how users are told to update their instructions: `atlas-update` queues an action item for it, and the kernel's boot check (§2 step 0) shows the new text.
+The setup guide (`docs/setup/04-create-the-atlas-project.md`) and `atlas-setup` both use exactly this text. `atlas-setup` shows it with the user's repository filled in, ready to copy, so the user never writes it themselves. `Atlas bootstrap <N>` must equal `system/manifest.yaml: bootstrap_version`; bump both whenever this text changes (the release checklist, `docs/maintainers/releasing.md` on the upstream repo's `maintainers` branch). A higher `bootstrap_version` is how users are told to update their instructions: `atlas-update` queues an action item for it, and the kernel's boot check (§2 step 0) shows the new text.
 
 ```text
 This Project is my Atlas (Atlas bootstrap 2). At the start of every conversation:
