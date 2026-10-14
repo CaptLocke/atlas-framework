@@ -45,6 +45,7 @@ Full example: `system/tests/dashboards/projects.json`. `summary` counts cover **
 ## Rendering notes
 - **Project pages:** a project with `page_url` is a link: clicking anywhere on its card opens its project page (a new tab, like every dashboard link), and the card shows a "Project page ↗" chip. Every other card opens the record panel.
 - **Record panel:** clicking a card without a project page opens it in the record panel (`system/dashboards/README.md` §Record panel), with the project's open commitments and risks as sections. Every project may carry the panel data fields (`details`, `body`, `body_truncated`, `links`, `created`, `updated`; same section). Before the caps below drop any project, cut each `body` to 800 characters, then drop `body` from the oldest projects first.
+- Layout: the filter row, then the project cards across the full width, with no section heading (the page title says "Projects").
 - Sort: `health` off_track, at_risk, unknown, on_track; then `status` active, proposed, paused; then `target` ascending (nulls last).
 - Cards in a grid (one column on phones), each with a colored top edge for its health.
 - Default filter "All"; the viewer's last choice is remembered in browser storage when available.

@@ -282,6 +282,7 @@ html.rp-lock { overflow: hidden; }
 .proj-counts { display: flex; gap: 1rem; font-size: .875rem; color: var(--ink-2); }
 .proj-counts b { color: var(--ink); }
 .page-controls { margin: 0 0 1.25rem; }
+.proj-all { padding: 1.25rem 0 1.75rem; border-top: 1px solid var(--line); }
 /* A project with its own project page: the whole card is a link to it */
 .proj.has-page { position: relative; cursor: pointer; transition: background-color .12s; }
 .proj.has-page:hover { background: color-mix(in srgb, var(--accent) 5%, var(--surface)); }
@@ -880,9 +881,9 @@ html.rp-lock { overflow: hidden; }
           { value: "later", label: "Proposed or paused" }], "all", function (v) { filter = v; apply(); }),
         N.search("Filter by project, owner, or goal", function (q) { query = q; apply(); })));
     }
-    main.appendChild(N.section({ id: "projects", title: "Projects", key: "projects",
-      note: "Active, proposed, and paused work. Off track first.",
-      body: ps.length ? [grid, noMatch] : N.empty("No active projects.") }));
+    /* No section heading: the page title already says "Projects". The cards use the full width. */
+    main.appendChild(h("div", { class: "proj-all", id: "projects" },
+      ps.length ? [grid, noMatch] : N.empty("No active projects."), N.more("projects")));
     main.appendChild(panel.el);
 
     var s = d.summary || {};
