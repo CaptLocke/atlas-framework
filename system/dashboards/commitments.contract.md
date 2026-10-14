@@ -9,7 +9,7 @@ stale_after_hours: 36
 # Dashboard: commitments
 
 ## Purpose
-Every open commitment, in two sections so the direction is never in doubt: **Waiting on** (what other people have promised the user) and **I owe** (what the user has promised others). Each shows who, when it's due, priority, project, a short insight, and one recommended next step. One filter row applies to both sections: All / Overdue / High priority, plus a search by title, person, or project. Projects have their own dashboard (`projects`).
+Every open commitment, in two sections so the direction is never in doubt: **I owe** (what the user has promised others) and **Waiting on** (what other people have promised the user). Each shows who, when it's due, priority, project, a short insight, and one recommended next step. One filter row applies to both sections: All / Overdue / High priority, plus a search by title, person, or project. Projects have their own dashboard (`projects`).
 
 Republished by `daily-brief` every run. `triage` may republish it after a full (not `light`) run that changed commitments, so Standard and Full profiles see fresher priorities during the day.
 
@@ -40,8 +40,8 @@ Full example: `system/tests/dashboards/commitments.json`. `summary` counts cover
 
 ## Rendering notes
 - **Record panel:** clicking a card opens it in the record panel (`system/dashboards/README.md` §Record panel). Every item may carry the panel data fields (`details`, `body`, `body_truncated`, `links`, `created`, `updated`; same section). Before the caps below drop any item, cut each `body` to 800 characters, then drop `body` from the oldest items first.
-- Sections: Waiting on (`direction: waiting_on`), then I owe (`direction: i_owe`). Each has a one-line description and no count. Each shows its own empty message when it has nothing.
+- Sections: I owe (`direction: i_owe`), then Waiting on (`direction: waiting_on`). Each has a one-line description and no count. Each shows its own empty message when it has nothing.
 - Sort within each section: overdue/slipped first (most overdue first), then by `due` ascending, `due: null` last; ties by priority (high → low), then title.
 - Default filter "All"; the viewer's last choice is remembered in browser storage when available.
-- Caps: 200 commitments. When over budget or cap, drop in this order: low-priority commitments with no due date, then commitments due more than 30 days out; record the counts per section in `meta.truncated.waiting_on` and `meta.truncated.i_owe` (each section shows its own "N more not shown here").
+- Caps: 200 commitments. When over budget or cap, drop in this order: low-priority commitments with no due date, then commitments due more than 30 days out; record the counts per section in `meta.truncated.i_owe` and `meta.truncated.waiting_on` (each section shows its own "N more not shown here").
 - Text limits: `insight` and `next_step` 240 characters.
