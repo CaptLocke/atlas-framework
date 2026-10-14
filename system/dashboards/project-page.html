@@ -517,25 +517,31 @@ a.rid:hover { color: var(--accent); }
   };
   applyTheme(N.store.get("theme") || "auto");
 
-  var STAR = "M12 1.5c.5 5.6 4.9 10 10.5 10.5-5.6.5-10 4.9-10.5 10.5C11.5 16.9 7.1 12.5 1.5 12 7.1 11.5 11.5 7.1 12 1.5z";
-  function star() {
+  /* The Atlas mark (a four-point star with four petals), drawn in --star. */
+  var LOGO = [
+    "M2498 4745c-3-5-8-55-12-110-13-189-56-590-82-755-98-643-264-931-638-1105-219-103-469-159-931-209-242-26-594-56-658-56-21 0-36-4-33-9 3-4 58-11 123-15 151-9 409-32 588-52 1176-131 1442-390 1575-1529 19-164 60-612 60-657 0-12 2-19 4-17 2 2 11 90 20 194 23 268 62 611 87 756 140 837 416 1094 1309 1223 214 31 514 61 758 77 100 7 182 15 182 18 0 4-105 15-232 25-537 41-865 85-1098 147-273 72-448 165-583 309-236 249-339 638-415 1565-10 116-20 206-24 200z",
+    "M2115 4145c-317-74-586-226-817-461-105-108-132-141-215-266-71-109-137-241-181-369-34-95-78-287-68-296 8-8 169 66 311 144 255 140 397 246 570 424 200 206 341 417 490 733 63 135 70 129-90 91z",
+    "M2756 4134c35-84 158-321 212-408 206-335 443-571 766-763 140-83 430-226 434-213 6 17-30 174-64 278-154 473-529 868-991 1046-96 38-246 79-325 91l-48 7 16-38z",
+    "M835 2213c12-80 53-230 91-326 139-363 423-684 774-875 140-76 364-154 508-176 42-6 43-6 36 16-13 42-151 315-205 405-179 297-420 551-689 726-117 76-263 156-404 222l-118 55 7-47z",
+    "M4005 2181c-498-243-790-499-1040-911-56-91-192-354-214-413l-11-28 48 7c159 23 370 97 537 190 358 199 651 554 779 946 34 104 70 261 64 278-2 5-75-26-163-69z"
+  ];
+  function logo() {
     var ns = "http://www.w3.org/2000/svg";
     var svg = document.createElementNS(ns, "svg");
-    svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("aria-hidden", "true");
-    var p = document.createElementNS(ns, "path"); p.setAttribute("d", STAR); svg.appendChild(p);
+    svg.setAttribute("viewBox", "0 0 500 500"); svg.setAttribute("aria-hidden", "true");
+    var g = document.createElementNS(ns, "g"); g.setAttribute("transform", "translate(0,500) scale(0.1,-0.1)");
+    LOGO.forEach(function (d) { var p = document.createElementNS(ns, "path"); p.setAttribute("d", d); g.appendChild(p); });
+    svg.appendChild(g);
     return svg;
   }
 
-  /* The standard refresh marker: when this page was last refreshed and by what, flagged when older
+  /* The standard refresh marker: when this page was last refreshed, flagged when older
      than meta.stale_after_hours (from the contract). Staleness is the one thing measured against the
      viewer's clock: it is about how old the page is when someone opens it. */
   N.refreshedText = function () {
     var at = N.meta.generated_at;
     if (!at) return "Not refreshed yet";
-    var by = N.meta.generated_by, who = "";
-    if (by === "chat") who = " in chat";
-    else if (by && /^routine:/.test(by)) who = " by the " + by.slice(8).replace(/-/g, " ") + " run";
-    return "Refreshed " + N.weekday(at) + ", " + N.time(at) + who;
+    return "Refreshed " + N.weekday(at) + ", " + N.time(at);
   };
   N.isStale = function () {
     var at = Date.parse(N.meta.generated_at || ""), limit = N.meta.stale_after_hours;
@@ -553,7 +559,7 @@ a.rid:hover { color: var(--accent); }
     var nav = N.list(N.meta.nav).filter(function (n) { return n && n.url && /^https:\/\//.test(n.url); });
     return h("header", { class: "mast" },
       h("div", { class: "mast-top" },
-        h("p", { class: "mast-who" }, star(), N.meta.user_display_name ? "Atlas for " + N.meta.user_display_name : "Atlas"),
+        h("p", { class: "mast-who" }, logo(), "Atlas"),
         N.refreshed()),
       h("h1", null, o.title),
       o.subtitle ? h("p", { class: "mast-sub" }, o.subtitle) : null,
@@ -566,11 +572,11 @@ a.rid:hover { color: var(--accent); }
       })) : null);
   };
 
+  /* Footer: the Atlas version on the left, the theme button on the right. */
   N.footer = function () {
-    var at = N.meta.generated_at;
     return h("footer", { class: "foot" },
-      h("p", null, (at ? "Refreshed " + N.dateY(at) + ", " + N.time(at) : "Not refreshed yet") + " · Ask Atlas in chat to change anything"),
-      h("p", { class: "chips" }, N.meta.atlas_version ? h("span", null, "Atlas " + N.meta.atlas_version) : null, N.themeButton()));
+      h("p", null, N.meta.atlas_version ? "Atlas " + N.meta.atlas_version : "Atlas"),
+      h("p", { class: "chips" }, N.themeButton()));
   };
 
   /* Render a page. build(data, main) appends sections to main and may return masthead options. */

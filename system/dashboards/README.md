@@ -43,7 +43,7 @@ Shared files:
 ```
 Each template contains each placeholder **exactly once**. No other text is substituted.
 
-**Refresh marker.** Every page shows, at the top, when it was refreshed and by what (`N.refreshed()` in `_base.js`, from `meta.generated_at` and `meta.generated_by`). If the page is older than its contract's `stale_after_hours` when it is opened, the marker adds "May be out of date". This is the one place a page compares against the viewer's clock (everything else uses `meta.as_of`). Templates get it through `N.masthead`; never remove it.
+**Refresh marker.** Every page shows, at the top, when it was refreshed (`N.refreshed()` in `_base.js`, from `meta.generated_at`). If the page is older than its contract's `stale_after_hours` when it is opened, the marker adds "May be out of date". This is the one place a page compares against the viewer's clock (everything else uses `meta.as_of`). Templates get it through `N.masthead`; never remove it.
 
 ## How a page is rendered (`atlas-dashboards`)
 1. Read the contract. Build one JSON object exactly as it specifies, from the listed source files. Every list is sorted, filtered, and capped as the contract says.
@@ -81,8 +81,8 @@ Every dashboard's JSON has a `meta` object:
 | `dashboard` | yes | The dashboard name (equals the contract `name`). |
 | `schema_version` | yes | `1` for this release. Bump in the contract when the shape changes incompatibly. |
 | `title` | no | Page title; defaults to the dashboard name. Project pages use the project title. |
-| `generated_at` | yes | Render time, ISO 8601 with offset in the user's time zone. Shown at the top of every page as the refresh marker ("Refreshed Tue, Oct 13, 6:04 AM by the nightly cycle run") and in the footer. |
-| `generated_by` | no | `chat` or `routine:<name>` (as in the commit `Atlas-Actor`). Shown in the refresh marker ("by the nightly cycle run", "in chat"). |
+| `generated_at` | yes | Render time, ISO 8601 with offset in the user's time zone. Shown at the top of every page as the refresh marker ("Refreshed Tue, Oct 13, 6:04 AM"). |
+| `generated_by` | no | `chat` or `routine:<name>` (as in the commit `Atlas-Actor`). Kept for troubleshooting; not shown on the page. |
 | `stale_after_hours` | no | Copied from the contract's frontmatter `stale_after_hours`. When the page is older than this when someone opens it, the refresh marker adds "May be out of date". Omitted for pages that are never stale (Atlas Guide). |
 | `as_of` | yes | The calendar day the view is for (`YYYY-MM-DD`). For the brief rendered the night before with `target: tomorrow`, this is tomorrow. All "today", "overdue", and "in N days" wording is computed against it, never against the viewer's clock. |
 | `timezone` | yes | `user/settings/atlas.yaml: timezone`. Datetimes are displayed in it. |
