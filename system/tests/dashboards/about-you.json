@@ -1,6 +1,7 @@
 {
   "meta": {
     "dashboard": "about-you",
+    "headline": "Two things Atlas noticed about how you work are waiting for your OK.",
     "schema_version": 1,
     "title": "About You",
     "generated_at": "2026-10-01T20:30:40-07:00",

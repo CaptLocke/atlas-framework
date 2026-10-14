@@ -1,6 +1,7 @@
 {
   "meta": {
     "dashboard": "control-center",
+    "headline": "One connection needs you; everything else ran on time.",
     "schema_version": 1,
     "title": "Control Center",
     "generated_at": "2026-10-12T20:32:20-07:00",

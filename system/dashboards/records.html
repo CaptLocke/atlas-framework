@@ -113,9 +113,10 @@ button, input, select { font: inherit; color: inherit; }
 .mast h1 { font-size: clamp(2.1rem, 6vw, 3.4rem); letter-spacing: -0.015em; font-weight: 600; }
 .mast-sub { font-family: var(--font-heading); font-size: clamp(1.1rem, 2.6vw, 1.4rem); color: var(--ink-2); margin-top: .35rem; }
 .mast-lede { max-width: var(--measure); margin-top: 1rem; font-size: 1.05rem; }
-.mast-stats { display: flex; flex-wrap: wrap; gap: .5rem 1.75rem; margin: 1.25rem 0 0; padding: 0; list-style: none; }
-.mast-stats li { display: flex; align-items: baseline; gap: .4rem; color: var(--ink-2); font-size: .9rem; }
-.mast-stats b { font-family: var(--font-heading); font-size: 1.5rem; color: var(--ink); font-weight: 600; }
+.mast-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); gap: .75rem; margin: 1.5rem 0 0; padding: 0; list-style: none; }
+.mast-stats .stat { display: flex; flex-direction: column; gap: .2rem; min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: .85rem 1rem .9rem; }
+.mast-stats b { font-family: var(--font-heading); font-size: 1.9rem; line-height: 1.1; color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.mast-stats .stat span { color: var(--ink-2); font-size: .875rem; line-height: 1.3; }
 .mast-nav { margin-top: 1.25rem; display: flex; flex-wrap: wrap; gap: .25rem 1rem; font-size: .9rem; }
 .mast-nav a[aria-current="page"] { color: var(--ink); text-decoration: none; font-weight: 600; }
 
@@ -558,7 +559,8 @@ a.rid:hover { color: var(--accent); }
       stale ? N.chip("May be out of date", "warn") : null);
   };
 
-  /* opts: {title, subtitle, lede, stats:[[value,label]]} */
+  /* Every page's header: title, subtitle, headline (meta.headline, else the page's own lede), stat cards.
+     opts: {title, subtitle, lede, stats:[[value,label]]} */
   N.masthead = function (o) {
     var nav = N.list(N.meta.nav).filter(function (n) { return n && n.url && /^https:\/\//.test(n.url); });
     return h("header", { class: "mast" },
@@ -567,9 +569,9 @@ a.rid:hover { color: var(--accent); }
         N.refreshed()),
       h("h1", null, o.title),
       o.subtitle ? h("p", { class: "mast-sub" }, o.subtitle) : null,
-      o.lede ? h("p", { class: "mast-lede" }, N.rich(o.lede)) : null,
+      (N.meta.headline || o.lede) ? h("p", { class: "mast-lede" }, N.rich(N.meta.headline || o.lede)) : null,
       o.stats && o.stats.length ? h("ul", { class: "mast-stats" }, o.stats.map(function (s) {
-        return h("li", null, h("b", null, String(s[0])), s[1]);
+        return h("li", { class: "stat" }, h("b", null, String(s[0])), h("span", null, s[1]));
       })) : null,
       nav.length ? h("nav", { class: "mast-nav", "aria-label": "Other Atlas pages" }, nav.map(function (n) {
         return h("a", { href: n.url, target: "_blank", rel: "noopener noreferrer", "aria-current": n.name === N.meta.dashboard ? "page" : null }, n.title || n.name);

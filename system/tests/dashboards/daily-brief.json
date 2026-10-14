@@ -1,6 +1,7 @@
 {
   "meta": {
-    "dashboard": "daily-brief", "stale_after_hours": 36,
+    "dashboard": "daily-brief",
+    "headline": "A customer-heavy day: the Brightline renewal call at 10, and your pricing feedback for Jordan is due by end of day.", "stale_after_hours": 36,
     "schema_version": 1,
     "title": "Daily Brief",
     "generated_at": "2026-10-12T20:31:40-07:00",

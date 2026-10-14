@@ -1,6 +1,7 @@
 {
   "meta": {
     "dashboard": "decisions-risks",
+    "headline": "The onboarding import bug is now an active issue, and the MSA legal review could delay the enterprise launch.",
     "schema_version": 1,
     "title": "Decisions and Risks",
     "generated_at": "2026-10-09T14:44:02-07:00",

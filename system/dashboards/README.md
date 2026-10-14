@@ -43,6 +43,22 @@ Shared files:
 ```
 Each template contains each placeholder **exactly once**. No other text is substituted.
 
+**Page header.** Every page opens the same way (`N.masthead`): the **title**; a **subtitle** (the date, period, or a fixed description of the page); the **headline** (`meta.headline`); then the page's counts as **stat cards**. What each headline leads with:
+
+| Dashboard | Subtitle | The headline says |
+|---|---|---|
+| Daily Brief | The day's date (catch-up: the away dates) | The shape of the day and the one or two things that matter most (the brief's own headline) |
+| Work Board | As of date | What's slipping or most at risk among open commitments and projects |
+| Week Ahead | The week's dates | Where the week is heavy, and the best window for focused work |
+| Goals | The period | How the top-ranked goals are tracking, and which needs attention |
+| People | As of date | Who needs attention: gone quiet, owed something, or owing something important |
+| Decisions & Risks | As of date | The most serious open risk or issue, and any decision that changes plans |
+| Project page | The project's summary | The project's health and the reason for it |
+| Records | As of date | What changed most recently in what Atlas has filed |
+| About You | "What Atlas believes about you, and why" | What's waiting for the user's confirmation, or what Atlas learned most recently |
+| Control Center | As of date | Whether Atlas is running well, and the one thing that needs the user if any |
+| Atlas Guide | "Everything Atlas can do, and how to ask" | How to talk to Atlas, or what's new after an update |
+
 **Refresh marker.** Every page shows, at the top, when it was refreshed (`N.refreshed()` in `_base.js`, from `meta.generated_at`). If the page is older than its contract's `stale_after_hours` when it is opened, the marker adds "May be out of date". This is the one place a page compares against the viewer's clock (everything else uses `meta.as_of`). Templates get it through `N.masthead`; never remove it.
 
 ## How a page is rendered (`atlas-dashboards`)
@@ -63,6 +79,7 @@ Every dashboard's JSON has a `meta` object:
   "dashboard": "daily-brief",
   "schema_version": 1,
   "title": "Daily Brief",
+  "headline": "A customer-heavy day: the Brightline renewal call at 10, and your pricing feedback for Jordan is due by end of day.",
   "generated_at": "2026-10-12T20:31:40-07:00",
   "generated_by": "routine:nightly-cycle",
   "as_of": "2026-10-13",
@@ -81,6 +98,7 @@ Every dashboard's JSON has a `meta` object:
 | `dashboard` | yes | The dashboard name (equals the contract `name`). |
 | `schema_version` | yes | `1` for this release. Bump in the contract when the shape changes incompatibly. |
 | `title` | no | Page title; defaults to the dashboard name. Project pages use the project title. |
+| `headline` | yes | One plain sentence (at most about 25 words) saying what matters most on this page right now, written fresh from this render's data (see Page header). Never a list of the stat cards' numbers. |
 | `generated_at` | yes | Render time, ISO 8601 with offset in the user's time zone. Shown at the top of every page as the refresh marker ("Refreshed Tue, Oct 13, 6:04 AM"). |
 | `generated_by` | no | `chat` or `routine:<name>` (as in the commit `Atlas-Actor`). Kept for troubleshooting; not shown on the page. |
 | `stale_after_hours` | no | Copied from the contract's frontmatter `stale_after_hours`. When the page is older than this when someone opens it, the refresh marker adds "May be out of date". Omitted for pages that are never stale (Atlas Guide). |

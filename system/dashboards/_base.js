@@ -318,7 +318,8 @@
       stale ? N.chip("May be out of date", "warn") : null);
   };
 
-  /* opts: {title, subtitle, lede, stats:[[value,label]]} */
+  /* Every page's header: title, subtitle, headline (meta.headline, else the page's own lede), stat cards.
+     opts: {title, subtitle, lede, stats:[[value,label]]} */
   N.masthead = function (o) {
     var nav = N.list(N.meta.nav).filter(function (n) { return n && n.url && /^https:\/\//.test(n.url); });
     return h("header", { class: "mast" },
@@ -327,9 +328,9 @@
         N.refreshed()),
       h("h1", null, o.title),
       o.subtitle ? h("p", { class: "mast-sub" }, o.subtitle) : null,
-      o.lede ? h("p", { class: "mast-lede" }, N.rich(o.lede)) : null,
+      (N.meta.headline || o.lede) ? h("p", { class: "mast-lede" }, N.rich(N.meta.headline || o.lede)) : null,
       o.stats && o.stats.length ? h("ul", { class: "mast-stats" }, o.stats.map(function (s) {
-        return h("li", null, h("b", null, String(s[0])), s[1]);
+        return h("li", { class: "stat" }, h("b", null, String(s[0])), h("span", null, s[1]));
       })) : null,
       nav.length ? h("nav", { class: "mast-nav", "aria-label": "Other Atlas pages" }, nav.map(function (n) {
         return h("a", { href: n.url, target: "_blank", rel: "noopener noreferrer", "aria-current": n.name === N.meta.dashboard ? "page" : null }, n.title || n.name);
