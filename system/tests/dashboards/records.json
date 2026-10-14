@@ -19,9 +19,14 @@
     "url": "https://claude.ai/artifact/example-daily-brief"
    },
    {
-    "name": "work-board",
-    "title": "Work Board",
-    "url": "https://claude.ai/artifact/example-work-board"
+    "name": "commitments",
+    "title": "Commitments",
+    "url": "https://claude.ai/artifact/example-commitments"
+   },
+   {
+    "name": "projects",
+    "title": "Projects",
+    "url": "https://claude.ai/artifact/example-projects"
    },
    {
     "name": "week-ahead",

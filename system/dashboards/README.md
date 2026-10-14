@@ -12,7 +12,8 @@ The `atlas-dashboards` skill owns rendering and publishing. This folder holds wh
 | Dashboard | Template | Contract | Republished by | Page budget |
 |---|---|---|---|---|
 | Daily Brief | `daily-brief.html` | `daily-brief.contract.md` | `daily-brief` job; chat catch-up | 120 KB |
-| Work Board | `work-board.html` | `work-board.contract.md` | `daily-brief`; `triage` (optional) | 300 KB |
+| Commitments | `commitments.html` | `commitments.contract.md` | `daily-brief`; `triage` (optional) | 300 KB |
+| Projects | `projects.html` | `projects.contract.md` | `daily-brief`, `triage`, `weekly-review` | 250 KB |
 | Goals (with accomplishments) | `goals.html` | `goals.contract.md` | `weekly-review`, `monthly`, `quarterly` | 200 KB |
 | Week Ahead | `week-ahead.html` | `week-ahead.contract.md` | `daily-brief`, `weekly-review` | 150 KB |
 | People | `people.html` | `people.contract.md` | `weekly-review` | 250 KB |
@@ -23,7 +24,7 @@ The `atlas-dashboards` skill owns rendering and publishing. This folder holds wh
 | Records | `records.html` | `records.contract.md` | `maintenance`, `weekly-review` | 1500 KB |
 | Project page (on request) | `project-page.html` | `project-page.contract.md` | created in chat; then `triage`, `weekly-review` while listed | 250 KB |
 
-Any chat may also republish any dashboard after changing the records it shows (`dashboards_refresh: auto`). `atlas-setup` publishes all ten for the first time. A dashboard added by an update is published at the user's next chat (`atlas-dashboards`, Publish).
+Any chat may also republish any dashboard after changing the records it shows (`dashboards_refresh: auto`). `atlas-setup` publishes all eleven for the first time. A dashboard added by an update is published at the user's next chat (`atlas-dashboards`, Publish).
 
 Shared files:
 - `_base.css`: canonical base styles. **Every template inlines it verbatim** inside `<style id="atlas-base">`.
@@ -48,7 +49,8 @@ Each template contains each placeholder **exactly once**. No other text is subst
 | Dashboard | Subtitle | The headline says |
 |---|---|---|
 | Daily Brief | The day's date (catch-up: the away dates) | The shape of the day and the one or two things that matter most (the brief's own headline) |
-| Work Board | "Everything you owe, and everything owed to you." | What's slipping or most at risk among open commitments and projects |
+| Commitments | "Everything you owe, and everything owed to you." | What's slipping or most overdue, in either direction |
+| Projects | "Everything you're moving forward, and how it's going." | Which projects need attention and why |
 | Week Ahead | The week's dates | Where the week is heavy, and the best window for focused work |
 | Goals | "What you're working toward, and how it's going." (the period is the first stat card) | How the top-ranked goals are tracking, and which needs attention |
 | People | "The people who matter to your work." | Who needs attention: gone quiet, owed something, or owing something important |
@@ -61,7 +63,7 @@ Each template contains each placeholder **exactly once**. No other text is subst
 
 **Links.** A link on a dashboard only ever opens another dashboard: the nav row under the header, and the name of another dashboard where a page's own wording mentions one (`N.pageLink`). Pages have no jump-to-section links.
 
-**Record panel.** On Records, Work Board, Decisions & Risks, and People, clicking a card (or its title, or Enter on it) opens the item in a panel (`N.recordPanel`, `N.clickable` in `_base.js`): a drawer on the right, full screen on phones. It shows the type and status, title, summary, **Details** (the fields the card shows plus any `details` the data carries), sections the page adds (next step, mitigation, why, who owes what), the item's `body`, **Linked records** (any linked item that is on the same page opens in the panel, with Back; others are listed by name), the created and updated dates, and "Copy a request for Atlas", which copies a ready-made request to paste into chat. Esc, Close, or a click outside shuts it.
+**Record panel.** On Records, Commitments, Projects, Decisions & Risks, and People, clicking a card (or its title, or Enter on it) opens the item in a panel (`N.recordPanel`, `N.clickable` in `_base.js`): a drawer on the right, full screen on phones. It shows the type and status, title, summary, **Details** (the fields the card shows plus any `details` the data carries), sections the page adds (next step, mitigation, why, who owes what), the item's `body`, **Linked records** (any linked item that is on the same page opens in the panel, with Back; others are listed by name), the created and updated dates, and "Copy a request for Atlas", which copies a ready-made request to paste into chat. Esc, Close, or a click outside shuts it.
 
 **Panel data** (optional on every item of those four pages, same rules everywhere):
 | Field | Rule |
@@ -103,7 +105,7 @@ Every dashboard's JSON has a `meta` object:
   "user_display_name": "Maya Chen",
   "atlas_version": "1.0.0",
   "record_base_url": null,
-  "nav": [{ "name": "work-board", "title": "Work Board", "url": "https://claude.ai/artifact/…" }],
+  "nav": [{ "name": "commitments", "title": "Commitments", "url": "https://claude.ai/artifact/…" }],
   "notices": [{ "level": "warn", "text": "Your Outlook connection expired…" }],
   "truncated": { "commitments": 14 }
 }
@@ -133,7 +135,7 @@ Every dashboard's JSON has a `meta` object:
 - **Dates** are `YYYY-MM-DD` (calendar days) or ISO 8601 datetimes with offset. The page formats them.
 - **Never include** `notes_private`, phone numbers, email addresses, secrets, or content whose data-rule handling is `ignore` or `pointer`. Use `summary` text for `summary` handling. Excluded records (`data-rules.yaml: exclusions`) never appear. Archived and superseded records are left out unless the contract says otherwise.
 - **Absent vs empty:** use `null` for unknown single values and `[]` for empty lists. Pages handle both.
-- **Insights** on People, Decisions & Risks, Goals, Work Board, and the brief come from `user/inbox/insights.md` (status `new` or `seen`) and from record `insight` fields; each carries its reasoning.
+- **Insights** on People, Decisions & Risks, Goals, Commitments, Projects, and the brief come from `user/inbox/insights.md` (status `new` or `seen`) and from record `insight` fields; each carries its reasoning.
 
 ## Theming contract
 The theme comes from `user/profile/design-system.md` (`system/schemas/profile.md`). `atlas-dashboards` writes **only** these custom properties, on `:root`:

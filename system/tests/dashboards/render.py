@@ -28,7 +28,7 @@ HERE = Path(__file__).resolve().parent
 DASH = HERE.parent.parent / "dashboards"
 OUT = HERE / "out"
 
-NAMES = ["daily-brief", "work-board", "goals", "week-ahead", "people",
+NAMES = ["daily-brief", "commitments", "projects", "goals", "week-ahead", "people",
          "decisions-risks", "control-center", "about-you", "atlas-guide", "records", "project-page"]
 DATA_PH = "{{ATLAS_DATA}}"
 THEME_PH = "{{ATLAS_THEME_CSS}}"

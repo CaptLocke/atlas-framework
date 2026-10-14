@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<title>Work Board</title>
+<title>Projects</title>
 <style id="atlas-base">
 /* Atlas dashboard base styles.
    CANONICAL COPY. Every template in system/dashboards/*.html inlines this file
@@ -281,7 +281,7 @@ html.rp-lock { overflow: hidden; }
 .proj .item-meta { gap: .15rem .8rem; }
 .proj-counts { display: flex; gap: 1rem; font-size: .875rem; color: var(--ink-2); }
 .proj-counts b { color: var(--ink); }
-.dir { font-size: .8rem; font-weight: 600; color: var(--ink-2); }
+.page-controls { margin: 0 0 1.25rem; }
 </style>
 <style id="atlas-theme">{{ATLAS_THEME_CSS}}</style>
 </head>
@@ -611,7 +611,7 @@ html.rp-lock { overflow: hidden; }
 
   /* Links on a page only ever open another dashboard: the nav row, and names of other pages in text.
      NAV_ORDER fixes the order so every page lists them the same way. */
-  var NAV_ORDER = ["daily-brief", "work-board", "week-ahead", "goals", "people", "decisions-risks", "records", "about-you", "control-center", "atlas-guide"];
+  var NAV_ORDER = ["daily-brief", "commitments", "projects", "week-ahead", "goals", "people", "decisions-risks", "records", "about-you", "control-center", "atlas-guide"];
   N.navLinks = function () {
     return N.list(N.meta.nav).filter(function (n) { return n && n.url && /^https:\/\//.test(n.url); })
       .sort(function (a, b) {
@@ -807,97 +807,77 @@ html.rp-lock { overflow: hidden; }
 (function () {
   var N = window.Atlas, h = N.h, L = N.list;
   var HEALTH_TONE = { off_track: "danger", at_risk: "warn", on_track: "ok", unknown: null };
+  function attention(p) { return p.health === "off_track" || p.health === "at_risk"; }
 
-  function overdue(c) { return c.status === "slipped" || (c.due && N.daysFromToday(c.due) < 0); }
-
-  N.page({ title: "Work Board" }, function (d, main) {
-    var cs = L(d.commitments), ps = L(d.projects);
+  N.page({ title: "Projects" }, function (d, main) {
+    var ps = L(d.projects);
     var filter = "all", query = "";
-
     var panel = N.recordPanel();
-    function cView(c) {
-      var who = c.direction === "i_owe" ? "You owe " + (N.name(c.counterparty) || "someone") : "Waiting on " + (N.name(c.owner) || "someone");
-      return panel.add({ id: c.id, title: c.title, kind: "Commitment",
-        chips: [overdue(c) ? N.chip(c.status === "slipped" ? "Slipped" : N.due(c.due), "danger") : null, c.priority === "high" ? N.chip("High priority", "warn") : null],
-        summary: c.summary || who + ".",
-        details: N.mergeDetails([["Direction", who], ["Owner", N.name(c.owner)], ["For", N.name(c.counterparty)], ["Due", c.due ? N.dateY(c.due) + " (" + N.due(c.due).toLowerCase() + ")" : "No date"],
-          ["Priority", c.priority ? N.label(c.priority) : null], ["Project", N.name(c.project)], ["Status", c.status ? N.label(c.status) : null]], c.details),
-        sections: [c.insight ? { heading: "What Atlas noticed", nodes: N.para(c.insight) } : null, c.next_step ? { heading: "Next step", nodes: N.para(c.next_step) } : null],
-        body: c.body, body_truncated: c.body_truncated,
-        links: [c.project, c.owner, c.counterparty].concat(L(c.links)).filter(Boolean),
-        dates: N.datesLine(c.created, c.updated) });
-    }
-    function pView(p) {
-      var mine = cs.filter(function (c) { return c.project && c.project.id === p.id; }).map(function (c) { return { id: c.id, title: c.title }; });
+
+    function view(p) {
+      var cs = L(p.commitments);
       return panel.add({ id: p.id, title: p.title, kind: p.scale && p.scale !== "project" ? N.label(p.scale) : "Project",
         chips: [N.status(p.health || "unknown"), p.status && p.status !== "active" ? N.status(p.status) : null],
         summary: p.summary,
         details: N.mergeDetails([["Health", N.label(p.health || "unknown")], ["Status", p.status ? N.label(p.status) : null], ["Owner", N.name(p.owner)],
           ["Target", p.target ? N.dateY(p.target) : null], ["Serves", N.name(p.goal)], ["Open commitments", String(p.open_commitments || 0)], ["Open risks", String(p.active_risks || 0)]], p.details),
-        sections: [p.insight ? { heading: "What Atlas noticed", nodes: N.para(p.insight) } : null, p.next_step ? { heading: "Next step", nodes: N.para(p.next_step) } : null],
+        sections: [p.insight ? { heading: "What Atlas noticed", nodes: N.para(p.insight) } : null,
+          p.next_step ? { heading: "Next step", nodes: N.para(p.next_step) } : null,
+          cs.length ? { heading: "Open commitments", nodes: N.lines(cs.map(function (c) {
+            return [c.title, " · ", c.direction === "i_owe" ? "You owe" : "Waiting on", c.due ? ", " + N.due(c.due).toLowerCase() : ""];
+          })) } : null,
+          L(p.risks).length ? { heading: "Open risks", nodes: N.lines(L(p.risks).map(function (r) { return [r.title, r.status === "active" ? " · happening now" : ""]; })) } : null],
         body: p.body, body_truncated: p.body_truncated,
-        links: mine.concat([p.goal, p.owner]).concat(L(p.links)).filter(Boolean),
+        links: [p.goal, p.owner].concat(L(p.links)).filter(Boolean),
         dates: N.datesLine(p.created, p.updated) });
     }
-    var cViews = cs.map(cView), pViews = ps.map(pView);
 
-    var list = h("ul", { class: "items" });
-    var emptyMsg = N.empty("Nothing matches this view.");
-    var rows = cs.map(function (c, i) {
-      var late = overdue(c);
-      var who = c.direction === "i_owe" ? (c.counterparty ? "For " + N.name(c.counterparty) : null) : (c.owner ? "From " + N.name(c.owner) : null);
-      var li = N.item({ tone: late ? "danger" : (c.priority === "high" ? "warn" : (c.direction === "waiting_on" ? "muted" : "accent")),
-        title: N.openTitle(c.title), id: c.id,
-        meta: [h("span", { class: "dir" }, N.label(c.direction)), who, c.project ? N.name(c.project) : null, c.priority ? N.label(c.priority) + " priority" : null],
-        insight: c.insight, nextStep: c.next_step,
-        aside: [h("span", null, N.due(c.due)), c.status === "slipped" ? N.status("slipped") : null] });
-      li._c = c;
-      N.clickable(li, panel, cViews[i]);
-      li._text = [c.title, c.id, N.name(c.counterparty), N.name(c.owner), N.name(c.project)].join(" ").toLowerCase();
-      list.appendChild(li);
-      return li;
-    });
-    function apply() {
-      var shown = 0;
-      rows.forEach(function (li) {
-        var c = li._c;
-        var ok = (filter === "all" || (filter === "mine" && c.direction === "i_owe") || (filter === "waiting" && c.direction === "waiting_on") || (filter === "overdue" && overdue(c)))
-          && (!query || li._text.indexOf(query) !== -1);
-        li.hidden = !ok; shown += ok;
-      });
-      list.hidden = !shown; emptyMsg.hidden = !!shown;
-    }
-    var controls = h("div", { class: "controls" },
-      N.segmented("Show commitments", [
-        { value: "all", label: "All" }, { value: "mine", label: "Mine" },
-        { value: "waiting", label: "Waiting on" }, { value: "overdue", label: "Overdue" }], "all",
-        function (v) { filter = v; apply(); }),
-      N.search("Filter by name, person, or project", function (q) { query = q; apply(); }));
-
-    main.appendChild(N.section({ id: "commitments", title: "Commitments", count: N.total("commitments", cs.length), key: "commitments",
-      note: "Open promises in both directions. Overdue first, then by due date.",
-      body: cs.length ? [controls, list, emptyMsg, panel.el] : [N.empty("No open commitments."), panel.el] }));
-
-    var cards = ps.map(function (p, i) {
-      return N.clickable(h("article", { class: "proj", "data-tone": HEALTH_TONE[p.health] || null, "aria-labelledby": "p-" + p.id.replace(/\W/g, "-") },
-        h("h3", { id: "p-" + p.id.replace(/\W/g, "-") }, N.openTitle(p.title)),
+    var cards = ps.map(function (p) {
+      var hid = "p-" + p.id.replace(/\W/g, "-");
+      var card = N.clickable(h("article", { class: "proj", "data-tone": HEALTH_TONE[p.health] || null, "aria-labelledby": hid },
+        h("h3", { id: hid }, N.openTitle(p.title)),
         h("div", { class: "chips" }, N.status(p.health || "unknown"), p.status !== "active" ? N.status(p.status) : null, p.scale && p.scale !== "project" ? N.chip(N.label(p.scale)) : null),
         h("p", { class: "item-meta" }, p.owner ? h("span", null, "Owner " + N.name(p.owner)) : null, p.target ? h("span", null, "Target " + N.date(p.target)) : null, p.goal ? h("span", null, "Serves " + N.name(p.goal)) : null),
         p.insight ? h("p", { class: "item-insight" }, N.rich(p.insight)) : null,
         p.next_step ? h("p", { class: "item-insight" }, h("b", null, "Next step: "), N.rich(p.next_step)) : null,
-        h("p", { class: "proj-counts" }, h("span", null, h("b", null, String(p.open_commitments || 0)), p.open_commitments === 1 ? " open commitment" : " open commitments"), h("span", null, h("b", null, String(p.active_risks || 0)), p.active_risks === 1 ? " open risk" : " open risks"))),
-        panel, pViews[i]);
+        h("p", { class: "proj-counts" }, h("span", null, h("b", null, String(p.open_commitments || 0)), p.open_commitments === 1 ? " open commitment" : " open commitments"),
+          h("span", null, h("b", null, String(p.active_risks || 0)), p.active_risks === 1 ? " open risk" : " open risks"))),
+        panel, view(p));
+      card._p = p;
+      card._text = [p.title, N.name(p.owner), N.name(p.goal), p.insight].join(" ").toLowerCase();
+      return card;
     });
-    main.appendChild(N.section({ id: "projects", title: "Projects", count: N.total("projects", ps.length), key: "projects",
+    var grid = h("div", { class: "proj-grid" }, cards);
+    var noMatch = N.empty("No projects match.");
+    noMatch.hidden = true;
+    function apply() {
+      var shown = 0;
+      cards.forEach(function (c) {
+        var p = c._p;
+        var ok = (filter === "all" || (filter === "attention" && attention(p)) || (filter === "on_track" && p.health === "on_track") || (filter === "later" && (p.status === "proposed" || p.status === "paused")))
+          && (!query || c._text.indexOf(query) !== -1);
+        c.hidden = !ok; shown += ok ? 1 : 0;
+      });
+      grid.hidden = !shown; noMatch.hidden = !!shown;
+    }
+    if (ps.length) {
+      main.appendChild(h("div", { class: "controls page-controls no-print" },
+        N.segmented("Show projects", [{ value: "all", label: "All" }, { value: "attention", label: "Needs attention" }, { value: "on_track", label: "On track" },
+          { value: "later", label: "Proposed or paused" }], "all", function (v) { filter = v; apply(); }),
+        N.search("Filter by project, owner, or goal", function (q) { query = q; apply(); })));
+    }
+    main.appendChild(N.section({ id: "projects", title: "Projects", key: "projects",
       note: "Active, proposed, and paused work. Off track first.",
-      body: ps.length ? h("div", { class: "proj-grid" }, cards) : N.empty("No active projects.") }));
+      body: ps.length ? [grid, noMatch] : N.empty("No active projects.") }));
+    main.appendChild(panel.el);
 
     var s = d.summary || {};
-    return { subtitle: "Everything you owe, and everything owed to you.",
-      stats: [[s.overdue != null ? s.overdue : cs.filter(overdue).length, "overdue"],
-        [s.i_owe != null ? s.i_owe : cs.filter(function (c) { return c.direction === "i_owe"; }).length, "I owe"],
-        [s.waiting_on != null ? s.waiting_on : cs.filter(function (c) { return c.direction === "waiting_on"; }).length, "waiting on others"],
-        [s.projects != null ? s.projects : ps.length, ["project", "projects"]]] };
+    var active = ps.filter(function (p) { return p.status === "active"; });
+    return { subtitle: "Everything you're moving forward, and how it's going.",
+      stats: [[s.active != null ? s.active : active.length, ["active project", "active projects"]],
+        [s.attention != null ? s.attention : ps.filter(attention).length, "need attention"],
+        [s.on_track != null ? s.on_track : ps.filter(function (p) { return p.health === "on_track"; }).length, "on track"],
+        [s.later != null ? s.later : ps.filter(function (p) { return p.status === "proposed" || p.status === "paused"; }).length, "proposed or paused"]] };
   });
 })();
 </script>

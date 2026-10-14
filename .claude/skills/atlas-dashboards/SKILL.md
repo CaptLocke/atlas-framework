@@ -1,14 +1,14 @@
 ---
 name: atlas-dashboards
-description: "Render Atlas's dashboards from their templates and data contracts, publish them as private pages (first time, in chat) and republish them with fresh data (chats and routines), keep their links, and make project pages and user dashboards on request. Use when a job or skill needs dashboards refreshed, at setup, or when the user says \"update my dashboards\", \"where's my Work Board?\", \"make a page for the Orion project\", \"the Goals page looks out of date\", \"send me the link to my brief\"."
+description: "Render Atlas's dashboards from their templates and data contracts, publish them as private pages (first time, in chat) and republish them with fresh data (chats and routines), keep their links, and make project pages and user dashboards on request. Use when a job or skill needs dashboards refreshed, at setup, or when the user says \"update my dashboards\", \"where's my Commitments page?\", \"make a page for the Orion project\", \"the Goals page looks out of date\", \"send me the link to my brief\"."
 ---
 # Dashboards
 
 ## Purpose
-Keep a small set of always-current, browsable pages: Daily Brief, Work Board, Goals, Week Ahead, People, Decisions & Risks, Control Center, About You, Atlas Guide, and Records, plus project pages on request and the user's own dashboards. Each page is a self-contained HTML file built from a system template with the data embedded, themed to the user's design system, and published privately so routines can refresh it unattended.
+Keep a small set of always-current, browsable pages: Daily Brief, Commitments, Projects, Goals, Week Ahead, People, Decisions & Risks, Control Center, About You, Atlas Guide, and Records, plus project pages on request and the user's own dashboards. Each page is a self-contained HTML file built from a system template with the data embedded, themed to the user's design system, and published privately so routines can refresh it unattended.
 
 ## When to use
-- Setup step 11: publish all ten (`atlas-setup`).
+- Setup step 11: publish all eleven (`atlas-setup`).
 - Jobs (per each contract's `republished_by`, e.g. `daily-brief`, `triage`, `weekly-review`, `monthly`): republish the dashboards whose data changed.
 - Skills after relevant changes: `atlas-settings`/`atlas-away` (Control Center, Daily Brief), `atlas-update` (Atlas Guide, Control Center), `atlas-review` (Goals, About You), `atlas-health` (Control Center).
 - User: "refresh my dashboards", "I lost the link to …", "make a project page for Orion", "add the deals dashboard I built".

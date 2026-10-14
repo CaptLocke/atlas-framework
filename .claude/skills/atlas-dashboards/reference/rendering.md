@@ -6,12 +6,13 @@ skill: atlas-dashboards
 > **Contracts govern.** `system/dashboards/README.md` and each `<name>.contract.md` define placeholders, theme tokens, truncation, and titles; where this file differs, they win.
 # Rendering and publishing detail
 
-## The ten dashboards (and who usually refreshes them)
+## The eleven dashboards (and who usually refreshes them)
 The contract's `republished_by` is authoritative; this is the usual pattern.
 | Dashboard | Shows | Typical republishers |
 |---|---|---|
 | `daily-brief` | Today's brief (sections from `user/work/briefs/`) | daily-brief, chat catch-up |
-| `work-board` | Active projects and commitments; filters mine / waiting on / overdue | triage, daily-brief |
+| `commitments` | Open commitments, split into Waiting on and I owe; filters all / overdue / high priority | triage, daily-brief |
+| `projects` | Active, proposed, and paused projects with health, next step, and their open commitments and risks | daily-brief, triage, weekly-review |
 | `goals` | Goals with progress, linked projects, evidence, accomplishments | weekly-review, monthly |
 | `week-ahead` | Next 7 days: meetings with prep status, deadlines, commitments due, focus time | daily-brief, meeting-prep |
 | `people` | Key relationships, last contact, open items each way, gone quiet | weekly-review, daily-brief |
@@ -43,14 +44,14 @@ Map `user/profile/design-system.md` to the template's theme tokens (the contract
 - **Private:** never public, never shared with anyone.
 - **Page-only:** a single self-contained HTML file; no extra published files, no uploaded assets.
 - **No grants:** no connector access, no live data, no runtime capabilities; everything the page shows is embedded at render time.
-- Same title on every republish (the template's title, e.g. "Work Board"), so the user recognizes it.
+- Same title on every republish (the template's title, e.g. "Commitments"), so the user recognizes it.
 - Publishing a new page is done in chat (setup or recovery); republishing an existing URL is allowed in routines.
 - Use whatever artifact publishing tool the session provides; publish the rendered file from `.atlas-tmp/dashboards/`.
 
 ## dashboards.yaml upkeep
 ```yaml
 dashboards:
-  work-board: { url: "https://…", last_published: 2026-10-12 }
+  commitments: { url: "https://…", last_published: 2026-10-12 }
   deals-board: { url: "https://…", last_published: 2026-10-20 }   # user dashboard (extension name)
 project_pages:
   projects/orion-migration: "https://…"

@@ -28,7 +28,7 @@ Formats: `system/schemas/settings.md`. Classes and locked levels: `system/rules/
 | "Use the strongest model for upkeep" | `routines.yaml · routines[].model` | `behavior_settings` | update platform routine model |
 | "Stop ingesting Teams", "read only my inbox, not other folders", "also read my CRM" | `sources.yaml · ingest[]` (`scope`, add/remove) | `behavior_settings` | connector needed? → `atlas-connectors` |
 | "I can't connect our CRM; I'll forward updates" | `sources.yaml · fallbacks[]` | `behavior_settings` | explain the fallback steps to the user |
-| "Re-publish my dashboards", "I lost the Work Board link" | `dashboards.yaml` | `behavior_settings` / `dashboards_refresh` | `atlas-dashboards` |
+| "Re-publish my dashboards", "I lost the Commitments page link" | `dashboards.yaml` | `behavior_settings` / `dashboards_refresh` | `atlas-dashboards` |
 | "Connect/disconnect a tool", "fix my connector map" | `connectors.yaml` | `governance_settings` 🔒 | `atlas-connectors` |
 | "Change where finished files go" | `atlas.yaml · deliverables_folder` | `behavior_settings` | find/create folder (`files.create_folder`) |
 | "My time zone is now Europe/Berlin" | `atlas.yaml · timezone` | `behavior_settings` | all schedules are local; update every platform routine's time zone |
