@@ -59,7 +59,7 @@ Each template contains each placeholder **exactly once**. No other text is subst
 | Control Center | As of date | Whether Atlas is running well, and the one thing that needs the user if any |
 | Atlas Guide | "Everything Atlas can do, and how to ask" | How to talk to Atlas, or what's new after an update |
 
-**Refresh marker.** Every page shows, at the top, when it was refreshed (`N.refreshed()` in `_base.js`, from `meta.generated_at`). If the page is older than its contract's `stale_after_hours` when it is opened, the marker adds "May be out of date". This is the one place a page compares against the viewer's clock (everything else uses `meta.as_of`). Templates get it through `N.masthead`; never remove it.
+**Refresh marker.** Every page shows, at the top, when it was refreshed (`N.refreshed()` in `_base.js`, from `meta.generated_at`). A signal dot in front of it is green while the page is current. If the page is older than its contract's `stale_after_hours` when it is opened, the dot turns amber and the marker adds "May be out of date" (grey before the first refresh). This is the one place a page compares against the viewer's clock (everything else uses `meta.as_of`). Templates get it through `N.masthead`; never remove it.
 
 ## How a page is rendered (`atlas-dashboards`)
 1. Read the contract. Build one JSON object exactly as it specifies, from the listed source files. Every list is sorted, filtered, and capped as the contract says.

@@ -312,8 +312,9 @@
     return !isNaN(at) && typeof limit === "number" && limit > 0 && (Date.now() - at) / 36e5 > limit;
   };
   N.refreshed = function () {
-    var stale = N.isStale();
+    var stale = N.isStale(), state = !N.meta.generated_at ? "none" : stale ? "stale" : "fresh";
     return h("p", { class: "mast-fresh", "data-stale": stale ? "1" : null },
+      h("span", { class: "signal", "data-state": state, "aria-hidden": "true" }),
       h("time", { datetime: N.meta.generated_at || null }, N.refreshedText()),
       stale ? N.chip("May be out of date", "warn") : null);
   };
