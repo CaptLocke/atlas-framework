@@ -51,7 +51,8 @@ Full example: `system/tests/dashboards/people.json`.
 | Excluded always | `notes_private`, `emails`, `phone`, `location` |
 
 ## Rendering notes
+- **Record panel:** clicking a card opens it in the record panel (`system/dashboards/README.md` §Record panel). Every item may carry the panel data fields (`details`, `body`, `body_truncated`, `links`, `created`, `updated`; same section). Before the caps below drop any item, cut each `body` to 800 characters, then drop `body` from the oldest items first.
 - Which people: everyone with an open item either way, a touchpoint in the next 14 days, `quiet: true`, or a relationship of manager, report, board, customer, prospect, stakeholder, or partner; then others by most recent `last_contact`.
 - Sort: quiet first, then by relationship weight (manager, report, board, customer, stakeholder, prospect, partner, peer, vendor, external, other), then by number of open items, then `last_contact` (most recent first).
-- Caps: 80 people, 5 items per direction per person, soonest due first (the rest are on the Work Board). `meta.truncated.people` counts people left out (lowest in the sort order go first).
+- Caps: 80 people, 5 items per direction per person, soonest due first (the rest are on the Commitments page). `meta.truncated.people` counts people left out (lowest in the sort order go first).
 - Text limits: `insight`, `quiet_reason` 240 characters.

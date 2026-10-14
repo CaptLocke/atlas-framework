@@ -17,7 +17,7 @@ Period: the ISO week (`YYYY-Www`) being reviewed; a Friday run covers Monday to 
 | **Aging waiting-on** | Open `waiting_on` older than 7 days or past due | With counterparty, age, and a suggested nudge (offer a draft via `atlas-write`) |
 | **People to reconnect with** | Key people (manager, reports, customers, stakeholders) past their `cadence` or with no contact in 30+ days, and people with open items both ways | Max 5 |
 | **Next week** | Meetings that matter (1:1s, external, linked to open items), deadlines, commitments due, events needing prep | From calendar (`calendar.list_range`) and records |
-| **Suggested priorities** | Max 5, ranked by active goals, then due dates and risk | One-line reason each, citing the goal |
+| **Suggested priorities** | Max 5, ranked by active goals, then due dates and risk; each written as an outcome for the week ("Get Dana's MSA review unblocked"), since they become the Week Ahead's "This week's outcomes" | One-line reason each, citing the goal |
 | **Accomplishments recorded** | The entries appended this week | Links to goals |
 
 ## File format

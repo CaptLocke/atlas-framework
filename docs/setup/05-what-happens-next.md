@@ -61,7 +61,7 @@ This is the part where you may need to follow a few clicks. If Claude can't crea
 
 ## 8. Your dashboards
 
-Atlas creates your dashboards: always-up-to-date pages such as your Daily Brief, Work Board, and the Atlas Guide (a handy reference for everything Atlas can do).
+Atlas creates your dashboards: always-up-to-date pages such as your Daily Brief, Commitments, and the Atlas Guide (a handy reference for everything Atlas can do).
 
 ## 9. Your first brief
 

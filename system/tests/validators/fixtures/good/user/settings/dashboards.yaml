@@ -2,7 +2,8 @@
 # Format: system/schemas/settings.md.
 dashboards:
   daily-brief: { url: null, last_published: null }
-  work-board: { url: null, last_published: null }
+  commitments: { url: null, last_published: null }
+  projects: { url: null, last_published: null }
   goals: { url: null, last_published: null }
   week-ahead: { url: null, last_published: null }
   people: { url: null, last_published: null }

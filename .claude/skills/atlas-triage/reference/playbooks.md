@@ -4,7 +4,7 @@ skill: atlas-triage
 ---
 # Playbooks: from recurring work to a checklist Atlas runs
 
-A playbook is a record (`system/schemas/playbook.md`). Running one adds no new machinery: each run is a small project whose steps are commitments, so triage tracks them, the brief and Work Board show them, `email-drafts` pre-drafts the messages, and slipped steps are flagged like any other slipped work.
+A playbook is a record (`system/schemas/playbook.md`). Running one adds no new machinery: each run is a small project whose steps are commitments, so triage tracks them, the brief and the Commitments page show them, `email-drafts` pre-drafts the messages, and slipped steps are flagged like any other slipped work.
 
 ## 1. Proposing a playbook from recurring work (`intelligence`)
 1. **Look for repeats.** Atlas looks for the same kind of work done at least **3 times in 12 months**: projects or clusters of commitments with similar titles, the same kind of counterparty (customer, new hire, vendor), and a similar sequence of steps. Examples are three renewals that each went quote → call → contract, or two onboardings and one in progress.

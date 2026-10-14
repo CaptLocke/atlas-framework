@@ -1,6 +1,7 @@
 {
   "meta": {
     "dashboard": "people",
+    "headline": "Dana Ruiz and Rosa Alvarez have gone quiet, and you're waiting on Dana for the MSA review.",
     "schema_version": 1,
     "title": "People",
     "generated_at": "2026-10-09T14:43:30-07:00",
@@ -10,8 +11,7 @@
     "locale": "en-US",
     "user_display_name": "Maya Chen",
     "atlas_version": "1.0.0",
-    "record_base_url": null,
-    "nav": [],
+    "nav": [{"name": "daily-brief", "title": "Daily Brief", "url": "https://claude.ai/artifact/example-daily-brief"}, {"name": "commitments", "title": "Commitments", "url": "https://claude.ai/artifact/example-commitments"}, {"name": "projects", "title": "Projects", "url": "https://claude.ai/artifact/example-projects"}, {"name": "week-ahead", "title": "Week Ahead", "url": "https://claude.ai/artifact/example-week-ahead"}, {"name": "goals", "title": "Goals", "url": "https://claude.ai/artifact/example-goals"}, {"name": "people", "title": "People", "url": "https://claude.ai/artifact/example-people"}, {"name": "decisions-risks", "title": "Decisions & Risks", "url": "https://claude.ai/artifact/example-decisions-risks"}, {"name": "records", "title": "Records", "url": "https://claude.ai/artifact/example-records"}, {"name": "about-you", "title": "About You", "url": "https://claude.ai/artifact/example-about-you"}, {"name": "control-center", "title": "Control Center", "url": "https://claude.ai/artifact/example-control-center"}, {"name": "atlas-guide", "title": "Atlas Guide", "url": "https://claude.ai/artifact/example-atlas-guide"}],
     "notices": [],
     "truncated": { "people": 23 }
   },
@@ -19,9 +19,9 @@
   "people": [
     { "id": "people/jordan-lee", "title": "Jordan Lee", "aliases": ["JL"], "role": "VP Product", "org": { "id": "organizations/acme", "title": "Acme" }, "relationship": "manager", "last_contact": "2026-10-08", "cadence": "weekly 1:1", "quiet": false, "quiet_reason": null,
       "i_owe": [{ "id": "commitments/send-pricing-feedback", "title": "Send pricing feedback", "due": "2026-10-13" }, { "id": "commitments/draft-hiring-scorecard", "title": "Draft the PM hiring scorecard", "due": null }],
-      "they_owe": [], "next_touchpoint": { "id": "events/2026-10-13-one-on-one-jordan", "title": "1:1", "start": "2026-10-13T14:00:00-07:00" }, "insight": "Prefers numbers first; bring the per-seat comparison to the 1:1." },
+      "they_owe": [], "next_touchpoint": { "id": "events/2026-10-13-one-on-one-jordan", "title": "1:1", "start": "2026-10-13T14:00:00-07:00" }, "insight": "Prefers numbers first; bring the per-seat comparison to the 1:1.", "created": "2026-09-01", "updated": "2026-10-08", "details": [{"label": "Reports to", "value": "Chief Product Officer"}], "body": [{"heading": "How Jordan works", "text": "- Numbers first, then the story.\n- Decides in the Monday 1:1; send questions in writing beforehand."}], "body_truncated": false },
     { "id": "people/dana-ruiz", "title": "Dana Ruiz", "aliases": ["D. Ruiz"], "role": "Senior counsel", "org": { "id": "organizations/acme", "title": "Acme" }, "relationship": "stakeholder", "last_contact": "2026-09-30", "cadence": null, "quiet": true, "quiet_reason": "No reply in 9 days while she owes you the MSA review. She usually answers calls faster than email.",
-      "i_owe": [], "they_owe": [{ "id": "commitments/dana-msa-review", "title": "Review the enterprise MSA", "due": "2026-10-07" }], "next_touchpoint": { "id": "events/2026-10-15-enterprise-tier-review", "title": "Enterprise tier review", "start": "2026-10-15T13:00:00-07:00" }, "insight": null },
+      "i_owe": [], "they_owe": [{ "id": "commitments/dana-msa-review", "title": "Review the enterprise MSA", "due": "2026-10-07" }], "next_touchpoint": { "id": "events/2026-10-15-enterprise-tier-review", "title": "Enterprise tier review", "start": "2026-10-15T13:00:00-07:00" }, "insight": null, "created": "2026-09-02", "updated": "2026-10-09", "body": [{"heading": "Working with Dana", "text": "- Reviews customer contracts, DPAs, and the enterprise MSA.\n- Answers calls faster than email; Tuesdays and Thursdays are her best days."}], "body_truncated": false },
     { "id": "people/sam-okafor", "title": "Sam Okafor", "aliases": [], "role": "Head of Operations", "org": { "id": "organizations/brightline-logistics", "title": "Brightline Logistics" }, "relationship": "customer", "last_contact": "2026-10-08", "cadence": "monthly", "quiet": false, "quiet_reason": null,
       "i_owe": [{ "id": "commitments/intro-sam-to-support-lead", "title": "Introduce Sam to the new support lead", "due": "2026-10-20" }], "they_owe": [], "next_touchpoint": { "id": "events/2026-10-13-brightline-renewal-call", "title": "Renewal call", "start": "2026-10-13T10:00:00-07:00" }, "insight": "Raised the import bug twice; renewal decision due in November." },
     { "id": "people/tomas-herrera", "title": "Tomás Herrera", "aliases": ["Tomas"], "role": "Engineering lead", "org": { "id": "organizations/acme", "title": "Acme" }, "relationship": "peer", "last_contact": "2026-10-09", "cadence": "daily standup", "quiet": false, "quiet_reason": null,

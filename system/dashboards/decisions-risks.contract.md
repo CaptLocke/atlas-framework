@@ -43,10 +43,11 @@ Full example: `system/tests/dashboards/decisions-risks.json`. `rationale: "unkno
 | `risks[]` | `user/knowledge/risks/*.md`: all `potential` and `active`, plus `resolved` updated in the last 90 days: `id, title, summary, status, likelihood, impact, owner, mitigation, updated`; `projects` = `links.projects` |
 | `risks[].insight` | Latest `user/inbox/insights.md` entry linking the risk (status `new|seen`), else `null` |
 | `decisions[]` | `user/knowledge/decisions/*.md`, not superseded: `proposed` (any age) and `made`/`reversed` with `decided_on` in the last 365 days: `id, title, summary, status, decided_on, deciders, rationale, alternatives, reversible, revisit_on`; `projects` = `links.projects` |
-| `insights[]` | `user/inbox/insights.md`, status `new|seen`, linking a decision or risk and not already attached to a risk, max 5 |
+| `insights[]` | `user/inbox/insights.md`, status `new|seen`, linking a decision or risk and not already attached to a risk, max 5: `{ "id", "text", "why", "suggested_action" }` (entry ID, Insight, Why it matters, Suggested action) |
 | `summary` | Counts over the full sets: `issues` (active risks), `open_risks` (potential), `decisions_90d` (made in the last 90 days) |
 
 ## Rendering notes
+- **Record panel:** clicking a card opens it in the record panel (`system/dashboards/README.md` §Record panel). Every item may carry the panel data fields (`details`, `body`, `body_truncated`, `links`, `created`, `updated`; same section). Before the caps below drop any item, cut each `body` to 800 characters, then drop `body` from the oldest items first.
 - Risks sort: `active` first, then exposure (likelihood × impact, high = 3, medium = 2, low = 1) descending, then `updated` (newest first); resolved last. Default filter "Open".
 - Decisions sort: `proposed` with a `revisit_on` or none first, then `decided_on` newest first. Default filter "All". "Revisit soon" = `revisit_on` within 14 days.
 - Caps: 100 risks, 150 decisions. Over budget, drop resolved risks first, then the oldest decisions; record `meta.truncated.risks` / `meta.truncated.decisions`. Older decisions remain searchable in chat.

@@ -28,11 +28,11 @@ HERE = Path(__file__).resolve().parent
 DASH = HERE.parent.parent / "dashboards"
 OUT = HERE / "out"
 
-NAMES = ["daily-brief", "work-board", "goals", "week-ahead", "people",
+NAMES = ["daily-brief", "commitments", "projects", "goals", "week-ahead", "people",
          "decisions-risks", "control-center", "about-you", "atlas-guide", "records", "project-page"]
 DATA_PH = "{{ATLAS_DATA}}"
 THEME_PH = "{{ATLAS_THEME_CSS}}"
-REQUIRED_META = ["dashboard", "schema_version", "generated_at", "as_of", "timezone"]
+REQUIRED_META = ["dashboard", "schema_version", "generated_at", "as_of", "timezone", "headline"]
 BLOCKS = {  # inlined canonical files: (opening tag, closing tag, source file)
     "css": ('<style id="atlas-base">', "</style>", DASH / "_base.css"),
     "js": ('<script id="atlas-base-js">', "</script>", DASH / "_base.js"),

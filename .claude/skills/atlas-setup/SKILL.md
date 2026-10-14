@@ -97,7 +97,7 @@ Full detail, including copy-paste text: `reference/automations.md`.
 5. **Test run:** run one routine now (the platform's "run now", or ask the user to press it; pick the shortest, e.g. `upkeep`, or any routine whose jobs will early-exit before step 12). When it finishes, pull and read its run report in `user/logs/runs/`: it must show `atlas_context: routine`. If it shows anything else, the routine isn't attached to the environment: walk the user through fixing it (`reference/automations.md` §3) and test again. If no run can be started now, record `notes: {10: "routine test pending"}`; the weekly health check catches a missing marker (`routine-env-missing`).
 
 ### Step 11. Dashboards
-Use `atlas-dashboards` to publish the ten dashboards privately and save their links in `user/settings/dashboards.yaml`. Suggest bookmarking the Daily Brief and Atlas Guide. If publishing fails, continue setup and add a known issue (`health.yaml`); briefs still work in chat.
+Use `atlas-dashboards` to publish the eleven dashboards privately and save their links in `user/settings/dashboards.yaml`. Suggest bookmarking the Daily Brief and Atlas Guide. If publishing fails, continue setup and add a known issue (`health.yaml`); briefs still work in chat.
 
 ### Step 12. First pass and first Daily Brief
 1. Run the `ingest` job procedure (`system/jobs/ingest.md`) over the last ~14 days (`lookback_days_initial`), then `triage` and `intelligence`. Tell the user it may take a few minutes; summarize progress in one line at a time (no noise).
@@ -108,7 +108,7 @@ Use `atlas-dashboards` to publish the ten dashboards privately and save their li
 - `user/settings/{atlas,governance,data-rules,connectors,sources,rhythms,routines,dashboards}.yaml`
 - `user/profile/*.md` and `user/profile/assets/`; `user/extensions/registry.yaml`; inbox starters in `user/inbox/`; state starters and `setup.yaml` in `user/.state/`
 - Initial records (employer with its company profile, self, manager, key people, goals, projects, topics) and sources; originals in `user/library/`
-- Cloud-drive folders "Atlas Deliverables" and "Atlas Drop/Processed"; the "Atlas routine" environment and the routines; ten published dashboards
+- Cloud-drive folders "Atlas Deliverables" and "Atlas Drop/Processed"; the "Atlas routine" environment and the routines; eleven published dashboards
 - The first brief at `user/work/briefs/YYYY-MM-DD.md`
 - If importing: `user/.state/import.yaml` (`status: complete`), import sources and the records made from them, the "Atlas Import" drive folder (left untouched) and its data-rule exclusion
 - Activity-log lines and commits with `Atlas-Actor: setup` after every step
@@ -127,6 +127,6 @@ Use `atlas-dashboards` to publish the ten dashboards privately and save their li
 - The "Atlas routine" environment exists with `ATLAS_CONTEXT=routine`, every routine uses it, and a test run's report shows `atlas_context: routine` (or `setup.yaml: notes` says the test is pending).
 - `atlas.yaml` has a full attestation; every settings file passes `python3 system/tools/validate.py --all`.
 - Each `routines.yaml` routine has a `routine_id` or the user confirmed creating it from the copy-paste text.
-- `dashboards.yaml` has URLs for the ten dashboards (or a known issue says why not).
+- `dashboards.yaml` has URLs for the eleven dashboards (or a known issue says why not).
 - The first Daily Brief exists and the user has seen it; `first_brief_delivered` is set.
 - An import, if started, is `complete` (or the user chose to stop it; `notes` says so) before the first brief.

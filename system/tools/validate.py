@@ -36,7 +36,7 @@ SKILLS = ["atlas-recall", "atlas-capture", "atlas-brief", "atlas-triage", "atlas
           "atlas-connectors", "atlas-report-issue"]
 JOBS = ["ingest", "triage", "intelligence", "email-drafts", "meeting-prep", "daily-brief", "weekly-review",
         "status-updates", "monthly", "quarterly", "maintenance", "update-check"]
-DASHBOARDS = ["daily-brief", "work-board", "goals", "week-ahead", "people", "decisions-risks",
+DASHBOARDS = ["daily-brief", "commitments", "projects", "goals", "week-ahead", "people", "decisions-risks",
               "control-center", "about-you", "atlas-guide", "records"]
 ON_DEMAND_DASHBOARDS = ["project-page"]
 JOB_SECTIONS = ["Purpose", "Runs when", "Away and paused", "Readiness check", "Inputs", "Steps",

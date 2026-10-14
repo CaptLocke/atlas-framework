@@ -229,7 +229,8 @@ Job entries are a job name or `{ job, when, target, mode }`. Modifiers: `when` (
 ```yaml
 dashboards:
   daily-brief: { url: null, last_published: null }
-  work-board: { url: null, last_published: null }
+  commitments: { url: null, last_published: null }
+  projects: { url: null, last_published: null }
   goals: { url: null, last_published: null }
   week-ahead: { url: null, last_published: null }
   people: { url: null, last_published: null }

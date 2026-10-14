@@ -14,7 +14,7 @@
 
    Theming: atlas-dashboards fills <style id="atlas-theme"> with --brand-* values
    from user/profile/design-system.md. Nothing here sets --brand-*, so an empty
-   theme block falls back to the neutral defaults below. */
+   theme block falls back to the default palette below. */
 
 :root {
   color-scheme: light dark;
@@ -22,20 +22,21 @@
   --font-body: var(--brand-font-body, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
   --font-id: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
 
-  --bg: var(--brand-bg, #f4f6f8);
-  --surface: var(--brand-surface, #ffffff);
-  --surface-2: #eaeef2;
-  --ink: var(--brand-ink, #1a2632);
-  --ink-2: #4a5866;
-  --line: #d3dae1;
-  --accent: var(--brand-accent, #2b5a8a);
+  /* Default palette (no brand): warm stone neutrals, navy accent, rust highlight, olive secondary. */
+  --bg: var(--brand-bg, #f4f0e8);
+  --surface: var(--brand-surface, #fcfaf5);
+  --surface-2: #eae3d4;
+  --ink: var(--brand-ink, #1c1a15);
+  --ink-2: #5e584c;
+  --line: #d3c7ad;
+  --accent: var(--brand-accent, #28374a);
   --accent-ink: var(--brand-accent-ink, #ffffff);
-  --accent-soft: #e2ebf5;
-  --star: var(--brand-highlight, #a86f12);
+  --accent-soft: #e9eef6;
+  --star: var(--brand-highlight, #754437);
   --ok: #2c7552;
   --warn: #8f5500;
   --danger: #b0281f;
-  --muted: #7a8794;
+  --muted: #6b6751;
 
   --radius: 6px;
   --gutter: 16px;
@@ -44,37 +45,37 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: var(--brand-bg-dark, #10161d);
-    --surface: var(--brand-surface-dark, #17212b);
-    --surface-2: #1f2b37;
-    --ink: var(--brand-ink-dark, #e3e9ef);
-    --ink-2: #a5b2bf;
-    --line: #2c3a48;
-    --accent: var(--brand-accent-dark, #8eb5e3);
-    --accent-ink: var(--brand-accent-ink-dark, #0d1620);
-    --accent-soft: #1d3149;
-    --star: var(--brand-highlight-dark, #e2b45c);
+    --bg: var(--brand-bg-dark, #1c1a15);
+    --surface: var(--brand-surface-dark, #26241e);
+    --surface-2: #3b382f;
+    --ink: var(--brand-ink-dark, #f4f0e8);
+    --ink-2: #aaa08b;
+    --line: #3b382f;
+    --accent: var(--brand-accent-dark, #b5c7e2);
+    --accent-ink: var(--brand-accent-ink-dark, #101923);
+    --accent-soft: #28374a;
+    --star: var(--brand-highlight-dark, #d7826c);
     --ok: #6cc49a;
     --warn: #e5a94c;
     --danger: #f08b80;
-    --muted: #7f8e9c;
+    --muted: #908b6e;
   }
 }
 :root[data-theme="dark"] {
-  --bg: var(--brand-bg-dark, #10161d);
-  --surface: var(--brand-surface-dark, #17212b);
-  --surface-2: #1f2b37;
-  --ink: var(--brand-ink-dark, #e3e9ef);
-  --ink-2: #a5b2bf;
-  --line: #2c3a48;
-  --accent: var(--brand-accent-dark, #8eb5e3);
-  --accent-ink: var(--brand-accent-ink-dark, #0d1620);
-  --accent-soft: #1d3149;
-  --star: var(--brand-highlight-dark, #e2b45c);
+  --bg: var(--brand-bg-dark, #1c1a15);
+  --surface: var(--brand-surface-dark, #26241e);
+  --surface-2: #3b382f;
+  --ink: var(--brand-ink-dark, #f4f0e8);
+  --ink-2: #aaa08b;
+  --line: #3b382f;
+  --accent: var(--brand-accent-dark, #b5c7e2);
+  --accent-ink: var(--brand-accent-ink-dark, #101923);
+  --accent-soft: #28374a;
+  --star: var(--brand-highlight-dark, #d7826c);
   --ok: #6cc49a;
   --warn: #e5a94c;
   --danger: #f08b80;
-  --muted: #7f8e9c;
+  --muted: #908b6e;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -107,23 +108,31 @@ button, input, select { font: inherit; color: inherit; }
 /* Masthead: the one expressive element. */
 .mast { padding: 2.25rem 0 1.75rem; border-bottom: 1px solid var(--line); margin-bottom: 1.5rem; }
 .mast-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .35rem 1rem; margin-bottom: 1.1rem; }
-.mast-who { display: flex; align-items: center; gap: .5rem; color: var(--ink-2); font-size: .9rem; margin: 0; }
-.mast-fresh { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin: 0; color: var(--ink-2); font-size: .85rem; font-variant-numeric: tabular-nums; }
-.mast-who svg { width: 1.1rem; height: 1.1rem; fill: var(--star); flex: none; }
+.mast-who { display: flex; align-items: center; gap: .6rem; color: var(--ink); font-family: var(--font-heading); font-size: 1.35rem; font-weight: 600; letter-spacing: -0.005em; margin: 0; }
+.mast-fresh { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin: 0; color: var(--ink-2); font-size: .85rem; font-variant-numeric: tabular-nums; }
+/* Signal dot: green when the page is current, amber when it may be out of date, grey before the first refresh. */
+.signal { width: .55rem; height: .55rem; border-radius: 50%; flex: none; background: var(--ok); box-shadow: 0 0 0 .2rem color-mix(in srgb, var(--ok) 22%, transparent); }
+.signal[data-state="stale"] { background: var(--warn); box-shadow: 0 0 0 .2rem color-mix(in srgb, var(--warn) 22%, transparent); }
+.signal[data-state="none"] { background: var(--ink-2); box-shadow: none; }
+.mast-who svg { width: 2.75rem; height: 2.75rem; fill: var(--star); flex: none; }
 .mast h1 { font-size: clamp(2.1rem, 6vw, 3.4rem); letter-spacing: -0.015em; font-weight: 600; }
 .mast-sub { font-family: var(--font-heading); font-size: clamp(1.1rem, 2.6vw, 1.4rem); color: var(--ink-2); margin-top: .35rem; }
 .mast-lede { max-width: var(--measure); margin-top: 1rem; font-size: 1.05rem; }
-.mast-stats { display: flex; flex-wrap: wrap; gap: .5rem 1.75rem; margin: 1.25rem 0 0; padding: 0; list-style: none; }
-.mast-stats li { display: flex; align-items: baseline; gap: .4rem; color: var(--ink-2); font-size: .9rem; }
-.mast-stats b { font-family: var(--font-heading); font-size: 1.5rem; color: var(--ink); font-weight: 600; }
+.mast-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); gap: .75rem; margin: 1.5rem 0 0; padding: 0; list-style: none; }
+.mast-stats .stat { display: flex; flex-direction: column; gap: .2rem; min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: .85rem 1rem .9rem; }
+.mast-stats b { font-family: var(--font-heading); font-size: 1.9rem; line-height: 1.1; color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.mast-stats .stat span { color: var(--ink-2); font-size: .875rem; line-height: 1.3; }
 .mast-nav { margin-top: 1.25rem; display: flex; flex-wrap: wrap; gap: .25rem 1rem; font-size: .9rem; }
 .mast-nav a[aria-current="page"] { color: var(--ink); text-decoration: none; font-weight: 600; }
 
 /* Notices (stale data, connection problems) */
-.notices { list-style: none; margin: 0 0 1.5rem; padding: 0; display: grid; gap: .5rem; }
-.notice { border-left: 3px solid var(--warn); background: var(--surface); padding: .6rem .9rem; border-radius: 0 var(--radius) var(--radius) 0; font-size: .95rem; }
-.notice[data-level="error"] { border-color: var(--danger); }
-.notice[data-level="info"] { border-color: var(--accent); }
+.notices { list-style: none; margin: 0 0 1.75rem; padding: 0; display: grid; gap: .6rem; }
+.notice { --tone: var(--warn); display: flex; align-items: flex-start; gap: .75rem; padding: .85rem 1rem; border: 1px solid color-mix(in srgb, var(--tone) 45%, var(--line)); border-left: 4px solid var(--tone); border-radius: var(--radius); background: color-mix(in srgb, var(--tone) 14%, var(--surface)); color: var(--ink); font-size: .95rem; }
+.notice[data-level="error"] { --tone: var(--danger); }
+.notice[data-level="info"] { --tone: var(--accent); }
+.notice p { margin: 0; min-width: 0; }
+.notice b { color: var(--tone); font-weight: 650; }
+.notice-icon { width: 1.3rem; height: 1.3rem; flex: none; margin-top: .05rem; fill: none; stroke: var(--tone); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
 /* ---- Sections: heading in a margin column on wide screens ---- */
 .sec { padding: 1.25rem 0 1.75rem; border-top: 1px solid var(--line); }
@@ -162,10 +171,6 @@ button, input, select { font: inherit; color: inherit; }
   .item-aside { text-align: left; justify-items: start; display: flex; flex-wrap: wrap; gap: .4rem; }
 }
 
-/* Record IDs: always visible so the user can ask Atlas about the record. */
-.rid { font-family: var(--font-id); font-size: .76rem; color: var(--ink-2); background: var(--surface-2); padding: .05em .4em; border-radius: 4px; -webkit-user-select: all; user-select: all; overflow-wrap: anywhere; justify-self: start; }
-a.rid { text-decoration: none; }
-a.rid:hover { color: var(--accent); }
 
 /* Chips: short status words. Color always paired with text. */
 .chip { display: inline-block; font-size: .78rem; font-weight: 600; line-height: 1.5; padding: 0 .5rem; border-radius: 999px; border: 1px solid currentColor; color: var(--ink-2); white-space: nowrap; }
@@ -203,13 +208,57 @@ a.rid:hover { color: var(--accent); }
 .theme-btn { background: none; border: 1px solid var(--line); border-radius: 999px; padding: .2rem .75rem; cursor: pointer; font-size: .85rem; color: var(--ink-2); }
 
 /* ---- Print ---- */
+/* Clickable cards open the record panel (N.recordPanel) */
+.rec { cursor: pointer; transition: background-color .12s; }
+.rec:hover { background: color-mix(in srgb, var(--accent) 5%, var(--surface)); }
+.rec-open { all: unset; cursor: pointer; font: inherit; color: inherit; }
+.rec-open:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+/* Record panel: a drawer on the right; full screen on phones */
+dialog.rec-panel { position: fixed; inset: 0 0 0 auto; margin: 0; width: min(42rem, 100%); height: 100%; max-height: none; max-width: 100%;
+  border: 0; border-left: 1px solid var(--line); padding: 0; background: var(--surface); color: var(--ink); box-shadow: -10px 0 40px rgba(0, 0, 0, .22); }
+dialog.rec-panel:not([open]) { display: none; }
+dialog.rec-panel::backdrop { background: rgba(20, 18, 12, .45); }
+.rp { height: 100%; overflow-y: auto; overscroll-behavior: contain; }
+.rp-bar { position: sticky; top: 0; z-index: 1; display: flex; justify-content: space-between; align-items: center; gap: .75rem;
+  padding: calc(.75rem + env(safe-area-inset-top, 0px)) 1.5rem .75rem; background: var(--surface); border-bottom: 1px solid var(--line); }
+.rp-bar .chips { flex: 1; min-width: 0; }
+.rp-btn { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: .3rem .85rem; font: inherit; font-size: .88rem; cursor: pointer; }
+.rp-btn:hover { border-color: var(--accent); }
+.rp-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.rp-body { padding: 1.25rem 1.5rem 2.5rem; display: flex; flex-direction: column; gap: 1.35rem; }
+.rp-body h2 { font-size: clamp(1.45rem, 4vw, 1.9rem); line-height: 1.2; margin: 0; text-wrap: balance; }
+.rp-sum { margin: .5rem 0 0; font-size: 1.02rem; }
+.rp-h { font-family: var(--font-heading); font-size: 1.05rem; font-weight: 600; margin: 0 0 .45rem; }
+.rp-details { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: .75rem 1.25rem; margin: 0; }
+.rp-details div { min-width: 0; }
+.rp-details dt { font-size: .78rem; color: var(--ink-2); margin: 0 0 .1rem; }
+.rp-details dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.rp-text { margin: 0; white-space: pre-line; max-width: var(--measure); }
+.rp-list { margin: 0; padding-left: 1.1rem; display: grid; gap: .3rem; max-width: var(--measure); }
+.rp-cut { margin: 0; font-size: .9rem; color: var(--ink-2); font-style: italic; }
+.rp-links { list-style: none; margin: 0; padding: 0; display: grid; gap: .4rem; }
+.rp-link { all: unset; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: .75rem; width: 100%; padding: .55rem .8rem;
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); cursor: pointer; }
+.rp-link:hover { border-color: var(--accent); }
+.rp-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.rp-link span:first-child { font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.rp-link-off { padding: .55rem .8rem; border: 1px dashed var(--line); border-radius: var(--radius); color: var(--ink-2); }
+.rp-dates { margin: 0; font-size: .86rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.rp-ask { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem .9rem; padding-top: 1.1rem; border-top: 1px solid var(--line); }
+.rp-ask .rp-btn { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.rp-ask p { margin: 0; font-size: .88rem; color: var(--ink-2); }
+.rp-copy { width: 100%; font: inherit; font-size: .88rem; padding: .45rem .6rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); color: var(--ink); }
+html.rp-lock { overflow: hidden; }
+@media (max-width: 640px) { dialog.rec-panel { width: 100%; border-left: 0; } .rp-bar, .rp-body { padding-left: 16px; padding-right: 16px; } }
+@media (prefers-reduced-motion: reduce) { .rec { transition: none; } }
+
 @media print {
   :root, :root:not([data-theme="light"]), :root[data-theme="dark"] {
     --bg: #ffffff; --surface: #ffffff; --surface-2: #f0f0f0; --ink: #000000; --ink-2: #333333;
     --line: #bbbbbb; --accent: #000000; --star: #000000; --ok: #000000; --warn: #000000; --danger: #000000; --muted: #555555;
   }
   body { font-size: 11pt; }
-  .no-print, .controls, .theme-btn, .skip, .mast-nav { display: none !important; }
+  .no-print, .controls, .theme-btn, .skip, .mast-nav, dialog.rec-panel { display: none !important; }
   .items { border: 0; }
   .item { break-inside: avoid; padding-left: .75rem; }
   .sec { break-inside: auto; }
@@ -381,24 +430,25 @@ a.rid:hover { color: var(--accent); }
     return "Due " + N.date(s);
   };
 
-  /* ---- Record references ---- */
+  /* ---- Record references ----
+     Pages never show record IDs, [[type/slug]] mentions, inbox entry numbers, or file paths: they are
+     noise to the reader. The data still carries them (contracts, search, troubleshooting). */
   var ID_RE = /\[\[([a-z]+\/[a-z0-9][a-z0-9-]*)\]\]/g;
-  N.rid = function (id) {
-    if (!id) return null;
-    var text = "[[" + id + "]]";
-    var base = N.meta.record_base_url;
-    if (base && /^https:\/\//.test(base) && /^[a-z]+\/[a-z0-9][a-z0-9-]*$/.test(id)) {
-      return h("a", { class: "rid", href: base + id + ".md", target: "_blank", rel: "noopener noreferrer", title: "Open the record file" }, text);
-    }
-    return h("code", { class: "rid", title: "Record ID: mention it in chat to ask Atlas about it" }, text);
+  N.rid = function () { return null; };
+  N.path = function () { return null; };
+  /* A readable name for a bare ID: "sources/2026-10-13-brightline-agenda-thread" -> "Brightline agenda thread". */
+  N.idName = function (id) {
+    var parts = String(id || "").split("/"), type = parts.length > 1 ? parts[0] : "";
+    var s = parts.pop().replace(/^\d{4}-\d{2}-\d{2}-/, "").replace(/-/g, " ");
+    if (!s) return "";
+    if (type === "people" || type === "organizations") return s.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+    return s.charAt(0).toUpperCase() + s.slice(1);
   };
-  /* A file path in the user's repository (not a record), e.g. a prep note or profile file. */
-  N.path = function (p) { return p ? h("code", { class: "rid", title: "File in your Atlas repository" }, p) : null; };
-  /* A ref is {id, title}. Renders the title followed by its ID. */
-  N.ref = function (r, opts) {
+  /* A ref is {id, title}. Renders the title as plain text (links on a page only ever open another dashboard). */
+  N.ref = function (r) {
     if (!r) return null;
-    if (typeof r === "string") return N.rid(r);
-    return h("span", { class: "ref" }, r.title || r.id, r.id && !(opts && opts.noId) ? [" ", N.rid(r.id)] : null);
+    if (typeof r === "string") r = { id: r };
+    return h("span", { class: "ref" }, r.title || N.idName(r.id));
   };
   N.refs = function (list) {
     list = N.list(list);
@@ -407,19 +457,18 @@ a.rid:hover { color: var(--accent); }
     return out;
   };
   N.name = function (r) { return r ? (typeof r === "string" ? r : r.title || r.id) : ""; };
-  /* Plain text with [[type/slug]] mentions styled as IDs. */
+  /* Plain text with [[type/slug]] mentions: a citation in brackets is dropped; a mention used as a word
+     becomes the record's readable name. */
   N.rich = function (text) {
     if (text == null) return null;
-    text = String(text);
-    var out = [], last = 0, m;
-    ID_RE.lastIndex = 0;
-    while ((m = ID_RE.exec(text))) {
-      if (m.index > last) out.push(text.slice(last, m.index));
-      out.push(N.rid(m[1]));
-      last = m.index + m[0].length;
-    }
-    if (last < text.length) out.push(text.slice(last));
-    return out;
+    if (typeof text !== "string") return text;  /* already built nodes (e.g. text with a page link) */
+    var M = "\\[\\[[a-z]+\\/[a-z0-9][a-z0-9-]*\\]\\]";
+    return String(text)
+      .replace(new RegExp("\\s*\\(\\s*" + M + "(?:\\s*[,;]\\s*" + M + ")*\\s*\\)", "g"), "")
+      .replace(ID_RE, function (_, id) { return N.idName(id); })
+      .replace(/\s+([.,;:!?)])/g, "$1")
+      .replace(/\s{2,}/g, " ")
+      .trim();
   };
 
   /* ---- Building blocks ---- */
@@ -521,61 +570,197 @@ a.rid:hover { color: var(--accent); }
   };
   applyTheme(N.store.get("theme") || "auto");
 
-  var STAR = "M12 1.5c.5 5.6 4.9 10 10.5 10.5-5.6.5-10 4.9-10.5 10.5C11.5 16.9 7.1 12.5 1.5 12 7.1 11.5 11.5 7.1 12 1.5z";
-  function star() {
+  /* The Atlas mark: two long blades and two short ones around a disc, drawn in --star. */
+  var LOGO = [
+    "M20.25 352.566L140.031 193.844C141.398 192.035 143.48 190.906 145.738 190.75C148 190.594 150.215 191.422 151.816 193.023L181.555 222.762C183.156 224.363 183.988 226.582 183.828 228.84C183.672 231.102 182.543 233.184 180.734 234.547L22.016 354.328C21.512 354.707 20.809 354.656 20.367 354.211C19.922 353.77 19.875 353.066 20.25 352.566Z",
+    "M355.539 21.555L234.996 179.496C233.617 181.301 231.527 182.426 229.262 182.574C226.996 182.727 224.777 181.895 223.172 180.289L195.113 152.23C193.508 150.625 192.672 148.402 192.824 146.137C192.977 143.871 194.098 141.781 195.902 140.406L353.844 19.863C354.324 19.496 355.004 19.539 355.43 19.969C355.859 20.395 355.906 21.074 355.539 21.555Z",
+    "M258.582 262.406L196.883 232.992C195.02 232.105 193.703 230.363 193.352 228.328C193.004 226.293 193.664 224.215 195.121 222.754L223.184 194.695C224.641 193.238 226.719 192.578 228.758 192.926C230.793 193.277 232.531 194.594 233.418 196.457L262.832 258.156C263.414 259.375 263.164 260.828 262.211 261.785C261.254 262.738 259.801 262.988 258.582 262.406Z",
+    "M118.082 112.582L179.781 141.996C181.645 142.887 182.961 144.625 183.313 146.66C183.664 148.695 183.004 150.773 181.543 152.234L153.484 180.293C152.023 181.754 149.945 182.414 147.91 182.063C145.875 181.711 144.137 180.395 143.246 178.531L113.832 116.832C113.25 115.613 113.5 114.16 114.453 113.203C115.41 112.25 116.863 112 118.082 112.582Z",
+    "M135.297 187.918a52.625 52.625 0 1 0 105.25 0a52.625 52.625 0 1 0-105.25 0Z"
+  ];
+  function logo() {
     var ns = "http://www.w3.org/2000/svg";
     var svg = document.createElementNS(ns, "svg");
-    svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("aria-hidden", "true");
-    var p = document.createElementNS(ns, "path"); p.setAttribute("d", STAR); svg.appendChild(p);
+    svg.setAttribute("viewBox", "0 0 375 375"); svg.setAttribute("aria-hidden", "true");
+    LOGO.forEach(function (d) { var p = document.createElementNS(ns, "path"); p.setAttribute("d", d); svg.appendChild(p); });
     return svg;
   }
 
-  /* The standard refresh marker: when this page was last refreshed and by what, flagged when older
+  /* The standard refresh marker: when this page was last refreshed, flagged when older
      than meta.stale_after_hours (from the contract). Staleness is the one thing measured against the
      viewer's clock: it is about how old the page is when someone opens it. */
   N.refreshedText = function () {
     var at = N.meta.generated_at;
     if (!at) return "Not refreshed yet";
-    var by = N.meta.generated_by, who = "";
-    if (by === "chat") who = " in chat";
-    else if (by && /^routine:/.test(by)) who = " by the " + by.slice(8).replace(/-/g, " ") + " run";
-    return "Refreshed " + N.weekday(at) + ", " + N.time(at) + who;
+    return "Refreshed " + N.weekday(at) + ", " + N.time(at);
   };
   N.isStale = function () {
     var at = Date.parse(N.meta.generated_at || ""), limit = N.meta.stale_after_hours;
     return !isNaN(at) && typeof limit === "number" && limit > 0 && (Date.now() - at) / 36e5 > limit;
   };
   N.refreshed = function () {
-    var stale = N.isStale();
+    var stale = N.isStale(), state = !N.meta.generated_at ? "none" : stale ? "stale" : "fresh";
     return h("p", { class: "mast-fresh", "data-stale": stale ? "1" : null },
+      h("span", { class: "signal", "data-state": state, "aria-hidden": "true" }),
       h("time", { datetime: N.meta.generated_at || null }, N.refreshedText()),
       stale ? N.chip("May be out of date", "warn") : null);
   };
 
-  /* opts: {title, subtitle, lede, stats:[[value,label]]} */
+  /* Links on a page only ever open another dashboard: the nav row, and names of other pages in text.
+     NAV_ORDER fixes the order so every page lists them the same way. */
+  var NAV_ORDER = ["daily-brief", "commitments", "projects", "week-ahead", "goals", "people", "decisions-risks", "records", "about-you", "control-center", "atlas-guide"];
+  N.navLinks = function () {
+    return N.list(N.meta.nav).filter(function (n) { return n && n.url && /^https:\/\//.test(n.url); })
+      .sort(function (a, b) {
+        var ia = NAV_ORDER.indexOf(a.name), ib = NAV_ORDER.indexOf(b.name);
+        return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+      });
+  };
+  /* The name of another dashboard, linked when its URL is known (plain text otherwise). */
+  N.pageLink = function (name, text) {
+    var n = N.navLinks().filter(function (x) { return x.name === name; })[0];
+    text = text || (n && n.title) || name;
+    return n && n.name !== N.meta.dashboard ? h("a", { href: n.url, target: "_blank", rel: "noopener noreferrer" }, text) : text;
+  };
+
+  /* Every page's header: title, subtitle, headline (meta.headline, else the page's own lede), stat cards.
+     opts: {title, subtitle, lede, stats:[[value, label or [singular, plural]]]} */
   N.masthead = function (o) {
-    var nav = N.list(N.meta.nav).filter(function (n) { return n && n.url && /^https:\/\//.test(n.url); });
+    var nav = N.navLinks();
     return h("header", { class: "mast" },
       h("div", { class: "mast-top" },
-        h("p", { class: "mast-who" }, star(), N.meta.user_display_name ? "Atlas for " + N.meta.user_display_name : "Atlas"),
+        h("p", { class: "mast-who" }, logo(), "Atlas"),
         N.refreshed()),
       h("h1", null, o.title),
       o.subtitle ? h("p", { class: "mast-sub" }, o.subtitle) : null,
-      o.lede ? h("p", { class: "mast-lede" }, N.rich(o.lede)) : null,
+      (N.meta.headline || o.lede) ? h("p", { class: "mast-lede" }, N.rich(N.meta.headline || o.lede)) : null,
       o.stats && o.stats.length ? h("ul", { class: "mast-stats" }, o.stats.map(function (s) {
-        return h("li", null, h("b", null, String(s[0])), s[1]);
+        var label = Array.isArray(s[1]) ? (Number(s[0]) === 1 ? s[1][0] : s[1][1]) : s[1];  /* [singular, plural] */
+        return h("li", { class: "stat" }, h("b", null, String(s[0])), h("span", null, label));
       })) : null,
       nav.length ? h("nav", { class: "mast-nav", "aria-label": "Other Atlas pages" }, nav.map(function (n) {
         return h("a", { href: n.url, target: "_blank", rel: "noopener noreferrer", "aria-current": n.name === N.meta.dashboard ? "page" : null }, n.title || n.name);
       })) : null);
   };
 
+  /* Footer: the Atlas version on the left, the theme button on the right. */
   N.footer = function () {
-    var at = N.meta.generated_at;
     return h("footer", { class: "foot" },
-      h("p", null, (at ? "Refreshed " + N.dateY(at) + ", " + N.time(at) : "Not refreshed yet") + " · Ask Atlas in chat to change anything"),
-      h("p", { class: "chips" }, N.meta.atlas_version ? h("span", null, "Atlas " + N.meta.atlas_version) : null, N.themeButton()));
+      h("p", null, N.meta.atlas_version ? "Atlas " + N.meta.atlas_version : "Atlas"),
+      h("p", { class: "chips" }, N.themeButton()));
   };
+
+  /* ---- Record panel ----
+     A drawer (full screen on phones) that shows one item in full. Pages build a "view" per item:
+       { id, title, kind, chips:[nodes], summary, details:[{label,value}], sections:[{heading, nodes}],
+         body:[{heading,text}], body_truncated, links:[{id,title}], dates }
+     and register every view, so linked items on the same page open in the panel too (with Back).
+     N.clickable(card, view) makes a card open it (click, or Enter/Space on its title button). */
+  N.recordPanel = function () {
+    var panel = h("dialog", { class: "rec-panel", "aria-labelledby": "rp-title" });
+    var views = {}, trail = [], lastFocus = null;
+    function close() { if (panel.open && panel.close) panel.close(); else panel.removeAttribute("open"); onClose(); }
+    function onClose() { document.documentElement.classList.remove("rp-lock"); trail = []; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+    panel.addEventListener("close", onClose);
+    panel.addEventListener("click", function (e) { if (e.target === panel) close(); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && panel.hasAttribute("open") && !panel.showModal) close(); });
+    function copyRequest(v, where) {
+      var text = "Show me the “" + v.title + "” record" + (v.id ? " (" + v.id + ")" : "") + ".";
+      function fallback() {
+        var box = h("input", { class: "rp-copy", type: "text", readonly: true, value: text, "aria-label": "Request to paste in chat" });
+        while (where.firstChild) where.removeChild(where.firstChild);
+        where.appendChild(h("p", null, "Copy this and paste it in your Atlas chat:")); where.appendChild(box);
+        box.focus(); box.select();
+      }
+      try { navigator.clipboard.writeText(text).then(function () { where.textContent = "Copied. Paste it in your Atlas chat to see or change this record."; }, fallback); }
+      catch (e) { fallback(); }
+    }
+    function render(v) {
+      var details = N.list(v.details).filter(function (x) { return x && x.label && x.value != null && x.value !== ""; });
+      var body = N.list(v.body).filter(function (s) { return s && s.text; });
+      var links = N.list(v.links).filter(Boolean);
+      var askNote = h("p", { role: "status", "aria-live": "polite" }, "To change this, ask Atlas in chat.");
+      var inner = h("div", { class: "rp" },
+        h("div", { class: "rp-bar" },
+          h("p", { class: "chips" }, v.kind ? N.chip(v.kind) : null, v.chips || null),
+          trail.length > 1 ? h("button", { type: "button", class: "rp-btn", onclick: function () { trail.pop(); render(trail[trail.length - 1]); } }, "Back") : null,
+          h("button", { type: "button", class: "rp-btn", onclick: close }, "Close")),
+        h("div", { class: "rp-body" },
+          h("div", null, h("h2", { id: "rp-title" }, v.title), v.summary ? h("p", { class: "rp-sum" }, N.rich(v.summary)) : null),
+          details.length ? h("section", null, h("h3", { class: "rp-h" }, "Details"),
+            h("dl", { class: "rp-details" }, details.map(function (x) { return h("div", null, h("dt", null, x.label), h("dd", null, typeof x.value === "object" ? x.value : N.rich(String(x.value)))); }))) : null,
+          N.list(v.sections).filter(function (s) { return s && s.nodes; }).map(function (s) { return h("section", null, s.heading ? h("h3", { class: "rp-h" }, s.heading) : null, s.nodes); }),
+          body.map(function (s) { return h("section", null, s.heading ? h("h3", { class: "rp-h" }, s.heading) : null, h("p", { class: "rp-text" }, N.rich(s.text))); }),
+          v.body_truncated ? h("p", { class: "rp-cut" }, "There's more in this record than fits here. Ask Atlas in chat to see all of it.") : null,
+          links.length ? h("section", null, h("h3", { class: "rp-h" }, "Linked records"),
+            h("ul", { class: "rp-links" }, links.map(function (x) {
+              var t = x.id && views[x.id];
+              if (!t) return h("li", null, h("div", { class: "rp-link-off" }, N.name(x)));
+              return h("li", null, h("button", { type: "button", class: "rp-link", onclick: function () { trail.push(t); render(t); } },
+                h("span", null, t.title), h("span", { class: "chips" }, t.kind ? N.chip(t.kind) : null, t.chips || null)));
+            }))) : null,
+          v.dates ? h("p", { class: "rp-dates" }, v.dates) : null,
+          h("div", { class: "rp-ask" },
+            h("button", { type: "button", class: "rp-btn", onclick: function () { copyRequest(v, askNote); } }, "Copy a request for Atlas"),
+            askNote)));
+      while (panel.firstChild) panel.removeChild(panel.firstChild);
+      panel.appendChild(inner);
+      var first = inner.querySelector(".rp-bar button:last-child");
+      if (first) first.focus();
+    }
+    function open(v) {
+      lastFocus = document.activeElement; trail = [v]; render(v);
+      document.documentElement.classList.add("rp-lock");
+      if (!panel.open) { if (panel.showModal) panel.showModal(); else panel.setAttribute("open", ""); }
+    }
+    return {
+      el: panel, open: open,
+      add: function (v) { if (v && v.id) views[v.id] = v; return v; },
+      get: function (id) { return views[id]; }
+    };
+  };
+  /* Panel section content: a paragraph, or a list of plain lines. */
+  N.para = function (text) { return text ? h("p", { class: "rp-text" }, N.rich(text)) : null; };
+  N.lines = function (items) { items = N.list(items).filter(Boolean); return items.length ? h("ul", { class: "rp-list" }, items.map(function (x) { return h("li", null, x); })) : null; };
+  /* Dates line for a panel: "Created Oct 1, 2026 · Updated Oct 9, 2026". */
+  N.datesLine = function (created, updated) {
+    return [created ? "Created " + N.dateY(created) : null, updated ? "Updated " + N.dateY(updated) : null].filter(Boolean).join(" · ");
+  };
+  /* A title rendered as a button, so keyboard users can open the card's panel. */
+  N.openTitle = function (text) { return h("button", { type: "button", class: "rec-open", "aria-haspopup": "dialog" }, text); };
+  /* Make a card open the panel: anywhere on the card, except while the reader is selecting text. */
+  N.clickable = function (card, panel, view) {
+    card.classList.add("rec");
+    card.addEventListener("click", function (e) {
+      if (e.target.closest && e.target.closest("a, input, select")) return;
+      var sel = window.getSelection && String(window.getSelection());
+      if (sel && sel.length > 2 && !(e.target.closest && e.target.closest(".rec-open"))) return;
+      panel.open(view);
+    });
+    return card;
+  };
+  /* Panel details: [label, value] pairs, empty ones dropped, then extra data details whose label isn't already shown. */
+  N.mergeDetails = function (pairs, extra) {
+    var out = [], seen = {};
+    N.list(pairs).forEach(function (p) { if (p && p[1] != null && p[1] !== "") { out.push({ label: p[0], value: p[1] }); seen[p[0]] = 1; } });
+    N.list(extra).forEach(function (x) { if (x && x.label && !seen[x.label]) out.push(x); });
+    return out.slice(0, 16);
+  };
+
+  /* Notices: a label and an icon per level, so a warning reads as one at a glance. */
+  var NOTICE = { warn: "Needs attention:", error: "Problem:", info: "Note:" };
+  var NOTICE_ICON = {
+    warn: ["M12 3.5 2.5 20h19L12 3.5z", "M12 10v4.5", "M12 17.4v.1"],
+    error: ["M12 2.75a9.25 9.25 0 1 0 0 18.5 9.25 9.25 0 0 0 0-18.5z", "M12 7.5v6", "M12 16.6v.1"],
+    info: ["M12 2.75a9.25 9.25 0 1 0 0 18.5 9.25 9.25 0 0 0 0-18.5z", "M12 11v5.5", "M12 7.6v.1"]
+  };
+  function noticeIcon(level) {
+    var ns = "http://www.w3.org/2000/svg";
+    var svg = document.createElementNS(ns, "svg");
+    svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("aria-hidden", "true"); svg.setAttribute("class", "notice-icon");
+    NOTICE_ICON[level].forEach(function (d) { var p = document.createElementNS(ns, "path"); p.setAttribute("d", d); svg.appendChild(p); });
+    return svg;
+  }
 
   /* Render a page. build(data, main) appends sections to main and may return masthead options. */
   N.page = function (defaults, build) {
@@ -604,7 +789,10 @@ a.rid:hover { color: var(--accent); }
       h("div", { class: "wrap" },
         N.masthead(mastOpts),
         notices.length ? h("ul", { class: "notices", "aria-label": "Notices" }, notices.map(function (n) {
-          return h("li", { class: "notice", "data-level": n.level || "warn" }, N.rich(n.text));
+          var level = NOTICE[n.level] ? n.level : "warn";
+          return h("li", { class: "notice", "data-level": level, role: level === "error" ? "alert" : null },
+            noticeIcon(level),
+            h("p", null, h("b", null, NOTICE[level] + " "), N.rich(n.text)));
         })) : null,
         main,
         N.footer())
@@ -625,29 +813,31 @@ a.rid:hover { color: var(--accent); }
     var catchUp = b.kind === "catch-up";
     var today = L(d.today), due = L(d.due), waiting = L(d.waiting_on);
 
+    /* Order: action needed, (catch-up only: while you were away), top priorities, today, due and slipping,
+       waiting on others, needs you, worth knowing, drafts ready. Section heads carry a description, no count. */
     var acts = L(d.actions);
     if (acts.length) {
       main.appendChild(N.section({ id: "actions", title: "Action needed",
         note: "Only you can do these. They stay here until they're done; tell Atlas in chat when you've done one.",
         body: N.items(acts.map(function (a) {
           return N.item({ tone: "warn", title: a.text, text: a.how || null,
-            insight: a.copy_text ? "The text to copy is on the Control Center, or ask Atlas in chat." : null,
-            aside: [h("span", null, a.id)] });
+            insight: a.copy_text ? ["The text to copy is on the ", N.pageLink("control-center", "Control Center"), ", or ask Atlas in chat."] : null,
+            aside: [null] });
         })) }));
     }
 
-    if (L(d.since_last_night).length) {
-      main.appendChild(N.section({ id: "since", title: catchUp ? "While you were away" : "Since last night",
-        note: catchUp ? null : "Picked up when you opened Atlas this morning.", body: notes(d.since_last_night), key: "since_last_night" }));
+    if (catchUp && L(d.since_last_night).length) {
+      main.appendChild(N.section({ id: "away", title: "While you were away", note: "What happened while you were out, most important first.",
+        body: notes(d.since_last_night), key: "since_last_night" }));
     }
 
     main.appendChild(N.section({ id: "priorities", title: "Top priorities", note: "Ranked against your goals, not just due dates.",
       body: L(d.priorities).length ? h("ol", { class: "prio" }, L(d.priorities).map(function (p) {
-        return h("li", null, h("p", { class: "prio-title" }, p.text), p.why ? h("p", { class: "prio-why" }, N.rich(p.why)) : null,
-          p.ref ? N.rid(p.ref.id) : null);
+        return h("li", null, h("p", { class: "prio-title" }, p.text), p.why ? h("p", { class: "prio-why" }, N.rich(p.why)) : null);
       })) : N.empty("No priorities set for today.") }));
 
-    main.appendChild(N.section({ id: "today", title: "Today", count: N.total("today", today.length), key: "today",
+    main.appendChild(N.section({ id: "today", title: "Today", key: "today",
+      note: "Your meetings and deadlines, with whether prep is ready.",
       body: today.length ? h("ul", { class: "items sched" }, today.map(function (e) {
         var prep = e.prep || {};
         var li = N.item({ tone: prep.status === "ready" ? "ok" : (e.kind === "deadline" ? "danger" : null), title: e.title, id: e.id,
@@ -660,7 +850,7 @@ a.rid:hover { color: var(--accent); }
         return li;
       })) : N.empty("No meetings or deadlines today.") }));
 
-    main.appendChild(N.section({ id: "due", title: "Due and slipping", count: N.total("due", due.length), key: "due",
+    main.appendChild(N.section({ id: "due", title: "Due and slipping", key: "due",
       note: "What you owe that is due soon or overdue.",
       body: N.items(due.map(function (c) {
         var late = c.status === "slipped" || (N.daysFromToday(c.due) || 0) < 0;
@@ -670,13 +860,24 @@ a.rid:hover { color: var(--accent); }
           aside: [h("span", null, N.due(c.due)), c.status === "slipped" ? N.status("slipped") : null] });
       }), "Nothing due in the next few days.") }));
 
-    main.appendChild(N.section({ id: "waiting", title: "Waiting on others", count: N.total("waiting_on", waiting.length), key: "waiting_on",
+    main.appendChild(N.section({ id: "waiting", title: "Waiting on others", key: "waiting_on",
+      note: "What other people owe you, and when it's due.",
       body: N.items(waiting.map(function (c) {
         var late = c.status === "slipped" || (c.due && N.daysFromToday(c.due) < 0);
         return N.item({ tone: late ? "warn" : "muted", title: c.title, id: c.id,
           meta: [c.counterparty ? "From " + N.name(c.counterparty) : null, c.since ? "Asked " + N.date(c.since) : null],
           nextStep: c.next_step, aside: [h("span", null, N.due(c.due))] });
       }), "You're not waiting on anyone.") }));
+
+    var asks = L(d.approvals), qs = L(d.questions);
+    if (asks.length || qs.length) {
+      main.appendChild(N.section({ id: "asks", title: "Needs you", note: "Reply in chat to approve, decline, or answer.",
+        body: [N.items(asks.map(function (a) {
+            return N.item({ tone: "warn", title: a.action, text: a.why, aside: [N.status("pending")] });
+          }).concat(qs.map(function (q) {
+            return N.item({ tone: "accent", title: q.text, aside: [N.chip("Question")] });
+          }))), N.more("approvals"), N.more("questions")] }));
+    }
 
     if (L(d.insights).length) {
       main.appendChild(N.section({ id: "insights", title: "Worth knowing", note: "Patterns Atlas noticed, with the reasoning.",
@@ -686,30 +887,15 @@ a.rid:hover { color: var(--accent); }
             extra: [i.draft && i.draft.where ? h("p", { class: "item-insight" }, h("b", null, "Draft ready: "),
                 (i.draft.to ? "to " + i.draft.to + ", " : "") + "in " + i.draft.where + ". Review and send it yourself, or say \"send it\" in chat.") : null,
               L(i.refs).length ? h("p", { class: "item-meta" }, h("span", null, "Based on ", N.refs(i.refs))) : null],
-            aside: [h("span", null, i.id), i.draft && i.draft.where ? N.chip("Draft ready", "ok") : null] });
+            aside: [i.draft && i.draft.where ? N.chip("Draft ready", "ok") : null] });
         })) }));
     }
 
-    main.appendChild(N.section({ id: "changes", title: "What changed", count: N.total("changes", L(d.changes).length), key: "changes",
-      body: L(d.changes).length ? notes(d.changes) : N.empty("Nothing new came in.") }));
-
     if (L(d.drafts).length) {
-      main.appendChild(N.section({ id: "drafts", title: "Drafts ready", note: "Waiting in your email drafts. Nothing has been sent.",
-        count: N.total("drafts", L(d.drafts).length), key: "drafts",
+      main.appendChild(N.section({ id: "drafts", title: "Drafts ready", note: "Waiting in your email drafts. Nothing has been sent.", key: "drafts",
         body: N.items(L(d.drafts).map(function (x) {
           return N.item({ title: x.title, meta: [x.to ? "To " + x.to : null, x.where], text: x.why, id: x.ref && x.ref.id });
         })) }));
-    }
-
-    var asks = L(d.approvals), qs = L(d.questions);
-    if (asks.length || qs.length) {
-      main.appendChild(N.section({ id: "asks", title: "Needs you", note: "Reply in chat to approve, decline, or answer.",
-        count: N.total("approvals", asks.length) + N.total("questions", qs.length),
-        body: [N.items(asks.map(function (a) {
-            return N.item({ tone: "warn", title: a.action, text: a.why, aside: [h("span", null, a.id), N.status("pending")] });
-          }).concat(qs.map(function (q) {
-            return N.item({ tone: "accent", title: q.text, aside: [h("span", null, q.id), N.chip("Question")] });
-          }))), N.more("approvals"), N.more("questions")] }));
     }
 
     var meetings = today.filter(function (e) { return e.kind !== "deadline"; }).length;

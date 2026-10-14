@@ -1,6 +1,7 @@
 {
   "meta": {
     "dashboard": "week-ahead",
+    "headline": "Meeting-heavy Thursday; Wednesday morning is your best window for the roadmap review, and the pricing sign-off needs time set aside.",
     "schema_version": 1,
     "title": "Week Ahead",
     "generated_at": "2026-10-12T20:32:05-07:00",
@@ -10,8 +11,63 @@
     "locale": "en-US",
     "user_display_name": "Maya Chen",
     "atlas_version": "1.0.0",
-    "record_base_url": null,
-    "nav": [],
+    "nav": [
+      {
+        "name": "daily-brief",
+        "title": "Daily Brief",
+        "url": "https://claude.ai/artifact/example-daily-brief"
+      },
+      {
+        "name": "commitments",
+        "title": "Commitments",
+        "url": "https://claude.ai/artifact/example-commitments"
+      },
+      {
+        "name": "projects",
+        "title": "Projects",
+        "url": "https://claude.ai/artifact/example-projects"
+      },
+      {
+        "name": "week-ahead",
+        "title": "Week Ahead",
+        "url": "https://claude.ai/artifact/example-week-ahead"
+      },
+      {
+        "name": "goals",
+        "title": "Goals",
+        "url": "https://claude.ai/artifact/example-goals"
+      },
+      {
+        "name": "people",
+        "title": "People",
+        "url": "https://claude.ai/artifact/example-people"
+      },
+      {
+        "name": "decisions-risks",
+        "title": "Decisions & Risks",
+        "url": "https://claude.ai/artifact/example-decisions-risks"
+      },
+      {
+        "name": "records",
+        "title": "Records",
+        "url": "https://claude.ai/artifact/example-records"
+      },
+      {
+        "name": "about-you",
+        "title": "About You",
+        "url": "https://claude.ai/artifact/example-about-you"
+      },
+      {
+        "name": "control-center",
+        "title": "Control Center",
+        "url": "https://claude.ai/artifact/example-control-center"
+      },
+      {
+        "name": "atlas-guide",
+        "title": "Atlas Guide",
+        "url": "https://claude.ai/artifact/example-atlas-guide"
+      }
+    ],
     "notices": [],
     "truncated": {}
   },
@@ -19,11 +75,13 @@
     "start": "2026-10-13",
     "end": "2026-10-19"
   },
-  "headline": "Meeting-heavy Tuesday and Thursday; Wednesday morning is your best window for the roadmap review.",
   "work_hours_per_day": 10,
   "summary": {
     "meetings": 9,
     "meeting_hours": 8.5,
+    "focus_hours": 22,
+    "work_due_hours": 6.3,
+    "unsized": 1,
     "deadlines": 5,
     "prep_missing": 1
   },
@@ -69,7 +127,8 @@
           ],
           "prep": {
             "status": "ready",
-            "path": "user/work/prep/2026-10-13-brightline-renewal-call.md"
+            "path": "user/work/prep/2026-10-13-brightline-renewal-call.md",
+            "summary": "Lead with the import fix date; Sam will ask about SSO pricing."
           }
         },
         {
@@ -86,7 +145,8 @@
             }
           ],
           "prep": {
-            "status": "ready"
+            "status": "ready",
+            "summary": "Three items: pricing feedback, hiring plan, roadmap review date."
           }
         }
       ],
@@ -102,7 +162,8 @@
             "title": "Jordan Lee"
           }
         }
-      ]
+      ],
+      "free_hours": 3.0
     },
     {
       "date": "2026-10-14",
@@ -158,7 +219,8 @@
             "title": "Tomás Herrera"
           }
         }
-      ]
+      ],
+      "free_hours": 6.5
     },
     {
       "date": "2026-10-15",
@@ -187,7 +249,8 @@
             }
           ],
           "prep": {
-            "status": "planned"
+            "status": "planned",
+            "todo": "Bring this month's import failure numbers; Atlas will add talking points Wednesday night."
           },
           "note": "Raise the onboarding import pattern here."
         },
@@ -213,9 +276,14 @@
             }
           ],
           "prep": {
-            "status": "none"
+            "status": "none",
+            "todo": "Decide what to say about the late MSA review. There's no prep note yet."
           },
-          "note": "No prep note yet; the MSA status is the open question."
+          "note": "No prep note yet; the MSA status is the open question.",
+          "project": {
+            "id": "projects/enterprise-launch",
+            "title": "Enterprise launch"
+          }
         },
         {
           "id": "events/2026-10-15-harbor-onboarding",
@@ -226,7 +294,8 @@
           "location": "Zoom",
           "attendees": [],
           "prep": {
-            "status": "planned"
+            "status": "planned",
+            "todo": "Atlas will write the prep note Wednesday evening."
           }
         }
       ],
@@ -250,7 +319,8 @@
           "status": "open",
           "counterparty": null
         }
-      ]
+      ],
+      "free_hours": 2.0
     },
     {
       "date": "2026-10-16",
@@ -283,7 +353,8 @@
             }
           ],
           "prep": {
-            "status": "planned"
+            "status": "planned",
+            "todo": "Atlas will draft your status update Thursday for you to review."
           }
         }
       ],
@@ -306,7 +377,8 @@
             "title": "Sam Okafor"
           }
         }
-      ]
+      ],
+      "free_hours": 3.5
     },
     {
       "date": "2026-10-17",
@@ -314,7 +386,8 @@
       "meeting_hours": 0,
       "events": [],
       "focus": [],
-      "due": []
+      "due": [],
+      "free_hours": 0
     },
     {
       "date": "2026-10-18",
@@ -322,7 +395,8 @@
       "meeting_hours": 0,
       "events": [],
       "focus": [],
-      "due": []
+      "due": [],
+      "free_hours": 0
     },
     {
       "date": "2026-10-19",
@@ -343,7 +417,55 @@
         }
       ],
       "focus": [],
-      "due": []
+      "due": [],
+      "free_hours": 7.0
+    }
+  ],
+  "outcomes": [
+    {
+      "text": "Send Jordan the pricing feedback before Thursday's tier decision",
+      "goal": {
+        "id": "goals/2026-q4-enterprise-revenue",
+        "title": "Launch the enterprise tier"
+      },
+      "status": "on_track",
+      "why": "It's due today and the draft is in your notes."
+    },
+    {
+      "text": "Get Dana's MSA review unblocked so the Globex pilot can start",
+      "goal": {
+        "id": "goals/2026-q4-enterprise-revenue",
+        "title": "Launch the enterprise tier"
+      },
+      "status": "at_risk",
+      "why": "Six days late; a call before Thursday is the fastest route."
+    },
+    {
+      "text": "Agree a date for the import fix and tell Support",
+      "goal": {
+        "id": "goals/2026-q4-retention",
+        "title": "Keep gross retention at 92% or better"
+      },
+      "status": "open",
+      "why": "Tomás's estimate is due Wednesday."
+    },
+    {
+      "text": "Finish your review of the Q4 roadmap draft",
+      "goal": null,
+      "status": "open",
+      "why": "Priya needs it by Thursday; Wednesday morning is free."
+    }
+  ],
+  "watchouts": [
+    {
+      "kind": "unprotected_deadline",
+      "date": "2026-10-15",
+      "text": "Enterprise pricing sign-off is due Thursday, the day with three long meetings, and no time is set aside for it."
+    },
+    {
+      "kind": "no_break",
+      "date": "2026-10-15",
+      "text": "Thursday afternoon runs from 1:00 to 4:30 PM with only a 30-minute gap."
     }
   ]
 }
