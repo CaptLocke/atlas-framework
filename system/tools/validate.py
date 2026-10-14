@@ -580,7 +580,7 @@ CHANGELOG_SUBSECTIONS = ("what's new", "action needed", "under the hood")
 
 def check_changelog(c):
     """CHANGELOG.md has a section for system/VERSION and only the three known ### headings
-    (docs/maintainers/releasing.md)."""
+    (release checklist: docs/maintainers/releasing.md on the upstream maintainers branch)."""
     path = c.p("CHANGELOG.md")
     if not os.path.exists(path):
         return  # reported by check_manifest (owned path missing)
@@ -592,8 +592,8 @@ def check_changelog(c):
         with open(vpath, encoding="utf-8") as f:
             ver = f.read().strip()
         if ver and ver not in versions:
-            c.rep.error(path, "no '## %s' section for system/VERSION (release checklist: "
-                              "docs/maintainers/releasing.md)" % ver)
+            c.rep.error(path, "no '## %s' section for system/VERSION (see the release checklist on the "
+                              "upstream repo's maintainers branch)" % ver)
     for m in re.finditer(r"^### +(.+?)\s*$", text, re.M):
         if m.group(1).strip().lower() not in CHANGELOG_SUBSECTIONS:
             c.rep.error(path, "unknown heading '### %s' (use What's new, Action needed, or Under the hood)"

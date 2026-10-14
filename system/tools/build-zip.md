@@ -4,7 +4,7 @@ name: build-zip
 ---
 # Building a release zip
 
-A release zip is the zip-delivery alternative to fetching from the upstream repo. When to build one, and every other release step, is in `docs/maintainers/releasing.md`; this file covers only the zip itself.
+A release zip is the zip-delivery alternative to fetching from the upstream repo. When to build one, and every other release step, is in the release checklist, `docs/maintainers/releasing.md` on the upstream repo's `maintainers` branch; this file covers only the zip itself.
 
 **Contents:** exactly the paths in `system/manifest.yaml: owned_paths`, taken from the release tag. Never anything under `user/`, never `.atlas-tmp/`.
 

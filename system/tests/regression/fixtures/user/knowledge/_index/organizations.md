@@ -1,1 +1,0 @@
-- [[organizations/acme]] | Acme | aliases: Acme Inc., acme.example | active | 2026-10-01 | Maya's employer; makes B2B analytics software.

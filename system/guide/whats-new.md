@@ -18,5 +18,5 @@ This section is **generated, not written here.** Its content comes from the `###
 - Anything only the user can do (update their Project instructions, for example) is not left to this section: it comes from the release's `### Action needed` list (and from a higher `bootstrap_version`) and `atlas-update` turns each item into an open `action` entry in `user/inbox/questions.md`, shown at the top of the next Daily Brief and in the Control Center until it's done.
 
 ## Maintainer rules
-- How to write the changelog and cut a release: `docs/maintainers/releasing.md` (the release checklist).
+- How to write the changelog and cut a release: the release checklist, `docs/maintainers/releasing.md` on the upstream repo's `maintainers` branch.
 - Never edit this file to announce a release.
