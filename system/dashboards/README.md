@@ -61,7 +61,7 @@ Each template contains each placeholder **exactly once**. No other text is subst
 | Control Center | "How Atlas is running, and what it needs from you." | Whether Atlas is running well, and the one thing that needs the user if any |
 | Atlas Guide | "Everything Atlas can do, and how to ask." | How to talk to Atlas, or what's new after an update |
 
-**Links.** A link on a dashboard only ever opens another dashboard: the nav row under the header, and the name of another dashboard where a page's own wording mentions one (`N.pageLink`). Pages have no jump-to-section links.
+**Links.** A link on a dashboard only ever opens another dashboard: the nav row under the header, and the name of another dashboard where a page's own wording mentions one (`N.pageLink`), and on Projects, the card of a project that has its own project page. Pages have no jump-to-section links.
 
 **Record panel.** On Records, Commitments, Projects, Decisions & Risks, and People, clicking a card (or its title, or Enter on it) opens the item in a panel (`N.recordPanel`, `N.clickable` in `_base.js`): a drawer on the right, full screen on phones. It shows the type and status, title, summary, **Details** (the fields the card shows plus any `details` the data carries), sections the page adds (next step, mitigation, why, who owes what), the item's `body`, **Linked records** (any linked item that is on the same page opens in the panel, with Back; others are listed by name), the created and updated dates, and "Copy a request for Atlas", which copies a ready-made request to paste into chat. Esc, Close, or a click outside shuts it.
 

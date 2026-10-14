@@ -282,6 +282,15 @@ html.rp-lock { overflow: hidden; }
 .proj-counts { display: flex; gap: 1rem; font-size: .875rem; color: var(--ink-2); }
 .proj-counts b { color: var(--ink); }
 .page-controls { margin: 0 0 1.25rem; }
+/* A project with its own project page: the whole card is a link to it */
+.proj.has-page { position: relative; cursor: pointer; transition: background-color .12s; }
+.proj.has-page:hover { background: color-mix(in srgb, var(--accent) 5%, var(--surface)); }
+.proj-link { color: inherit; text-decoration: none; }
+.proj-link::after { content: ""; position: absolute; inset: 0; border-radius: var(--radius); }
+.proj-link:focus-visible { outline: none; }
+.proj-link:focus-visible::after { outline: 2px solid var(--accent); outline-offset: 2px; }
+.page-chip { display: inline-flex; align-items: center; gap: .25rem; }
+@media (prefers-reduced-motion: reduce) { .proj.has-page { transition: none; } }
 </style>
 <style id="atlas-theme">{{ATLAS_THEME_CSS}}</style>
 </head>
@@ -832,17 +841,22 @@ html.rp-lock { overflow: hidden; }
         dates: N.datesLine(p.created, p.updated) });
     }
 
+    function pageUrl(p) { return p.page_url && /^https:\/\//.test(p.page_url) ? p.page_url : null; }
     var cards = ps.map(function (p) {
       var hid = "p-" + p.id.replace(/\W/g, "-");
-      var card = N.clickable(h("article", { class: "proj", "data-tone": HEALTH_TONE[p.health] || null, "aria-labelledby": hid },
-        h("h3", { id: hid }, N.openTitle(p.title)),
-        h("div", { class: "chips" }, N.status(p.health || "unknown"), p.status !== "active" ? N.status(p.status) : null, p.scale && p.scale !== "project" ? N.chip(N.label(p.scale)) : null),
+      var url = pageUrl(p);
+      /* A project with its own project page opens it; any other project opens the record panel. */
+      var card = h("article", { class: "proj" + (url ? " has-page" : ""), "data-tone": HEALTH_TONE[p.health] || null, "aria-labelledby": hid },
+        h("h3", { id: hid }, url ? h("a", { class: "proj-link", href: url, target: "_blank", rel: "noopener noreferrer" }, p.title) : N.openTitle(p.title)),
+        h("div", { class: "chips" }, N.status(p.health || "unknown"), p.status !== "active" ? N.status(p.status) : null, p.scale && p.scale !== "project" ? N.chip(N.label(p.scale)) : null,
+          url ? h("span", { class: "chip page-chip", "data-tone": "accent" }, "Project page \u2197") : null),
         h("p", { class: "item-meta" }, p.owner ? h("span", null, "Owner " + N.name(p.owner)) : null, p.target ? h("span", null, "Target " + N.date(p.target)) : null, p.goal ? h("span", null, "Serves " + N.name(p.goal)) : null),
         p.insight ? h("p", { class: "item-insight" }, N.rich(p.insight)) : null,
         p.next_step ? h("p", { class: "item-insight" }, h("b", null, "Next step: "), N.rich(p.next_step)) : null,
         h("p", { class: "proj-counts" }, h("span", null, h("b", null, String(p.open_commitments || 0)), p.open_commitments === 1 ? " open commitment" : " open commitments"),
-          h("span", null, h("b", null, String(p.active_risks || 0)), p.active_risks === 1 ? " open risk" : " open risks"))),
-        panel, view(p));
+          h("span", null, h("b", null, String(p.active_risks || 0)), p.active_risks === 1 ? " open risk" : " open risks")));
+      var v = view(p);
+      if (!url) N.clickable(card, panel, v);
       card._p = p;
       card._text = [p.title, N.name(p.owner), N.name(p.goal), p.insight].join(" ").toLowerCase();
       return card;

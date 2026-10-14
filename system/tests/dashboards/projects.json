@@ -113,7 +113,8 @@
           "title": "Onboarding import failures",
           "status": "active"
         }
-      ]
+      ],
+      "page_url": null
     },
     {
       "id": "projects/enterprise-launch",
@@ -181,7 +182,8 @@
           "title": "Design capacity in Q4",
           "status": "potential"
         }
-      ]
+      ],
+      "page_url": "https://claude.ai/artifact/example-project-page"
     },
     {
       "id": "projects/support-revamp",
@@ -224,7 +226,8 @@
           "title": "Onboarding import failures",
           "status": "active"
         }
-      ]
+      ],
+      "page_url": null
     },
     {
       "id": "projects/q4-roadmap",
@@ -257,7 +260,8 @@
           "due": null,
           "status": "open"
         }
-      ]
+      ],
+      "page_url": null
     },
     {
       "id": "projects/pm-hiring",
@@ -278,7 +282,8 @@
       "next_step": null,
       "open_commitments": 1,
       "active_risks": 0,
-      "commitments": []
+      "commitments": [],
+      "page_url": null
     }
   ]
 }
