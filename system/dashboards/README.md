@@ -27,7 +27,7 @@ Any chat may also republish any dashboard after changing the records it shows (`
 
 Shared files:
 - `_base.css`: canonical base styles. **Every template inlines it verbatim** inside `<style id="atlas-base">`.
-- `_base.js`: canonical runtime helpers (DOM builder, date formatting, record IDs, sections, filters, theme toggle). **Every template inlines it verbatim** inside `<script id="atlas-base-js">`.
+- `_base.js`: canonical runtime helpers (DOM builder, date formatting, record references, sections, filters, theme toggle). **Every template inlines it verbatim** inside `<script id="atlas-base-js">`.
 - After editing either file, run `python3 system/tests/dashboards/render.py --sync`, then `render.py --check`. Templates must never drift from the canonical copies.
 
 ## Template anatomy
@@ -89,14 +89,14 @@ Every dashboard's JSON has a `meta` object:
 | `locale` | no | BCP 47 tag for date formatting. Default `en-US` (see gaps in the contract notes). |
 | `user_display_name` | no | `atlas.yaml: user_display_name`. |
 | `atlas_version` | no | `atlas.yaml: installed_version`. |
-| `record_base_url` | no | `null` by default. If set (e.g. `https://github.com/<repo>/blob/main/user/knowledge/`, from `atlas.yaml: repo`), record IDs become links to the record file. Leave `null` unless the user asks; the ID text alone is enough to ask Atlas. |
+| `record_base_url` | no | `null` by default. If set (e.g. `https://github.com/<repo>/blob/main/user/knowledge/`, from `atlas.yaml: repo`), record titles become links to the record file. Leave `null` unless the user asks; the ID text alone is enough to ask Atlas. |
 | `nav` | no | Links to the other dashboards, from `dashboards.yaml` entries that have a `url`. Only `https://` links render. |
 | `notices` | no | Up to 3 short lines shown above the content: open `high` known issues from `user/.state/health.yaml` that affect this page's data (e.g. a disconnected source), and staleness (the readiness check found an upstream job stale). `level`: `info`, `warn`, or `error`. |
 | `truncated` | no | Map of list key → number of items left out. The page shows "N more not shown here. Ask Atlas in chat to see them." under that list. Keys are top-level list names unless the contract says otherwise. |
 
 ## Data rules for every contract
-- **Plain text only.** Every string is plain text; never HTML or Markdown. Mentions of records may appear inline as `[[type/slug]]`; the page renders them as record IDs. Templates render all text with `textContent`, so content can never inject markup or script (N7).
-- **References** are `{ "id": "<type>/<slug>", "title": "<record title>" }`. Every item that maps to a record carries its `id`, and the page shows the ID next to the title so the user can ask Atlas about it.
+- **Plain text only.** Every string is plain text; never HTML or Markdown. Mentions of records may appear inline as `[[type/slug]]`; the page drops a mention in brackets (a citation) and shows any other mention as the record's readable name. Templates render all text with `textContent`, so content can never inject markup or script (N7).
+- **References** are `{ "id": "<type>/<slug>", "title": "<record title>" }`. Every item that maps to a record carries its `id` (for search and troubleshooting). Pages never show record IDs, inbox entry numbers, or file paths; the user asks Atlas about a record by its name.
 - **Dates** are `YYYY-MM-DD` (calendar days) or ISO 8601 datetimes with offset. The page formats them.
 - **Never include** `notes_private`, phone numbers, email addresses, secrets, or content whose data-rule handling is `ignore` or `pointer`. Use `summary` text for `summary` handling. Excluded records (`data-rules.yaml: exclusions`) never appear. Archived and superseded records are left out unless the contract says otherwise.
 - **Absent vs empty:** use `null` for unknown single values and `[]` for empty lists. Pages handle both.

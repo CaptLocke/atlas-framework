@@ -107,9 +107,9 @@ button, input, select { font: inherit; color: inherit; }
 /* Masthead: the one expressive element. */
 .mast { padding: 2.25rem 0 1.75rem; border-bottom: 1px solid var(--line); margin-bottom: 1.5rem; }
 .mast-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .35rem 1rem; margin-bottom: 1.1rem; }
-.mast-who { display: flex; align-items: center; gap: .5rem; color: var(--ink-2); font-size: .9rem; margin: 0; }
+.mast-who { display: flex; align-items: center; gap: .6rem; color: var(--ink); font-family: var(--font-heading); font-size: 1.35rem; font-weight: 600; letter-spacing: -0.005em; margin: 0; }
 .mast-fresh { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin: 0; color: var(--ink-2); font-size: .85rem; font-variant-numeric: tabular-nums; }
-.mast-who svg { width: 1.1rem; height: 1.1rem; fill: var(--star); flex: none; }
+.mast-who svg { width: 2rem; height: 2rem; fill: var(--star); flex: none; }
 .mast h1 { font-size: clamp(2.1rem, 6vw, 3.4rem); letter-spacing: -0.015em; font-weight: 600; }
 .mast-sub { font-family: var(--font-heading); font-size: clamp(1.1rem, 2.6vw, 1.4rem); color: var(--ink-2); margin-top: .35rem; }
 .mast-lede { max-width: var(--measure); margin-top: 1rem; font-size: 1.05rem; }
@@ -380,24 +380,30 @@ a.rid:hover { color: var(--accent); }
     return "Due " + N.date(s);
   };
 
-  /* ---- Record references ---- */
+  /* ---- Record references ----
+     Pages never show record IDs, [[type/slug]] mentions, inbox entry numbers, or file paths: they are
+     noise to the reader. The data still carries them (contracts, search, troubleshooting). */
   var ID_RE = /\[\[([a-z]+\/[a-z0-9][a-z0-9-]*)\]\]/g;
-  N.rid = function (id) {
-    if (!id) return null;
-    var text = "[[" + id + "]]";
-    var base = N.meta.record_base_url;
-    if (base && /^https:\/\//.test(base) && /^[a-z]+\/[a-z0-9][a-z0-9-]*$/.test(id)) {
-      return h("a", { class: "rid", href: base + id + ".md", target: "_blank", rel: "noopener noreferrer", title: "Open the record file" }, text);
-    }
-    return h("code", { class: "rid", title: "Record ID: mention it in chat to ask Atlas about it" }, text);
+  N.rid = function () { return null; };
+  N.path = function () { return null; };
+  /* A readable name for a bare ID: "sources/2026-10-13-brightline-agenda-thread" -> "Brightline agenda thread". */
+  N.idName = function (id) {
+    var parts = String(id || "").split("/"), type = parts.length > 1 ? parts[0] : "";
+    var s = parts.pop().replace(/^\d{4}-\d{2}-\d{2}-/, "").replace(/-/g, " ");
+    if (!s) return "";
+    if (type === "people" || type === "organizations") return s.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+    return s.charAt(0).toUpperCase() + s.slice(1);
   };
-  /* A file path in the user's repository (not a record), e.g. a prep note or profile file. */
-  N.path = function (p) { return p ? h("code", { class: "rid", title: "File in your Atlas repository" }, p) : null; };
-  /* A ref is {id, title}. Renders the title followed by its ID. */
-  N.ref = function (r, opts) {
+  /* A ref is {id, title}. Renders the title; with record_base_url set, the title links to the record file. */
+  N.ref = function (r) {
     if (!r) return null;
-    if (typeof r === "string") return N.rid(r);
-    return h("span", { class: "ref" }, r.title || r.id, r.id && !(opts && opts.noId) ? [" ", N.rid(r.id)] : null);
+    if (typeof r === "string") r = { id: r };
+    var text = r.title || N.idName(r.id);
+    var base = N.meta.record_base_url;
+    if (base && /^https:\/\//.test(base) && r.id && /^[a-z]+\/[a-z0-9][a-z0-9-]*$/.test(r.id)) {
+      return h("a", { class: "ref", href: base + r.id + ".md", target: "_blank", rel: "noopener noreferrer" }, text);
+    }
+    return h("span", { class: "ref" }, text);
   };
   N.refs = function (list) {
     list = N.list(list);
@@ -406,19 +412,17 @@ a.rid:hover { color: var(--accent); }
     return out;
   };
   N.name = function (r) { return r ? (typeof r === "string" ? r : r.title || r.id) : ""; };
-  /* Plain text with [[type/slug]] mentions styled as IDs. */
+  /* Plain text with [[type/slug]] mentions: a citation in brackets is dropped; a mention used as a word
+     becomes the record's readable name. */
   N.rich = function (text) {
     if (text == null) return null;
-    text = String(text);
-    var out = [], last = 0, m;
-    ID_RE.lastIndex = 0;
-    while ((m = ID_RE.exec(text))) {
-      if (m.index > last) out.push(text.slice(last, m.index));
-      out.push(N.rid(m[1]));
-      last = m.index + m[0].length;
-    }
-    if (last < text.length) out.push(text.slice(last));
-    return out;
+    var M = "\\[\\[[a-z]+\\/[a-z0-9][a-z0-9-]*\\]\\]";
+    return String(text)
+      .replace(new RegExp("\\s*\\(\\s*" + M + "(?:\\s*[,;]\\s*" + M + ")*\\s*\\)", "g"), "")
+      .replace(ID_RE, function (_, id) { return N.idName(id); })
+      .replace(/\s+([.,;:!?)])/g, "$1")
+      .replace(/\s{2,}/g, " ")
+      .trim();
   };
 
   /* ---- Building blocks ---- */
@@ -643,7 +647,7 @@ a.rid:hover { color: var(--accent); }
       main.appendChild(N.section({ id: "proposals", title: "Waiting for your OK", count: N.total("proposals", props.length), key: "proposals",
         note: "Things Atlas noticed but won't rely on until you confirm. Reply yes or no in chat.",
         body: N.items(props.map(function (q) {
-          return N.item({ tone: "warn", title: q.text, text: q.proposed_change ? "Would add: " + q.proposed_change : null, aside: [h("span", null, q.id), h("span", null, "Asked " + N.date(q.asked))] });
+          return N.item({ tone: "warn", title: q.text, text: q.proposed_change ? "Would add: " + q.proposed_change : null, aside: [h("span", null, "Asked " + N.date(q.asked))] });
         })) }));
     }
 

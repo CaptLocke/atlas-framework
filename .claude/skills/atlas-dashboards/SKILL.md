@@ -56,5 +56,5 @@ Keep a small set of always-current, browsable pages: Daily Brief, Work Board, Go
 
 ## Done when
 - Each requested dashboard is rendered from the right template, matches its contract's shape, is under budget, and is published privately at the URL recorded in `dashboards.yaml` with today's `last_published`.
-- Every record shown links to its record ID.
+- Every record shown carries its record ID in the data; pages show only the title (never IDs, inbox entry numbers, or file paths).
 - Failures are recorded as known issues with a plain-language fix, and cleared once fixed.
