@@ -6,7 +6,7 @@
 
    Theming: atlas-dashboards fills <style id="atlas-theme"> with --brand-* values
    from user/profile/design-system.md. Nothing here sets --brand-*, so an empty
-   theme block falls back to the neutral defaults below. */
+   theme block falls back to the default palette below. */
 
 :root {
   color-scheme: light dark;
@@ -14,20 +14,21 @@
   --font-body: var(--brand-font-body, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
   --font-id: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
 
-  --bg: var(--brand-bg, #f4f6f8);
-  --surface: var(--brand-surface, #ffffff);
-  --surface-2: #eaeef2;
-  --ink: var(--brand-ink, #1a2632);
-  --ink-2: #4a5866;
-  --line: #d3dae1;
-  --accent: var(--brand-accent, #2b5a8a);
+  /* Default palette (no brand): warm stone neutrals, navy accent, rust highlight, olive secondary. */
+  --bg: var(--brand-bg, #f4f0e8);
+  --surface: var(--brand-surface, #fcfaf5);
+  --surface-2: #eae3d4;
+  --ink: var(--brand-ink, #1c1a15);
+  --ink-2: #5e584c;
+  --line: #d3c7ad;
+  --accent: var(--brand-accent, #28374a);
   --accent-ink: var(--brand-accent-ink, #ffffff);
-  --accent-soft: #e2ebf5;
-  --star: var(--brand-highlight, #a86f12);
+  --accent-soft: #e9eef6;
+  --star: var(--brand-highlight, #754437);
   --ok: #2c7552;
   --warn: #8f5500;
   --danger: #b0281f;
-  --muted: #7a8794;
+  --muted: #6b6751;
 
   --radius: 6px;
   --gutter: 16px;
@@ -36,37 +37,37 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: var(--brand-bg-dark, #10161d);
-    --surface: var(--brand-surface-dark, #17212b);
-    --surface-2: #1f2b37;
-    --ink: var(--brand-ink-dark, #e3e9ef);
-    --ink-2: #a5b2bf;
-    --line: #2c3a48;
-    --accent: var(--brand-accent-dark, #8eb5e3);
-    --accent-ink: var(--brand-accent-ink-dark, #0d1620);
-    --accent-soft: #1d3149;
-    --star: var(--brand-highlight-dark, #e2b45c);
+    --bg: var(--brand-bg-dark, #1c1a15);
+    --surface: var(--brand-surface-dark, #26241e);
+    --surface-2: #3b382f;
+    --ink: var(--brand-ink-dark, #f4f0e8);
+    --ink-2: #aaa08b;
+    --line: #3b382f;
+    --accent: var(--brand-accent-dark, #b5c7e2);
+    --accent-ink: var(--brand-accent-ink-dark, #101923);
+    --accent-soft: #28374a;
+    --star: var(--brand-highlight-dark, #d7826c);
     --ok: #6cc49a;
     --warn: #e5a94c;
     --danger: #f08b80;
-    --muted: #7f8e9c;
+    --muted: #908b6e;
   }
 }
 :root[data-theme="dark"] {
-  --bg: var(--brand-bg-dark, #10161d);
-  --surface: var(--brand-surface-dark, #17212b);
-  --surface-2: #1f2b37;
-  --ink: var(--brand-ink-dark, #e3e9ef);
-  --ink-2: #a5b2bf;
-  --line: #2c3a48;
-  --accent: var(--brand-accent-dark, #8eb5e3);
-  --accent-ink: var(--brand-accent-ink-dark, #0d1620);
-  --accent-soft: #1d3149;
-  --star: var(--brand-highlight-dark, #e2b45c);
+  --bg: var(--brand-bg-dark, #1c1a15);
+  --surface: var(--brand-surface-dark, #26241e);
+  --surface-2: #3b382f;
+  --ink: var(--brand-ink-dark, #f4f0e8);
+  --ink-2: #aaa08b;
+  --line: #3b382f;
+  --accent: var(--brand-accent-dark, #b5c7e2);
+  --accent-ink: var(--brand-accent-ink-dark, #101923);
+  --accent-soft: #28374a;
+  --star: var(--brand-highlight-dark, #d7826c);
   --ok: #6cc49a;
   --warn: #e5a94c;
   --danger: #f08b80;
-  --muted: #7f8e9c;
+  --muted: #908b6e;
 }
 
 *, *::before, *::after { box-sizing: border-box; }

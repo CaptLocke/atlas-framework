@@ -127,15 +127,15 @@ The theme comes from `user/profile/design-system.md` (`system/schemas/profile.md
 
 | Property | From the design system | Fallback |
 |---|---|---|
-| `--brand-accent` | Primary color (light) | `#2b5a8a` |
-| `--brand-accent-dark` | Primary color tuned for dark backgrounds; lighten the primary if none is given | `#8eb5e3` |
-| `--brand-accent-ink` / `--brand-accent-ink-dark` | Text on the accent | `#ffffff` / `#0d1620` |
-| `--brand-highlight` / `--brand-highlight-dark` | Secondary/accent color (used for the star mark and priority numerals) | `#a86f12` / `#e2b45c` |
+| `--brand-accent` | Primary color (light) | `#28374a` (navy) |
+| `--brand-accent-dark` | Primary color tuned for dark backgrounds; lighten the primary if none is given | `#b5c7e2` |
+| `--brand-accent-ink` / `--brand-accent-ink-dark` | Text on the accent | `#ffffff` / `#101923` |
+| `--brand-highlight` / `--brand-highlight-dark` | Secondary/accent color (used for the star mark and priority numerals) | `#754437` / `#d7826c` (rust) |
 | `--brand-font-heading` | Heading family with web-safe fallbacks | humanist serif stack |
 | `--brand-font-body` | Body family with web-safe fallbacks | system UI stack |
-| `--brand-bg`, `--brand-surface`, `--brand-ink` (+ `-dark`) | Optional background, surface, and text colors | neutral cool greys |
+| `--brand-bg`, `--brand-surface`, `--brand-ink` (+ `-dark`) | Optional background, surface, and text colors | warm stone: `#f4f0e8` / `#fcfaf5` / `#1c1a15` (dark `#1c1a15` / `#26241e` / `#f4f0e8`) |
 
-Rules: only `--brand-*` declarations; colors as hex; font names as CSS family lists that work without downloading fonts (no `@import`, no `url()`). Keep text contrast at WCAG AA (4.5:1) against the surface in both light and dark; if a brand color fails, darken it (light) or lighten it (dark) rather than using it as is. An empty theme block gives the neutral default look. Example: `system/tests/dashboards/theme-sample.css`.
+Rules: only `--brand-*` declarations; colors as hex; font names as CSS family lists that work without downloading fonts (no `@import`, no `url()`). Keep text contrast at WCAG AA (4.5:1) against the surface in both light and dark; if a brand color fails, darken it (light) or lighten it (dark) rather than using it as is. An empty theme block gives the default Atlas palette (warm stone neutrals, navy accent, rust highlight, olive for muted text and lines from the same family); the non-brand tokens (`--ink-2`, `--line`, `--surface-2`, `--accent-soft`, `--muted`) always come from it. Example: `system/tests/dashboards/theme-sample.css`.
 
 Pages support light and dark (`prefers-color-scheme`), a viewer-chosen theme (`<html data-theme="light|dark">`, set by the footer button), phone widths down to 320 px with 16 px gutters and no horizontal scroll, keyboard focus states, and printing (filters hidden, black on white).
 
