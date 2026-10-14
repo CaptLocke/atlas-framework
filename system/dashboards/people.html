@@ -212,13 +212,57 @@ a.rid:hover { color: var(--accent); }
 .theme-btn { background: none; border: 1px solid var(--line); border-radius: 999px; padding: .2rem .75rem; cursor: pointer; font-size: .85rem; color: var(--ink-2); }
 
 /* ---- Print ---- */
+/* Clickable cards open the record panel (N.recordPanel) */
+.rec { cursor: pointer; transition: background-color .12s; }
+.rec:hover { background: color-mix(in srgb, var(--accent) 5%, var(--surface)); }
+.rec-open { all: unset; cursor: pointer; font: inherit; color: inherit; }
+.rec-open:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+/* Record panel: a drawer on the right; full screen on phones */
+dialog.rec-panel { position: fixed; inset: 0 0 0 auto; margin: 0; width: min(42rem, 100%); height: 100%; max-height: none; max-width: 100%;
+  border: 0; border-left: 1px solid var(--line); padding: 0; background: var(--surface); color: var(--ink); box-shadow: -10px 0 40px rgba(0, 0, 0, .22); }
+dialog.rec-panel:not([open]) { display: none; }
+dialog.rec-panel::backdrop { background: rgba(20, 18, 12, .45); }
+.rp { height: 100%; overflow-y: auto; overscroll-behavior: contain; }
+.rp-bar { position: sticky; top: 0; z-index: 1; display: flex; justify-content: space-between; align-items: center; gap: .75rem;
+  padding: calc(.75rem + env(safe-area-inset-top, 0px)) 1.5rem .75rem; background: var(--surface); border-bottom: 1px solid var(--line); }
+.rp-bar .chips { flex: 1; min-width: 0; }
+.rp-btn { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: .3rem .85rem; font: inherit; font-size: .88rem; cursor: pointer; }
+.rp-btn:hover { border-color: var(--accent); }
+.rp-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.rp-body { padding: 1.25rem 1.5rem 2.5rem; display: flex; flex-direction: column; gap: 1.35rem; }
+.rp-body h2 { font-size: clamp(1.45rem, 4vw, 1.9rem); line-height: 1.2; margin: 0; text-wrap: balance; }
+.rp-sum { margin: .5rem 0 0; font-size: 1.02rem; }
+.rp-h { font-family: var(--font-heading); font-size: 1.05rem; font-weight: 600; margin: 0 0 .45rem; }
+.rp-details { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: .75rem 1.25rem; margin: 0; }
+.rp-details div { min-width: 0; }
+.rp-details dt { font-size: .78rem; color: var(--ink-2); margin: 0 0 .1rem; }
+.rp-details dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.rp-text { margin: 0; white-space: pre-line; max-width: var(--measure); }
+.rp-list { margin: 0; padding-left: 1.1rem; display: grid; gap: .3rem; max-width: var(--measure); }
+.rp-cut { margin: 0; font-size: .9rem; color: var(--ink-2); font-style: italic; }
+.rp-links { list-style: none; margin: 0; padding: 0; display: grid; gap: .4rem; }
+.rp-link { all: unset; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: .75rem; width: 100%; padding: .55rem .8rem;
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); cursor: pointer; }
+.rp-link:hover { border-color: var(--accent); }
+.rp-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.rp-link span:first-child { font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.rp-link-off { padding: .55rem .8rem; border: 1px dashed var(--line); border-radius: var(--radius); color: var(--ink-2); }
+.rp-dates { margin: 0; font-size: .86rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.rp-ask { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem .9rem; padding-top: 1.1rem; border-top: 1px solid var(--line); }
+.rp-ask .rp-btn { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.rp-ask p { margin: 0; font-size: .88rem; color: var(--ink-2); }
+.rp-copy { width: 100%; font: inherit; font-size: .88rem; padding: .45rem .6rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); color: var(--ink); }
+html.rp-lock { overflow: hidden; }
+@media (max-width: 640px) { dialog.rec-panel { width: 100%; border-left: 0; } .rp-bar, .rp-body { padding-left: 16px; padding-right: 16px; } }
+@media (prefers-reduced-motion: reduce) { .rec { transition: none; } }
+
 @media print {
   :root, :root:not([data-theme="light"]), :root[data-theme="dark"] {
     --bg: #ffffff; --surface: #ffffff; --surface-2: #f0f0f0; --ink: #000000; --ink-2: #333333;
     --line: #bbbbbb; --accent: #000000; --star: #000000; --ok: #000000; --warn: #000000; --danger: #000000; --muted: #555555;
   }
   body { font-size: 11pt; }
-  .no-print, .controls, .theme-btn, .skip, .mast-nav { display: none !important; }
+  .no-print, .controls, .theme-btn, .skip, .mast-nav, dialog.rec-panel { display: none !important; }
   .items { border: 0; }
   .item { break-inside: avoid; padding-left: .75rem; }
   .sec { break-inside: auto; }
@@ -607,6 +651,103 @@ a.rid:hover { color: var(--accent); }
       h("p", { class: "chips" }, N.themeButton()));
   };
 
+  /* ---- Record panel ----
+     A drawer (full screen on phones) that shows one item in full. Pages build a "view" per item:
+       { id, title, kind, chips:[nodes], summary, details:[{label,value}], sections:[{heading, nodes}],
+         body:[{heading,text}], body_truncated, links:[{id,title}], dates }
+     and register every view, so linked items on the same page open in the panel too (with Back).
+     N.clickable(card, view) makes a card open it (click, or Enter/Space on its title button). */
+  N.recordPanel = function () {
+    var panel = h("dialog", { class: "rec-panel", "aria-labelledby": "rp-title" });
+    var views = {}, trail = [], lastFocus = null;
+    function close() { if (panel.open && panel.close) panel.close(); else panel.removeAttribute("open"); onClose(); }
+    function onClose() { document.documentElement.classList.remove("rp-lock"); trail = []; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+    panel.addEventListener("close", onClose);
+    panel.addEventListener("click", function (e) { if (e.target === panel) close(); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && panel.hasAttribute("open") && !panel.showModal) close(); });
+    function copyRequest(v, where) {
+      var text = "Show me the “" + v.title + "” record" + (v.id ? " (" + v.id + ")" : "") + ".";
+      function fallback() {
+        var box = h("input", { class: "rp-copy", type: "text", readonly: true, value: text, "aria-label": "Request to paste in chat" });
+        while (where.firstChild) where.removeChild(where.firstChild);
+        where.appendChild(h("p", null, "Copy this and paste it in your Atlas chat:")); where.appendChild(box);
+        box.focus(); box.select();
+      }
+      try { navigator.clipboard.writeText(text).then(function () { where.textContent = "Copied. Paste it in your Atlas chat to see or change this record."; }, fallback); }
+      catch (e) { fallback(); }
+    }
+    function render(v) {
+      var details = N.list(v.details).filter(function (x) { return x && x.label && x.value != null && x.value !== ""; });
+      var body = N.list(v.body).filter(function (s) { return s && s.text; });
+      var links = N.list(v.links).filter(Boolean);
+      var askNote = h("p", { role: "status", "aria-live": "polite" }, "To change this, ask Atlas in chat.");
+      var inner = h("div", { class: "rp" },
+        h("div", { class: "rp-bar" },
+          h("p", { class: "chips" }, v.kind ? N.chip(v.kind) : null, v.chips || null),
+          trail.length > 1 ? h("button", { type: "button", class: "rp-btn", onclick: function () { trail.pop(); render(trail[trail.length - 1]); } }, "Back") : null,
+          h("button", { type: "button", class: "rp-btn", onclick: close }, "Close")),
+        h("div", { class: "rp-body" },
+          h("div", null, h("h2", { id: "rp-title" }, v.title), v.summary ? h("p", { class: "rp-sum" }, N.rich(v.summary)) : null),
+          details.length ? h("section", null, h("h3", { class: "rp-h" }, "Details"),
+            h("dl", { class: "rp-details" }, details.map(function (x) { return h("div", null, h("dt", null, x.label), h("dd", null, typeof x.value === "object" ? x.value : N.rich(String(x.value)))); }))) : null,
+          N.list(v.sections).filter(function (s) { return s && s.nodes; }).map(function (s) { return h("section", null, s.heading ? h("h3", { class: "rp-h" }, s.heading) : null, s.nodes); }),
+          body.map(function (s) { return h("section", null, s.heading ? h("h3", { class: "rp-h" }, s.heading) : null, h("p", { class: "rp-text" }, N.rich(s.text))); }),
+          v.body_truncated ? h("p", { class: "rp-cut" }, "There's more in this record than fits here. Ask Atlas in chat to see all of it.") : null,
+          links.length ? h("section", null, h("h3", { class: "rp-h" }, "Linked records"),
+            h("ul", { class: "rp-links" }, links.map(function (x) {
+              var t = x.id && views[x.id];
+              if (!t) return h("li", null, h("div", { class: "rp-link-off" }, N.name(x)));
+              return h("li", null, h("button", { type: "button", class: "rp-link", onclick: function () { trail.push(t); render(t); } },
+                h("span", null, t.title), h("span", { class: "chips" }, t.kind ? N.chip(t.kind) : null, t.chips || null)));
+            }))) : null,
+          v.dates ? h("p", { class: "rp-dates" }, v.dates) : null,
+          h("div", { class: "rp-ask" },
+            h("button", { type: "button", class: "rp-btn", onclick: function () { copyRequest(v, askNote); } }, "Copy a request for Atlas"),
+            askNote)));
+      while (panel.firstChild) panel.removeChild(panel.firstChild);
+      panel.appendChild(inner);
+      var first = inner.querySelector(".rp-bar button:last-child");
+      if (first) first.focus();
+    }
+    function open(v) {
+      lastFocus = document.activeElement; trail = [v]; render(v);
+      document.documentElement.classList.add("rp-lock");
+      if (!panel.open) { if (panel.showModal) panel.showModal(); else panel.setAttribute("open", ""); }
+    }
+    return {
+      el: panel, open: open,
+      add: function (v) { if (v && v.id) views[v.id] = v; return v; },
+      get: function (id) { return views[id]; }
+    };
+  };
+  /* Panel section content: a paragraph, or a list of plain lines. */
+  N.para = function (text) { return text ? h("p", { class: "rp-text" }, N.rich(text)) : null; };
+  N.lines = function (items) { items = N.list(items).filter(Boolean); return items.length ? h("ul", { class: "rp-list" }, items.map(function (x) { return h("li", null, x); })) : null; };
+  /* Dates line for a panel: "Created Oct 1, 2026 · Updated Oct 9, 2026". */
+  N.datesLine = function (created, updated) {
+    return [created ? "Created " + N.dateY(created) : null, updated ? "Updated " + N.dateY(updated) : null].filter(Boolean).join(" · ");
+  };
+  /* A title rendered as a button, so keyboard users can open the card's panel. */
+  N.openTitle = function (text) { return h("button", { type: "button", class: "rec-open", "aria-haspopup": "dialog" }, text); };
+  /* Make a card open the panel: anywhere on the card, except while the reader is selecting text. */
+  N.clickable = function (card, panel, view) {
+    card.classList.add("rec");
+    card.addEventListener("click", function (e) {
+      if (e.target.closest && e.target.closest("a, input, select")) return;
+      var sel = window.getSelection && String(window.getSelection());
+      if (sel && sel.length > 2 && !(e.target.closest && e.target.closest(".rec-open"))) return;
+      panel.open(view);
+    });
+    return card;
+  };
+  /* Panel details: [label, value] pairs, empty ones dropped, then extra data details whose label isn't already shown. */
+  N.mergeDetails = function (pairs, extra) {
+    var out = [], seen = {};
+    N.list(pairs).forEach(function (p) { if (p && p[1] != null && p[1] !== "") { out.push({ label: p[0], value: p[1] }); seen[p[0]] = 1; } });
+    N.list(extra).forEach(function (x) { if (x && x.label && !seen[x.label]) out.push(x); });
+    return out.slice(0, 16);
+  };
+
   /* Notices: a label and an icon per level, so a warning reads as one at a glance. */
   var NOTICE = { warn: "Needs attention:", error: "Problem:", info: "Note:" };
   var NOTICE_ICON = {
@@ -676,13 +817,33 @@ a.rid:hover { color: var(--accent); }
   N.page({ title: "People" }, function (d, main) {
     var people = L(d.people);
     var filter = "all", query = "";
+    var panel = N.recordPanel();
+    function owedLines(list) {
+      return N.lines(L(list).map(function (c) { return [c.title, c.due ? " \u00b7 " + N.due(c.due) : ""]; }));
+    }
+    function view(p) {
+      return panel.add({ id: p.id, title: p.title, kind: "Person",
+        chips: [p.relationship ? N.chip(N.label(p.relationship)) : null, p.quiet ? N.chip("Gone quiet", "warn") : null],
+        summary: p.summary || [p.role, N.name(p.org)].filter(Boolean).join(", "),
+        details: N.mergeDetails([["Role", p.role], ["Organization", N.name(p.org)], ["Relationship", p.relationship ? N.label(p.relationship) : null],
+          ["Usually", p.cadence], ["Last contact", p.last_contact ? N.dateY(p.last_contact) + " (" + N.rel(p.last_contact) + ")" : "No contact recorded"],
+          ["Next meeting", p.next_touchpoint ? p.next_touchpoint.title + ", " + N.weekday(p.next_touchpoint.start) : null], ["Also known as", L(p.aliases).join(", ")]], p.details),
+        sections: [(p.quiet && p.quiet_reason) || p.insight ? { heading: "What Atlas noticed", nodes: N.para(p.quiet && p.quiet_reason ? p.quiet_reason : p.insight) } : null,
+          L(p.i_owe).length ? { heading: "You owe " + p.title.split(" ")[0], nodes: owedLines(p.i_owe) } : null,
+          L(p.they_owe).length ? { heading: p.title.split(" ")[0] + " owes you", nodes: owedLines(p.they_owe) } : null],
+        body: p.body, body_truncated: p.body_truncated,
+        links: [p.org].concat(L(p.links)).filter(Boolean),
+        dates: N.datesLine(p.created, p.updated) });
+    }
+    var views = people.map(view);
+
     var list = h("ul", { class: "items" });
     var emptyMsg = N.empty("Nobody matches this view.");
-    var rows = people.map(function (p) {
+    var rows = people.map(function (p, i) {
       var openN = L(p.i_owe).length + L(p.they_owe).length;
       var last = p.last_contact ? "Last contact " + N.rel(p.last_contact) : "No contact recorded";
       var li = N.item({ tone: p.quiet ? "warn" : (openN ? "accent" : null),
-        title: h("span", { class: "person-name" }, p.title, p.relationship ? N.chip(N.label(p.relationship)) : null),
+        title: h("span", { class: "person-name" }, N.openTitle(p.title), p.relationship ? N.chip(N.label(p.relationship)) : null),
         id: p.id,
         meta: [[p.role, p.org ? N.name(p.org) : null].filter(Boolean).join(", "), p.cadence ? "Usually " + p.cadence : null],
         insight: p.quiet && p.quiet_reason ? p.quiet_reason : p.insight,
@@ -690,6 +851,7 @@ a.rid:hover { color: var(--accent); }
         aside: [h("span", { class: "contact" }, last), p.quiet ? N.chip("Gone quiet", "warn") : null,
           p.next_touchpoint ? h("span", null, "Next: " + p.next_touchpoint.title + ", " + N.weekday(p.next_touchpoint.start)) : null] });
       li._p = p;
+      N.clickable(li, panel, views[i]);
       li._text = [p.title, p.role, N.name(p.org), p.relationship, L(p.aliases).join(" ")].join(" ").toLowerCase();
       list.appendChild(li);
       return li;
@@ -711,6 +873,7 @@ a.rid:hover { color: var(--accent); }
           { value: "open", label: "Open items" }, { value: "soon", label: "Meeting soon" }], "all", function (v) { filter = v; apply(); }),
         N.search("Find a person or company", function (q) { query = q; apply(); })), list, emptyMsg]
         : N.empty("No people recorded yet.") }));
+    main.appendChild(panel.el);
 
     var ins = L(d.insights);
     if (ins.length) {

@@ -49,7 +49,7 @@ Full example: `system/tests/dashboards/records.json`.
 | `current` | `true` unless the status is closed for that type (below). |
 | `facts` | Up to 3 short strings, chosen per type (below). Plain text, each ≤ 60 characters. |
 | `links` | Up to 8 linked records as references, most important first (people and projects before sources). |
-| `details` | For the record panel: up to 12 `{ label, value }` pairs, every meaningful frontmatter field in a plain label ("Owner", "Due", "Decided by", "Target"), values as display text (dates formatted, references as titles). Same exclusions as everywhere: never `notes_private`, `emails`, `phone`, `location`. |
+| `details` | For the record panel (`system/dashboards/README.md` §Record panel; Records uses the same panel data rules): up to 12 `{ label, value }` pairs, every meaningful frontmatter field in a plain label ("Owner", "Due", "Decided by", "Target"), values as display text (dates formatted, references as titles). Same exclusions as everywhere: never `notes_private`, `emails`, `phone`, `location`. |
 | `body` | For the record panel: the record's body as plain text, one `{ heading, text }` per section (`heading` is the section's heading or `null`; `text` keeps line breaks, list items as lines starting with "- ", no Markdown). At most 2,000 characters in all; cut at a sentence or line end and set `body_truncated: true`. Omitted (`null`) for sources (their summary stands in), for records with `summary` handling, and when the body is empty. |
 | `body_truncated` | `true` when `body` was cut; the panel says the rest is in chat. |
 

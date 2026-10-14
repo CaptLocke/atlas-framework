@@ -61,6 +61,19 @@ Each template contains each placeholder **exactly once**. No other text is subst
 
 **Links.** A link on a dashboard only ever opens another dashboard: the nav row under the header, and the name of another dashboard where a page's own wording mentions one (`N.pageLink`). Pages have no jump-to-section links.
 
+**Record panel.** On Records, Work Board, Decisions & Risks, and People, clicking a card (or its title, or Enter on it) opens the item in a panel (`N.recordPanel`, `N.clickable` in `_base.js`): a drawer on the right, full screen on phones. It shows the type and status, title, summary, **Details** (the fields the card shows plus any `details` the data carries), sections the page adds (next step, mitigation, why, who owes what), the item's `body`, **Linked records** (any linked item that is on the same page opens in the panel, with Back; others are listed by name), the created and updated dates, and "Copy a request for Atlas", which copies a ready-made request to paste into chat. Esc, Close, or a click outside shuts it.
+
+**Panel data** (optional on every item of those four pages, same rules everywhere):
+| Field | Rule |
+|---|---|
+| `details` | Up to 12 `{ label, value }` pairs: meaningful frontmatter fields the card doesn't already show, as display text (dates formatted, references as titles). Never `notes_private`, `emails`, `phone`, `location`. |
+| `body` | The record's body as plain text, one `{ heading, text }` per section (`heading` or `null`; line breaks kept, list items as lines starting with "- ", no Markdown), at most 2,000 characters in all, cut at a sentence or line end. `null` for sources, records with `summary` handling, and empty bodies. Never a `## Private notes` section or text whose handling is `ignore` or `pointer`. |
+| `body_truncated` | `true` when `body` was cut; the panel says the rest is in chat. |
+| `links` | Extra linked records (`{ id, title }`) beyond the item's own references, most important first, up to 8. |
+| `created`, `updated` | The record's dates, for the panel's dates line. |
+
+When a page is over budget, its contract's truncation runs these steps first: cut each `body` to 800 characters, then drop `body` from the oldest items, before dropping any item.
+
 **Refresh marker.** Every page shows, at the top, when it was refreshed (`N.refreshed()` in `_base.js`, from `meta.generated_at`). A signal dot in front of it is green while the page is current. If the page is older than its contract's `stale_after_hours` when it is opened, the dot turns amber and the marker adds "May be out of date" (grey before the first refresh). This is the one place a page compares against the viewer's clock (everything else uses `meta.as_of`). Templates get it through `N.masthead`; never remove it.
 
 ## How a page is rendered (`atlas-dashboards`)

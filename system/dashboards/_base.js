@@ -362,6 +362,103 @@
       h("p", { class: "chips" }, N.themeButton()));
   };
 
+  /* ---- Record panel ----
+     A drawer (full screen on phones) that shows one item in full. Pages build a "view" per item:
+       { id, title, kind, chips:[nodes], summary, details:[{label,value}], sections:[{heading, nodes}],
+         body:[{heading,text}], body_truncated, links:[{id,title}], dates }
+     and register every view, so linked items on the same page open in the panel too (with Back).
+     N.clickable(card, view) makes a card open it (click, or Enter/Space on its title button). */
+  N.recordPanel = function () {
+    var panel = h("dialog", { class: "rec-panel", "aria-labelledby": "rp-title" });
+    var views = {}, trail = [], lastFocus = null;
+    function close() { if (panel.open && panel.close) panel.close(); else panel.removeAttribute("open"); onClose(); }
+    function onClose() { document.documentElement.classList.remove("rp-lock"); trail = []; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+    panel.addEventListener("close", onClose);
+    panel.addEventListener("click", function (e) { if (e.target === panel) close(); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && panel.hasAttribute("open") && !panel.showModal) close(); });
+    function copyRequest(v, where) {
+      var text = "Show me the “" + v.title + "” record" + (v.id ? " (" + v.id + ")" : "") + ".";
+      function fallback() {
+        var box = h("input", { class: "rp-copy", type: "text", readonly: true, value: text, "aria-label": "Request to paste in chat" });
+        while (where.firstChild) where.removeChild(where.firstChild);
+        where.appendChild(h("p", null, "Copy this and paste it in your Atlas chat:")); where.appendChild(box);
+        box.focus(); box.select();
+      }
+      try { navigator.clipboard.writeText(text).then(function () { where.textContent = "Copied. Paste it in your Atlas chat to see or change this record."; }, fallback); }
+      catch (e) { fallback(); }
+    }
+    function render(v) {
+      var details = N.list(v.details).filter(function (x) { return x && x.label && x.value != null && x.value !== ""; });
+      var body = N.list(v.body).filter(function (s) { return s && s.text; });
+      var links = N.list(v.links).filter(Boolean);
+      var askNote = h("p", { role: "status", "aria-live": "polite" }, "To change this, ask Atlas in chat.");
+      var inner = h("div", { class: "rp" },
+        h("div", { class: "rp-bar" },
+          h("p", { class: "chips" }, v.kind ? N.chip(v.kind) : null, v.chips || null),
+          trail.length > 1 ? h("button", { type: "button", class: "rp-btn", onclick: function () { trail.pop(); render(trail[trail.length - 1]); } }, "Back") : null,
+          h("button", { type: "button", class: "rp-btn", onclick: close }, "Close")),
+        h("div", { class: "rp-body" },
+          h("div", null, h("h2", { id: "rp-title" }, v.title), v.summary ? h("p", { class: "rp-sum" }, N.rich(v.summary)) : null),
+          details.length ? h("section", null, h("h3", { class: "rp-h" }, "Details"),
+            h("dl", { class: "rp-details" }, details.map(function (x) { return h("div", null, h("dt", null, x.label), h("dd", null, typeof x.value === "object" ? x.value : N.rich(String(x.value)))); }))) : null,
+          N.list(v.sections).filter(function (s) { return s && s.nodes; }).map(function (s) { return h("section", null, s.heading ? h("h3", { class: "rp-h" }, s.heading) : null, s.nodes); }),
+          body.map(function (s) { return h("section", null, s.heading ? h("h3", { class: "rp-h" }, s.heading) : null, h("p", { class: "rp-text" }, N.rich(s.text))); }),
+          v.body_truncated ? h("p", { class: "rp-cut" }, "There's more in this record than fits here. Ask Atlas in chat to see all of it.") : null,
+          links.length ? h("section", null, h("h3", { class: "rp-h" }, "Linked records"),
+            h("ul", { class: "rp-links" }, links.map(function (x) {
+              var t = x.id && views[x.id];
+              if (!t) return h("li", null, h("div", { class: "rp-link-off" }, N.name(x)));
+              return h("li", null, h("button", { type: "button", class: "rp-link", onclick: function () { trail.push(t); render(t); } },
+                h("span", null, t.title), h("span", { class: "chips" }, t.kind ? N.chip(t.kind) : null, t.chips || null)));
+            }))) : null,
+          v.dates ? h("p", { class: "rp-dates" }, v.dates) : null,
+          h("div", { class: "rp-ask" },
+            h("button", { type: "button", class: "rp-btn", onclick: function () { copyRequest(v, askNote); } }, "Copy a request for Atlas"),
+            askNote)));
+      while (panel.firstChild) panel.removeChild(panel.firstChild);
+      panel.appendChild(inner);
+      var first = inner.querySelector(".rp-bar button:last-child");
+      if (first) first.focus();
+    }
+    function open(v) {
+      lastFocus = document.activeElement; trail = [v]; render(v);
+      document.documentElement.classList.add("rp-lock");
+      if (!panel.open) { if (panel.showModal) panel.showModal(); else panel.setAttribute("open", ""); }
+    }
+    return {
+      el: panel, open: open,
+      add: function (v) { if (v && v.id) views[v.id] = v; return v; },
+      get: function (id) { return views[id]; }
+    };
+  };
+  /* Panel section content: a paragraph, or a list of plain lines. */
+  N.para = function (text) { return text ? h("p", { class: "rp-text" }, N.rich(text)) : null; };
+  N.lines = function (items) { items = N.list(items).filter(Boolean); return items.length ? h("ul", { class: "rp-list" }, items.map(function (x) { return h("li", null, x); })) : null; };
+  /* Dates line for a panel: "Created Oct 1, 2026 · Updated Oct 9, 2026". */
+  N.datesLine = function (created, updated) {
+    return [created ? "Created " + N.dateY(created) : null, updated ? "Updated " + N.dateY(updated) : null].filter(Boolean).join(" · ");
+  };
+  /* A title rendered as a button, so keyboard users can open the card's panel. */
+  N.openTitle = function (text) { return h("button", { type: "button", class: "rec-open", "aria-haspopup": "dialog" }, text); };
+  /* Make a card open the panel: anywhere on the card, except while the reader is selecting text. */
+  N.clickable = function (card, panel, view) {
+    card.classList.add("rec");
+    card.addEventListener("click", function (e) {
+      if (e.target.closest && e.target.closest("a, input, select")) return;
+      var sel = window.getSelection && String(window.getSelection());
+      if (sel && sel.length > 2 && !(e.target.closest && e.target.closest(".rec-open"))) return;
+      panel.open(view);
+    });
+    return card;
+  };
+  /* Panel details: [label, value] pairs, empty ones dropped, then extra data details whose label isn't already shown. */
+  N.mergeDetails = function (pairs, extra) {
+    var out = [], seen = {};
+    N.list(pairs).forEach(function (p) { if (p && p[1] != null && p[1] !== "") { out.push({ label: p[0], value: p[1] }); seen[p[0]] = 1; } });
+    N.list(extra).forEach(function (x) { if (x && x.label && !seen[x.label]) out.push(x); });
+    return out.slice(0, 16);
+  };
+
   /* Notices: a label and an icon per level, so a warning reads as one at a glance. */
   var NOTICE = { warn: "Needs attention:", error: "Problem:", info: "Note:" };
   var NOTICE_ICON = {

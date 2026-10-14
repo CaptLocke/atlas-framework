@@ -47,6 +47,7 @@ Full example: `system/tests/dashboards/decisions-risks.json`. `rationale: "unkno
 | `summary` | Counts over the full sets: `issues` (active risks), `open_risks` (potential), `decisions_90d` (made in the last 90 days) |
 
 ## Rendering notes
+- **Record panel:** clicking a card opens it in the record panel (`system/dashboards/README.md` §Record panel). Every item may carry the panel data fields (`details`, `body`, `body_truncated`, `links`, `created`, `updated`; same section). Before the caps below drop any item, cut each `body` to 800 characters, then drop `body` from the oldest items first.
 - Risks sort: `active` first, then exposure (likelihood × impact, high = 3, medium = 2, low = 1) descending, then `updated` (newest first); resolved last. Default filter "Open".
 - Decisions sort: `proposed` with a `revisit_on` or none first, then `decided_on` newest first. Default filter "All". "Revisit soon" = `revisit_on` within 14 days.
 - Caps: 100 risks, 150 decisions. Over budget, drop resolved risks first, then the oldest decisions; record `meta.truncated.risks` / `meta.truncated.decisions`. Older decisions remain searchable in chat.

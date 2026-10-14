@@ -48,6 +48,7 @@ Full example: `system/tests/dashboards/work-board.json`. `summary` counts cover 
 | Ref titles | Title of the referenced record (index line in `user/knowledge/_index/`) |
 
 ## Rendering notes
+- **Record panel:** clicking a card opens it in the record panel (`system/dashboards/README.md` §Record panel). Every item may carry the panel data fields (`details`, `body`, `body_truncated`, `links`, `created`, `updated`; same section). Before the caps below drop any item, cut each `body` to 800 characters, then drop `body` from the oldest items first.
 - Commitments sort: overdue/slipped first (most overdue first), then by `due` ascending, `due: null` last; ties by priority (high → low), then title.
 - Projects sort: `health` off_track, at_risk, unknown, on_track; then `status` active, proposed, paused; then `target` ascending (nulls last).
 - Default filter "All"; the viewer's last choice is remembered in browser storage when available.
