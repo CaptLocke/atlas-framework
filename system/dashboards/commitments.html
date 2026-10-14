@@ -844,9 +844,9 @@ html.rp-lock { overflow: hidden; }
       return { body: rows.length ? [ul, noMatch] : none, apply: apply };
     }
 
-    var waitGroup = group(wait, "You're not waiting on anyone.");
     var oweGroup = group(owe, "You don't owe anyone anything right now.");
-    function applyAll() { waitGroup.apply(); oweGroup.apply(); }
+    var waitGroup = group(wait, "You're not waiting on anyone.");
+    function applyAll() { oweGroup.apply(); waitGroup.apply(); }
 
     if (cs.length) {
       main.appendChild(h("div", { class: "controls page-controls no-print" },
@@ -854,10 +854,10 @@ html.rp-lock { overflow: hidden; }
           function (v) { filter = v; applyAll(); }),
         N.search("Filter by name, person, or project", function (q) { query = q; applyAll(); })));
     }
-    main.appendChild(N.section({ id: "waiting", title: "Waiting on", key: "waiting_on",
-      note: "What other people have promised you. Overdue first, then by due date.", body: waitGroup.body }));
     main.appendChild(N.section({ id: "owe", title: "I owe", key: "i_owe",
       note: "What you've promised other people. Overdue first, then by due date.", body: oweGroup.body }));
+    main.appendChild(N.section({ id: "waiting", title: "Waiting on", key: "waiting_on",
+      note: "What other people have promised you. Overdue first, then by due date.", body: waitGroup.body }));
     main.appendChild(panel.el);
 
     var s = d.summary || {};

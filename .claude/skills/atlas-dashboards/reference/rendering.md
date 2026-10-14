@@ -11,7 +11,7 @@ Each contract's `republished_by` lists the jobs that republish it; any chat may 
 | Dashboard | Shows | `republished_by` |
 |---|---|---|
 | `daily-brief` | Today's brief (from `user/work/briefs/`) | daily-brief (and the chat catch-up) |
-| `commitments` | Open commitments in two sections, Waiting on and I owe | daily-brief, triage |
+| `commitments` | Open commitments in two sections, I owe and Waiting on | daily-brief, triage |
 | `projects` | Active, proposed, and paused projects with health and next step; a project with its own page opens it | daily-brief, triage, weekly-review |
 | `week-ahead` | The next 7 days as a plan: outcomes, day load and free time, prep, watch-outs, each day | daily-brief, weekly-review |
 | `goals` | Ranked goals with progress, evidence, linked projects, accomplishments | weekly-review, monthly, quarterly |
