@@ -35,13 +35,13 @@ Output paths follow `system/schemas/formats.md` §7.
 Every routine's saved prompt is exactly this, with `<name>` replaced by the routine name. `atlas-setup` and `atlas-settings` use it when creating or recreating routines:
 
 ```
-Run the Atlas routine `<name>`: look it up in user/settings/routines.yaml and run its jobs in order. Push all changes directly to main.
+Run the Atlas routine `<name>`. First read `timezone` in user/settings/atlas.yaml and run `TZ=<timezone> date`; use that as the current date and time for this whole run and ignore the session's stated date. Then look up the routine in user/settings/routines.yaml and run its jobs in order. Push all changes directly to main.
 ```
 
 All behavior lives in the repo, so changing which jobs a routine runs is a settings edit. Only schedule and model changes touch the routine on the platform.
 
 ## Running a routine (summary of `system/kernel.md` §6)
-1. Sync (`system/rules/sync.md`). Read `user/settings/routines.yaml` and find the routine by name. If it isn't there, write a failed run report saying so and stop.
+1. Set the clock: run `TZ=<atlas.yaml timezone> date` and use it as the current date and time for the run, not the session's stated (UTC) date. Sync (`system/rules/sync.md`). Read `user/settings/routines.yaml` and find the routine by name. If it isn't there, write a failed run report saying so and stop.
 2. For each job entry, in order:
    - **Modifiers.** `when` is checked against the run date in the user's time zone (`atlas.yaml: timezone`): `always` (default), `weekdays` (Mon–Fri), `weekends` (Sat–Sun), `sundays`. If it doesn't match, skip the job: add a run-report row `skipped · not scheduled today` and leave `jobs.yaml` unchanged. Pass `target` (`today` | `tomorrow`) and `mode` (`full` default | `light`) to the job.
    - Read `system/jobs/<job>.md`, or the registered user job in `user/extensions/jobs/` (precedence: `system/rules/extensions.md`), and follow it: away/paused check, readiness check, steps, early exit.
