@@ -89,12 +89,13 @@ Do these quietly, then answer the user. Never narrate them unless something need
 Load detail only when a task needs it.
 
 ## 6. Running a routine
-1. Sync. Read `user/settings/routines.yaml`, find the named routine, and run its jobs **in order**, honoring modifiers (`when`, `target`, `mode`).
-2. For each job, read `system/jobs/<job>.md` (or the registered user job) and follow it, including its away/paused check, readiness check, and early exit.
-3. You are unattended: never wait for a reply. Anything needing approval goes to `user/inbox/approvals.md`. Locked actions are blocked in routines.
-4. **Check the routine marker.** Read `ATLAS_CONTEXT` (`echo $ATLAS_CONTEXT`) and record the value you observe in the run report (`atlas_context`). Routines must run in the "Atlas routine" cloud environment, which sets `ATLAS_CONTEXT=routine`; the safety hooks treat anything unmarked as a chat. If the value isn't `routine` (any case), still behave as a routine by instruction: never write approval records or purge locks, never take locked or `propose`-level actions, produce drafts only, and commit as `Atlas-Actor: routine:<name>`. Add or update a high-severity known issue `routine-env-missing` in `user/.state/health.yaml` naming the routine, with the fix ("attach this routine to the 'Atlas routine' environment"). The next chat surfaces it (§2 step 5) and offers to fix it.
-5. Commit after each job. Update `user/.state/jobs.yaml`. Write one run report (`system/schemas/formats.md` §4).
-6. If a job fails, record it and continue with the next job unless it depends on the failed one.
+1. **Set the clock.** Run `TZ=<atlas.yaml timezone> date` and use that as the current date and time for the whole run (run dates, file names, timestamps); ignore the session's stated date, which is UTC.
+2. Sync. Read `user/settings/routines.yaml`, find the named routine, and run its jobs **in order**, honoring modifiers (`when`, `target`, `mode`).
+3. For each job, read `system/jobs/<job>.md` (or the registered user job) and follow it, including its away/paused check, readiness check, and early exit.
+4. You are unattended: never wait for a reply. Anything needing approval goes to `user/inbox/approvals.md`. Locked actions are blocked in routines.
+5. **Check the routine marker.** Read `ATLAS_CONTEXT` (`echo $ATLAS_CONTEXT`) and record the value you observe in the run report (`atlas_context`). Routines must run in the "Atlas routine" cloud environment, which sets `ATLAS_CONTEXT=routine`; the safety hooks treat anything unmarked as a chat. If the value isn't `routine` (any case), still behave as a routine by instruction: never write approval records or purge locks, never take locked or `propose`-level actions, produce drafts only, and commit as `Atlas-Actor: routine:<name>`. Add or update a high-severity known issue `routine-env-missing` in `user/.state/health.yaml` naming the routine, with the fix ("attach this routine to the 'Atlas routine' environment"). The next chat surfaces it (§2 step 5) and offers to fix it.
+6. Commit after each job. Update `user/.state/jobs.yaml`. Write one run report (`system/schemas/formats.md` §4).
+7. If a job fails, record it and continue with the next job unless it depends on the failed one.
 
 ## 7. Extensions
 Read `user/extensions/registry.yaml` at session start. Registered user skills, jobs, triggers, types, dashboards, and playbooks are part of Atlas: read their files on demand from `user/extensions/`. Never copy them into `.claude/` (updates replace it). Precedence: `system/rules/extensions.md`.
