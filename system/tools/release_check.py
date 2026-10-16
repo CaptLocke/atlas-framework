@@ -37,6 +37,7 @@ SIGNERS = (  # ssh-ed25519 public keys: main, then offline backup
     "AAAAC3NzaC1lZDI1NTE5AAAAIP5zeqZrVr4K4Im8koRm5jkuyjjYciof5oxbAGEFUArK",
     "AAAAC3NzaC1lZDI1NTE5AAAAIF8Eax3RKJZebfTKRZP2zsU/BKc5aBvsFL99/Ul5i/0b",
 )
+MIN_VERSION = (1, 0, 1)  # the routine check never restores a release older than this (raise it on re-paste)
 TAG_NAME = re.compile(r"^v\d+\.\d+\.\d+(-rc\.\d+)?$")
 STATUS_FILE = ".atlas-tmp/release-check.json"
 UPSTREAM_URL = None  # tests only; the real check always fetches github.com/UPSTREAM
@@ -189,7 +190,7 @@ def verify_sshsig(armored, message, signers, namespace=b"git"):
 
 # ------------------------------------------------------------------ git tags
 def _git(repo, args, check=True, timeout=120):
-    r = subprocess.run(["git", "-C", repo] + args, capture_output=True, timeout=timeout,
+    r = subprocess.run(["git", "--literal-pathspecs", "-C", repo] + args, capture_output=True, timeout=timeout,
                        stdin=subprocess.DEVNULL)
     if check and r.returncode != 0:
         raise CheckFailed("git %s failed: %s" % (args[0], r.stderr.decode("utf-8", "replace").strip()[:200]))
@@ -205,12 +206,16 @@ def verify_tag(repo, ref, name, signers=None):
     if kind != "tag":
         raise CheckFailed("%s is not an annotated (signed) tag" % ref)
     raw = _git(repo, ["cat-file", "tag", ref]).stdout
-    at = raw.find(b"-----BEGIN SSH SIGNATURE-----")
+    at = raw.rfind(b"\n-----BEGIN SSH SIGNATURE-----")
     if at < 0:
         raise CheckFailed("%s is not signed" % name)
+    at += 1
     payload, armored = raw[:at], raw[at:].decode("ascii", "replace")
     head = payload.split(b"\n\n", 1)[0].decode("utf-8", "replace").split("\n")
-    fields = dict(line.split(" ", 1) for line in head if " " in line)
+    pairs = [line.split(" ", 1) for line in head if " " in line]
+    fields = dict(pairs)
+    if len(fields) != len(pairs):
+        raise CheckFailed("tag object has repeated headers")
     if fields.get("type") != "commit" or fields.get("tag") != name:
         raise CheckFailed("tag object is for %r (%s), not release %s" % (fields.get("tag"), fields.get("type"), name))
     verify_sshsig(armored, payload, signers)
@@ -221,7 +226,11 @@ def verify_tag(repo, ref, name, signers=None):
 
 
 # ---------------------------------------------------- routine setup (restore)
+SAFE_PATH = re.compile(r"^(\.claude|\.gitignore|[A-Za-z0-9_][A-Za-z0-9._-]*)(/[A-Za-z0-9_][A-Za-z0-9._-]*)*$")
+
+
 def _owned_paths(text):
+    """owned_paths from a (signed) manifest: plain relative names only, never user/ or .git."""
     out, inside = [], False
     for line in (text or "").splitlines():
         if re.match(r"^owned_paths:\s*$", line):
@@ -233,7 +242,7 @@ def _owned_paths(text):
                 out.append(m.group(1).rstrip("/"))
             elif line.strip() and not line.startswith((" ", "\t")):
                 break
-    return [p for p in out if p and not p.startswith(("user", "/", ".git")) and ".." not in p.split("/")]
+    return [p for p in out if SAFE_PATH.match(p) and p.split("/")[0] not in ("user", ".git")]
 
 
 def _find_repo():
@@ -251,32 +260,43 @@ def _find_repo():
     return None
 
 
+def _version(v):
+    return tuple(int(x) for x in v.split("."))
+
+
 def _installed_version(repo):
+    """installed_version from atlas.yaml; None when Atlas isn't set up (no atlas.yaml).
+    Raises CheckFailed when the file exists but the version is missing or malformed."""
     try:
         with open(os.path.join(repo, "user", "settings", "atlas.yaml"), encoding="utf-8") as f:
-            m = re.search(r"^installed_version:\s*[\"']?([0-9][0-9A-Za-z.\-]*)", f.read(), re.M)
-        return m.group(1) if m else None
-    except OSError:
+            text = f.read()
+    except FileNotFoundError:
         return None
+    m = re.search(r"^installed_version:[ \t]*[\"']?(\d+\.\d+\.\d+)[\"']?[ \t]*(#.*)?$", text, re.M)
+    if not m:
+        raise CheckFailed("installed_version in user/settings/atlas.yaml is missing or not a release number")
+    if _version(m.group(1)) < MIN_VERSION:
+        raise CheckFailed("installed_version %s is older than this check allows (%s)"
+                          % (m.group(1), ".".join(map(str, MIN_VERSION))))
+    return m.group(1)
 
 
 def restore(repo):
-    """(status, detail). status: clean | restored | restored-settings | skipped | failed."""
+    """(status, detail). status: clean | restored | restored-settings | skipped. Raises CheckFailed."""
     version = _installed_version(repo)
     if not version:
-        return "skipped", "Atlas isn't set up in this repo yet (no installed_version)"
+        return "skipped", "Atlas isn't set up in this repo yet (no user/settings/atlas.yaml)"
     tag = "v" + version
     ref = "refs/atlas-upstream/" + tag
     url = UPSTREAM_URL or "https://github.com/%s.git" % UPSTREAM
     _git(repo, ["fetch", "--quiet", "--depth=1", "--no-tags", url, "+refs/tags/%s:%s" % (tag, ref)])
     commit = verify_tag(repo, ref, tag)
-    rel_manifest = _git(repo, ["show", commit + ":system/manifest.yaml"]).stdout.decode("utf-8", "replace")
-    head_manifest = _git(repo, ["show", "HEAD:system/manifest.yaml"], check=False).stdout.decode("utf-8", "replace")
-    owned = _owned_paths(rel_manifest)
+    # only the signed release decides what is system-owned (a chat can edit HEAD's manifest)
+    owned = _owned_paths(_git(repo, ["show", commit + ":system/manifest.yaml"]).stdout.decode("utf-8", "replace"))
     if not owned:
         raise CheckFailed("release %s lists no owned paths" % tag)
-    paths = sorted(set(owned) | set(_owned_paths(head_manifest)))
-    for p in paths:
+    _git(repo, ["reset", "-q"])  # start from an empty index: commit only what this check restores
+    for p in owned:
         now = set(_git(repo, ["ls-files", "-z", "--", p]).stdout.decode("utf-8", "replace").split("\0")) - {""}
         rel = set(_git(repo, ["ls-tree", "-r", "-z", "--name-only", commit, "--", p]).stdout
                   .decode("utf-8", "replace").split("\0")) - {""}
@@ -285,8 +305,8 @@ def restore(repo):
             _git(repo, ["rm", "-q", "-f", "--"] + extra)
         if rel:
             _git(repo, ["checkout", commit, "--", p])
-        # untracked files can shadow hook modules: remove them under .claude/hooks
-    _git(repo, ["clean", "-q", "-f", "-d", "--", ".claude/hooks"], check=False)
+    # untracked or ignored files (a planted module or .pyc) can shadow hook code
+    _git(repo, ["clean", "-q", "-f", "-d", "-x", "--", ".claude/hooks"], check=False)
     if _git(repo, ["diff", "--cached", "--quiet", "HEAD"], check=False).returncode == 0:
         return "clean", "system files match signed %s" % tag
     # hook registrations are read when the session starts: a changed settings file only counts next run
