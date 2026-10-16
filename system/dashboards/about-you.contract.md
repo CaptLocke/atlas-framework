@@ -38,7 +38,6 @@ Republished by `monthly` (after the user health check) and `quarterly` (after th
               "fonts": [ { "role": "Headings", "family": "Source Serif 4, Georgia" } ] }
 }
 ```
-Full example: `system/tests/dashboards/about-you.json`.
 
 | Field | Notes |
 |---|---|

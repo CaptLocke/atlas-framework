@@ -42,7 +42,7 @@ Created only in chat. Once listed in `project_pages`, it is republished by `tria
   "sources": [ { "id": "sources/2026-10-08-pricing-sync", "title": "Pricing sync transcript", "kind": "meeting", "occurred_on": "2026-10-08" } ]
 }
 ```
-Full example: `system/tests/dashboards/project-page.json`. `meta.title` = the project title.
+`meta.title` = the project title.
 
 ## Sources (file → field)
 | Field | Source |

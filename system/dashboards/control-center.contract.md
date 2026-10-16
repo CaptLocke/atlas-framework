@@ -51,7 +51,6 @@ Republished by `daily-brief` (each cycle) and `monthly` (after health checks and
               "notes_import": { "status": "complete", "source_system": "Obsidian", "total": 312, "processed": 300, "skipped": 12 } }
 }
 ```
-Full example: `system/tests/dashboards/control-center.json`.
 
 | Field | Notes |
 |---|---|

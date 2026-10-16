@@ -29,7 +29,7 @@ Republished by `daily-brief` every run. `triage` may republish it after a full (
   ]
 }
 ```
-Full example: `system/tests/dashboards/commitments.json`. `summary` counts cover **all** matching records, including any truncated from the list.
+`summary` counts cover **all** matching records, including any truncated from the list.
 
 ## Sources (file → field)
 | Field | Source |

@@ -37,7 +37,6 @@ Republished by `maintenance` (after indexes are rebuilt) and `weekly-review`. An
   ]
 }
 ```
-Full example: `system/tests/dashboards/records.json`.
 
 | Field | Notes |
 |---|---|

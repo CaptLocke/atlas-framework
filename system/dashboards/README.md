@@ -29,7 +29,7 @@ Any chat may also republish any dashboard after changing the records it shows (`
 Shared files:
 - `_base.css`: canonical base styles. **Every template inlines it verbatim** inside `<style id="atlas-base">`.
 - `_base.js`: canonical runtime helpers (DOM builder, date formatting, record references, sections, filters, theme toggle). **Every template inlines it verbatim** inside `<script id="atlas-base-js">`.
-- After editing either file, run `python3 system/tests/dashboards/render.py --sync`, then `render.py --check`. Templates must never drift from the canonical copies.
+- After editing either file, sync every template with the maintainer tools (release checklist on the `maintainers` branch). Templates must never drift from the canonical copies.
 
 ## Template anatomy
 ```html
@@ -88,7 +88,6 @@ When a page is over budget, its contract's truncation runs these steps first: cu
 6. Replace `{{ATLAS_DATA}}` with the escaped JSON and `{{ATLAS_THEME_CSS}}` with the theme CSS (or an empty string). Nothing else in the template changes.
 7. Publish: first time in chat (setup), then republish to the URL stored in `user/settings/dashboards.yaml` and set `last_published`. Project pages store their URL under `project_pages`.
 
-`system/tests/dashboards/render.py` implements steps 4 to 6 exactly; use it as the reference.
 
 ## Common envelope: `meta`
 Every dashboard's JSON has a `meta` object:
@@ -149,7 +148,7 @@ The theme comes from `user/profile/design-system.md` (`system/schemas/profile.md
 | `--brand-font-body` | Body family with web-safe fallbacks | system UI stack |
 | `--brand-bg`, `--brand-surface`, `--brand-ink` (+ `-dark`) | Optional background, surface, and text colors | warm stone: `#f4f0e8` / `#fcfaf5` / `#1c1a15` (dark `#1c1a15` / `#26241e` / `#f4f0e8`) |
 
-Rules: only `--brand-*` declarations; colors as hex; font names as CSS family lists that work without downloading fonts (no `@import`, no `url()`). Keep text contrast at WCAG AA (4.5:1) against the surface in both light and dark; if a brand color fails, darken it (light) or lighten it (dark) rather than using it as is. An empty theme block gives the default Atlas palette (warm stone neutrals, navy accent, rust highlight, olive for muted text and lines from the same family); the non-brand tokens (`--ink-2`, `--line`, `--surface-2`, `--accent-soft`, `--muted`) always come from it. Example: `system/tests/dashboards/theme-sample.css`.
+Rules: only `--brand-*` declarations; colors as hex; font names as CSS family lists that work without downloading fonts (no `@import`, no `url()`). Keep text contrast at WCAG AA (4.5:1) against the surface in both light and dark; if a brand color fails, darken it (light) or lighten it (dark) rather than using it as is. An empty theme block gives the default Atlas palette (warm stone neutrals, navy accent, rust highlight, olive for muted text and lines from the same family); the non-brand tokens (`--ink-2`, `--line`, `--surface-2`, `--accent-soft`, `--muted`) always come from it.
 
 Pages support light and dark (`prefers-color-scheme`), a viewer-chosen theme (`<html data-theme="light|dark">`, set by the footer button), phone widths down to 320 px with 16 px gutters and no horizontal scroll, keyboard focus states, and printing (filters hidden, black on white).
 
@@ -167,4 +166,4 @@ If a republish fails (artifact deleted, permission lost), the job records a know
 User dashboards live in `user/extensions/dashboards/` (registered in `registry.yaml`, kind `dashboard`) and follow the same pattern: a contract using the outline in `system/guide/authoring.md` and a template with the same placeholders. They may inline `_base.css`/`_base.js` to match. A user dashboard with `overrides: <name>` replaces the built-in one.
 
 ## Testing
-`system/tests/dashboards/` holds one fictional fixture per contract and `render.py`, which injects each fixture, writes `out/<name>.html`, and checks: valid HTML structure, placeholders replaced, embedded JSON round-trips, required `meta` fields, data within budget, base files in sync, no external URLs, no `innerHTML`. `--shots` adds Playwright screenshots (desktop and phone, light and dark) and fails on horizontal overflow or console errors.
+The dashboard test suite lives on the upstream repo's `maintainers` branch, not here: one fictional fixture per contract and `render.py`, which injects each fixture, writes `out/<name>.html`, and checks: valid HTML structure, placeholders replaced, embedded JSON round-trips, required `meta` fields, data within budget, base files in sync, no external URLs, no `innerHTML`. `--shots` adds Playwright screenshots (desktop and phone, light and dark) and fails on horizontal overflow or console errors.

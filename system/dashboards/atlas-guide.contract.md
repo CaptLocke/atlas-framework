@@ -30,7 +30,7 @@ Republished by `update-check` after an update is applied (and by `atlas-setup` a
   ]
 }
 ```
-Full example: `system/tests/dashboards/atlas-guide.json`. All strings are plain text (inline Markdown emphasis and links are stripped to their text; inline code keeps its text).
+All strings are plain text (inline Markdown emphasis and links are stripped to their text; inline code keeps its text).
 
 ## Sources (file → field)
 | Field | Source |

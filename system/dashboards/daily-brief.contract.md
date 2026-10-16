@@ -45,7 +45,6 @@ Envelope: `meta` as in `system/dashboards/README.md`; `meta.as_of` = the brief's
   "questions": [ { "id": "Q-2026-10-12-02", "kind": "profile", "text": "…" } ]
 }
 ```
-Full example: `system/tests/dashboards/daily-brief.json`.
 
 | Field | Notes |
 |---|---|
