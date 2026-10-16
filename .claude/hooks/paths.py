@@ -31,6 +31,7 @@ Bash detection is pragmatic (see shell.py for what is and isn't detected).
 """
 import os
 import sys
+import subprocess
 
 # --- fail-safe entry: any error, even an import failure, ends in exit 0 or 2
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -128,9 +129,23 @@ def update_source_ok(proj, via):
     ref = via[len("update:"):] if via and via.startswith("update:") else None
     if not ref:
         return False
-    if atlas.full_ref_name(proj, ref).startswith("refs/atlas-upstream/"):
-        return True
+    full = atlas.full_ref_name(proj, ref)
+    if full.startswith("refs/atlas-upstream/"):
+        return release_signed(proj, full)
     return atlas.in_history(proj, ref)
+
+
+def release_signed(proj, full):
+    """A fetched release counts only when its tag is signed by a release key
+    (system/tools/release_check.py; fails closed when it can't run)."""
+    tool = os.path.join(proj, "system", "tools", "release_check.py")
+    name = full[len("refs/atlas-upstream/"):]
+    try:
+        r = subprocess.run([sys.executable, "-I", tool, "verify", full, name], cwd=proj, capture_output=True,
+                           timeout=30, stdin=subprocess.DEVNULL)
+        return r.returncode == 0
+    except (OSError, subprocess.SubprocessError):
+        return False
 
 
 def check(rels, tool_name, proj, ctx):

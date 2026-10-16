@@ -11,6 +11,11 @@ Each release's "What's new" section is shown to users in the Atlas Guide and the
 
 ### What's new
 - Atlas no longer warns that it couldn't save to GitHub when everything was saved.
+- Updates are checked before they install: Atlas installs a new version only if it was signed by Atlas's maker, and skips (and tells you about) any that isn't.
+- Before anything is sent, shared, or deleted from a chat, Claude shows its own approval card with exactly what will happen. Setup now walks you through turning these cards on.
+
+### Action needed
+- In Settings → Connectors, set every tool that sends, replies, forwards, shares, or deletes to ✋ **Needs approval**, and remove those connectors from your Atlas routines (routines only draft). Ask Atlas "help me set up approval cards" and it walks you through it.
 
 ### Under the hood
 - Shell guard: commands after a blank line, or after `;` and a newline, were merged into the previous command and missed by the guards (a delete written that way went unseen). Any token made only of separator characters now ends a command. This also fixes `cd` being ignored after heredocs.
@@ -18,6 +23,8 @@ Each release's "What's new" section is shown to users in the Atlas Guide and the
 - Tripwire: send, share and delete are blocked while tracked owned files differ from HEAD, or `.claude/hooks/` has untracked files, outside an update; `atlas-health` restores them with `git checkout HEAD -- <owned paths>`.
 - Risk classifier: `collaborator`, `visibility` and `gist` are share words; on GitHub tools, an input setting visibility, privacy or a permission is a share.
 - Zip updates removed: releases install only from the upstream tag. `system/tools/build-zip.md` deleted.
+- Signed releases: `system/tools/release_check.py` (standard library only; no `ssh-keygen` needed) verifies a release tag's SSH signature against the release keys it carries. `atlas-update` runs it after fetching and before taking any file; the paths hook accepts `refs/atlas-upstream/*` as a source only when the tag passes it (name must match, annotated, signed by a release key).
+- Chat approvals: repo hooks don't load in Cowork chats, so the chat-side guard is Claude's confirmation plus Cowork's approval card. Setup step 9 and `atlas-connectors` set send/share/delete tools to Needs approval; routines get no sending connectors; the quarterly review re-checks both. Governance, kernel and Controls guide say where hooks apply.
 - Sync hooks: session start on a non-main branch (cloud routines' `claude/...` branch) fetches and fast-forwards to `origin/main` instead of failing; the end-of-turn check fetches before counting unpushed commits and skips the count if the fetch fails.
 
 ## 1.0.0 (2026-10-16)

@@ -28,6 +28,12 @@ git fetch --depth=1 --no-tags <up> refs/tags/v1.1.0:refs/atlas-upstream/v1.1.0
 ```
 The fetched history is unrelated to the user's (template copies don't share history); that's expected. The `refs/atlas-upstream/*` refs stay local and are never pushed.
 
+## Verify the signature
+```bash
+python3 -I system/tools/release_check.py verify refs/atlas-upstream/v1.1.0 v1.1.0
+```
+It checks, with the installed `release_check.py` and the release keys inside it, that the tag is named `v1.1.0` and signed by Atlas's maker; it prints the release commit. If it fails, stop before changing anything: release the lock, delete the fetched ref (`git update-ref -d refs/atlas-upstream/v1.1.0`), record `update-check` as failed, and add a high-severity known issue `update-signature-failed` naming the version ("Atlas skipped an update that wasn't signed by its maker"). Never install an unverified release. (Installs from before 1.0.1 have no `release_check.py`; their first update to 1.0.1 or later brings it.)
+
 ## Replace owned paths
 Use the **release's** `owned_paths` (read `system/manifest.yaml` from `refs/atlas-upstream/v1.1.0`; a release may add or remove an owned path). Write refs and paths out in full in each command: the hooks don't expand shell variables, so `git checkout $REL -- system` is blocked while `git checkout refs/atlas-upstream/v1.1.0 -- system` is allowed. For each path P:
 ```bash

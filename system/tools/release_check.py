@@ -1,0 +1,226 @@
+#!/usr/bin/env python3
+"""Atlas release check: verify that a release tag was signed by Atlas's maker.
+
+Standard library only (no ssh-keygen needed):
+
+  python3 -I system/tools/release_check.py verify <ref> <tag>
+
+atlas-update runs it before taking any file from a fetched release, and the
+paths hook runs it before accepting a refs/atlas-upstream/* source. Exit 0 and
+print the release commit when <ref> is an annotated tag named <tag>, signed by
+a key in SIGNERS; exit 1 otherwise.
+
+Signatures are git's SSH signatures (ssh-keygen -Y sign, namespace "git") made
+with Ed25519 keys. Replacing a key is a release, signed by a key users already
+trust, that changes SIGNERS.
+"""
+import base64
+import hashlib
+import os
+import re
+import subprocess
+import sys
+
+SIGNERS = (  # ssh-ed25519 public keys: main, then offline backup
+    "AAAAC3NzaC1lZDI1NTE5AAAAIP5zeqZrVr4K4Im8koRm5jkuyjjYciof5oxbAGEFUArK",
+    "AAAAC3NzaC1lZDI1NTE5AAAAIF8Eax3RKJZebfTKRZP2zsU/BKc5aBvsFL99/Ul5i/0b",
+)
+TAG_NAME = re.compile(r"^v\d+\.\d+\.\d+(-rc\.\d+)?$")
+
+
+class CheckFailed(Exception):
+    pass
+
+
+# --------------------------------------------------------- Ed25519 (RFC 8032)
+_P = 2 ** 255 - 19
+_L = 2 ** 252 + 27742317777372353535851937790883648493
+_D = -121665 * pow(121666, _P - 2, _P) % _P
+_I = pow(2, (_P - 1) // 4, _P)
+
+
+def _add(a, b):
+    x1, y1, z1, t1 = a
+    x2, y2, z2, t2 = b
+    A = (y1 - x1) * (y2 - x2) % _P
+    B = (y1 + x1) * (y2 + x2) % _P
+    C = 2 * t1 * t2 * _D % _P
+    Dz = 2 * z1 * z2 % _P
+    E, F, G, H = B - A, Dz - C, Dz + C, B + A
+    return (E * F % _P, G * H % _P, F * G % _P, E * H % _P)
+
+
+def _mul(s, p):
+    q = (0, 1, 1, 0)
+    while s > 0:
+        if s & 1:
+            q = _add(q, p)
+        p = _add(p, p)
+        s >>= 1
+    return q
+
+
+def _equal(a, b):
+    return ((a[0] * b[2] - b[0] * a[2]) % _P == 0) and ((a[1] * b[2] - b[1] * a[2]) % _P == 0)
+
+
+def _decode(s):
+    if len(s) != 32:
+        return None
+    y = int.from_bytes(s, "little")
+    sign = y >> 255
+    y &= (1 << 255) - 1
+    if y >= _P:
+        return None
+    x2 = (y * y - 1) * pow(_D * y * y + 1, _P - 2, _P) % _P
+    if x2 == 0:
+        if sign:
+            return None
+        x = 0
+    else:
+        x = pow(x2, (_P + 3) // 8, _P)
+        if (x * x - x2) % _P != 0:
+            x = x * _I % _P
+        if (x * x - x2) % _P != 0:
+            return None
+        if (x & 1) != sign:
+            x = _P - x
+    return (x, y, 1, x * y % _P)
+
+
+_GY = 4 * pow(5, _P - 2, _P) % _P
+_G = _decode(_GY.to_bytes(32, "little"))
+
+
+def ed25519_verify(public, message, signature):
+    if len(public) != 32 or len(signature) != 64:
+        return False
+    A = _decode(public)
+    R = _decode(signature[:32])
+    if A is None or R is None:
+        return False
+    s = int.from_bytes(signature[32:], "little")
+    if s >= _L:
+        return False
+    h = int.from_bytes(hashlib.sha512(signature[:32] + public + message).digest(), "little") % _L
+    return _equal(_mul(s, _G), _add(R, _mul(h, A)))
+
+
+# ------------------------------------------------------------ SSH signatures
+def _string(buf, i):
+    if i + 4 > len(buf):
+        raise CheckFailed("signature is truncated")
+    n = int.from_bytes(buf[i:i + 4], "big")
+    if i + 4 + n > len(buf):
+        raise CheckFailed("signature is truncated")
+    return buf[i + 4:i + 4 + n], i + 4 + n
+
+
+def _ssh_string(b):
+    return len(b).to_bytes(4, "big") + b
+
+
+def _ed25519_key(blob):
+    kind, i = _string(blob, 0)
+    key, i = _string(blob, i)
+    if kind != b"ssh-ed25519" or len(key) != 32 or i != len(blob):
+        raise CheckFailed("signature is not an Ed25519 signature")
+    return key
+
+
+def verify_sshsig(armored, message, signers, namespace=b"git"):
+    """Raise CheckFailed unless 'armored' is a valid SSH signature of
+    'message' in 'namespace' by one of 'signers' (base64 key blobs)."""
+    m = re.search(r"-----BEGIN SSH SIGNATURE-----\s*(.*?)\s*-----END SSH SIGNATURE-----", armored, re.S)
+    if not m:
+        raise CheckFailed("no SSH signature")
+    try:
+        blob = base64.b64decode("".join(m.group(1).split()), validate=True)
+    except ValueError:
+        raise CheckFailed("signature is not valid base64")
+    if blob[:6] != b"SSHSIG" or int.from_bytes(blob[6:10], "big") != 1:
+        raise CheckFailed("not an SSHSIG version 1 signature")
+    pub_blob, i = _string(blob, 10)
+    ns, i = _string(blob, i)
+    reserved, i = _string(blob, i)
+    hash_alg, i = _string(blob, i)
+    sig_blob, i = _string(blob, i)
+    if i != len(blob):
+        raise CheckFailed("signature has trailing data")
+    if ns != namespace:
+        raise CheckFailed("signature namespace is %r, not %r" % (ns, namespace))
+    trusted = set()
+    for s in signers:
+        try:
+            trusted.add(base64.b64decode(s))
+        except ValueError:
+            continue
+    if pub_blob not in trusted:
+        raise CheckFailed("signed by a key that isn't a trusted Atlas release key")
+    if hash_alg == b"sha512":
+        digest = hashlib.sha512(message).digest()
+    elif hash_alg == b"sha256":
+        digest = hashlib.sha256(message).digest()
+    else:
+        raise CheckFailed("unsupported hash %r" % hash_alg)
+    kind, j = _string(sig_blob, 0)
+    raw, j = _string(sig_blob, j)
+    if kind != b"ssh-ed25519" or j != len(sig_blob):
+        raise CheckFailed("signature is not an Ed25519 signature")
+    signed = (b"SSHSIG" + _ssh_string(ns) + _ssh_string(reserved) + _ssh_string(hash_alg)
+              + _ssh_string(digest))
+    if not ed25519_verify(_ed25519_key(pub_blob), signed, raw):
+        raise CheckFailed("signature does not match")
+
+
+# ------------------------------------------------------------------ git tags
+def _git(repo, args, check=True, timeout=120):
+    r = subprocess.run(["git", "--literal-pathspecs", "-C", repo] + args, capture_output=True, timeout=timeout,
+                       stdin=subprocess.DEVNULL)
+    if check and r.returncode != 0:
+        raise CheckFailed("git %s failed: %s" % (args[0], r.stderr.decode("utf-8", "replace").strip()[:200]))
+    return r
+
+
+def verify_tag(repo, ref, name, signers=None):
+    """Commit id the signed annotated tag 'ref' (named 'name') points to."""
+    signers = SIGNERS if signers is None else signers
+    if not TAG_NAME.match(name or ""):
+        raise CheckFailed("%r is not an Atlas release tag name" % name)
+    kind = _git(repo, ["cat-file", "-t", ref]).stdout.decode().strip()
+    if kind != "tag":
+        raise CheckFailed("%s is not an annotated (signed) tag" % ref)
+    raw = _git(repo, ["cat-file", "tag", ref]).stdout
+    at = raw.rfind(b"\n-----BEGIN SSH SIGNATURE-----")
+    if at < 0:
+        raise CheckFailed("%s is not signed" % name)
+    at += 1
+    payload, armored = raw[:at], raw[at:].decode("ascii", "replace")
+    head = payload.split(b"\n\n", 1)[0].decode("utf-8", "replace").split("\n")
+    pairs = [line.split(" ", 1) for line in head if " " in line]
+    fields = dict(pairs)
+    if len(fields) != len(pairs):
+        raise CheckFailed("tag object has repeated headers")
+    if fields.get("type") != "commit" or fields.get("tag") != name:
+        raise CheckFailed("tag object is for %r (%s), not release %s" % (fields.get("tag"), fields.get("type"), name))
+    verify_sshsig(armored, payload, signers)
+    commit = fields.get("object", "")
+    if not re.match(r"^[0-9a-f]{40}([0-9a-f]{24})?$", commit):
+        raise CheckFailed("tag object id is malformed")
+    return commit
+
+
+def main(argv):
+    if len(argv) == 4 and argv[1] == "verify":
+        try:
+            print(verify_tag(os.getcwd(), argv[2], argv[3]))
+            return 0
+        except (CheckFailed, OSError, subprocess.SubprocessError) as e:
+            print("release check failed: %s" % e, file=sys.stderr)
+            return 1
+    print(__doc__, file=sys.stderr)
+    return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

@@ -9,7 +9,7 @@ Let Atlas work with whatever tools the user has, without vendor-specific code. E
 
 ## When to use
 - Setup step 9 (`atlas-setup`).
-- "I just connected Teams", "I disconnected Gmail", "what are you connected to?", "you're not seeing my Slack", "remap my connectors".
+- "I just connected Teams", "I disconnected Gmail", "what are you connected to?", "you're not seeing my Slack", "remap my connectors", "help me set up approval cards" (step 10 alone, for every existing send, share or delete tool).
 - `atlas-health` system check finds a changed `tool_fingerprint`, a connector missing from the session, auth failures, or a new connector not yet mapped. In a routine the health check can only record the drift; the re-map happens in the next chat (it needs confirmation).
 - A run report shows a connector's tools ran (or failed) in a routine while `available_in_routines` is `unknown`.
 
@@ -31,6 +31,7 @@ Full detail, examples, and the fingerprint recipe: `reference/mapping.md`.
 7. **Sources and fallbacks.** Propose what to ingest per category (defaults from the category guide and setup choices, scopes in plain language, `lookback_days_initial: 14` for new sources) and a fallback for each category the user relies on but hasn't connected (`forward | drop | export | manual`, with one-sentence instructions). The user's yes is the confirmation (`behavior_settings`). For a removed connector, switch its categories to their fallback and tell the user.
 8. **Folders.** If a files connector was added or replaced and `atlas.yaml` has no working `deliverables_folder`/`drop_folder`, offer to set them up (as in setup step 9).
 9. **Confirm and write `connectors.yaml` (protected, N6).** In plain language, show what changed: "Gmail: mail. I can read and search, create drafts, and (only with your OK each time) send or delete. Google Calendar: calendar…". Say which tools are treated as risky. Ask for an explicit yes. Then follow the approval-record procedure in `system/rules/governance.md` (action `governance_settings`, target `user/settings/connectors.yaml`, `tool` = the exact tool used for the write; make the whole change in that one call so one record covers it). Write `sources.yaml`, validate, commit, log.
+10. **Approval cards.** For each newly tagged `send`, `share`, or `delete` tool, ask the user to set it to ✋ Needs approval in Settings → Connectors (as in setup step 9), so Cowork shows its approval card before anything goes out. If the connector is attached to any routine, ask them to remove it there: routines only draft.
 10. **Report** in one or two lines: what's connected, what it covers, what's missing and the fallback. If the user isn't in a chat (routine), do none of the writes: add a known issue in `user/.state/health.yaml` ("Your connections changed; I'll update my map next time we chat") and an entry in the run report under "Connector health".
 
 ## Outputs

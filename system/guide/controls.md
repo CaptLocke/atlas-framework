@@ -39,7 +39,7 @@ Atlas starts at the highest level that's safe, and you can raise or lower any ad
 - Applying a major Atlas update
 
 ## What always needs your approval
-These are locked. Atlas shows you exactly what will happen and waits for your clear yes, every time. In background runs they can't happen at all; they wait for you.
+These are locked. Atlas shows you exactly what will happen and waits for your clear yes, every time. For sending, sharing, and deleting, Claude then shows its own approval card with exactly what will go out, and nothing happens until you click it (keep those tools on "Needs approval" in Settings → Connectors; setup walks you through it). In background runs they can't happen at all; they wait for you.
 - **Sending anything:** emails, replies, forwards, chat messages, comments others can see, meeting responses, invitations
 - **Sharing anything:** sharing files, changing permissions, publishing
 - **Deleting anything:** inside or outside Atlas, including forgetting or permanently erasing knowledge

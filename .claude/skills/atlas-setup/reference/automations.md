@@ -64,7 +64,7 @@ For each routine in `routines.yaml`:
 | Repository | The user's Atlas repo only |
 | Environment | `Atlas routine` (always; a routine without it isn't guarded by the safety hooks) |
 | Branch pushes | Allow pushing to `main` if the option exists |
-| Connectors | Only connectors in `connectors.yaml` that the routine's jobs use (usually all mapped ones except `web`-only tools it doesn't need); never extra ones |
+| Connectors | Only connectors in `connectors.yaml` that the routine's jobs read from; never a connector with send, share or delete tools (routines only draft), and never extra ones |
 | Model | `system/manifest.yaml: models.<role>` for the routine's `model` role; if a routine mixes fast and strongest jobs, strongest |
 | Schedule | The cron from `routines.yaml`, in the user's time zone |
 
