@@ -83,8 +83,8 @@ When a page is over budget, its contract's truncation runs these steps first: cu
 1. Read the contract. Build one JSON object exactly as it specifies, from the listed source files. Every list is sorted, filtered, and capped as the contract says.
 2. Fill the common `meta` envelope (below).
 3. **Check size.** `size_budget_kb` is the size of the **whole rendered page** (template ≈ 35–40 KB plus the embedded data), measured after embedding. Serialize the JSON (compact, UTF-8); if the page would exceed the budget, apply the contract's truncation rules (drop from the low-priority end of each list, shorten long text fields), record what was dropped in `meta.truncated`, and repeat until it fits.
-4. **Escape for embedding.** In the serialized JSON replace `<` with `<`, `>` with `>`, `&` with `&`, and U+2028/U+2029 with ` `/` `. The result is still valid JSON and can never close the script element.
-5. **Theme.** Build the theme CSS (below). Remove any `</` sequence from it.
+4. **Escape for embedding** (done by `system/tools/render.py`, which also does steps 5–6; never substitute by hand). In the serialized JSON replace `<` with `<`, `>` with `>`, `&` with `&`, and U+2028/U+2029 with ` `/` `. The result is still valid JSON and can never close the script element.
+5. **Theme.** Build the theme CSS (below); the render script removes every `<` from it.
 6. Replace `{{ATLAS_DATA}}` with the escaped JSON and `{{ATLAS_THEME_CSS}}` with the theme CSS (or an empty string). Nothing else in the template changes.
 7. Publish: first time in chat (setup), then republish to the URL stored in `user/settings/dashboards.yaml` and set `last_published`. Project pages store their URL under `project_pages`.
 

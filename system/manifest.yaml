@@ -14,6 +14,7 @@ owned_paths:
   - README.md
   - LICENSE
   - CHANGELOG.md
+  - SECURITY.md
   - .gitignore
   - docs/
   - .claude/
