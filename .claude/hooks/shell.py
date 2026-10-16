@@ -19,6 +19,14 @@ import re
 import shlex
 
 SEPARATORS = {";", "&&", "||", "|", "&", "\n", "(", ")", "|&", ";;"}
+SEPARATOR_CHARS = set(";&|()\n")
+
+
+def is_separator(token):
+    """True for an operator token that ends a command. shlex groups adjacent
+    punctuation, so a blank line arrives as '\n\n' and 'cmd;' + newline as
+    ';\n': any token made only of separator characters ends the command."""
+    return token in SEPARATORS or (bool(token) and set(token) <= SEPARATOR_CHARS)
 REDIRECTS = {">", ">>", ">|", "&>", "&>>", "<>", ">&"}
 WRAPPERS = {"sudo", "env", "command", "nohup", "time", "nice", "xargs", "builtin", "exec", "stdbuf", "timeout"}
 SHELLS = {"bash", "sh", "zsh", "dash"}
@@ -117,7 +125,7 @@ def segments(command, cwd, _depth=0):
 
     while i < len(tokens):
         t = tokens[i]
-        if t in SEPARATORS:
+        if is_separator(t):
             flush()
         elif t in REDIRECTS or re.match(r"^[<>&|]+$", t) and ">" in t:
             target = tokens[i + 1] if i + 1 < len(tokens) else ""
@@ -127,7 +135,7 @@ def segments(command, cwd, _depth=0):
                 continue
             if cur and re.match(r"^\d+$", cur[-1]):
                 cur.pop()  # the fd number in '2>file'
-            if target and target not in SEPARATORS:
+            if target and not is_separator(target):
                 redirects.append(target)
                 i += 2
                 continue

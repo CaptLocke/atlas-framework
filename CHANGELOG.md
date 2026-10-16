@@ -7,6 +7,19 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Atlas Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. "Under the hood" notes are for maintainers and are not shown to users. How to write this file and cut a release: the release checklist, `docs/maintainers/releasing.md` on the upstream repo's `maintainers` branch.
 
+## Unreleased
+
+### What's new
+- Atlas no longer warns that it couldn't save to GitHub when everything was saved.
+
+### Under the hood
+- Shell guard: commands after a blank line, or after `;` and a newline, were merged into the previous command and missed by the guards (a delete written that way went unseen). Any token made only of separator characters now ends a command. This also fixes `cd` being ignored after heredocs.
+- N5: owned paths are never written by editing, in any context. Restoring from an explicitly named `HEAD` is always allowed (the index is never a trusted source); under the update lock, `git checkout` from `refs/atlas-upstream/*` or a commit already in history, and `git rm`. Commits touching owned paths need the lock and `Atlas-Actor: update`. `git fetch`/`pull` reach only origin and `https://github.com/<manifest.upstream>`, one source at a time, and only the upstream may fill `refs/atlas-upstream/*` (checked by the ref's full name). Adding other remotes and redirecting fetches (`url.*`, `remote.*`, `branch -u`) are blocked. A glob with no folder (`rm -rf sys*`) counts as its whole folder.
+- Tripwire: send, share and delete are blocked while tracked owned files differ from HEAD, or `.claude/hooks/` has untracked files, outside an update; `atlas-health` restores them with `git checkout HEAD -- <owned paths>`.
+- Risk classifier: `collaborator`, `visibility` and `gist` are share words; on GitHub tools, an input setting visibility, privacy or a permission is a share.
+- Zip updates removed: releases install only from the upstream tag. `system/tools/build-zip.md` deleted.
+- Sync hooks: session start on a non-main branch (cloud routines' `claude/...` branch) fetches and fast-forwards to `origin/main` instead of failing; the end-of-turn check fetches before counting unpushed commits and skips the count if the fetch fails.
+
 ## 1.0.0 (2026-10-16)
 
 ### What's new

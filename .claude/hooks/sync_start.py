@@ -12,6 +12,9 @@ https://code.claude.com/docs/en/hooks-guide, checked 2026-10-12):
 - $CLAUDE_PROJECT_DIR is the project root.
 
 Behavior (system/rules/sync.md "Session start"):
+- On another branch (cloud routines start on their own claude/... branch),
+  fetch and fast-forward that branch to origin/main instead of giving up;
+  Atlas pushes HEAD:main either way.
 - No-op in the upstream product repo (same bypass as the other hooks) and
   outside a git repo with an `origin` remote.
 - `git fetch origin` then `git pull --rebase --autostash origin main` (about
@@ -77,19 +80,32 @@ def main():
     if gs.is_upstream(proj) or not gs.is_git_repo(proj) or not gs.has_origin(proj):
         return None
     branch = gs.current_branch(proj)
-    if branch != gs.BRANCH:
-        return failure(gs, proj, "the repo is on %r, not %s" % (branch or "a detached HEAD", gs.BRANCH))
     if gs.operation_in_progress(proj):
         return failure(gs, proj, "an unfinished %s is in progress" % gs.operation_in_progress(proj))
     rc, _, err = gs.git(proj, ["fetch", "--quiet", "origin"], timeout=FETCH_TIMEOUT)
     if rc != 0:
         return failure(gs, proj, "git fetch failed: %s" % (err.strip() or "exit %d" % rc))
-    rc, out, err = gs.git(proj, ["pull", "--rebase", "--autostash", "--quiet", "origin", gs.BRANCH],
-                          timeout=PULL_TIMEOUT)
-    if rc != 0:
-        if gs.operation_in_progress(proj) == "rebase":
-            gs.git(proj, ["rebase", "--abort"], timeout=10)
-        return failure(gs, proj, "git pull --rebase failed: %s" % ((err or out).strip() or "exit %d" % rc))
+    if branch == gs.BRANCH:
+        rc, out, err = gs.git(proj, ["pull", "--rebase", "--autostash", "--quiet", "origin", gs.BRANCH],
+                              timeout=PULL_TIMEOUT)
+        if rc != 0:
+            if gs.operation_in_progress(proj) == "rebase":
+                gs.git(proj, ["rebase", "--abort"], timeout=10)
+            return failure(gs, proj, "git pull --rebase failed: %s" % ((err or out).strip() or "exit %d" % rc))
+    else:
+        # Cloud routines start on their own working branch (claude/...). Atlas always pushes HEAD:main,
+        # so bring this branch level with origin/main instead of giving up.
+        target = "origin/" + gs.BRANCH
+        rc, _, _ = gs.git(proj, ["merge-base", "--is-ancestor", "HEAD", target], timeout=5)
+        if rc == 0:
+            rc, out, err = gs.git(proj, ["merge", "--ff-only", "--quiet", target], timeout=PULL_TIMEOUT)
+            if rc != 0:
+                return failure(gs, proj, "could not fast-forward %s to %s: %s"
+                               % (branch or "HEAD", target, (err or out).strip() or "exit %d" % rc))
+        else:
+            rc, _, _ = gs.git(proj, ["merge-base", "--is-ancestor", target, "HEAD"], timeout=5)
+            if rc != 0:
+                return failure(gs, proj, "%s has diverged from %s" % (branch or "HEAD", target))
     sha = gs.short_sha(proj)
     rc, out, err = gs.git(proj, ["push", "--dry-run", "--quiet", "origin", "HEAD:" + gs.BRANCH],
                           timeout=PUSH_CHECK_TIMEOUT)

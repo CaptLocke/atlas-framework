@@ -17,8 +17,9 @@ Behavior (system/rules/sync.md "after each logical change set"):
   a git repo, or without an `origin` remote.
 - Blocks the stop when (a) tracked files have uncommitted changes or there are
   untracked, non-ignored files (except .atlas-tmp/ and user/inbox/drop/), or an
-  unfinished rebase/merge, or (b) HEAD has commits origin/main doesn't (after
-  the local `origin/main` tracking ref; no network call).
+  unfinished rebase/merge, or (b) HEAD has commits origin/main doesn't. It
+  fetches origin/main first (a cached ref can be stale); if the fetch fails it
+  skips (b) rather than guess, so a stale ref never raises a false alarm.
 - Loop safety: when `stop_hook_active` is true, or this would be the 3rd
   consecutive block (counter in .atlas-tmp/sync_guard.json, per session), the
   stop is allowed: an open high-severity known issue `sync-push-failing` is
@@ -35,7 +36,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 STATE = ".atlas-tmp/sync_guard.json"
 MAX_BLOCKS = 2          # the 3rd consecutive block is turned into an allowed stop
-FETCH_TIMEOUT = 5
+FETCH_TIMEOUT = 8
 STALE_SECONDS = 3600
 REASON = ("Unsaved Atlas changes: commit (with Atlas-Actor/Atlas-Reason trailers) and push to origin main before "
           "finishing (system/rules/sync.md).")
@@ -83,8 +84,12 @@ def problems(gs, proj):
     elif paths:
         out.append("%d uncommitted file(s): %s%s" % (len(paths), ", ".join(paths[:5]),
                                                      ", ..." if len(paths) > 5 else ""))
-    # No network call: commits ahead of the local origin/main tracking ref (updated by every
-    # successful push or pull) are unpushed by definition, so the check stays instant.
+    # Fetch first: a cached origin/main can be stale (a cloud session's clone, or a repo recreated
+    # under the same name), and counting against it reports commits GitHub already has.
+    rc, _, err = gs.git(proj, ["fetch", "--quiet", "origin", gs.BRANCH], timeout=FETCH_TIMEOUT)
+    if rc != 0:
+        gs.log(proj, "sync_guard.fetch_failed", (err or "").strip() or "exit %d" % rc)
+        return out  # can't tell what's unpushed; don't guess
     n = gs.unpushed_count(proj)
     if n:
         out.append("%d commit(s) not pushed to origin/%s" % (n, gs.BRANCH))

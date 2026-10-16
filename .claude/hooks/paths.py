@@ -13,8 +13,12 @@ tool_input.command; exit 2 + stderr blocks and the message goes to Claude;
 $CLAUDE_PROJECT_DIR is the project root. Shared policy: context.py.
 
 What it enforces (system/rules/governance.md, system/schemas/formats.md s2):
-- N5: writes to system/manifest.yaml owned_paths only while
-  .atlas-tmp/update.lock exists and is unexpired (any context).
+- N5: owned paths (system/manifest.yaml owned_paths) are never written by
+  file tools or ordinary shell commands, in any context. The only changes
+  allowed are git's own: restoring from HEAD or the index (any time), and,
+  while .atlas-tmp/update.lock is valid, `git checkout <src> -- <path>` from
+  a fetched release ref (refs/atlas-upstream/*) or a commit already in this
+  repo's history, and `git rm`. That is all atlas-update needs.
 - N6: writes to user/settings/{governance,data-rules,connectors}.yaml are
   blocked in routines; in chats they need an approval record with action
   governance_settings for this exact tool whose target is the file's
@@ -65,8 +69,33 @@ def file_targets(payload):
     return out
 
 
+HEAD_SOURCES = ("HEAD", "@")
+INDEX_READS = ("--ours", "--theirs", "-m", "--merge", "--conflict", "-p", "--patch")
+
+
+def git_source(seg):
+    """For git checkout/restore/rm segments: 'head' (restore from an explicitly
+    named HEAD), 'update:<ref>' (needs the update lock and an allowed ref; ''
+    means the index, which is never an allowed source), or 'rm' (git rm, needs
+    the update lock). None for any other command."""
+    if seg.name != "git":
+        return None
+    sub, sargs = shell.git_subcommand(seg.argv)
+    if sub == "rm":
+        return "rm"
+    index_read = any(a in INDEX_READS or a.startswith("--conflict=") for a in sargs)
+    if sub == "checkout" and "--" in sargs:
+        before = shell.positional(["git"] + sargs[:sargs.index("--")])
+        ref = before[0] if before else ""
+    elif sub == "restore":
+        ref = shell.option_value(["git"] + sargs, "-s", "--source") or ""
+    else:
+        return None
+    return "head" if ref in HEAD_SOURCES and not index_read else "update:" + ref
+
+
 def bash_targets(payload, proj):
-    """[(word, cwd, 'write'|'delete')] of paths a shell command may change."""
+    """[(word, cwd, 'write'|'delete', git_source)] of paths a shell command may change."""
     command = (payload.get("tool_input") or {}).get("command")
     if not isinstance(command, str) or not command.strip():
         return []
@@ -81,22 +110,46 @@ def bash_targets(payload, proj):
             if dest.endswith("/") or os.path.isdir(dpath):
                 writes = writes[:-1] + [os.path.join(dest, os.path.basename(src.rstrip("/")) or src)
                                         for src in sources]
+        via = git_source(seg)
         for kind, words in (("write", writes), ("delete", deletes)):
             for w in words:
                 if shell.unresolvable(w):
                     continue
-                out.append((shell.literal_prefix(w) if shell.has_glob(w) else w, seg.cwd, kind))
+                # a glob with no literal folder ('sys*') may match anything in its folder
+                word = (shell.literal_prefix(w) or ".") if shell.has_glob(w) else w
+                out.append((word, seg.cwd, kind, via))
     return out
+
+
+def update_source_ok(proj, via):
+    """May this git operation change owned paths under a valid update lock?"""
+    if via == "rm":
+        return True
+    ref = via[len("update:"):] if via and via.startswith("update:") else None
+    if not ref:
+        return False
+    if atlas.full_ref_name(proj, ref).startswith("refs/atlas-upstream/"):
+        return True
+    return atlas.in_history(proj, ref)
 
 
 def check(rels, tool_name, proj, ctx):
     owned = atlas.owned_paths(proj)
     owned_hits, gov_hits, tmp_hits, git_hits = [], [], [], []
-    for rel, kind in rels:
+    update_ok = None
+    for rel, kind, via in rels:
         if rel == ".git" or rel.startswith(".git/"):
             git_hits.append(rel)
         if any(atlas.overlaps(rel, e) for e in owned):
-            owned_hits.append(rel or ".")
+            if via == "head":
+                pass  # restoring committed content never introduces anything new
+            elif via is not None and update_source_ok(proj, via):
+                if update_ok is None:
+                    update_ok = atlas.valid_lock(proj, "update")
+                if not update_ok[0]:
+                    owned_hits.append(rel or ".")
+            else:
+                owned_hits.append(rel or ".")
         # a write names the file it changes; a delete of a parent folder also
         # removes the governance files inside it
         if (rel in atlas.GOVERNANCE_FILES) or (kind == "delete" and any(
@@ -115,14 +168,14 @@ def check(rels, tool_name, proj, ctx):
                    % ", ".join(sorted(set(tmp_hits))))
 
     if owned_hits:
-        ok, why = atlas.valid_lock(proj, "update")
-        if not ok:
-            atlas.block("%s %s system-owned (system/manifest.yaml: owned_paths) and only change through "
-                       "atlas-update while .atlas-tmp/update.lock is valid (N5): %s. Put user changes in "
-                       "user/ (extensions go in user/extensions/ via atlas-extend). If a system file looks "
-                       "broken, record it for atlas-health / atlas-update instead of editing it."
-                       % (", ".join(sorted(set(owned_hits))[:5]),
-                          "is" if len(set(owned_hits)) == 1 else "are", why))
+        atlas.STATE.locked = True
+        atlas.block("%s %s system-owned (system/manifest.yaml: owned_paths) and never change by editing "
+                   "(N5). Only atlas-update changes them, with `git checkout` from a fetched release and "
+                   "`git rm`, while .atlas-tmp/update.lock is valid. Put user changes in user/ (extensions "
+                   "go in user/extensions/ via atlas-extend). If a system file looks broken, record it for "
+                   "atlas-health, which can restore it."
+                   % (", ".join(sorted(set(owned_hits))[:5]),
+                      "is" if len(set(owned_hits)) == 1 else "are"))
 
     if gov_hits:
         files = ", ".join(sorted(set(gov_hits)))
@@ -158,12 +211,12 @@ def main(payload, proj, ctx):
         for p in file_targets(payload):
             rel = atlas.rel_to_project(p, base, proj)
             if rel is not None:
-                rels.append((rel, "write"))
+                rels.append((rel, "write", None))
     elif tool_name in ("Bash", "Monitor"):
-        for word, cwd, kind in bash_targets(payload, proj):
+        for word, cwd, kind, via in bash_targets(payload, proj):
             rel = atlas.rel_to_project(word, cwd, proj)
             if rel is not None:
-                rels.append((rel, kind))
+                rels.append((rel, kind, via))
     if rels:
         check(rels, tool_name, proj, ctx)
     atlas.allow()
