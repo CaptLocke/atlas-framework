@@ -30,6 +30,9 @@ Each release's "What's new" section is shown to users in the Atlas Guide and the
 - Connector writes (#7): GitHub connector calls that write into this Atlas repo (any `path`/`file` key, nested) are blocked for owned paths, protected settings, `.atlas-tmp/` and `.git/`; GitHub writes to another repo, forks and new repos are a share; forced ref updates are blocked (N8).
 - Upstream bypass (#12): hooks skip enforcement only when origin is the upstream **and** the git-ignored `.atlas-maintainer` file exists; a clone of the upstream is guarded, and setup tells its user to create their own repo from the template. Atlas never creates, changes or removes that file.
 - Routine marker (#5): the routine prompt checks `ATLAS_CONTEXT` first, and a run without `routine` stops before any job (it used to continue by instruction).
+- Dashboards (#10): `system/tools/render.py` embeds data and theme (JSON with <, >, &, U+2028/9 escaped; every `<` removed from theme CSS); `atlas-dashboards` must use it instead of substituting by hand. Every template carries a content security policy (`default-src 'none'`, inline script and style only, `connect-src 'none'`, `form-action 'none'`), so a page can't load or send anything.
+- Issue reports (#11): `system/tools/redact_check.py` flags emails, phone numbers, links, and known people, organizations, employer domains and the repo name left in a report; `atlas-report-issue` runs it before showing the draft.
+- `SECURITY.md` (#9): how to report vulnerabilities privately; added to `owned_paths`.
 - Sync hooks: session start on a non-main branch (cloud routines' `claude/...` branch) fetches and fast-forwards to `origin/main` instead of failing; the end-of-turn check fetches before counting unpushed commits and skips the count if the fetch fails.
 
 ## 1.0.0 (2026-10-16)

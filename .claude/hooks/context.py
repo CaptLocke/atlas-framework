@@ -53,7 +53,7 @@ GOVERNANCE_FILES = (
 # one minute of clock slack. A record claiming to live longer is invalid.
 MAX_MINUTES = {"approval": 2 + 1, "update": 30 + 1, "purge": 15 + 1}
 DEFAULT_UPSTREAM = "CaptLocke/atlas-framework"
-DEFAULT_OWNED_PATHS = ["CLAUDE.md", "README.md", "LICENSE", "CHANGELOG.md", ".gitignore", "docs/", ".claude/",
+DEFAULT_OWNED_PATHS = ["CLAUDE.md", "README.md", "LICENSE", "CHANGELOG.md", "SECURITY.md", ".gitignore", "docs/", ".claude/",
                        "system/"]
 
 _CACHE = {}
