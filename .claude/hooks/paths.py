@@ -69,26 +69,29 @@ def file_targets(payload):
     return out
 
 
-HEAD_SOURCES = ("", "HEAD", "@")
+HEAD_SOURCES = ("HEAD", "@")
+INDEX_READS = ("--ours", "--theirs", "-m", "--merge", "--conflict", "-p", "--patch")
 
 
 def git_source(seg):
-    """For git checkout/restore/rm segments: 'head' (restore from HEAD or the
-    index), 'update:<ref>' (needs the update lock and an allowed ref), or
-    'rm' (git rm, needs the update lock). None for any other command."""
+    """For git checkout/restore/rm segments: 'head' (restore from an explicitly
+    named HEAD), 'update:<ref>' (needs the update lock and an allowed ref; ''
+    means the index, which is never an allowed source), or 'rm' (git rm, needs
+    the update lock). None for any other command."""
     if seg.name != "git":
         return None
     sub, sargs = shell.git_subcommand(seg.argv)
     if sub == "rm":
         return "rm"
+    index_read = any(a in INDEX_READS or a.startswith("--conflict=") for a in sargs)
     if sub == "checkout" and "--" in sargs:
         before = shell.positional(["git"] + sargs[:sargs.index("--")])
         ref = before[0] if before else ""
-        return "head" if ref in HEAD_SOURCES else "update:" + ref
-    if sub == "restore":
+    elif sub == "restore":
         ref = shell.option_value(["git"] + sargs, "-s", "--source") or ""
-        return "head" if ref in HEAD_SOURCES else "update:" + ref
-    return None
+    else:
+        return None
+    return "head" if ref in HEAD_SOURCES and not index_read else "update:" + ref
 
 
 def bash_targets(payload, proj):
@@ -112,7 +115,9 @@ def bash_targets(payload, proj):
             for w in words:
                 if shell.unresolvable(w):
                     continue
-                out.append((shell.literal_prefix(w) if shell.has_glob(w) else w, seg.cwd, kind, via))
+                # a glob with no literal folder ('sys*') may match anything in its folder
+                word = (shell.literal_prefix(w) or ".") if shell.has_glob(w) else w
+                out.append((word, seg.cwd, kind, via))
     return out
 
 
@@ -123,7 +128,7 @@ def update_source_ok(proj, via):
     ref = via[len("update:"):] if via and via.startswith("update:") else None
     if not ref:
         return False
-    if ref.startswith("refs/atlas-upstream/"):
+    if atlas.full_ref_name(proj, ref).startswith("refs/atlas-upstream/"):
         return True
     return atlas.in_history(proj, ref)
 

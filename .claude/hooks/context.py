@@ -219,17 +219,33 @@ def in_history(proj, ref):
     return rc == 0
 
 
+def full_ref_name(proj, ref):
+    """Full name git resolves 'ref' to ('refs/heads/x' for a branch named
+    'refs/atlas-upstream/x'), or '' when it isn't a ref."""
+    if not ref or ref.startswith("-"):
+        return ""
+    rc, out = _git(proj, ["rev-parse", "--symbolic-full-name", ref], timeout=10)
+    return out.strip() if rc == 0 else ""
+
+
 def system_files_changed(proj):
-    """(changed, detail). True when tracked files under .claude/ or system/
-    differ from HEAD (file-mode and line-ending-only changes ignored), or
-    when git can't tell (fail closed)."""
+    """(changed, detail). True when tracked owned files differ from HEAD
+    (file-mode and line-ending-only changes ignored), when .claude/hooks has
+    untracked files (they could shadow a hook module), or when git can't tell
+    (fail closed)."""
+    owned = [e.rstrip("/") for e in owned_paths(proj)] or [".claude", "system"]
     rc, _ = _git(proj, ["-c", "core.fileMode=false", "diff", "--quiet", "--ignore-cr-at-eol", "HEAD",
-                        "--", ".claude", "system"], timeout=10)
-    if rc == 0:
-        return False, ""
+                        "--"] + owned, timeout=10)
+    if rc not in (0, 1):
+        return True, "git could not check the system files"
     if rc == 1:
         return True, "system files differ from the last commit"
-    return True, "git could not check the system files"
+    rc, out = _git(proj, ["ls-files", "--others", "--exclude-standard", "--", ".claude/hooks"], timeout=10)
+    if rc != 0:
+        return True, "git could not check the system files"
+    if out.strip():
+        return True, "there are unexpected files in .claude/hooks (%s)" % ", ".join(out.split()[:3])
+    return False, ""
 
 
 # --------------------------------------------------------------- paths

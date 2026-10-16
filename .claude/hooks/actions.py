@@ -262,9 +262,9 @@ def guard_locked(tool_name, risks, proj, ctx, what):
     changed, detail = atlas.system_files_changed(proj)
     if changed and not atlas.valid_lock(proj, "update")[0]:
         atlas.block(
-            "%s is a locked action (%s), and %s (.claude/ or system/), outside an update. Locked actions "
+            "%s is a locked action (%s), and %s, outside an update. Locked actions "
             "stay blocked until the system files are restored: tell the user, and offer atlas-health's "
-            "\"restore system files\" (git checkout HEAD -- .claude system)." % (what, cls, detail))
+            "\"restore system files\" (git checkout HEAD -- followed by the owned paths)." % (what, cls, detail))
     if ctx != "chat":
         atlas.block(
             "%s is a locked action (%s) and this is a routine (ATLAS_CONTEXT=routine). "

@@ -211,20 +211,59 @@ FETCH_VALUE_OPTS = ("--depth", "--deepen", "--shallow-since", "--shallow-exclude
                     "-s", "--strategy", "-X", "--strategy-option")
 
 
+FETCH_SPREAD_OPTS = ("--all", "--multiple", "--refmap")
+GITHUB_URL = re.compile(r"^(https://github\.com/|ssh://git@github\.com/|git@github\.com:)", re.I)
+
+
 def fetch_problem(sub, args, proj):
     """Why this fetch/pull isn't allowed, or None."""
+    upstream = atlas.upstream_slug(proj)
+
+    def official(url):
+        return bool(upstream) and bool(GITHUB_URL.match(url)) and atlas.repo_slug(url) == upstream
+
+    if sub == "remote" and args[:1] == ["update"]:
+        return "git remote update: Atlas fetches from one named source at a time"
+    if sub == "remote" and args[:1] == ["add"]:
+        rest = positional(args[1:])
+        if not (len(rest) >= 2 and official(rest[1])):
+            return "git remote add: Atlas only uses its own repo (origin) and the official upstream"
+        return None
     if sub not in ("fetch", "pull"):
         return None
+    spread = [a for a in args if a.split("=", 1)[0] in FETCH_SPREAD_OPTS]
+    if spread:
+        return "git %s %s: Atlas fetches from one named source at a time" % (sub, spread[0])
     pos = shell.positional(["git"] + args, value_opts=FETCH_VALUE_OPTS)
     repo = pos[0] if pos else "origin"
     refspecs = pos[1:]
-    upstream = atlas.upstream_slug(proj)
-    from_upstream = bool(upstream) and atlas.repo_slug(repo) == upstream
+    from_upstream = official(repo)
     if repo != "origin" and not from_upstream:
         return ("git %s from %r: Atlas only fetches from its own repo (origin) or the official upstream "
-                "(%s)" % (sub, repo, upstream))
-    if not from_upstream and any("refs/atlas-upstream/" in r for r in refspecs):
+                "(https://github.com/%s)" % (sub, repo, upstream))
+    if not from_upstream and any("atlas-upstream" in r.lower() for r in refspecs):
         return "only the official upstream (%s) may fill refs/atlas-upstream/* (release refs)" % upstream
+    return None
+
+
+REDIRECT_KEY = re.compile(r"^(url\.|remote\.|branch\.[^=]*\.(remote|merge|pushremote)\b)", re.I)
+
+
+def config_redirect(sub, args, argv):
+    """Config that would make fetches read from somewhere else: 'git -c url.X.insteadOf=..',
+    'git config url.*', 'git branch -u'. Returns a description or None."""
+    i = 1
+    while i < len(argv) and argv[i] != sub:
+        if argv[i] == "-c" and i + 1 < len(argv) and REDIRECT_KEY.match(argv[i + 1]):
+            return "git -c %s" % argv[i + 1].split("=", 1)[0]
+        i += 1
+    if sub == "config":
+        keys = [a for a in positional(args)[:1] if REDIRECT_KEY.match(a)]
+        if keys and len(positional(args)) >= 2:
+            return "git config %s" % keys[0]
+    if sub == "branch" and any(a in ("-u", "--set-upstream-to") or a.startswith("--set-upstream-to=")
+                               for a in args):
+        return "git branch --set-upstream-to"
     return None
 
 
@@ -259,6 +298,11 @@ def owned_commit_problem(proj, cwd, include_worktree, message):
     return ("this commit changes system-owned files (%s), which only atlas-update may commit, with "
             "'Atlas-Actor: update' while .atlas-tmp/update.lock is valid (%s)"
             % (", ".join(hits[:5]), why if not ok else "the commit isn't marked Atlas-Actor: update"))
+
+
+COMMIT_VALUE_OPTS = ("-m", "--message", "-F", "--file", "-C", "--reuse-message", "-c", "--reedit-message",
+                     "--author", "--date", "-t", "--template", "--fixup", "--squash", "--cleanup",
+                     "--trailer")
 
 
 # ------------------------------------------------------------------ N12
@@ -436,7 +480,9 @@ def main(payload, proj, ctx):
                     what, ": tags may only be removed by atlas-update (update lock) or a confirmed purge "
                           "(purge lock, chat)" if kind == "tag" else
                     ": only a user-confirmed purge in a chat may delete branches that exist on origin"))
-        fetch_why = fetch_problem(sub, args, proj)
+        redirect = config_redirect(sub, args, seg.argv)
+        fetch_why = fetch_problem(sub, args, proj) or (redirect and (
+            "%s would change where git fetches from, which Atlas never does" % redirect))
         if fetch_why:
             atlas.STATE.locked = True
             atlas.block("%s (N5)." % fetch_why)
@@ -461,7 +507,9 @@ def main(payload, proj, ctx):
                                 "Atlas-Actor and Atlas-Reason trailers" % why)
             else:
                 check_trailers(message, ctx)
-            include_wt = staged_by_command or "--" in args or any(
+            include_wt = staged_by_command or "--" in args or bool(
+                shell.positional(["git"] + args, value_opts=COMMIT_VALUE_OPTS)) or any(
+                a.startswith("--pathspec-from-file") for a in args) or any(
                 a in ("-a", "--all", "--include", "-i", "--only", "-o") or
                 (re.match(r"^-[a-zA-Z]+$", a) and "a" in a and not a.startswith("-m"))
                 for a in args)
