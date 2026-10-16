@@ -4,7 +4,7 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from hook_support import HookTestCase  # noqa: E402
+from hook_support import HookTestCase, sh  # noqa: E402
 
 
 class OwnedPaths(HookTestCase):
@@ -19,16 +19,18 @@ class OwnedPaths(HookTestCase):
         self.assertBlocked(self.write_call("system/kernel.md", context="chat", tool="Edit"))
         self.assertBlocked(self.write_call("system/x.ipynb", tool="NotebookEdit"))
 
-    def test_owned_write_with_lock_allowed(self):
+    def test_owned_write_blocked_even_with_lock(self):
+        # N5: the update installs with git, never by editing, so a lock doesn't open file tools
         self.update_lock()
-        self.assertAllowed(self.write_call("system/kernel.md"))
-        self.assertAllowed(self.write_call(".claude/settings.json", context="chat"))
+        self.assertBlocked(self.write_call("system/kernel.md"), "owned")
+        self.assertBlocked(self.write_call(".claude/settings.json", context="chat"), "owned")
 
-    def test_expired_or_overlong_lock_blocked(self):
+    def test_expired_or_overlong_lock_blocks_release_checkout(self):
+        cmd = "git checkout refs/atlas-upstream/v1.1.0 -- system"
         self.update_lock(minutes=-1)
-        self.assertBlocked(self.write_call("system/kernel.md"), "expired")
+        self.assertBlocked(self.bash("paths", cmd, "routine"), "owned")
         self.update_lock(minutes=600)
-        self.assertBlocked(self.write_call("system/kernel.md"), "too far")
+        self.assertBlocked(self.bash("paths", cmd, "routine"), "owned")
 
     def test_relative_path_from_subdir(self):
         r = self.run_hook("paths", "Write", {"file_path": "../system/kernel.md", "content": "x"},
@@ -52,7 +54,7 @@ class OwnedPaths(HookTestCase):
                     "cd system && echo x > kernel.md",
                     "bash -c 'echo x > system/kernel.md'",
                     "unzip -o atlas-1.1.0.zip",
-                    "git checkout -- system/kernel.md",
+                    "git checkout main~1 -- system/kernel.md",
                     "touch docs/new.md"):
             self.assertBlocked(self.bash("paths", cmd, "routine"), "owned")
 
@@ -73,9 +75,14 @@ class OwnedPaths(HookTestCase):
         self.assertBlocked(self.write_call("user/work/x.md"), "internal error")
         self.assertAllowed(self.write_call("user/work/x.md", context="chat"))
 
-    def test_bash_owned_with_lock_allowed(self):
+    def test_bash_owned_with_lock_only_git_release_ops(self):
         self.update_lock()
-        self.assertAllowed(self.bash("paths", "unzip -o atlas-1.1.0.zip && cp -r x/system .", "routine"))
+        sh(["git", "update-ref", "refs/atlas-upstream/v1.1.0", "HEAD"], self.root)
+        self.assertAllowed(self.bash("paths", "git checkout refs/atlas-upstream/v1.1.0 -- system", "routine"))
+        self.assertAllowed(self.bash("paths", "git rm -q -- system/old.md", "routine"))
+        self.assertBlocked(self.bash("paths", "unzip -o atlas-1.1.0.zip && cp -r x/system .", "routine"),
+                           "owned")
+        self.assertBlocked(self.bash("paths", "git checkout some-branch -- system", "routine"), "owned")
 
     def test_git_internals_blocked(self):
         self.update_lock()

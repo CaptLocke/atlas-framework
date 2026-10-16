@@ -112,9 +112,20 @@ class SessionStart(SyncCase):
         with open(self.path(".atlas-tmp/sync.log")) as f:
             self.assertIn("sync_start.read_only", f.read())
 
-    def test_not_on_main(self):
+    def test_routine_branch_fast_forwards(self):
+        # cloud routines start on their own claude/... branch: catch up, don't fail
         sh(["git", "checkout", "-q", "-b", "claude/x"], self.root)
-        self.assertIn("not main", self.start())
+        sha = self.other_clone_commit()
+        ctx = self.start(context="routine")
+        self.assertIn("Atlas boot", ctx)
+        self.assertIn(sha, ctx)
+        self.assertTrue(os.path.exists(self.path("user/work/from-elsewhere.md")))
+
+    def test_diverged_branch_reported(self):
+        sh(["git", "checkout", "-q", "-b", "claude/x"], self.root)
+        self.other_clone_commit()
+        self.commit_local()
+        self.assertIn("diverged", self.start())
 
     def test_broken_helper_module_does_not_crash(self):
         self.write(".claude/hooks/gitsync.py", "raise ImportError('simulated damage')\n")
