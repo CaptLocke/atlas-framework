@@ -35,7 +35,7 @@ Output paths follow `system/schemas/formats.md` §7.
 Every routine's saved prompt is exactly this, with `<name>` replaced by the routine name. `atlas-setup` and `atlas-settings` use it when creating or recreating routines:
 
 ```
-Run the Atlas routine `<name>`. First read `timezone` in user/settings/atlas.yaml and run `TZ=<timezone> date`; use that as the current date and time for this whole run and ignore the session's stated date. Then look up the routine in user/settings/routines.yaml and run its jobs in order. Push all changes directly to main.
+Run the Atlas routine `<name>`. First run `python3 -I /opt/atlas/release_check.py` and keep the line it prints for the run report. Then read `timezone` in user/settings/atlas.yaml and run `TZ=<timezone> date`; use that as the current date and time for this whole run and ignore the session's stated date. Then look up the routine in user/settings/routines.yaml and run its jobs in order. Push all changes directly to main.
 ```
 
 All behavior lives in the repo, so changing which jobs a routine runs is a settings edit. Only schedule and model changes touch the routine on the platform.

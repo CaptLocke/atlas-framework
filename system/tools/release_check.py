@@ -9,12 +9,15 @@ Standard library only (no ssh-keygen needed). Two uses:
       print the release commit when <ref> is an annotated tag named <tag>,
       signed by a key in SIGNERS; exit 1 otherwise.
 
-  python3 - <<'ATLAS' ... ATLAS          (this whole file, pasted)
-      The "Atlas routine" environment's setup script. Before every routine it
-      fetches the installed version's tag from UPSTREAM, verifies it, and puts
-      the system-owned files back to that release (committing the repair), so
-      routines always run the released hooks even if a chat changed them.
-      Writes .atlas-tmp/routine-setup.json; never fails the session.
+  python3 -I /opt/atlas/release_check.py
+      The first step of every Atlas routine (its prompt says so). The "Atlas
+      routine" environment's setup script writes this file to /opt/atlas, outside
+      the repo, so a chat can't change it (atlas-setup reference/automations.md
+      §3). It fetches the installed version's tag from UPSTREAM, verifies it,
+      and puts the system-owned files back to that release (committing and
+      pushing the repair), so the routine runs the released hooks even if a chat
+      changed them. Prints one status line, writes .atlas-tmp/release-check.json,
+      and always exits 0.
 
 Signatures are git's SSH signatures (ssh-keygen -Y sign, namespace "git") made
 with Ed25519 keys. Replacing a key is a release, signed by a key users already
@@ -35,7 +38,8 @@ SIGNERS = (  # ssh-ed25519 public keys: main, then offline backup
     "AAAAC3NzaC1lZDI1NTE5AAAAIF8Eax3RKJZebfTKRZP2zsU/BKc5aBvsFL99/Ul5i/0b",
 )
 TAG_NAME = re.compile(r"^v\d+\.\d+\.\d+(-rc\.\d+)?$")
-STATUS_FILE = ".atlas-tmp/routine-setup.json"
+STATUS_FILE = ".atlas-tmp/release-check.json"
+UPSTREAM_URL = None  # tests only; the real check always fetches github.com/UPSTREAM
 
 
 class CheckFailed(Exception):
@@ -192,8 +196,9 @@ def _git(repo, args, check=True, timeout=120):
     return r
 
 
-def verify_tag(repo, ref, name, signers=SIGNERS):
+def verify_tag(repo, ref, name, signers=None):
     """Commit id the signed annotated tag 'ref' (named 'name') points to."""
+    signers = SIGNERS if signers is None else signers
     if not TAG_NAME.match(name or ""):
         raise CheckFailed("%r is not an Atlas release tag name" % name)
     kind = _git(repo, ["cat-file", "-t", ref]).stdout.decode().strip()
@@ -256,13 +261,13 @@ def _installed_version(repo):
 
 
 def restore(repo):
-    """(status, detail). status: restored | clean | skipped | failed."""
+    """(status, detail). status: clean | restored | restored-settings | skipped | failed."""
     version = _installed_version(repo)
     if not version:
         return "skipped", "Atlas isn't set up in this repo yet (no installed_version)"
     tag = "v" + version
     ref = "refs/atlas-upstream/" + tag
-    url = "https://github.com/%s.git" % UPSTREAM
+    url = UPSTREAM_URL or "https://github.com/%s.git" % UPSTREAM
     _git(repo, ["fetch", "--quiet", "--depth=1", "--no-tags", url, "+refs/tags/%s:%s" % (tag, ref)])
     commit = verify_tag(repo, ref, tag)
     rel_manifest = _git(repo, ["show", commit + ":system/manifest.yaml"]).stdout.decode("utf-8", "replace")
@@ -284,20 +289,24 @@ def restore(repo):
     _git(repo, ["clean", "-q", "-f", "-d", "--", ".claude/hooks"], check=False)
     if _git(repo, ["diff", "--cached", "--quiet", "HEAD"], check=False).returncode == 0:
         return "clean", "system files match signed %s" % tag
-    msg = ("atlas(repair): restore system files to signed %s\n\nAtlas-Actor: routine-setup\n"
+    # hook registrations are read when the session starts: a changed settings file only counts next run
+    settings_changed = _git(repo, ["diff", "--cached", "--quiet", "HEAD", "--", ".claude/settings.json"],
+                            check=False).returncode != 0
+    msg = ("atlas(release-check): restore system files to signed %s\n\nAtlas-Actor: release-check\n"
            "Atlas-Reason: system files differed from the signed release before a routine\n"
            "Atlas-Records: -\n" % tag)
     _git(repo, ["-c", "user.name=Atlas", "-c", "user.email=atlas@users.noreply.github.com",
                 "-c", "commit.gpgsign=false", "commit", "-q", "--no-verify", "-m", msg])
     pushed = _git(repo, ["push", "--quiet", "origin", "HEAD:main"], check=False).returncode == 0
-    return "restored", "system files restored to signed %s%s" % (
-        tag, "" if pushed else " (commit not pushed yet; the routine's sync pushes it)")
+    return ("restored-settings" if settings_changed else "restored"), "system files restored to signed %s%s%s" % (
+        tag, "; .claude/settings.json had been changed, so this run's hook list may be the changed one"
+        if settings_changed else "", "" if pushed else " (commit not pushed yet; push it with this run's changes)")
 
 
-def routine_setup():
+def run_check():
     repo = _find_repo()
     if not repo:
-        print("Atlas routine setup: no Atlas repo found; nothing checked")
+        print("Atlas release check: no Atlas repo found; nothing checked")
         return
     try:
         status, detail = restore(repo)
@@ -310,7 +319,7 @@ def routine_setup():
             json.dump(record, f)
     except OSError:
         pass
-    print("Atlas routine setup: %s: %s" % (status, detail))
+    print("Atlas release check: %s: %s" % (status, detail))
 
 
 def main(argv):
@@ -322,7 +331,10 @@ def main(argv):
             print("release check failed: %s" % e, file=sys.stderr)
             return 1
     if len(argv) <= 1:
-        routine_setup()
+        try:
+            run_check()
+        except Exception as e:  # never stop the routine here; the kernel reads the status
+            print("Atlas release check: failed: %s" % e)
         return 0
     print(__doc__, file=sys.stderr)
     return 2
