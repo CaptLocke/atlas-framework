@@ -790,6 +790,8 @@ def check_connectors(c, path, data, template):
         air = cn.get("available_in_routines", "unknown")
         if air not in (True, False, "unknown"):
             rep.error(path, "%s: available_in_routines must be true, false or unknown" % where)
+        if cn.get("own_storage", False) not in (True, False):
+            rep.error(path, "%s: own_storage must be true or false" % where)
         if cn.get("mapped_on") is not None and not is_date(cn.get("mapped_on")):
             rep.error(path, "%s: mapped_on must be YYYY-MM-DD" % where)
 

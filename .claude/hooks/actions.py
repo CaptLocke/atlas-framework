@@ -23,6 +23,11 @@ What it enforces (system/rules/governance.md):
   is asked in chats ("risky until mapped").
 - GitHub tools whose input sets visibility, privacy or a permission are a
   share, whatever their name (N9).
+- Data exits (N9): export/import/upload tools are a share unless the
+  connector is own_storage; curl/wget that send data are a share; in routines
+  WebFetch (matcher "WebFetch") opens only the employer's sites and GitHub.
+- GitHub connector writes into this repo: owned paths, protected settings,
+  .atlas-tmp/ and .git/ are blocked (N5/N6 for connector side doors).
 - Tripwire: a locked action is blocked while tracked files under .claude/ or
   system/ differ from HEAD outside an update (a hook may have been rewritten
   by a command the path guard can't see, such as an interpreter).
@@ -108,6 +113,14 @@ ATTENDEE_KEYS = ("attendee", "invitee", "guest", "participant")
 # On GitHub tools only: an input that changes who can see the repo is a share
 # (a public repo or a new collaborator exposes everything Atlas keeps).
 EXPOSURE_KEYS = ("visibility", "private", "permission")
+# Moving content into another service (a design tool, a converter) shares it, unless the
+# connector is the user's own storage (connectors.yaml: own_storage: true).
+TRANSFER_WORDS = {"export", "import", "upload"}
+# curl/wget options that send data, and methods other than GET/HEAD
+CURL_DATA = ("-d", "--data", "--data-raw", "--data-binary", "--data-urlencode", "--data-ascii", "--json",
+             "-F", "--form", "--form-string", "-T", "--upload-file")
+WGET_DATA = ("--post-data", "--post-file", "--body-data", "--body-file")
+GITHUB_PATH_KEYS = ("path", "file_path", "filepath", "filename")
 
 
 def inflections(word):
@@ -253,6 +266,78 @@ def lookup_tag(tool_name, proj):
     return None, False, None
 
 
+def own_storage(tool_name, proj):
+    """True when connectors.yaml marks this tool's connector as the user's own storage."""
+    path = os.path.join(proj, "user", "settings", "connectors.yaml")
+    try:
+        conns = (atlas.load_yaml(path, proj) or {}).get("connectors") or []
+    except Exception:
+        return False
+    server, _ = split_tool(tool_name)
+    lname = tool_name.lower()
+    for c in conns if isinstance(conns, list) else []:
+        if not isinstance(c, dict) or c.get("own_storage") is not True:
+            continue
+        extra = c.get("mcp_prefixes")
+        prefixes = [str(c.get("mcp_prefix") or "")] + ([str(p) for p in extra] if isinstance(extra, list) else [])
+        if any(p and lname.startswith(p.lower()) for p in prefixes) or (
+                server and _norm(c.get("connector", "")) == _norm(server)):
+            return True
+    return False
+
+
+def github_paths(server, bare, tool_input, proj):
+    """Repo paths a GitHub connector call writes in this Atlas repo (N5/N6 via connectors)."""
+    if "github" not in _norm(server) or not isinstance(tool_input, dict) or read_only_name(tokens(bare)):
+        return []
+    repo = tool_input.get("repo") or tool_input.get("repository") or ""
+    owner = tool_input.get("owner") or ""
+    slug = ("%s/%s" % (owner, repo) if owner and "/" not in str(repo) else str(repo)).lower()
+    if slug and atlas.repo_slug(slug) != atlas.origin_slug(proj):
+        return []
+    found = []
+    for k, v in tool_input.items():
+        if str(k).lower() in GITHUB_PATH_KEYS and isinstance(v, str):
+            found.append(v)
+        elif isinstance(v, list):
+            found += [str(f.get("path")) for f in v if isinstance(f, dict) and f.get("path")]
+    return [re.sub(r"^(\./|/)+", "", os.path.normpath(p)) for p in found if p]
+
+
+def check_github_write(tool_name, paths, proj):
+    owned = atlas.owned_paths(proj)
+    bad = [p for p in paths if any(atlas.overlaps(p, e) for e in owned) or p in atlas.GOVERNANCE_FILES
+           or p.startswith((".atlas-tmp", ".git/")) or p in (".", ".git")]
+    if bad:
+        atlas.STATE.locked = True
+        atlas.block("%s would write %s in the Atlas repo through GitHub. System files change only through "
+                    "atlas-update (N5) and protected settings only in a confirmed chat (N6); connector writes "
+                    "to them are never allowed." % (tool_name, ", ".join(sorted(set(bad))[:5])))
+
+
+def handle_webfetch(payload, proj, ctx):
+    """Routines open only the employer's own sites and GitHub: a link can carry data out."""
+    if ctx == "chat":
+        atlas.allow()
+    url = str((payload.get("tool_input") or {}).get("url") or "")
+    m = re.match(r"^[a-z][a-z0-9+.-]*://([^/?#@]*@)?([^/?#:]+)", url, re.I)
+    host = (m.group(2) if m else "").lower().rstrip(".")
+    allowed = {"github.com", "raw.githubusercontent.com"}
+    try:
+        data = atlas.load_yaml(os.path.join(proj, "user", "settings", "atlas.yaml"), proj) or {}
+        company = data.get("company") or {}
+        site = re.sub(r"^([a-z]+://)?(www\.)?", "", str(company.get("website") or ""), flags=re.I).split("/")[0]
+        allowed |= {d.lower().lstrip(".") for d in [site] + list(company.get("email_domains") or []) if d}
+    except Exception:
+        pass
+    if host and any(host == d or host.endswith("." + d) for d in allowed):
+        atlas.allow()
+    atlas.STATE.locked = True
+    atlas.block("Opening %s from a routine is not allowed: routines open only the employer's own sites and "
+                "GitHub, because a link can carry data out. Use web search results instead, or note the link "
+                "in the run report for the next chat." % (host or url[:80]))
+
+
 def guard_locked(tool_name, risks, proj, ctx, what):
     """risks: the locked kinds this call falls under (send/share/delete).
     An approval for any one of their classes authorizes the call."""
@@ -291,6 +376,11 @@ def handle_mcp(payload, proj, ctx):
         risks.add(tag if tag in SEVERITY else "delete")  # unknown tag value: treat as risky
     if exposes_repo(server, payload.get("tool_input")):
         risks.add("share")
+    if TRANSFER_WORDS & set(tokens(bare)) and not own_storage(tool_name, proj):
+        risks.add("share")
+    gh_paths = github_paths(server, bare, payload.get("tool_input"), proj)
+    if gh_paths:
+        check_github_write(tool_name, gh_paths, proj)
     if event_write:
         # creating/changing an event with attendees sends invitations; only a
         # tool tagged 'write' called without attendees manages the own calendar
@@ -319,6 +409,32 @@ def handle_mcp(payload, proj, ctx):
 EXEMPT_DELETE = ("user/inbox/drop/", "user/knowledge/_index/")
 
 
+def uploads(seg):
+    """True when a curl/wget call sends data (a body, a form, a file, or a non-GET method)."""
+    args = seg.argv[1:]
+    for i, a in enumerate(args):
+        opt = a.split("=", 1)[0]
+        if seg.name == "curl":
+            if opt in CURL_DATA:
+                return True
+            if re.match(r"^-[A-Za-z]+$", a) and set(a[1:]) & set("dFT"):
+                return True
+            if opt in ("-X", "--request"):
+                method = a.split("=", 1)[1] if "=" in a else (args[i + 1] if i + 1 < len(args) else "")
+                if method.upper() not in ("GET", "HEAD"):
+                    return True
+            if re.match(r"^-X.+", a) and a[2:].upper() not in ("GET", "HEAD"):
+                return True
+        else:
+            if opt in WGET_DATA:
+                return True
+            if opt == "--method":
+                method = a.split("=", 1)[1] if "=" in a else (args[i + 1] if i + 1 < len(args) else "")
+                if method.upper() not in ("GET", "HEAD"):
+                    return True
+    return False
+
+
 def handle_bash(payload, proj, ctx):
     command = (payload.get("tool_input") or {}).get("command")
     if not isinstance(command, str) or not command.strip():
@@ -326,6 +442,8 @@ def handle_bash(payload, proj, ctx):
     base = atlas.session_cwd(payload, proj)
     hits = []
     for seg in shell.segments(command, base):
+        if seg.name in ("curl", "wget") and uploads(seg):
+            guard_locked("Bash", ["share"], proj, ctx, "Sending data with %s" % seg.name)
         writes, deletes = shell.write_targets(seg)
         if seg.name == "mv" or (seg.name == "git" and shell.git_subcommand(seg.argv)[0] == "mv"):
             # moving within user/ is a rename, not a delete
@@ -357,6 +475,8 @@ def main(payload, proj, ctx):
         handle_mcp(payload, proj, ctx)
     elif tool_name in ("Bash", "Monitor"):
         handle_bash(payload, proj, ctx)
+    elif tool_name == "WebFetch":
+        handle_webfetch(payload, proj, ctx)
     atlas.allow()
 
 

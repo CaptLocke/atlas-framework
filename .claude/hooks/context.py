@@ -40,6 +40,7 @@ import subprocess
 import sys
 
 TMP_DIR = ".atlas-tmp"
+MAINTAINER_MARKER = ".atlas-maintainer"
 APPROVAL = ".atlas-tmp/approval.json"
 UPDATE_LOCK = ".atlas-tmp/update.lock"
 PURGE_LOCK = ".atlas-tmp/purge.lock"
@@ -158,17 +159,22 @@ def is_upstream(proj):
     text = _manifest_text(proj)
     m = re.search(r"^upstream:\s*[\"']?([^\s\"'#]+)", text, re.M) if text else None
     upstream = (m.group(1) if m else DEFAULT_UPSTREAM).strip().lower()
-    result = False
-    if upstream:
-        try:
-            r = subprocess.run(["git", "-C", proj, "remote", "get-url", "origin"],
-                               capture_output=True, text=True, timeout=3)
-            if r.returncode == 0:
-                result = repo_slug(r.stdout) == repo_slug(upstream)
-        except (OSError, subprocess.SubprocessError):
-            result = False
+    # A clone of the upstream (instead of "Use this template") is still guarded: only a
+    # maintainer's copy, marked with the git-ignored .atlas-maintainer file, bypasses.
+    result = bool(upstream) and os.path.isfile(os.path.join(proj, MAINTAINER_MARKER)) \
+        and origin_slug(proj) == repo_slug(upstream)
     _CACHE[key] = result
     return result
+
+
+def origin_slug(proj):
+    """'owner/repo' of the origin remote, or ''."""
+    try:
+        r = subprocess.run(["git", "-C", proj, "remote", "get-url", "origin"],
+                           capture_output=True, text=True, timeout=3)
+        return repo_slug(r.stdout) if r.returncode == 0 else ""
+    except (OSError, subprocess.SubprocessError):
+        return ""
 
 
 # --------------------------------------------------------------- yaml

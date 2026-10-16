@@ -162,17 +162,22 @@ def gh_change(argv):
     """Description when a gh command changes repo visibility or collaborators
     (N9), else None."""
     args = argv[1:]
+    if len(args) >= 2 and args[0] == "gist" and args[1] not in ("list", "view"):
+        return "gh gist %s (a gist copies content out of the repo)" % args[1]
+    if len(args) >= 2 and args[0] == "repo" and args[1] in ("create", "fork"):
+        return "gh repo %s (copies the repo elsewhere)" % args[1]
     if len(args) >= 2 and args[0] == "repo" and args[1] == "edit":
         if any(a == "--visibility" or a.startswith("--visibility=") for a in args):
             return "gh repo edit --visibility"
     if args and args[0] == "api":
         text = " ".join(args).lower()
-        if "collaborator" in text or "visibility" in text or "/invitations" in text:
+        if any(w in text for w in ("collaborator", "visibility", "/invitations", "gists", "/forks", "user/repos",
+                                   "/generate", "/transfer")):
             method = shell.option_value(argv, "-X", "--method") or "GET"
             writes = any(a in ("-f", "-F", "--field", "--raw-field", "--input") or
                          a.startswith(("--field=", "--raw-field=", "--input=", "-f", "-F")) for a in args)
             if method.upper() != "GET" or writes:
-                return "gh api changing collaborators or visibility"
+                return "gh api changing collaborators or visibility, or copying content out"
     return None
 
 
@@ -202,6 +207,18 @@ def remote_change(sub, args):
         setting = len(positional(args)) >= 2  # 'git config remote.origin.url <value>'
         if destructive or setting:
             return "changing remote.origin config"
+    return None
+
+
+def push_problem(sub, args):
+    """git push goes only to origin (N9: nothing leaves except to the user's own repo)."""
+    if sub != "push":
+        return None
+    if any(a.split("=", 1)[0] in ("--repo", "--receive-pack", "--exec") for a in args):
+        return "git push with --repo/--receive-pack/--exec"
+    pos = shell.positional(["git"] + args, value_opts=("-o", "--push-option"))
+    if pos and pos[0] != "origin":
+        return "git push to %r" % pos[0]
     return None
 
 
@@ -480,6 +497,11 @@ def main(payload, proj, ctx):
                     what, ": tags may only be removed by atlas-update (update lock) or a confirmed purge "
                           "(purge lock, chat)" if kind == "tag" else
                     ": only a user-confirmed purge in a chat may delete branches that exist on origin"))
+        push_why = push_problem(sub, args)
+        if push_why:
+            atlas.STATE.locked = True
+            atlas.block("%s is not allowed: Atlas pushes only to its own repo (origin), so nothing it keeps "
+                        "can be copied elsewhere (N9)." % push_why)
         redirect = config_redirect(sub, args, seg.argv)
         fetch_why = fetch_problem(sub, args, proj) or (redirect and (
             "%s would change where git fetches from, which Atlas never does" % redirect))

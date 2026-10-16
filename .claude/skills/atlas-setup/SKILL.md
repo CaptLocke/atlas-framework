@@ -9,7 +9,7 @@ Get a non-technical person from "I made the repo" to "my first Daily Brief is wa
 
 ## When to use
 - Kernel §0.2: `user/settings/atlas.yaml` does not exist, or `user/.state/setup.yaml` has setup in progress (step 12 in neither `completed` nor `skipped`).
-- "Set up Atlas", "let's continue setup", "where were we with setup?", "I'm stuck at step N", "can we redo the interview / connectors / automations part?"
+- "Set up Atlas", "let's continue setup", "where were we with setup?", "I'm stuck at step N", "can we redo the interview / connectors / automations part?"; "update my routine instructions" after a release changes the routine prompt (step 10 item 4 only: show each routine's new instructions to paste, then run one and check its run report)
 - Not invoked by jobs. Other skills hand back here if they find setup unfinished.
 
 ## Inputs
@@ -37,7 +37,7 @@ Get a non-technical person from "I made the repo" to "my first Daily Brief is wa
 
 ### Steps 1–4. Before Atlas runs (accounts, repo, GitHub connection, Project)
 These happen in the setup guide (`docs/setup/`) before this skill can run. This skill still:
-1. **Checks them quietly** on first run: the repo is private; pushing to `main` works (commit and push `setup.yaml`); the user is in a Project (ask once if unsure).
+1. **Checks them quietly** on first run: origin is not Atlas's public repo (`system/manifest.yaml: upstream`; if it is, the user cloned Atlas instead of using "Use this template": stop, explain in plain words that Atlas needs their own private copy, and walk them through `reference/before-atlas.md` step 2 to create it; set up nothing here); the repo is private; pushing to `main` works (commit and push `setup.yaml`); the user is in a Project (ask once if unsure).
 2. **Handles "I'm stuck at step N"** with the plain-language fixes in `reference/before-atlas.md`.
 3. **Generates the bootstrap stub** with the user's repo name filled in, whenever they need it (step 4, or the stub was lost, or chats start without Atlas). Canonical text: `system/templates/bootstrap-stub.md`; how to present it: `reference/before-atlas.md`.
 

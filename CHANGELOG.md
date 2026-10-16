@@ -16,6 +16,7 @@ Each release's "What's new" section is shown to users in the Atlas Guide and the
 
 ### Action needed
 - In Settings → Connectors, set every tool that sends, replies, forwards, shares, or deletes to ✋ **Needs approval**, and remove those connectors from your Atlas routines (routines only draft). Ask Atlas "help me set up approval cards" and it walks you through it.
+- Update each Atlas routine's instructions so it stops if it ever runs outside its "Atlas routine" environment. Ask Atlas "update my routine instructions" and it shows you exactly what to paste.
 
 ### Under the hood
 - Shell guard: commands after a blank line, or after `;` and a newline, were merged into the previous command and missed by the guards (a delete written that way went unseen). Any token made only of separator characters now ends a command. This also fixes `cd` being ignored after heredocs.
@@ -25,6 +26,10 @@ Each release's "What's new" section is shown to users in the Atlas Guide and the
 - Zip updates removed: releases install only from the upstream tag. `system/tools/build-zip.md` deleted.
 - Signed releases: `system/tools/release_check.py` (standard library only; no `ssh-keygen` needed) verifies a release tag's SSH signature against the release keys it carries. `atlas-update` runs it after fetching and before taking any file; the paths hook accepts `refs/atlas-upstream/*` as a source only when the tag passes it (name must match, annotated, signed by a release key).
 - Chat approvals: repo hooks don't load in Cowork chats, so the chat-side guard is Claude's confirmation plus Cowork's approval card. Setup step 9 and `atlas-connectors` set send/share/delete tools to Needs approval; routines get no sending connectors; the quarterly review re-checks both. Governance, kernel and Controls guide say where hooks apply.
+- Data exits (#6): `git push` goes only to origin; `gh gist`, `gh repo create/fork` and `gh api` calls that create gists, forks or repos are blocked; curl/wget that send data (body, form, file, non-GET method) are a share; in routines, WebFetch opens only the employer's website and email domains (`atlas.yaml: company`) and GitHub; export/import/upload tools are a share unless the connector is `own_storage: true` (new optional `connectors.yaml` field).
+- Connector writes (#7): GitHub connector calls that write into this Atlas repo (`path`, `files[].path`) are blocked for owned paths, protected settings, `.atlas-tmp/` and `.git/`.
+- Upstream bypass (#12): hooks skip enforcement only when origin is the upstream **and** the git-ignored `.atlas-maintainer` file exists; a clone of the upstream is guarded, and setup tells its user to create their own repo from the template.
+- Routine marker (#5): the routine prompt checks `ATLAS_CONTEXT` first, and a run without `routine` stops before any job (it used to continue by instruction).
 - Sync hooks: session start on a non-main branch (cloud routines' `claude/...` branch) fetches and fast-forwards to `origin/main` instead of failing; the end-of-turn check fetches before counting unpushed commits and skips the count if the fetch fails.
 
 ## 1.0.0 (2026-10-16)
