@@ -199,19 +199,13 @@ class RepoExposure(HookTestCase):
 
 
 class UpdateProcedure(HookTestCase):
-    """The commands in atlas-update/reference/procedure.md pass every hook under the lock."""
+    """The commands in atlas-update/reference/procedure.md pass every hook under the lock,
+    for a release whose tag is signed (the real v1.0.0 tag stands in for a new release)."""
 
     def setUp(self):
         super().setUp()
-        # a fake release: an unrelated commit with a changed system file, at refs/atlas-upstream/v1.1.0
-        sh(["git", "checkout", "-q", "--orphan", "rel"], self.root)
-        self.write("system/kernel.md", "release 1.1.0\n")
-        sh(["git", "add", "-A"], self.root)
-        sh(["git", "commit", "-q", "-m", "release"], self.root)
-        sh(["git", "update-ref", "refs/atlas-upstream/v1.1.0", "HEAD"], self.root)
-        sh(["git", "checkout", "-q", "-f", "main"], self.root)
-        sh(["git", "clean", "-qfd"], self.root)
-        sh(["git", "tag", "pre-update-1.0.0"], self.root)
+        self.signed_release()
+        sh(["git", "tag", "pre-update-0.9.0"], self.root)
         self.update_lock()
 
     def allowed_everywhere(self, cmd):
@@ -219,20 +213,27 @@ class UpdateProcedure(HookTestCase):
             self.assertAllowed(self.bash(hook, cmd, "routine"))
 
     def test_apply_and_revert_commands_allowed(self):
-        for cmd in ("git ls-files -- system | sort > /tmp/now.txt",
-                    "git ls-tree -r --name-only refs/atlas-upstream/v1.1.0 -- system | sort > /tmp/rel.txt",
+        for cmd in ("python3 -I system/tools/release_check.py verify refs/atlas-upstream/v1.0.0 v1.0.0",
+                    "git ls-files -- system | sort > /tmp/now.txt",
+                    "git ls-tree -r --name-only refs/atlas-upstream/v1.0.0 -- system | sort > /tmp/rel.txt",
                     "comm -23 /tmp/now.txt /tmp/rel.txt | xargs -r git rm -q --",
-                    "git checkout refs/atlas-upstream/v1.1.0 -- system",
-                    "git checkout pre-update-1.0.0 -- system"):
+                    "git checkout refs/atlas-upstream/v1.0.0 -- system",
+                    "git checkout pre-update-0.9.0 -- system"):
             self.allowed_everywhere(cmd)
-        sh(["git", "checkout", "refs/atlas-upstream/v1.1.0", "--", "system"], self.root)
+        sh(["git", "checkout", "refs/atlas-upstream/v1.0.0", "--", "system"], self.root)
         commit = ("git add -A -- system && git commit -m 'atlas(update): system files' "
-                  "-m 'Atlas-Actor: update' -m 'Atlas-Reason: apply release v1.1.0'")
+                  "-m 'Atlas-Actor: update' -m 'Atlas-Reason: apply release v1.0.0'")
         self.allowed_everywhere(commit)
 
     def test_variables_are_not_trusted(self):
-        self.assertBlocked(self.bash("paths", "REL=refs/atlas-upstream/v1.1.0; git checkout $REL -- system",
+        self.assertBlocked(self.bash("paths", "REL=refs/atlas-upstream/v1.0.0; git checkout $REL -- system",
                                      "routine"), "owned")
+
+    def test_unsigned_or_renamed_release_blocked(self):
+        sh(["git", "update-ref", "refs/atlas-upstream/v1.1.0", "HEAD"], self.root)  # a commit, no tag
+        self.signed_release("refs/atlas-upstream/v1.0.9")  # signed, but for v1.0.0
+        for ref in ("refs/atlas-upstream/v1.1.0", "refs/atlas-upstream/v1.0.9"):
+            self.assertBlocked(self.bash("paths", "git checkout %s -- system" % ref, "routine"), "owned")
 
 
 class StaleOriginRef(SyncCase):
