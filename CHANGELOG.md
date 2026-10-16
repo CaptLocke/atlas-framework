@@ -7,7 +7,7 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Atlas Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. "Under the hood" notes are for maintainers and are not shown to users. How to write this file and cut a release: the release checklist, `docs/maintainers/releasing.md` on the upstream repo's `maintainers` branch.
 
-## 1.0.0
+## 1.0.0 (2026-10-16)
 
 ### What's new
 - First public release of Atlas.
