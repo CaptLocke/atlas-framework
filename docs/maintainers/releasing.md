@@ -34,7 +34,7 @@ This is the one place that says how an Atlas release is made. Other files (`syst
 2. **Set it** in `system/VERSION` and `system/manifest.yaml: version` (they must match).
 3. **Changelog:** rename `## Unreleased` to `## <version> (YYYY-MM-DD)`; check every user-visible change has a What's new line and every user step has an Action needed line.
 4. **Checks:** run the three commands above. The validator also confirms the changelog has a section for the version.
-   Then run the **regression suite** on the release candidate (`system/tests/regression/README.md`, from this branch) and fill in its scorecard. Every gate item must pass.
+   Then run the **regression suite** on the release candidate (`system/tests/regression/README.md`, from this branch) and fill in its scorecard. A release needs two passing runs; the README's "Pass criteria" and "Releasing: two runs, and when to stop" set the bar and when to stop rerunning.
 5. **Merge** the release pull request to `main`.
 6. **Tag** the merge commit, signed, on your own machine (the signing key never leaves it). Claude prepares everything up to this step and hands you the command:
    ```bash

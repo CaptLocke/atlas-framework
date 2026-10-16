@@ -17,7 +17,7 @@ Multi-party customer meeting. Tests a jointly made decision, several commitments
 | ID | Level | Type | Expectation |
 |---|---|---|---|
 | E04-R1 | M | event | Globex pilot planning: `kind: meeting`, `start` 2026-10-13T10:00-07:00, `status: held`, attendees the four people, `outcomes` summarized; linked to the Globex pilot project and E04-S1. |
-| E04-R2 | M | person | Tom Becker: `org` Globex, role IT & Procurement (or similar), `relationship: customer` (or `external`). |
+| E04-R2 | M | person | Tom Becker: `org` Globex, role IT & Procurement (or similar), `relationship: customer` (or `prospect`/`external`; `person.md` maps evaluators in a pilot to `prospect`). |
 | E04-R3 | M | decision | Pilot starts with Globex EMEA operations only, 50 seats; North America later as phase 2. `rationale`: NA team is mid data-warehouse migration. `decided_on` 2026-10-13; deciders include Priya and Maya (Raj optional). Linked to the Globex pilot project. |
 | E04-R4 | M | project (update) | The single Globex pilot project now reflects EMEA-only, 50 seats, planned start 2026-11-09 (`start` field or body), with an Updates line citing E04-S1. |
 | E04-R5 | M | question | EMEA data residency: can Acme guarantee EU-only storage for the pilot workspace? `asked_by` Tom; `status: open`; linked to the Globex pilot project. (A Maya `i_owe` "find out", `due: null`, is also acceptable in addition, not instead.) |
