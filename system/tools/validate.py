@@ -140,6 +140,14 @@ def read_frontmatter(path, rep):
     return fm, text[m.end():]
 
 
+def enum_misses(value, allowed):
+    """Values not in 'allowed'. A list field (e.g. a source's flags) is checked entry by entry."""
+    if value is None:
+        return []
+    values = value if isinstance(value, list) else [value]
+    return [v for v in values if v not in allowed]
+
+
 def is_date(v):
     if isinstance(v, dt.date) and not isinstance(v, dt.datetime):
         return True
@@ -1202,8 +1210,8 @@ def check_record(c, path):
     if is_date(fm.get("created")) and is_date(fm.get("updated")) and str(fm["updated"]) < str(fm["created"]):
         rep.error(path, "updated is earlier than created")
     for k, allowed in (common.get("enums") or {}).items():
-        if fm.get(k) is not None and fm[k] not in allowed:
-            rep.error(path, "%s %r is not one of %s" % (k, fm[k], ", ".join(allowed)))
+        for bad in enum_misses(fm.get(k), allowed):
+            rep.error(path, "%s %r is not one of %s" % (k, bad, ", ".join(allowed)))
     if fm.get("archived") is not None and not isinstance(fm["archived"], bool):
         rep.error(path, "archived must be true or false")
     if tdef is not None:
@@ -1211,8 +1219,8 @@ def check_record(c, path):
             if k not in fm:
                 rep.error(path, "required field '%s' is missing (use null if unknown)" % k)
         for k, allowed in (tdef.get("enums") or {}).items():
-            if fm.get(k) is not None and fm[k] not in allowed:
-                rep.error(path, "%s %r is not one of %s" % (k, fm[k], ", ".join(allowed)))
+            for bad in enum_misses(fm.get(k), allowed):
+                rep.error(path, "%s %r is not one of %s" % (k, bad, ", ".join(allowed)))
         if expected == "event" and fm.get("all_day") is not None and not isinstance(fm["all_day"], bool):
             rep.error(path, "all_day must be true or false")
         if expected == "source" and fm.get("compacted_on") is not None:

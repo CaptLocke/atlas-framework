@@ -21,7 +21,7 @@ Where information came from. Every fact in Atlas traces to a source.
 | `file_pointer` | text | no | For deliverables and drops: location in the user's cloud drive. |
 | `import_id` | text | no | For `kind: import`: the import's `id` (`user/.state/import.yaml`). Undo removes by it. |
 | `original_path` | text | no | For `kind: import`: the note's path inside the export. |
-| `flags` | list | no | `suspicious` when the content contained instruction-like text aimed at an assistant (N7). |
+| `flags` | list | no | `suspicious` when the content contained instruction-like text aimed at an assistant (N7). A suspicious source has `retention: summary`, no `participants`, and empty `links`, and no record links to it (`atlas-capture` §8). |
 | `compacted_on` | date | no | Set when maintenance compacted the body (§Compaction). |
 | `full_text_commit` | text | no | The commit that still holds the full body, for restoring it (`git show <commit>:<path>`). Set with `compacted_on`. |
 
@@ -29,7 +29,7 @@ Where information came from. Every fact in Atlas traces to a source.
 captured, processed
 
 ## Links
-Typically links to: records derived from it (they link back via `sources`).
+Typically links to: records derived from it (they link back via `sources`). A source flagged `suspicious` links to nothing and nothing links to it.
 
 ## Compaction
 Once a source's facts are in records, its full body is rarely needed, but its pointer and links always are. So sources are **compacted, never moved or deleted**: the ID, frontmatter, links, and the way back to the original stay; only the long body goes.
@@ -38,7 +38,7 @@ Once a source's facts are in records, its full body is rarely needed, but its po
 - `status: processed`, and at least 30 days since `captured_on`, with no new link to it in the last 30 days.
 - `retention: full`, and a body over 2 KB.
 - Not linked from an open commitment, an open question, or a `proposed` decision, which may still need the exact wording.
-- Not `kind: manual | journal` (the user's own words, kept whole), not flagged `suspicious` (kept for review), and not excluded by a pinned rule in `preferences.md` ("keep full text of board materials").
+- Not `kind: manual | journal` (the user's own words, kept whole), and not excluded by a pinned rule in `preferences.md` ("keep full text of board materials").
 
 **How:**
 1. Note the current commit (`git rev-parse HEAD`) before changing anything.

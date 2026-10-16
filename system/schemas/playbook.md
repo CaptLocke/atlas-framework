@@ -41,4 +41,4 @@ steps:
 ```
 
 ## Capture guidance
-Create when the user describes a repeatable process or asks Atlas to remember how something is done ("save how we do renewals as a playbook"). Atlas also proposes one when it sees the same work recur (`.claude/skills/atlas-triage/reference/playbooks.md` §1); a proposed playbook is `status: draft` until the user confirms it. Suggest automation when `automatable: true`.
+Create with `status: active` when a repeatable process is stated: the user describes one or asks Atlas to remember how something is done ("save how we do renewals as a playbook"), or someone they work with describes it in a source (a manager in a 1:1: "here's how we run launch reviews"). Atlas also proposes one when it sees the same work recur (`.claude/skills/atlas-triage/reference/playbooks.md` §1); a playbook Atlas infers this way is `status: draft` until the user confirms it. Suggest automation when `automatable: true`.
