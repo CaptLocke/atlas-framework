@@ -26,7 +26,7 @@ Every knowledge record is one markdown file at `user/knowledge/<folder>/<slug>.m
 | `links` | no | Map of link group → list of IDs. Groups: `people, organizations, projects, goals, commitments, decisions, events, risks, questions, ideas, topics, playbooks, related`. |
 | `sources` | no* | List of source IDs this record's facts came from. *Required unless the user stated the fact directly in chat or journal (then link the journal source or set `provenance: stated`). |
 | `supersedes` / `superseded_by` | no | IDs. Set when one record replaces another. |
-| `provenance` | no | `stated` (user said it), `observed` (seen in a source), `researched` (web), `inferred` (Claude's conclusion). Default `observed`. |
+| `provenance` | no | `stated` (user said it), `observed` (seen in a source), `researched` (web), `inferred` (Claude's conclusion). Default `observed`. If a key field (a person's role or title, an owner, a date) is your inference rather than something a source states, use `inferred` and say in the body what was inferred and from what. |
 | `sensitivity` | no | Data-rule category the content falls under; default `normal`. |
 | `archived` | no | `true` removes the record from default indexes (kept in `_index/archive.md`). Fully reversible. |
 

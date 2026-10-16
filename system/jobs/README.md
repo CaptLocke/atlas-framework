@@ -48,7 +48,7 @@ All behavior lives in the repo, so changing which jobs a routine runs is a setti
 3. You are unattended: never wait for a reply. `propose`- and `approve`-level actions are queued in `user/inbox/approvals.md`; locked actions are never taken (`system/rules/governance.md`).
 4. Commit after each job (`Atlas-Actor: routine:<name>`) and update `user/.state/jobs.yaml` for that job: `last_status` always; `last_success` only when the status is `ok` or `partial`.
 5. If a job fails, record it and continue with the next job unless the next job depends on it (for example, `daily-brief` still runs after a failed `intelligence`, noting the gap).
-6. Write one run report (`system/schemas/formats.md` §4) at `user/logs/runs/YYYY-MM/<routine>-<YYYYMMDD-HHMM>.md`, commit, and push.
+6. Write one run report (`system/schemas/formats.md` §4) at `user/logs/runs/YYYY-MM/<routine>-<YYYYMMDD-HHMM>.md`. Check its counts against the commits before committing, so it never needs a correction. Commit it together with the activity-log lines for any change set not yet logged, then push. The run report's own commit gets no activity line (a commit can't name its own hash).
 
 ## Common job protocol
 Every job file follows the outline in `system/guide/authoring.md`. These rules apply to all jobs; job files state only what differs.
