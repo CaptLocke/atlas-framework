@@ -17,6 +17,11 @@ What it enforces (system/rules/governance.md, system/rules/sync.md):
   a commit that is already pushed. Sole exception: a valid
   .atlas-tmp/purge.lock in a chat (the atlas-memory purge procedure).
   Also blocks changing the `origin` remote (it decides the upstream bypass).
+- N5: `git fetch`/`git pull` only from origin or the official upstream
+  (system/manifest.yaml: upstream), and only the upstream may fill
+  refs/atlas-upstream/* (the release refs atlas-update installs from). A
+  commit that touches owned paths needs a valid update lock and
+  `Atlas-Actor: update`.
 - N8: deleting tags (`git tag -d`, push of :refs/tags/...) only under a valid
   update lock or a purge lock in a chat; deleting branches on origin
   (`git push --delete`, `git push origin :branch`, `git branch -d/-D` of a
@@ -200,6 +205,62 @@ def remote_change(sub, args):
     return None
 
 
+# ------------------------------------------------------------------ N5
+FETCH_VALUE_OPTS = ("--depth", "--deepen", "--shallow-since", "--shallow-exclude", "-j", "--jobs",
+                    "--negotiation-tip", "--upload-pack", "-o", "--server-option", "--refmap",
+                    "-s", "--strategy", "-X", "--strategy-option")
+
+
+def fetch_problem(sub, args, proj):
+    """Why this fetch/pull isn't allowed, or None."""
+    if sub not in ("fetch", "pull"):
+        return None
+    pos = shell.positional(["git"] + args, value_opts=FETCH_VALUE_OPTS)
+    repo = pos[0] if pos else "origin"
+    refspecs = pos[1:]
+    upstream = atlas.upstream_slug(proj)
+    from_upstream = bool(upstream) and atlas.repo_slug(repo) == upstream
+    if repo != "origin" and not from_upstream:
+        return ("git %s from %r: Atlas only fetches from its own repo (origin) or the official upstream "
+                "(%s)" % (sub, repo, upstream))
+    if not from_upstream and any("refs/atlas-upstream/" in r for r in refspecs):
+        return "only the official upstream (%s) may fill refs/atlas-upstream/* (release refs)" % upstream
+    return None
+
+
+def committed_paths(cwd, include_worktree):
+    """Repo-relative paths this commit would include, or None if git can't tell."""
+    rc, out = git(["diff", "--cached", "--name-only", "-z"], cwd, timeout=20)
+    if rc != 0:
+        return None
+    paths = set(p for p in out.split("\0") if p)
+    if include_worktree:
+        for args in (["diff", "--name-only", "-z"], ["ls-files", "--others", "--exclude-standard", "-z"]):
+            rc, out = git(args, cwd, timeout=20)
+            if rc != 0:
+                return None
+            paths.update(p for p in out.split("\0") if p)
+    return paths
+
+
+def owned_commit_problem(proj, cwd, include_worktree, message):
+    """Why this commit may not touch owned paths, or None."""
+    paths = committed_paths(cwd, include_worktree)
+    if paths is None:
+        return "git could not list the files in this commit"
+    owned = atlas.owned_paths(proj)
+    hits = sorted(p for p in paths if any(atlas.overlaps(p, e) for e in owned))
+    if not hits:
+        return None
+    ok, why = atlas.valid_lock(proj, "update")
+    actor = re.search(r"(?mi)^Atlas-Actor:[ \t]*(\S+)", message or "")
+    if ok and actor and actor.group(1) == "update":
+        return None
+    return ("this commit changes system-owned files (%s), which only atlas-update may commit, with "
+            "'Atlas-Actor: update' while .atlas-tmp/update.lock is valid (%s)"
+            % (", ".join(hits[:5]), why if not ok else "the commit isn't marked Atlas-Actor: update"))
+
+
 # ------------------------------------------------------------------ N12
 def commit_message(args, cwd, bodies):
     """(message or None, reason-if-None)."""
@@ -375,6 +436,10 @@ def main(payload, proj, ctx):
                     what, ": tags may only be removed by atlas-update (update lock) or a confirmed purge "
                           "(purge lock, chat)" if kind == "tag" else
                     ": only a user-confirmed purge in a chat may delete branches that exist on origin"))
+        fetch_why = fetch_problem(sub, args, proj)
+        if fetch_why:
+            atlas.STATE.locked = True
+            atlas.block("%s (N5)." % fetch_why)
         reason = rewrite_reason(sub, args, cwd)
         if reason:
             if purge_ok is None:
@@ -400,6 +465,11 @@ def main(payload, proj, ctx):
                 a in ("-a", "--all", "--include", "-i", "--only", "-o") or
                 (re.match(r"^-[a-zA-Z]+$", a) and "a" in a and not a.startswith("-m"))
                 for a in args)
+            owned_why = owned_commit_problem(proj, cwd, include_wt, message)
+            if owned_why:
+                atlas.STATE.locked = True
+                atlas.block("%s (N5). If a system file needs fixing, record it for atlas-health, which "
+                           "restores system files from the release." % owned_why)
             found = scan_for_secrets(cwd, include_wt)
             if found:
                 atlas.STATE.locked = True

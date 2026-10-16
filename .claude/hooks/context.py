@@ -139,6 +139,13 @@ def repo_slug(url):
     return "/".join(parts[-2:]) if len(parts) >= 2 else ""
 
 
+def upstream_slug(proj):
+    """'owner/repo' of the official upstream (manifest 'upstream', else DEFAULT_UPSTREAM)."""
+    text = _manifest_text(proj)
+    m = re.search(r"^upstream:\s*[\"']?([^\s\"'#]+)", text, re.M) if text else None
+    return repo_slug(m.group(1) if m else DEFAULT_UPSTREAM)
+
+
 def is_upstream(proj):
     """True when hooks must not enforce anything (maintainers' upstream repo).
 
@@ -188,6 +195,41 @@ def owned_paths(proj):
             raise ValueError("system/manifest.yaml has no owned_paths list")
         _CACHE[key] = [str(p) for p in paths]
     return _CACHE[key]
+
+
+def _git(proj, args, timeout=10):
+    """(returncode, stdout); 1 on any error."""
+    try:
+        r = subprocess.run(["git", "-C", proj] + args, capture_output=True, text=True,
+                           timeout=timeout, errors="replace", stdin=subprocess.DEVNULL)
+        return r.returncode, r.stdout
+    except (OSError, subprocess.SubprocessError):
+        return 1, ""
+
+
+def in_history(proj, ref):
+    """True when 'ref' names a commit that is HEAD or one of its ancestors
+    (rollback tags, installed_from_commit): content this repo already had."""
+    if not ref or ref.startswith("-"):
+        return False
+    rc, sha = _git(proj, ["rev-parse", "--verify", "-q", ref + "^{commit}"], timeout=5)
+    if rc != 0 or not sha.strip():
+        return False
+    rc, _ = _git(proj, ["merge-base", "--is-ancestor", sha.strip(), "HEAD"], timeout=5)
+    return rc == 0
+
+
+def system_files_changed(proj):
+    """(changed, detail). True when tracked files under .claude/ or system/
+    differ from HEAD (file-mode and line-ending-only changes ignored), or
+    when git can't tell (fail closed)."""
+    rc, _ = _git(proj, ["-c", "core.fileMode=false", "diff", "--quiet", "--ignore-cr-at-eol", "HEAD",
+                        "--", ".claude", "system"], timeout=10)
+    if rc == 0:
+        return False, ""
+    if rc == 1:
+        return True, "system files differ from the last commit"
+    return True, "git could not check the system files"
 
 
 # --------------------------------------------------------------- paths

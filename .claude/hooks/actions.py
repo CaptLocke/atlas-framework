@@ -21,6 +21,11 @@ What it enforces (system/rules/governance.md):
   matching action, which is consumed (deleted) on use.
 - Unmapped tools whose names match no pattern: blocked in routines, the user
   is asked in chats ("risky until mapped").
+- GitHub tools whose input sets visibility, privacy or a permission are a
+  share, whatever their name (N9).
+- Tripwire: a locked action is blocked while tracked files under .claude/ or
+  system/ differ from HEAD outside an update (a hook may have been rewritten
+  by a command the path guard can't see, such as an interpreter).
 - Bash deletes of anything under user/ (rm, rmdir, unlink, shred, git rm,
   git clean -f, find -delete, mv out of user/) are treated as `destructive`
   with tool "Bash". Exempt: user/inbox/drop/ (staging copies removed after
@@ -63,7 +68,7 @@ LOCKED_CLASS = {"send": "send_communication", "share": "share_expose", "delete":
 WORDS = {
     "send": ["send", "reply", "forward", "post", "publish", "invite", "respond", "rsvp", "broadcast", "notify",
              "comment", "accept", "decline"],
-    "share": ["share", "permission", "grant", "invite", "unshare"],
+    "share": ["share", "permission", "grant", "invite", "unshare", "collaborator", "visibility", "gist"],
     "delete": ["delete", "trash", "remove", "purge", "destroy", "erase", "wipe", "cancel"],
     "security": ["pay", "purchase", "charge", "sign", "password", "credential", "token", "2fa", "mfa",
                  "buy", "checkout", "otp", "secret", "apikey"],
@@ -100,6 +105,9 @@ EVENT_NOUNS = {"event", "events", "meeting", "meetings", "appointment", "appoint
 EVENT_WRITE_VERBS = {"create", "update", "edit", "modify", "move", "patch", "put", "add", "insert", "reschedule",
                      "set", "quick", "new", "make", "change"}
 ATTENDEE_KEYS = ("attendee", "invitee", "guest", "participant")
+# On GitHub tools only: an input that changes who can see the repo is a share
+# (a public repo or a new collaborator exposes everything Atlas keeps).
+EXPOSURE_KEYS = ("visibility", "private", "permission")
 
 
 def inflections(word):
@@ -190,6 +198,13 @@ def has_attendees(tool_input):
     return False
 
 
+def exposes_repo(server, tool_input):
+    """True for a GitHub tool call whose input sets visibility, privacy or a permission."""
+    if "github" not in _norm(server) or not isinstance(tool_input, dict):
+        return False
+    return any(any(k in str(key).lower() for k in EXPOSURE_KEYS) for key in tool_input)
+
+
 def _norm(name):
     return re.sub(r"[\s_-]+", "", str(name)).lower()
 
@@ -244,6 +259,12 @@ def guard_locked(tool_name, risks, proj, ctx, what):
     atlas.STATE.locked = True
     classes = {LOCKED_CLASS[r] for r in risks}
     cls = LOCKED_CLASS[max(risks, key=lambda r: SEVERITY[r])]
+    changed, detail = atlas.system_files_changed(proj)
+    if changed and not atlas.valid_lock(proj, "update")[0]:
+        atlas.block(
+            "%s is a locked action (%s), and %s (.claude/ or system/), outside an update. Locked actions "
+            "stay blocked until the system files are restored: tell the user, and offer atlas-health's "
+            "\"restore system files\" (git checkout HEAD -- .claude system)." % (what, cls, detail))
     if ctx != "chat":
         atlas.block(
             "%s is a locked action (%s) and this is a routine (ATLAS_CONTEXT=routine). "
@@ -268,6 +289,8 @@ def handle_mcp(payload, proj, ctx):
     tag, mapped, warning = lookup_tag(tool_name, proj)
     if tag:
         risks.add(tag if tag in SEVERITY else "delete")  # unknown tag value: treat as risky
+    if exposes_repo(server, payload.get("tool_input")):
+        risks.add("share")
     if event_write:
         # creating/changing an event with attendees sends invitations; only a
         # tool tagged 'write' called without attendees manages the own calendar

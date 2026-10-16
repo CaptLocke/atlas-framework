@@ -21,7 +21,7 @@ Chat only; the user's request plus a one-line confirmation is enough (`updates_m
 
 ## Repair (system files modified outside an update; chat only)
 - Triggered by `atlas-health` in a chat (owned paths differ from the baseline with changes not made by `Atlas-Actor: update` commits). In a routine, health records a known issue and nothing is restored.
-- Baseline: `refs/tags/v<installed>` from upstream; before the first real update (or if that tag doesn't exist upstream), `atlas.yaml: installed_from_commit`, the template's starting commit, which is already in the repo (no fetch needed). If upstream is unreachable and no `installed_from_commit` exists, ask for the zip of that version.
+- Baseline: the tag `v<installed>` fetched from upstream into `refs/atlas-upstream/v<installed>` (as in `procedure.md`); before the first real update (or if that tag doesn't exist upstream), `atlas.yaml: installed_from_commit`, the template's starting commit, which is already in the repo (no fetch needed). If upstream is unreachable and no `installed_from_commit` exists, record a known issue and try again later.
 - First, always: show what changed and offer to keep intentional edits (the user or a helper edited a skill) as a user extension with `atlas-extend` (`overrides: <component>`); never silently discard them.
 - Then restore from the baseline: take the update lock and make owned paths match it exactly, validate, release the lock, commit (`Atlas-Actor: update`, reason "repair: restore system files to 1.0.0"), push.
 
