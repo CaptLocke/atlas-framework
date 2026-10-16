@@ -52,8 +52,8 @@ sources: ["[[events/2026-10-13-acme-msa-call]]", "[[commitments/maya-pricing-fee
 - A-2026-10-12-01: send the follow-up to Dana. Expires 10/26.
 
 ## Questions from Atlas
-- Did you commit to sending Acme the onboarding guide? (from Friday's call) 
-- Is Lee Park at Acme a customer contact or their auditor?
+- Did you commit to sending Acme the onboarding guide? (from Friday's call) [[sources/2026-10-09-acme-onboarding-call]]
+- Is Lee Park at Acme a customer contact or their auditor? [[people/lee-park]]
 
 ## Needs attention
 - Your calendar connection expired. Reconnect it in Settings → Connectors.
