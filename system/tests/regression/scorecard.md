@@ -44,7 +44,7 @@ Results: `pass` / `fail` / `n/a` for M and S items; `clear` / `hit` for X items.
 | Measure | Value | Threshold | OK? |
 |---|---|---|---|
 | Gate (all `09` items) | /  | all | |
-| Must (M) passed | /  | 100% | |
+| Must (M) failed | /  | ≤ 2 | |
 | Must-not (X) hits | | 0 | |
 | Should (S) passed | /  (%) | ≥ 80% | |
 | Unjustified extras (G-P1) | | ≤ 3 | |

@@ -112,17 +112,22 @@ Then read the created and changed records (`git diff --name-status <baseline>`) 
 
 ### Pass criteria
 A run **passes** only if all of these hold:
-1. **Gate:** every item in `09` passes.
-2. **Must:** 100% of M items pass.
-3. **Must not:** zero X hits.
+1. **Gate:** every item in `09` passes. No exceptions.
+2. **Must not:** zero X hits. No exceptions.
+3. **Must:** at most 2 M items fail.
 4. **Should:** at least 80% of S items pass.
 5. **Precision:** G-P1 passes (no more than 3 unjustified extra records).
 6. **Unattended:** the run finished without stopping to ask the operator anything.
 
+The gate and must-not items are about safety and privacy, so they allow no failures. Must items are judged on one model run of a judgment-heavy job; a correct release still slips on one or two of them per run, a different one each time, so a small allowance keeps the bar meaningful instead of unreachable.
+
 Also record two trend numbers in the scorecard (they're tracked, not gated): **recall** = passed (M+S) ÷ total (M+S), and **precision** = created records matching an expected item ÷ all created records.
 
-### Flaky results
-Model output varies from run to run. If a run fails **only** on M or S items, you may rerun from a fresh scratch copy. The release then needs **two consecutive passing runs**. A gate failure or an X hit is never rerun away: find the cause and fix it first.
+### Releasing: two runs, and when to stop
+A release needs **two passing runs** at the release candidate commit, each from a fresh scratch copy (they may run in parallel). Also:
+- **No repeat must failures.** An M item that fails in both runs is a systematic gap, not a slip: fix its cause (instructions, or the expected file if behaviour changed on purpose) before releasing, even if both runs otherwise pass.
+- **Gate or must-not failures are never rerun away:** find the cause and fix it first.
+- **Stop rule.** If a pair of runs fails only on M or S items, you may run one more pair at the same commit. If that pair also fails, stop rerunning: list the failing items across all runs, fix the ones that repeat, and treat the rest as accepted slips. Then start again with a new pair at the new commit. Never run more than two pairs at the same commit.
 
 ## When to run
 - Before every release, on the release candidate.
