@@ -30,7 +30,6 @@ Key relationships: last contact, open items each way, who has gone quiet, and up
   "insights": [ { "id": "I-2026-10-09-01", "text": "…", "why": "…", "suggested_action": "…" } ]
 }
 ```
-Full example: `system/tests/dashboards/people.json`.
 
 | Field | Notes |
 |---|---|

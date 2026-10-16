@@ -35,7 +35,7 @@ A searchable decision log with the reasoning behind each decision, and the risk 
   "insights": []
 }
 ```
-Full example: `system/tests/dashboards/decisions-risks.json`. `rationale: "unknown"` renders as "Not recorded".
+`rationale: "unknown"` renders as "Not recorded".
 
 ## Sources (file → field)
 | Field | Source |

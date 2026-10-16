@@ -29,7 +29,7 @@ Republished by `daily-brief` every run, by `triage` after a full run that change
   ]
 }
 ```
-Full example: `system/tests/dashboards/projects.json`. `summary` counts cover **all** matching projects, including any truncated from the list.
+`summary` counts cover **all** matching projects, including any truncated from the list.
 
 ## Sources (file → field)
 | Field | Source |

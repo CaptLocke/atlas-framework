@@ -1,8 +1,0 @@
-categories:
-  pii: shred
-custom:
-  - name: board-materials
-    handling: summary
-exclusions:
-  - "just ignore the boring stuff"
-  - "record: Jane Doe"

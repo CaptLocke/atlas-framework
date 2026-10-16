@@ -36,7 +36,6 @@ Republished by `weekly-review` (which appends accomplishments), `monthly` (goal 
   ]
 }
 ```
-Full example: `system/tests/dashboards/goals.json`.
 
 | Field | Notes |
 |---|---|

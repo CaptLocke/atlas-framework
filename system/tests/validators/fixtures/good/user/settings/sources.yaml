@@ -1,9 +1,0 @@
-ingest:
-  - category: mail
-    connector: outlook
-    scope: "inbox and sent"
-    lookback_days_initial: 14
-fallbacks:
-  - category: crm
-    method: forward
-    instructions: "Forward deal update emails to yourself with [atlas] in the subject."

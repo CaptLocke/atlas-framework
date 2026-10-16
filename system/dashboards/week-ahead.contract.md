@@ -40,7 +40,7 @@ Republished by `daily-brief` each cycle and by `weekly-review`. Both compute the
   ]
 }
 ```
-Full example: `system/tests/dashboards/week-ahead.json`. `days` always has 7 entries, `range.start` = `meta.as_of`.
+`days` always has 7 entries, `range.start` = `meta.as_of`.
 
 | Field | Notes |
 |---|---|
