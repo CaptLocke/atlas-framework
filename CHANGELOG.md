@@ -54,5 +54,7 @@ Each release's "What's new" section is shown to users in the Atlas Guide and the
 - Daily Brief: "Questions from Atlas" shows questions raised since the last brief first, then the oldest, each linked to its record or source; the template's example lines now carry links.
 - Insights link every record they name or put at risk (the risk, each affected project, the goal) and name the dates at stake.
 - Topics: created when a theme recurs across three or more records from at least two sources, linking those records.
+- Daily Brief "Waiting on": open `waiting_on` items overdue or due within 7 days (soonest first), plus anything waiting 7+ days without a date, instead of aging items only.
+- Routine run reports: counts checked before committing; the run report commit carries any activity-log lines not yet written, and needs none of its own.
 - Validator: list-valued enum fields (a source's `flags`) are checked entry by entry, so `flags: [suspicious]` validates.
 - All changes are additive: no migration and no `data_version` change. Existing inbox files without a `counts` block get a warning until the next `maintenance` run adds it.
