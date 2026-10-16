@@ -161,7 +161,11 @@ def ref_deletion(sub, args, cwd):
 def gh_change(argv):
     """Description when a gh command changes repo visibility or collaborators
     (N9), else None."""
-    args = argv[1:]
+    args = list(argv[1:])
+    while args and args[0].startswith("-"):  # global flags: --repo x, -R x, --hostname x
+        args = args[2:] if args[0] in ("-R", "--repo", "--hostname") else args[1:]
+    if args[:2] == ["alias", "set"] or args[:1] == ["extension"]:
+        return "gh %s (can hide other gh commands)" % " ".join(args[:2])
     if len(args) >= 2 and args[0] == "gist" and args[1] not in ("list", "view"):
         return "gh gist %s (a gist copies content out of the repo)" % args[1]
     if len(args) >= 2 and args[0] == "repo" and args[1] in ("create", "fork"):
@@ -204,14 +208,15 @@ def remote_change(sub, args):
     if sub == "config" and any(re.match(r"^remote\.origin(\.|$)", a) for a in args):
         destructive = any(a in ("--unset", "--unset-all", "--remove-section", "--rename-section",
                                 "--replace-all", "--add") for a in args)
-        setting = len(positional(args)) >= 2  # 'git config remote.origin.url <value>'
+        setting = len(shell.positional(["git"] + args, value_opts=CONFIG_VALUE_OPTS)) >= 2
         if destructive or setting:
             return "changing remote.origin config"
     return None
 
 
-def push_problem(sub, args):
-    """git push goes only to origin (N9: nothing leaves except to the user's own repo)."""
+def push_problem(sub, args, cwd):
+    """git push goes only to origin, and origin's push URLs (pushurl, pushInsteadOf applied) must
+    still be this repo (N9: nothing leaves except to the user's own repo)."""
     if sub != "push":
         return None
     if any(a.split("=", 1)[0] in ("--repo", "--receive-pack", "--exec") for a in args):
@@ -219,6 +224,12 @@ def push_problem(sub, args):
     pos = shell.positional(["git"] + args, value_opts=("-o", "--push-option"))
     if pos and pos[0] != "origin":
         return "git push to %r" % pos[0]
+    rc, fetch_url = git(["remote", "get-url", "origin"], cwd)
+    rc2, push_urls = git(["remote", "get-url", "--push", "--all", "origin"], cwd)
+    if rc != 0 or rc2 != 0:
+        return "git push without a readable origin"
+    if any(u != fetch_url.strip() for u in push_urls.split()):
+        return "git push to a redirected push URL"
     return None
 
 
@@ -266,6 +277,9 @@ def fetch_problem(sub, args, proj):
 REDIRECT_KEY = re.compile(r"^(url\.|remote\.|branch\.[^=]*\.(remote|merge|pushremote)\b)", re.I)
 
 
+CONFIG_VALUE_OPTS = ("-f", "--file", "--blob", "--type", "--default", "--comment")
+
+
 def config_redirect(sub, args, argv):
     """Config that would make fetches read from somewhere else: 'git -c url.X.insteadOf=..',
     'git config url.*', 'git branch -u'. Returns a description or None."""
@@ -275,8 +289,10 @@ def config_redirect(sub, args, argv):
             return "git -c %s" % argv[i + 1].split("=", 1)[0]
         i += 1
     if sub == "config":
-        keys = [a for a in positional(args)[:1] if REDIRECT_KEY.match(a)]
-        if keys and len(positional(args)) >= 2:
+        pos = shell.positional(["git"] + args, value_opts=CONFIG_VALUE_OPTS)
+        keys = [a for a in pos[:1] if REDIRECT_KEY.match(a)]
+        writes = len(pos) >= 2 or any(a in ("--add", "--replace-all") for a in args)
+        if keys and writes:
             return "git config %s" % keys[0]
     if sub == "branch" and any(a in ("-u", "--set-upstream-to") or a.startswith("--set-upstream-to=")
                                for a in args):
@@ -463,6 +479,10 @@ def main(payload, proj, ctx):
     purge_ok = None
     staged_by_command = False
     warnings = []
+    if re.search(r"(^|[\s;&|(])(export\s+)?GIT_[A-Z_]+=", command):
+        atlas.STATE.locked = True
+        atlas.block("Setting GIT_* variables (config, directories, transport) is not allowed: they can redirect "
+                    "where git reads or pushes (N8/N9).")
     for seg in shell.segments(command, base):
         if seg.name == "gh":
             change = gh_change(seg.argv)
@@ -497,14 +517,14 @@ def main(payload, proj, ctx):
                     what, ": tags may only be removed by atlas-update (update lock) or a confirmed purge "
                           "(purge lock, chat)" if kind == "tag" else
                     ": only a user-confirmed purge in a chat may delete branches that exist on origin"))
-        push_why = push_problem(sub, args)
+        push_why = push_problem(sub, args, cwd)
         if push_why:
             atlas.STATE.locked = True
             atlas.block("%s is not allowed: Atlas pushes only to its own repo (origin), so nothing it keeps "
                         "can be copied elsewhere (N9)." % push_why)
         redirect = config_redirect(sub, args, seg.argv)
         fetch_why = fetch_problem(sub, args, proj) or (redirect and (
-            "%s would change where git fetches from, which Atlas never does" % redirect))
+            "%s would change where git fetches from or pushes to, which Atlas never does" % redirect))
         if fetch_why:
             atlas.STATE.locked = True
             atlas.block("%s (N5)." % fetch_why)

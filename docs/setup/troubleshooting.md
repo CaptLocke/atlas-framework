@@ -70,7 +70,7 @@ Claude answers like an ordinary chat, doesn't mention Atlas, or doesn't know any
 
 ## Atlas says an automation isn't using its routine environment
 
-Atlas's automations run in the cloud in an **environment** (a small behind-the-scenes workspace) called **Atlas routine**, which has one setting: `ATLAS_CONTEXT` set to `routine`. That setting tells Atlas's safety checks that nobody is there to approve things. If an automation runs without it, Atlas notices, keeps that run to drafts only, and tells you in your next chat. Your chats don't need this setting.
+Atlas's automations run in the cloud in an **environment** (a small behind-the-scenes workspace) called **Atlas routine**, which has one setting: `ATLAS_CONTEXT` set to `routine`. That setting tells Atlas's safety checks that nobody is there to approve things. If an automation runs without it, Atlas notices, stops that run before it does anything, and tells you in your next chat. Your chats don't need this setting.
 
 1. **Say "Fix my automation environment"** in a chat in the Atlas Project. Atlas fixes it for you where it can, or walks you through it one step at a time.
 2. **Or do it yourself:**

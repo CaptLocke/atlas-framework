@@ -115,12 +115,12 @@ ATTENDEE_KEYS = ("attendee", "invitee", "guest", "participant")
 EXPOSURE_KEYS = ("visibility", "private", "permission")
 # Moving content into another service (a design tool, a converter) shares it, unless the
 # connector is the user's own storage (connectors.yaml: own_storage: true).
-TRANSFER_WORDS = {"export", "import", "upload"}
+TRANSFER_WORDS = ("export", "import", "upload")
 # curl/wget options that send data, and methods other than GET/HEAD
 CURL_DATA = ("-d", "--data", "--data-raw", "--data-binary", "--data-urlencode", "--data-ascii", "--json",
              "-F", "--form", "--form-string", "-T", "--upload-file")
 WGET_DATA = ("--post-data", "--post-file", "--body-data", "--body-file")
-GITHUB_PATH_KEYS = ("path", "file_path", "filepath", "filename")
+GITHUB_PATH_KEYS = ("path", "file_path", "filepath", "filename", "file")
 
 
 def inflections(word):
@@ -131,6 +131,8 @@ def inflections(word):
         v.update({word[:-1] + "ies", word[:-1] + "ied"})
     return v
 
+
+TRANSFER_FORMS = set().union(*(inflections(w) for w in TRANSFER_WORDS))
 
 TOKEN_RISK = {}
 for _risk, _words in WORDS.items():
@@ -276,7 +278,11 @@ def own_storage(tool_name, proj):
     server, _ = split_tool(tool_name)
     lname = tool_name.lower()
     for c in conns if isinstance(conns, list) else []:
-        if not isinstance(c, dict) or c.get("own_storage") is not True:
+        if not isinstance(c, dict):
+            continue
+        # the user's own drive: marked own_storage, or a files connector not marked otherwise
+        cats = c.get("categories") or []
+        if not (c.get("own_storage") is True or (c.get("own_storage") is None and "files" in cats)):
             continue
         extra = c.get("mcp_prefixes")
         prefixes = [str(c.get("mcp_prefix") or "")] + ([str(p) for p in extra] if isinstance(extra, list) else [])
@@ -286,22 +292,62 @@ def own_storage(tool_name, proj):
     return False
 
 
+def _github_target(tool_input, proj):
+    """'own' when a GitHub call targets this Atlas repo (or names none), 'other' otherwise."""
+    repo = tool_input.get("repo") or tool_input.get("repository") or tool_input.get("repo_name") or ""
+    if isinstance(repo, dict):
+        repo = repo.get("full_name") or "%s/%s" % (repo.get("owner") or "", repo.get("name") or "")
+    owner = tool_input.get("owner") or ""
+    own = atlas.origin_slug(proj)
+    repo = str(repo).strip().lower()
+    if not repo:
+        return "own"
+    if "/" in repo:
+        return "own" if atlas.repo_slug(repo) == own else "other"
+    if owner:
+        return "own" if atlas.repo_slug("%s/%s" % (owner, repo)) == own else "other"
+    return "own" if own.split("/")[-1:] == [repo.removesuffix(".git")] else "other"
+
+
+def _paths_in(value, out):
+    if isinstance(value, dict):
+        for k, v in value.items():
+            if str(k).lower() in GITHUB_PATH_KEYS and isinstance(v, str):
+                out.append(v)
+            else:
+                _paths_in(v, out)
+    elif isinstance(value, list):
+        for v in value:
+            _paths_in(v, out)
+    return out
+
+
 def github_paths(server, bare, tool_input, proj):
     """Repo paths a GitHub connector call writes in this Atlas repo (N5/N6 via connectors)."""
     if "github" not in _norm(server) or not isinstance(tool_input, dict) or read_only_name(tokens(bare)):
         return []
-    repo = tool_input.get("repo") or tool_input.get("repository") or ""
-    owner = tool_input.get("owner") or ""
-    slug = ("%s/%s" % (owner, repo) if owner and "/" not in str(repo) else str(repo)).lower()
-    if slug and atlas.repo_slug(slug) != atlas.origin_slug(proj):
+    if _github_target(tool_input, proj) != "own":
         return []
-    found = []
-    for k, v in tool_input.items():
-        if str(k).lower() in GITHUB_PATH_KEYS and isinstance(v, str):
-            found.append(v)
-        elif isinstance(v, list):
-            found += [str(f.get("path")) for f in v if isinstance(f, dict) and f.get("path")]
-    return [re.sub(r"^(\./|/)+", "", os.path.normpath(p)) for p in found if p]
+    return [re.sub(r"^(\./|/)+", "", os.path.normpath(p)) for p in _paths_in(tool_input, []) if p]
+
+
+def github_extra_risks(server, bare, tool_input, proj):
+    """GitHub writes that copy content out (another repo, a fork, a new repo) are shares; forced
+    ref updates on this repo rewrite history (N8)."""
+    if "github" not in _norm(server) or not isinstance(tool_input, dict):
+        return set()
+    toks = set(tokens(bare))
+    if read_only_name(tokens(bare)):
+        return set()
+    if "fork" in toks or "forks" in toks or ({"create", "new"} & toks and {"repository", "repo"} & toks):
+        return {"share"}
+    if _github_target(tool_input, proj) == "other":
+        return {"share"}
+    if "ref" in toks or "refs" in toks or "branch" in toks:
+        if tool_input.get("force") in (True, "true"):
+            atlas.STATE.locked = True
+            atlas.block("Forcing a ref update on the Atlas repo rewrites history, which Atlas never does (N8).")
+    return set()
 
 
 def check_github_write(tool_name, paths, proj):
@@ -315,27 +361,60 @@ def check_github_write(tool_name, paths, proj):
                     "to them are never allowed." % (tool_name, ", ".join(sorted(set(bad))[:5])))
 
 
-def handle_webfetch(payload, proj, ctx):
-    """Routines open only the employer's own sites and GitHub: a link can carry data out."""
-    if ctx == "chat":
-        atlas.allow()
-    url = str((payload.get("tool_input") or {}).get("url") or "")
-    m = re.match(r"^[a-z][a-z0-9+.-]*://([^/?#@]*@)?([^/?#:]+)", url, re.I)
-    host = (m.group(2) if m else "").lower().rstrip(".")
+SHARED_HOSTS = {"github.io", "githubusercontent.com", "gitlab.io", "netlify.app", "vercel.app", "pages.dev",
+                "herokuapp.com", "azurewebsites.net", "cloudfront.net", "appspot.com", "web.app",
+                "firebaseapp.com", "blogspot.com", "wordpress.com", "medium.com", "notion.site", "sites.google.com"}
+
+
+def url_host(url):
+    """Host of an http(s) URL as a browser would parse it ('' when unclear)."""
+    u = str(url or "").strip().replace("\\", "/")
+    m = re.match(r"^https?://([^/?#]*)", u, re.I)
+    if not m:
+        return ""
+    host = m.group(1).rsplit("@", 1)[-1].split(":")[0].lower().rstrip(".")
+    return host if re.match(r"^[a-z0-9.-]+$", host) else ""
+
+
+def allowed_hosts(proj):
+    """github.com plus the employer's website and email domains (each a real domain, not a shared host)."""
     allowed = {"github.com", "raw.githubusercontent.com"}
     try:
         data = atlas.load_yaml(os.path.join(proj, "user", "settings", "atlas.yaml"), proj) or {}
         company = data.get("company") or {}
-        site = re.sub(r"^([a-z]+://)?(www\.)?", "", str(company.get("website") or ""), flags=re.I).split("/")[0]
-        allowed |= {d.lower().lstrip(".") for d in [site] + list(company.get("email_domains") or []) if d}
+        site = url_host("https://" + re.sub(r"^[a-z]+://", "", str(company.get("website") or ""), flags=re.I))
+        domains = company.get("email_domains") or []
+        domains = [domains] if isinstance(domains, str) else list(domains)
+        for d in [site] + [str(x) for x in domains]:
+            d = d.lower().strip().lstrip(".")
+            d = d[4:] if d.startswith("www.") else d
+            if re.match(r"^[a-z0-9-]+(\.[a-z0-9-]+)+$", d) and d not in SHARED_HOSTS \
+                    and not any(d.endswith("." + h) for h in SHARED_HOSTS):
+                allowed.add(d)
     except Exception:
         pass
-    if host and any(host == d or host.endswith("." + d) for d in allowed):
-        atlas.allow()
+    return allowed
+
+
+def host_allowed(host, proj):
+    return bool(host) and any(host == d or host.endswith("." + d) for d in allowed_hosts(proj))
+
+
+def block_host(what, host):
     atlas.STATE.locked = True
-    atlas.block("Opening %s from a routine is not allowed: routines open only the employer's own sites and "
+    atlas.block("%s %s from a routine is not allowed: routines reach only the employer's own sites and "
                 "GitHub, because a link can carry data out. Use web search results instead, or note the link "
-                "in the run report for the next chat." % (host or url[:80]))
+                "in the run report for the next chat." % (what, host or "that address"))
+
+
+def handle_webfetch(payload, proj, ctx):
+    """Routines open only the employer's own sites and GitHub: a link can carry data out."""
+    if ctx == "chat":
+        atlas.allow()
+    host = url_host((payload.get("tool_input") or {}).get("url"))
+    if host_allowed(host, proj):
+        atlas.allow()
+    block_host("Opening", host)
 
 
 def guard_locked(tool_name, risks, proj, ctx, what):
@@ -376,8 +455,10 @@ def handle_mcp(payload, proj, ctx):
         risks.add(tag if tag in SEVERITY else "delete")  # unknown tag value: treat as risky
     if exposes_repo(server, payload.get("tool_input")):
         risks.add("share")
-    if TRANSFER_WORDS & set(tokens(bare)) and not own_storage(tool_name, proj):
+    if (TRANSFER_FORMS & set(tokens(bare)) and not READ_VERBS & set(tokens(bare))
+            and not own_storage(tool_name, proj)):
         risks.add("share")
+    risks |= github_extra_risks(server, bare, payload.get("tool_input"), proj)
     gh_paths = github_paths(server, bare, payload.get("tool_input"), proj)
     if gh_paths:
         check_github_write(tool_name, gh_paths, proj)
@@ -410,29 +491,45 @@ EXEMPT_DELETE = ("user/inbox/drop/", "user/knowledge/_index/")
 
 
 def uploads(seg):
-    """True when a curl/wget call sends data (a body, a form, a file, or a non-GET method)."""
+    """True when a curl/wget call sends data (a body, a form, a file, a non-GET method) or reads
+    its options from a config file or script (-K, wget -e/--execute)."""
     args = seg.argv[1:]
+    curl = seg.name == "curl"
     for i, a in enumerate(args):
         opt = a.split("=", 1)[0]
-        if seg.name == "curl":
-            if opt in CURL_DATA:
+        nxt = args[i + 1] if i + 1 < len(args) else ""
+        if curl:
+            if opt in CURL_DATA or opt in ("-K", "--config"):
                 return True
-            if re.match(r"^-[A-Za-z]+$", a) and set(a[1:]) & set("dFT"):
-                return True
-            if opt in ("-X", "--request"):
-                method = a.split("=", 1)[1] if "=" in a else (args[i + 1] if i + 1 < len(args) else "")
-                if method.upper() not in ("GET", "HEAD"):
+            if opt == "--request":
+                if (a.split("=", 1)[1] if "=" in a else nxt).upper() not in ("GET", "HEAD"):
                     return True
-            if re.match(r"^-X.+", a) and a[2:].upper() not in ("GET", "HEAD"):
-                return True
+            elif re.match(r"^-[A-Za-z]", a) and not a.startswith("--"):
+                letters = a[1:]
+                for j, ch in enumerate(letters):
+                    if ch in "dFTK":
+                        return True
+                    if ch == "X":
+                        method = letters[j + 1:] or nxt
+                        if method.upper() not in ("GET", "HEAD"):
+                            return True
+                        break
         else:
-            if opt in WGET_DATA:
+            if opt in WGET_DATA or opt in ("-e", "--execute", "-i", "--input-file"):
                 return True
-            if opt == "--method":
-                method = a.split("=", 1)[1] if "=" in a else (args[i + 1] if i + 1 < len(args) else "")
-                if method.upper() not in ("GET", "HEAD"):
-                    return True
+            if opt == "--method" and (a.split("=", 1)[1] if "=" in a else nxt).upper() not in ("GET", "HEAD"):
+                return True
     return False
+
+
+def url_args(seg):
+    out = []
+    for i, a in enumerate(seg.argv[1:], 1):
+        if a.split("=", 1)[0] == "--url":
+            out.append(a.split("=", 1)[1] if "=" in a else (seg.argv[i + 1] if i + 1 < len(seg.argv) else ""))
+        elif re.match(r"^[a-z][a-z0-9+.-]*://", a, re.I):
+            out.append(a)
+    return out
 
 
 def handle_bash(payload, proj, ctx):
@@ -442,8 +539,13 @@ def handle_bash(payload, proj, ctx):
     base = atlas.session_cwd(payload, proj)
     hits = []
     for seg in shell.segments(command, base):
-        if seg.name in ("curl", "wget") and uploads(seg):
-            guard_locked("Bash", ["share"], proj, ctx, "Sending data with %s" % seg.name)
+        if seg.name in ("curl", "wget", "wget2"):
+            if uploads(seg):
+                guard_locked("Bash", ["share"], proj, ctx, "Sending data with %s" % seg.name)
+            if ctx != "chat":
+                for u in url_args(seg):
+                    if not host_allowed(url_host(u), proj):
+                        block_host("Reaching", url_host(u) or u[:60])
         writes, deletes = shell.write_targets(seg)
         if seg.name == "mv" or (seg.name == "git" and shell.git_subcommand(seg.argv)[0] == "mv"):
             # moving within user/ is a rename, not a delete

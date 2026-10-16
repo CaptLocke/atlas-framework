@@ -43,7 +43,7 @@ If this session has a tool to create or edit cloud environments, create it (defa
 ```
 "If it looks different: look for wherever you can add environment variables for cloud runs. The name and the line above are all that matter. Capitals and the underscore matter in ATLAS_CONTEXT; the value is routine in lower case, with no spaces or quotes."
 
-**Why it matters:** a routine without the marker is treated as a chat by the safety hooks. Atlas's routine instructions still keep it to drafts and queued requests, but the hooks aren't guarding it. So every run records the `ATLAS_CONTEXT` it saw in its run report (`atlas_context`); a run that doesn't see `routine` raises the high-severity known issue `routine-env-missing` naming the routine, and the weekly health check (`atlas-health`, via `maintenance`) looks for unmarked runs too.
+**Why it matters:** a routine without the marker is treated as a chat by the safety hooks. So the routine prompt checks the marker first and stops without running any job if it's missing. Every run records the `ATLAS_CONTEXT` it saw in its run report (`atlas_context`); a run that doesn't see `routine` raises the high-severity known issue `routine-env-missing` naming the routine, and the weekly health check (`atlas-health`, via `maintenance`) looks for unmarked runs too.
 
 **Fixing `routine-env-missing`** (offer this in the next chat):
 ```

@@ -16,7 +16,7 @@ Claude answers like an ordinary chat, or says it can't open your Atlas.
 3. If Claude says it can't attach your repository, follow **Reconnect GitHub** below.
 
 ## Atlas says an automation isn't using its routine environment
-Your automations run in their own environment, called **Atlas routine**, so Atlas's safety checks know nobody is there to approve things. If one runs without it, Atlas keeps that run to drafts only and tells you. Your chats don't need any of this.
+Your automations run in their own environment, called **Atlas routine**, so Atlas's safety checks know nobody is there to approve things. If one runs without it, that run stops without doing anything and Atlas tells you. Your chats don't need any of this.
 1. Say **"Fix my automation environment."** Atlas fixes it for you or walks you through it.
 2. To do it yourself: in the Claude desktop app, open **Routines** (it may be under **Claude Code**), open the automation Atlas named (**Atlas · …**), and set its **Environment** to **Atlas routine**.
 3. If there's no **Atlas routine** environment, create one in **Settings → Environments** (the label may differ) with one variable: `ATLAS_CONTEXT` set to `routine`.

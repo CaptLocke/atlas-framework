@@ -155,6 +155,9 @@ def check(rels, tool_name, proj, ctx):
     for rel, kind, via in rels:
         if rel == ".git" or rel.startswith(".git/"):
             git_hits.append(rel)
+        if rel == atlas.MAINTAINER_MARKER:
+            atlas.block("%s marks the maintainer's own copy of Atlas's source repo and switches the guards off "
+                       "there; Atlas never creates, changes or removes it." % rel)
         if any(atlas.overlaps(rel, e) for e in owned):
             if via == "head":
                 pass  # restoring committed content never introduces anything new
