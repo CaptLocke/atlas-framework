@@ -17,7 +17,7 @@ Customer email thread. Tests new organization and person creation, both commitme
 | ID | Level | Type | Expectation |
 |---|---|---|---|
 | E01-R1 | M | organization | Globex: `kind: customer` (or `prospect`), `domain: globex.example`. |
-| E01-R2 | M | person | Priya Shah: email `priya.shah@globex.example`, `org` Globex, role Head of Operations, `relationship: customer` (or `external`/`stakeholder`). |
+| E01-R2 | M | person | Priya Shah: email `priya.shah@globex.example`, `org` Globex, role Head of Operations, `relationship: customer` (or `prospect`/`external`/`stakeholder`; `person.md` maps evaluators in a pilot to `prospect`). |
 | E01-R3 | S | person | Raj Patel: email `raj.patel@acme.example`, `org` Acme. (Must exist by end of run; see 00.) |
 | E01-R4 | M | project | A Globex pilot project (e.g. `projects/globex-pilot`), created here or from input 04, linked to Globex, Priya, and Maya. Exactly one across the run (see 00). |
 | E01-R5 | S | event or org field | Globex's current analytics contract ends 2027-01-31: captured as an event (`kind: deadline`, `start` 2027-01-31) linked to Globex, or in Globex's `relationship_status`/body. |
