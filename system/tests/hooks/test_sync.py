@@ -228,6 +228,7 @@ class StopGuard(SyncCase):
 class SyncUpstreamBypass(SyncCase):
     def test_upstream_repo_is_untouched(self):
         sh(["git", "remote", "set-url", "origin", "https://github.com/CaptLocke/atlas-framework.git"], self.root)
+        self.write(".atlas-maintainer", "")
         self.write("user/work/new.md", "x\n")
         self.commit_local()
         r = self.run_event("sync_start", "SessionStart", {"source": "startup"})
