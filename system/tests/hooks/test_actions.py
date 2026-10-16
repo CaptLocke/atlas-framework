@@ -172,6 +172,16 @@ class ActionsChat(HookTestCase):
 class UpstreamBypass(HookTestCase):
     origin = "git@github.com:CaptLocke/atlas-framework.git"
 
+    def setUp(self):
+        super().setUp()
+        self.write(".atlas-maintainer", "")  # the maintainer's own copy
+
+    def test_clone_without_marker_is_guarded(self):
+        os.remove(self.path(".atlas-maintainer"))
+        self.connectors(CONNECTORS)
+        self.assertBlocked(self.run_hook("actions", SEND, {}, context="routine"))
+        self.assertBlocked(self.bash("git", "git commit -m 'no trailers'", "routine"))
+
     def test_everything_allowed_in_upstream_repo(self):
         self.connectors(CONNECTORS)
         self.assertAllowed(self.run_hook("actions", SEND, {}, context="routine"))
@@ -207,6 +217,7 @@ class NoManifest(HookTestCase):
     def test_missing_manifest_upstream_fallback(self):
         import subprocess
         os.remove(self.path("system/manifest.yaml"))
+        self.write(".atlas-maintainer", "")
         subprocess.run(["git", "remote", "set-url", "origin", "https://github.com/CaptLocke/atlas-framework.git"],
                        cwd=self.root, check=True)
         self.assertAllowed(self.run_hook("actions", "mcp__x__send_message", {}, context="routine"))
