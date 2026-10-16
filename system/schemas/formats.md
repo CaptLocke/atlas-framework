@@ -198,7 +198,6 @@ started: 2026-10-12T20:07:03-07:00
 finished: 2026-10-12T20:31:40-07:00
 status: ok              # ok | partial | failed
 atlas_context: routine   # the ATLAS_CONTEXT value observed at the start of the run, verbatim ("unset" if missing); anything but routine means routine-env-missing
-release_check: clean     # status word from the release check's line (clean | restored | restored-settings | skipped | failed), or missing if it didn't run; failed, restored-settings or missing means routine-release-check
 ---
 | Job | Status | Items | Notes |
 |---|---|---|---|

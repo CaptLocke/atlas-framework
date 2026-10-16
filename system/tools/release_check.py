@@ -1,46 +1,31 @@
 #!/usr/bin/env python3
-"""Atlas release check: verify that a release tag was signed by Atlas's maker,
-and restore Atlas's system files from it.
+"""Atlas release check: verify that a release tag was signed by Atlas's maker.
 
-Standard library only (no ssh-keygen needed). Two uses:
+Standard library only (no ssh-keygen needed):
 
   python3 -I system/tools/release_check.py verify <ref> <tag>
-      atlas-update, before taking any file from a fetched release. Exit 0 and
-      print the release commit when <ref> is an annotated tag named <tag>,
-      signed by a key in SIGNERS; exit 1 otherwise.
 
-  python3 -I /opt/atlas/release_check.py
-      The first step of every Atlas routine (its prompt says so). The "Atlas
-      routine" environment's setup script writes this file to /opt/atlas, outside
-      the repo, so a chat can't change it (atlas-setup reference/automations.md
-      §3). It fetches the installed version's tag from UPSTREAM, verifies it,
-      and puts the system-owned files back to that release (committing and
-      pushing the repair), so the routine runs the released hooks even if a chat
-      changed them. Prints one status line, writes .atlas-tmp/release-check.json,
-      and always exits 0.
+atlas-update runs it before taking any file from a fetched release, and the
+paths hook runs it before accepting a refs/atlas-upstream/* source. Exit 0 and
+print the release commit when <ref> is an annotated tag named <tag>, signed by
+a key in SIGNERS; exit 1 otherwise.
 
 Signatures are git's SSH signatures (ssh-keygen -Y sign, namespace "git") made
 with Ed25519 keys. Replacing a key is a release, signed by a key users already
-trust, that changes SIGNERS; users then paste the new setup script.
+trust, that changes SIGNERS.
 """
 import base64
 import hashlib
-import json
 import os
 import re
 import subprocess
 import sys
-import time
 
-UPSTREAM = "CaptLocke/atlas-framework"
 SIGNERS = (  # ssh-ed25519 public keys: main, then offline backup
     "AAAAC3NzaC1lZDI1NTE5AAAAIP5zeqZrVr4K4Im8koRm5jkuyjjYciof5oxbAGEFUArK",
     "AAAAC3NzaC1lZDI1NTE5AAAAIF8Eax3RKJZebfTKRZP2zsU/BKc5aBvsFL99/Ul5i/0b",
 )
-MIN_VERSION = (1, 0, 1)  # the routine check never restores a release older than this (raise it on re-paste)
 TAG_NAME = re.compile(r"^v\d+\.\d+\.\d+(-rc\.\d+)?$")
-STATUS_FILE = ".atlas-tmp/release-check.json"
-UPSTREAM_URL = None  # tests only; the real check always fetches github.com/UPSTREAM
 
 
 class CheckFailed(Exception):
@@ -225,123 +210,6 @@ def verify_tag(repo, ref, name, signers=None):
     return commit
 
 
-# ---------------------------------------------------- routine setup (restore)
-SAFE_PATH = re.compile(r"^(\.claude|\.gitignore|[A-Za-z0-9_][A-Za-z0-9._-]*)(/[A-Za-z0-9_][A-Za-z0-9._-]*)*$")
-
-
-def _owned_paths(text):
-    """owned_paths from a (signed) manifest: plain relative names only, never user/ or .git."""
-    out, inside = [], False
-    for line in (text or "").splitlines():
-        if re.match(r"^owned_paths:\s*$", line):
-            inside = True
-            continue
-        if inside:
-            m = re.match(r"^\s+-\s+[\"']?([^\"'#\s]+)", line)
-            if m:
-                out.append(m.group(1).rstrip("/"))
-            elif line.strip() and not line.startswith((" ", "\t")):
-                break
-    return [p for p in out if SAFE_PATH.match(p) and p.split("/")[0] not in ("user", ".git")]
-
-
-def _find_repo():
-    for c in (os.environ.get("CLAUDE_PROJECT_DIR"), os.getcwd()):
-        if c and os.path.isfile(os.path.join(c, "system", "manifest.yaml")):
-            return c
-    for root in ("/workspace", os.path.expanduser("~")):
-        try:
-            for name in sorted(os.listdir(root)):
-                c = os.path.join(root, name)
-                if os.path.isfile(os.path.join(c, "system", "manifest.yaml")):
-                    return c
-        except OSError:
-            continue
-    return None
-
-
-def _version(v):
-    return tuple(int(x) for x in v.split("."))
-
-
-def _installed_version(repo):
-    """installed_version from atlas.yaml; None when Atlas isn't set up (no atlas.yaml).
-    Raises CheckFailed when the file exists but the version is missing or malformed."""
-    try:
-        with open(os.path.join(repo, "user", "settings", "atlas.yaml"), encoding="utf-8") as f:
-            text = f.read()
-    except FileNotFoundError:
-        return None
-    m = re.search(r"^installed_version:[ \t]*[\"']?(\d+\.\d+\.\d+)[\"']?[ \t]*(#.*)?$", text, re.M)
-    if not m:
-        raise CheckFailed("installed_version in user/settings/atlas.yaml is missing or not a release number")
-    if _version(m.group(1)) < MIN_VERSION:
-        raise CheckFailed("installed_version %s is older than this check allows (%s)"
-                          % (m.group(1), ".".join(map(str, MIN_VERSION))))
-    return m.group(1)
-
-
-def restore(repo):
-    """(status, detail). status: clean | restored | restored-settings | skipped. Raises CheckFailed."""
-    version = _installed_version(repo)
-    if not version:
-        return "skipped", "Atlas isn't set up in this repo yet (no user/settings/atlas.yaml)"
-    tag = "v" + version
-    ref = "refs/atlas-upstream/" + tag
-    url = UPSTREAM_URL or "https://github.com/%s.git" % UPSTREAM
-    _git(repo, ["fetch", "--quiet", "--depth=1", "--no-tags", url, "+refs/tags/%s:%s" % (tag, ref)])
-    commit = verify_tag(repo, ref, tag)
-    # only the signed release decides what is system-owned (a chat can edit HEAD's manifest)
-    owned = _owned_paths(_git(repo, ["show", commit + ":system/manifest.yaml"]).stdout.decode("utf-8", "replace"))
-    if not owned:
-        raise CheckFailed("release %s lists no owned paths" % tag)
-    _git(repo, ["reset", "-q"])  # start from an empty index: commit only what this check restores
-    for p in owned:
-        now = set(_git(repo, ["ls-files", "-z", "--", p]).stdout.decode("utf-8", "replace").split("\0")) - {""}
-        rel = set(_git(repo, ["ls-tree", "-r", "-z", "--name-only", commit, "--", p]).stdout
-                  .decode("utf-8", "replace").split("\0")) - {""}
-        extra = sorted(now - rel)
-        if extra:
-            _git(repo, ["rm", "-q", "-f", "--"] + extra)
-        if rel:
-            _git(repo, ["checkout", commit, "--", p])
-    # untracked or ignored files (a planted module or .pyc) can shadow hook code
-    _git(repo, ["clean", "-q", "-f", "-d", "-x", "--", ".claude/hooks"], check=False)
-    if _git(repo, ["diff", "--cached", "--quiet", "HEAD"], check=False).returncode == 0:
-        return "clean", "system files match signed %s" % tag
-    # hook registrations are read when the session starts: a changed settings file only counts next run
-    settings_changed = _git(repo, ["diff", "--cached", "--quiet", "HEAD", "--", ".claude/settings.json"],
-                            check=False).returncode != 0
-    msg = ("atlas(release-check): restore system files to signed %s\n\nAtlas-Actor: release-check\n"
-           "Atlas-Reason: system files differed from the signed release before a routine\n"
-           "Atlas-Records: -\n" % tag)
-    _git(repo, ["-c", "user.name=Atlas", "-c", "user.email=atlas@users.noreply.github.com",
-                "-c", "commit.gpgsign=false", "commit", "-q", "--no-verify", "-m", msg])
-    pushed = _git(repo, ["push", "--quiet", "origin", "HEAD:main"], check=False).returncode == 0
-    return ("restored-settings" if settings_changed else "restored"), "system files restored to signed %s%s%s" % (
-        tag, "; .claude/settings.json had been changed, so this run's hook list may be the changed one"
-        if settings_changed else "", "" if pushed else " (commit not pushed yet; push it with this run's changes)")
-
-
-def run_check():
-    repo = _find_repo()
-    if not repo:
-        print("Atlas release check: no Atlas repo found; nothing checked")
-        return
-    try:
-        status, detail = restore(repo)
-    except (CheckFailed, OSError, subprocess.SubprocessError) as e:
-        status, detail = "failed", str(e)
-    record = {"status": status, "detail": detail, "at": time.strftime("%Y-%m-%dT%H:%M:%S%z")}
-    try:
-        os.makedirs(os.path.join(repo, ".atlas-tmp"), exist_ok=True)
-        with open(os.path.join(repo, STATUS_FILE), "w", encoding="utf-8") as f:
-            json.dump(record, f)
-    except OSError:
-        pass
-    print("Atlas release check: %s: %s" % (status, detail))
-
-
 def main(argv):
     if len(argv) == 4 and argv[1] == "verify":
         try:
@@ -350,12 +218,6 @@ def main(argv):
         except (CheckFailed, OSError, subprocess.SubprocessError) as e:
             print("release check failed: %s" % e, file=sys.stderr)
             return 1
-    if len(argv) <= 1:
-        try:
-            run_check()
-        except Exception as e:  # never stop the routine here; the kernel reads the status
-            print("Atlas release check: failed: %s" % e)
-        return 0
     print(__doc__, file=sys.stderr)
     return 2
 

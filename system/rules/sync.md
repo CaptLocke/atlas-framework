@@ -26,7 +26,7 @@ The user never sees or manages git. Pull at the start, commit and push after eac
 ```
 atlas(<actor>): <short summary>
 
-Atlas-Actor: chat | routine:<routine-name> | update | setup | release-check
+Atlas-Actor: chat | routine:<routine-name> | update | setup
 Atlas-Reason: <why, one line>
 Atlas-Records: <record IDs or paths touched, comma-separated; may be "-" for settings/logs only>
 ```

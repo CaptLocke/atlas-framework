@@ -16,7 +16,6 @@ Each release's "What's new" section is shown to users in the Atlas Guide and the
 
 ### Action needed
 - In Settings → Connectors, set every tool that sends, replies, forwards, shares, or deletes to ✋ **Needs approval**, and remove those connectors from your Atlas routines (routines only draft). Ask Atlas "help me set up approval cards" and it walks you through it.
-- Add the release check to your "Atlas routine" environment and update each routine's instructions, so every automation starts by putting Atlas's own files back to the signed release. Ask Atlas "update my routine setup" and it shows you exactly what to paste.
 
 ### Under the hood
 - Shell guard: commands after a blank line, or after `;` and a newline, were merged into the previous command and missed by the guards (a delete written that way went unseen). Any token made only of separator characters now ends a command. This also fixes `cd` being ignored after heredocs.
@@ -25,7 +24,6 @@ Each release's "What's new" section is shown to users in the Atlas Guide and the
 - Risk classifier: `collaborator`, `visibility` and `gist` are share words; on GitHub tools, an input setting visibility, privacy or a permission is a share.
 - Zip updates removed: releases install only from the upstream tag. `system/tools/build-zip.md` deleted.
 - Signed releases: `system/tools/release_check.py` (standard library only; no `ssh-keygen` needed) verifies a release tag's SSH signature against the release keys it carries. `atlas-update` runs it after fetching and before taking any file; the paths hook accepts `refs/atlas-upstream/*` as a source only when the tag passes it (name must match, annotated, signed by a release key).
-- Routine release check (#13): the "Atlas routine" environment's setup script writes `release_check.py` to `/opt/atlas` (outside the repo; setup scripts run once per cached environment, and every session gets a fresh clone), and every routine prompt runs it first. It fetches `v<installed_version>`, verifies the signature, restores owned paths (and removes untracked files under `.claude/hooks`), commits as `Atlas-Actor: release-check`, and pushes. Run reports record `release_check`; anything but clean, restored or skipped raises `routine-release-check`.
 - Chat approvals: repo hooks don't load in Cowork chats, so the chat-side guard is Claude's confirmation plus Cowork's approval card. Setup step 9 and `atlas-connectors` set send/share/delete tools to Needs approval; routines get no sending connectors; the quarterly review re-checks both. Governance, kernel and Controls guide say where hooks apply.
 - Sync hooks: session start on a non-main branch (cloud routines' `claude/...` branch) fetches and fast-forwards to `origin/main` instead of failing; the end-of-turn check fetches before counting unpushed commits and skips the count if the fetch fails.
 
