@@ -1,0 +1,95 @@
+{
+  "meta": {
+    "dashboard": "about-you",
+    "headline": "Two things Atlas noticed about how you work are waiting for your OK.",
+    "schema_version": 1,
+    "title": "About You",
+    "generated_at": "2026-10-01T20:30:40-07:00",
+    "generated_by": "routine:nightly-cycle",
+    "as_of": "2026-10-01",
+    "timezone": "America/Los_Angeles",
+    "locale": "en-US",
+    "user_display_name": "Maya Chen",
+    "atlas_version": "1.0.0",
+    "nav": [{"name": "daily-brief", "title": "Daily Brief", "url": "https://claude.ai/artifact/example-daily-brief"}, {"name": "commitments", "title": "Commitments", "url": "https://claude.ai/artifact/example-commitments"}, {"name": "projects", "title": "Projects", "url": "https://claude.ai/artifact/example-projects"}, {"name": "week-ahead", "title": "Week Ahead", "url": "https://claude.ai/artifact/example-week-ahead"}, {"name": "goals", "title": "Goals", "url": "https://claude.ai/artifact/example-goals"}, {"name": "people", "title": "People", "url": "https://claude.ai/artifact/example-people"}, {"name": "decisions-risks", "title": "Decisions & Risks", "url": "https://claude.ai/artifact/example-decisions-risks"}, {"name": "records", "title": "Records", "url": "https://claude.ai/artifact/example-records"}, {"name": "about-you", "title": "About You", "url": "https://claude.ai/artifact/example-about-you"}, {"name": "control-center", "title": "Control Center", "url": "https://claude.ai/artifact/example-control-center"}, {"name": "atlas-guide", "title": "Atlas Guide", "url": "https://claude.ai/artifact/example-atlas-guide"}],
+    "notices": [],
+    "truncated": {}
+  },
+  "counts": { "statements": 19, "confirmed": 17, "proposed": 2 },
+  "basics": {
+    "name": "Maya Chen",
+    "role": "Product Manager, Platform",
+    "company": { "id": "organizations/acme", "title": "Acme" },
+    "manager": { "id": "people/jordan-lee", "title": "Jordan Lee" },
+    "timezone": "America/Los_Angeles (Pacific)",
+    "self": { "id": "people/maya-chen", "title": "Maya Chen" },
+    "key_people": [{ "id": "people/jordan-lee", "title": "Jordan Lee" }, { "id": "people/tomas-herrera", "title": "Tomás Herrera" }, { "id": "people/priya-nair", "title": "Priya Nair" }],
+    "goals": [{ "id": "goals/2026-q4-retention", "title": "Q4 retention" }, { "id": "goals/2026-q4-enterprise-revenue", "title": "Launch the enterprise tier" }]
+  },
+  "proposals": [
+    { "id": "Q-2026-09-30-01", "text": "You shortened my last four drafts by about half. Should I default to shorter emails?", "proposed_change": "Keep emails under about 120 words (personal voice)", "asked": "2026-09-30" },
+    { "id": "Q-2026-09-28-02", "text": "You block Wednesday mornings most weeks. Should I protect them for deep work?", "proposed_change": "Wednesday mornings are focus time (working style)", "asked": "2026-09-28" }
+  ],
+  "files": [
+    { "part": "working-style", "title": "Working style", "path": "user/profile/working-style.md", "updated": "2026-09-30", "description": "How you plan, focus, and prioritize.",
+      "groups": [
+        { "heading": "Planning", "statements": [
+          { "text": "Plans the week on Sunday evening and wants the Week Ahead ready by then.", "provenance": "stated", "status": "confirmed", "date": "2026-09-14", "evidence": [] },
+          { "text": "Prefers two or three priorities a day, not a long list.", "provenance": "observed", "status": "confirmed", "date": "2026-09-22", "evidence": [{ "id": "sources/2026-09-21-journal" }] }
+        ] },
+        { "heading": "Focus", "statements": [
+          { "text": "Does deep work before 11 AM; meetings after lunch when possible.", "provenance": "stated", "status": "confirmed", "date": "2026-09-14", "evidence": [] }
+        ] }
+      ] },
+    { "part": "communication-style", "title": "How you like information", "path": "user/profile/communication-style.md", "updated": "2026-09-25", "description": "Length, format, and how to lead.",
+      "groups": [
+        { "heading": null, "statements": [
+          { "text": "Numbers first, then the story.", "provenance": "stated", "status": "confirmed", "date": "2026-09-14", "evidence": [] },
+          { "text": "Bullet summaries over prose for status updates.", "provenance": "observed", "status": "confirmed", "date": "2026-10-02", "evidence": [{ "id": "sources/2026-09-30-status-draft-edits" }] },
+          { "text": "Wants risks stated before recommendations.", "provenance": "stated", "status": "confirmed", "date": "2026-10-01", "evidence": [] }
+        ] }
+      ] },
+    { "part": "thinking-style", "title": "How you think and decide", "path": "user/profile/thinking-style.md", "updated": "2026-09-14", "description": null,
+      "groups": [
+        { "heading": null, "statements": [
+          { "text": "Data-led, but asks for a gut check from customers before big calls.", "provenance": "stated", "status": "confirmed", "date": "2026-09-14", "evidence": [] },
+          { "text": "Wants assumptions in pricing work challenged.", "provenance": "stated", "status": "confirmed", "date": "2026-09-14", "evidence": [] }
+        ] }
+      ] },
+    { "part": "preferences", "title": "Preferences", "path": "user/profile/preferences.md", "updated": "2026-09-20", "description": "Standing instructions for Atlas.",
+      "groups": [
+        { "heading": "Standing instructions", "statements": [
+          { "text": "Never draft to the CEO without asking first.", "provenance": "stated", "status": "confirmed", "date": "2026-09-14", "evidence": [] },
+          { "text": "Don't schedule anything on Friday afternoons.", "provenance": "stated", "status": "confirmed", "date": "2026-09-20", "evidence": [] }
+        ] }
+      ] },
+    { "part": "voice-personal", "title": "Your writing voice", "path": "user/profile/voice-personal.md", "updated": "2026-09-30", "description": "Used for internal messages and replies.",
+      "groups": [
+        { "heading": "Summary", "statements": [
+          { "text": "Warm but brisk; gets to the ask in the first two lines.", "provenance": "observed", "status": "confirmed", "date": "2026-09-16", "evidence": [{ "id": "sources/2026-09-15-writing-samples" }] },
+          { "text": "Signs off with just \"M\" to close colleagues.", "provenance": "observed", "status": "confirmed", "date": "2026-09-16", "evidence": [{ "id": "sources/2026-09-15-writing-samples" }] }
+        ] },
+        { "heading": "Don't", "statements": [
+          { "text": "Avoid \"circle back\" and \"synergy\".", "provenance": "stated", "status": "confirmed", "date": "2026-09-16", "evidence": [] }
+        ] }
+      ] },
+    { "part": "voice-house", "title": "Acme's house voice", "path": "user/profile/voice-house.md", "updated": "2026-09-18", "description": "Used for customer-facing and official material.",
+      "groups": [
+        { "heading": "Summary", "statements": [
+          { "text": "Plain, confident, no exclamation marks; product names capitalized.", "provenance": "uploaded", "status": "confirmed", "date": "2026-09-18", "evidence": [{ "id": "sources/2026-09-18-acme-brand-guide" }] },
+          { "text": "Uses \"customers\", never \"users\", in external copy.", "provenance": "researched", "status": "confirmed", "date": "2026-09-18", "evidence": [{ "id": "sources/2026-09-18-acme-website" }] }
+        ] }
+      ] }
+  ],
+  "design": {
+    "path": "user/profile/design-system.md",
+    "summary": "Acme's brand is calm and technical: deep teal with a warm sand accent, generous white space.",
+    "colors": [
+      { "name": "Acme Teal", "hex": "#0F5C5C", "use": "primary" },
+      { "name": "Sand", "hex": "#E8C99B", "use": "accent" },
+      { "name": "Graphite", "hex": "#2B2F33", "use": "text" },
+      { "name": "Mist", "hex": "#F3F6F6", "use": "background" }
+    ],
+    "fonts": [{ "role": "Headings", "family": "Source Serif 4, Georgia" }, { "role": "Body", "family": "Inter, Arial" }]
+  }
+}

@@ -1,0 +1,12 @@
+# Data rules. Copied to user/settings/data-rules.yaml by atlas-setup (step 9).
+# PROTECTED (N6): changes only in chat with the user's explicit confirmation.
+# Conservative defaults. Handling: ignore | pointer | summary | full.
+# Format: system/schemas/settings.md; applied per system/rules/governance.md (N11).
+categories:
+  confidential: pointer
+  pii: summary
+  phi: pointer
+  financial: summary
+  legal_privileged: ignore
+custom: []                       # e.g. - { name: board-materials, match: "Board decks and minutes", handling: summary }
+exclusions: []                   # never read; e.g. - "mail: from:*@newsletter.example.com"
