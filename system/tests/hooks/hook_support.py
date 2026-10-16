@@ -44,6 +44,9 @@ class HookTestCase(unittest.TestCase):
                         ignore=shutil.ignore_patterns("__pycache__"))
         shutil.copy(os.path.join(REPO, "system", "manifest.yaml"),
                     os.path.join(self.root, "system", "manifest.yaml"))
+        if os.path.exists(os.path.join(REPO, "system", "tools", "release_check.py")):
+            shutil.copy(os.path.join(REPO, "system", "tools", "release_check.py"),
+                        os.path.join(self.root, "system", "tools", "release_check.py"))
         for d in ("user/settings", "user/knowledge/people", "user/inbox/drop",
                   "user/knowledge/_index", "docs"):
             os.makedirs(os.path.join(self.root, d), exist_ok=True)
@@ -81,6 +84,13 @@ class HookTestCase(unittest.TestCase):
                "user_confirmation": "yes, do it", "created": iso(0), "expires": iso(minutes)}
         rec.update(extra)
         self.write_json(".atlas-tmp/approval.json", rec)
+
+    def signed_release(self, ref="refs/atlas-upstream/v1.0.0"):
+        """Fetch the real signed v1.0.0 tag from the repo under test into 'ref'
+        (skips the test when that tag isn't available locally)."""
+        if sh(["git", "rev-parse", "-q", "--verify", "refs/tags/v1.0.0"], REPO, check=False).returncode != 0:
+            self.skipTest("the signed v1.0.0 tag isn't in this clone (git fetch --tags)")
+        sh(["git", "fetch", "-q", "--no-tags", REPO, "+refs/tags/v1.0.0:" + ref], self.root)
 
     def update_lock(self, minutes=30):
         self.write_json(".atlas-tmp/update.lock", {"by": "atlas-update", "version_from": "1.0.0",
