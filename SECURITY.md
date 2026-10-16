@@ -27,4 +27,4 @@ You'll get an acknowledgement within **7 days**. Fixes ship as a signed release;
 - Attacks that need control of the user's GitHub account or computer
 - A user deliberately turning off a protection in their own copy
 
-Known limits are listed in `system/rules/governance.md`.
+Known limits (where the hooks run, and the routes they don't cover) are described in `system/rules/governance.md`, in the paragraph on hooks under the non-negotiables.

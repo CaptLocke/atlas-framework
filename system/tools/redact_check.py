@@ -4,33 +4,39 @@
     python3 -I system/tools/redact_check.py <report.txt>
 
 Run by atlas-report-issue after redaction and before the user sees the draft.
-Standard library only. It flags, it never edits: each line of output names one
-leftover (line number, kind, the text found), and the exit code is 1 when there
-is anything to resolve, 0 when the report looks clean.
+Standard library only. It flags, it never edits: each output line names one
+leftover (line number, kind, the text found). Exit 1 when there is anything to
+resolve, 0 when the report looks clean, 2 when it couldn't check (no report,
+or no Atlas repo around this script).
 
 What it looks for:
-- email addresses and phone numbers (Atlas's support address is fine);
-- links, except to Atlas's own public repo;
+- email addresses, phone numbers, and IP addresses (Atlas's support address is fine);
+- links, with or without https://, except to Atlas's own public repo;
 - names, aliases and slugs of the user's people and organizations
-  (user/knowledge/_index/people.md, organizations.md), the user's own name, and
-  their employer's website and email domains (user/settings/atlas.yaml);
-- the user's repo owner/name (git remote origin).
-Placeholders such as [PERSON-1] or [EMAIL-1] are ignored. Common product names
-(Gmail, Slack, Google Drive...) are never flagged on their own.
+  (user/knowledge/_index/people.md, organizations.md, archive.md), the user's own
+  name, their employer's website and email domains (user/settings/atlas.yaml),
+  and the repo's owner/name. A first or last name on its own counts only when
+  capitalized, and never when it's a common English word.
+Placeholders such as [PERSON-1] are ignored, and common product names (Gmail,
+Slack, Google Drive...) are never flagged on their own.
 """
 import os
 import re
 import subprocess
 import sys
 
-UPSTREAM = "captlocke/atlas-framework"
-SUPPORT = "atlas.framework.support@gmail.com"
+REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 PRODUCTS = {"google", "gmail", "google calendar", "google drive", "microsoft", "outlook", "teams", "onedrive",
             "sharepoint", "slack", "notion", "zoom", "github", "anthropic", "claude", "atlas", "cowork",
             "dropbox", "salesforce", "hubspot", "asana", "jira", "linear", "box", "apple", "icloud"}
+COMMON = set("""will may mark grace page rose june april august bill bob art chase hope joy faith grant
+lane park hall king young green brown white black gray grey long short ward rich frank dean drew miles
+sky summer autumn winter spring dawn eve jean ray roy max ben sam pat chris kim lee rob ed al day
+none null daily brief week goals people records project projects commitments decisions risks""".split())
 EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
-PHONE = re.compile(r"(?<![\w-])\+?\d[\d ().-]{7,}\d(?![\w-])")
-URL = re.compile(r"\b(?:https?://|www\.)[^\s)\]>\"']+", re.I)
+PHONE = re.compile(r"(?<![\w.:-])(?:\+\d[\d ().-]{6,}\d|\(?\d{3}\)?[ .-]\d{3}[ .-]\d{4})(?![\w-])")
+IP = re.compile(r"(?<![\w.])\d{1,3}(?:\.\d{1,3}){3}(?![\w.])")
+URL = re.compile(r"\b(?:https?://[^\s)\]>\"']+|(?:[a-z0-9-]+\.)+[a-z]{2,}/[^\s)\]>\"']*)", re.I)
 PLACEHOLDER = re.compile(r"\[[A-Z]+(?:-\d+)?\]")
 
 
@@ -39,21 +45,39 @@ def _read(path):
         with open(path, encoding="utf-8") as f:
             return f.read()
     except OSError:
-        return ""
+        return None
 
 
-def terms(repo):
-    """{lowercased term: kind} to look for, from the user's indexes and settings."""
+def manifest_values(repo):
+    text = _read(os.path.join(repo, "system", "manifest.yaml")) or ""
+    up = re.search(r"^upstream:\s*[\"']?([^\s\"'#]+)", text, re.M)
+    mail = re.search(r"^support_email:\s*[\"']?([^\s\"'#]+)", text, re.M)
+    return ((up.group(1) if up else "CaptLocke/atlas-framework").lower(),
+            (mail.group(1) if mail else "atlas.framework.support@gmail.com").lower())
+
+
+def terms(repo, warnings):
+    """{term: (kind, whole)}: whole terms match in any case; name parts only capitalized."""
     found = {}
 
-    def add(term, kind):
-        t = re.sub(r"\s+", " ", str(term or "")).strip().strip("'\"").lower()
-        if len(t) >= 3 and t not in PRODUCTS and not EMAIL.fullmatch(t):
-            found.setdefault(t, kind)
+    def add(term, kind, part=False):
+        t = re.sub(r"\s+", " ", str(term or "")).strip().strip("'\"")
+        low = t.lower()
+        if len(low) < 3 or low in PRODUCTS or low in ("none", "-", "[]", "n/a") or EMAIL.fullmatch(t):
+            return
+        if part and (low in COMMON or not t[:1].isupper()):
+            return
+        key = t if part else low
+        found.setdefault(key, (kind, not part))
 
     idx = os.path.join(repo, "user", "knowledge", "_index")
-    for name, kind in (("people.md", "person"), ("organizations.md", "organization")):
-        for line in _read(os.path.join(idx, name)).splitlines():
+    for name, kind in (("people.md", "person"), ("organizations.md", "organization"), ("archive.md", "record")):
+        text = _read(os.path.join(idx, name))
+        if text is None:
+            if name != "archive.md":
+                warnings.append("%s not found; names from it weren't checked" % name)
+            continue
+        for line in text.splitlines():
             m = re.match(r"^- \[\[([^\]]+)\]\]\s*\|\s*([^|]+)\|(.*)$", line)
             if not m:
                 continue
@@ -65,14 +89,17 @@ def terms(repo):
                 add(a, kind)
             parts = title.split()
             if kind == "person" and len(parts) > 1:
-                add(parts[0], kind)   # first name on its own
-                add(parts[-1], kind)  # surname on its own
+                add(parts[0], kind, part=True)
+                add(parts[-1], kind, part=True)
     settings = _read(os.path.join(repo, "user", "settings", "atlas.yaml"))
+    if settings is None:
+        warnings.append("user/settings/atlas.yaml not found; the user's name and employer domains weren't checked")
+        settings = ""
     m = re.search(r"^user_display_name:\s*[\"']?([^\"'#\n]+)", settings, re.M)
     if m:
         add(m.group(1), "user's name")
         for p in m.group(1).split():
-            add(p, "user's name")
+            add(p, "user's name", part=True)
     for line in settings.splitlines():
         if re.match(r"^\s*(website|email_domains):", line):
             for d in re.findall(r"([a-z0-9-]+(?:\.[a-z0-9-]+)+)", line.split(":", 1)[1], re.I):
@@ -81,7 +108,7 @@ def terms(repo):
         url = subprocess.run(["git", "-C", repo, "remote", "get-url", "origin"], capture_output=True,
                              text=True, timeout=5).stdout.strip()
         slug = "/".join(re.split(r"[/:]", re.sub(r"\.git$", "", url))[-2:])
-        if slug.lower() != UPSTREAM:
+        if slug and slug.lower() != manifest_values(repo)[0]:
             add(slug, "repo")
             add(slug.split("/")[0], "repo owner")
     except (OSError, subprocess.SubprocessError):
@@ -89,28 +116,44 @@ def terms(repo):
     return found
 
 
-def check(text, found):
+def _is_upstream_link(link, upstream):
+    m = re.match(r"^(?:https?://)?([^/?#]+)(/[^?#]*)?", link, re.I)
+    return bool(m) and m.group(1).lower() in ("github.com", "www.github.com") and \
+        (m.group(2) or "").lower().startswith("/" + upstream)
+
+
+def check(text, found, upstream, support):
     flags = []
-    patterns = [(t, k, re.compile(r"(?<![\w-])%s(?![\w-])" % re.escape(t), re.I))
-                for t, k in sorted(found.items(), key=lambda x: -len(x[0]))]
+    whole = [t for t, (k, w) in found.items() if w]
+    parts = [t for t, (k, w) in found.items() if not w]
+    edge = r"(?<![A-Za-z0-9])(%s)(?![A-Za-z0-9])"
+    rx_whole = re.compile(edge % "|".join(map(re.escape, sorted(whole, key=len, reverse=True))), re.I) if whole else None
+    rx_part = re.compile(edge % "|".join(map(re.escape, sorted(parts, key=len, reverse=True)))) if parts else None
     for n, raw in enumerate(text.splitlines(), 1):
         line = PLACEHOLDER.sub(" ", raw)
         for m in EMAIL.finditer(line):
-            if m.group(0).lower() != SUPPORT:
+            if m.group(0).lower() != support:
                 flags.append((n, "email", m.group(0)))
-        for m in URL.finditer(line):
-            if UPSTREAM not in m.group(0).lower():
-                flags.append((n, "link", m.group(0).rstrip(".,;:")))
+        no_mail = EMAIL.sub(" ", line)
+        for m in URL.finditer(no_mail):
+            link = m.group(0).rstrip(".,;:")
+            if not _is_upstream_link(link, upstream):
+                flags.append((n, "link", link))
+        for m in IP.finditer(line):
+            flags.append((n, "IP address", m.group(0)))
         for m in PHONE.finditer(line):
-            if len(re.sub(r"\D", "", m.group(0))) >= 9 and not re.match(r"^\d{4}-\d{2}-\d{2}", m.group(0)):
-                flags.append((n, "phone number", m.group(0)))
+            flags.append((n, "phone number", m.group(0)))
         taken = []
-        for t, kind, rx in patterns:
+        for rx, ci in ((rx_whole, True), (rx_part, False)):
+            if not rx:
+                continue
             for m in rx.finditer(line):
                 if any(a <= m.start() < b for a, b in taken):
                     continue
                 taken.append((m.start(), m.end()))
-                flags.append((n, kind, m.group(0)))
+                key = m.group(1).lower() if ci else m.group(1)
+                kind = found.get(key, ("name", True))[0]
+                flags.append((n, kind, m.group(1)))
     return flags
 
 
@@ -119,8 +162,17 @@ def main(argv):
         print(__doc__, file=sys.stderr)
         return 2
     text = _read(argv[1])
-    repo = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
-    flags = check(text, terms(repo))
+    if text is None:
+        print("can't read %s; nothing was checked" % argv[1], file=sys.stderr)
+        return 2
+    if not os.path.isfile(os.path.join(REPO, "system", "manifest.yaml")):
+        print("no Atlas repo around %s; nothing was checked" % __file__, file=sys.stderr)
+        return 2
+    warnings = []
+    upstream, support = manifest_values(REPO)
+    flags = check(text, terms(REPO, warnings), upstream, support)
+    for w in warnings:
+        print("warning: " + w)
     for n, kind, found in flags:
         print("line %d: %s: %s" % (n, kind, found))
     if not flags:

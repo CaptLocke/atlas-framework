@@ -12,6 +12,8 @@ page size in KB; exit 1 with a message on any problem
 (system/dashboards/README.md, "How a page is rendered").
 """
 import json
+import os
+import re
 import sys
 
 DATA_PH = "{{ATLAS_DATA}}"
@@ -21,7 +23,7 @@ ESCAPES = (("<", "\\u003c"), (">", "\\u003e"), ("&", "\\u0026"), (" ", "\\u202
 
 def safe_json(data):
     """JSON that can sit inside <script type="application/json"> safely."""
-    text = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
+    text = json.dumps(data, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
     for ch, esc in ESCAPES:
         text = text.replace(ch, esc)
     return text
@@ -37,8 +39,9 @@ def inject(template, data, theme_css=""):
         raise ValueError("template must contain exactly one %s" % DATA_PH)
     if template.count(THEME_PH) != 1:
         raise ValueError("template must contain exactly one %s" % THEME_PH)
-    page = template.replace(DATA_PH, safe_json(data))
-    return page.replace(THEME_PH, safe_css(theme_css))
+    # one pass, so a placeholder string inside the data is never substituted again
+    parts = {DATA_PH: safe_json(data), THEME_PH: safe_css(theme_css)}
+    return re.sub(re.escape(DATA_PH) + "|" + re.escape(THEME_PH), lambda m: parts[m.group(0)], template)
 
 
 def main(argv):
@@ -56,9 +59,11 @@ def main(argv):
             with open(theme_path, encoding="utf-8") as f:
                 theme = f.read()
         page = inject(template, data, theme)
-        with open(out_path, "w", encoding="utf-8") as f:
+        tmp = out_path + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
             f.write(page)
-    except (OSError, ValueError) as e:
+        os.replace(tmp, out_path)
+    except (OSError, ValueError, UnicodeError) as e:
         print("render failed: %s" % e, file=sys.stderr)
         return 1
     print("%s: %.1f KB" % (out_path, len(page.encode("utf-8")) / 1024))
