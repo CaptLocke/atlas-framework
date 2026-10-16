@@ -136,6 +136,7 @@ connectors:
     link_format: "https://outlook.office.com/mail/id/{id}"
     limits: "50 items per page"
     available_in_routines: true        # true | false | unknown; routines record evidence in .state/health.yaml (routine_availability), applied here in the next chat
+    own_storage: true                  # optional: the user's own file storage (their drive); default true for a `files` connector, false otherwise. Export, import and upload tools on any other connector count as sharing
     covered: { mail: full, calendar: full }   # optional: full | partial per category (partial = some † operations missing)
     mapped_on: 2026-10-12
     tool_fingerprint: 3f9a…            # hash of the tool list; health check re-maps when it changes

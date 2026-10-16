@@ -1,5 +1,7 @@
 # Atlas: transient, single-use files (approval records, locks). Never committed.
 .atlas-tmp/
+# Marks the maintainer's own copy of the upstream repo (hooks bypass only with it). Never committed.
+.atlas-maintainer
 # OS and editor clutter
 .DS_Store
 Thumbs.db
