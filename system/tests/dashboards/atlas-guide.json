@@ -1,0 +1,59 @@
+{
+  "meta": {
+    "dashboard": "atlas-guide",
+    "headline": "Talk to Atlas the way you would to a capable assistant who has read all your notes.",
+    "schema_version": 1,
+    "title": "Atlas Guide",
+    "generated_at": "2026-10-11T03:19:40-07:00",
+    "generated_by": "routine:upkeep",
+    "as_of": "2026-10-11",
+    "timezone": "America/Los_Angeles",
+    "locale": "en-US",
+    "user_display_name": "Maya Chen",
+    "atlas_version": "1.0.0",
+    "nav": [{"name": "daily-brief", "title": "Daily Brief", "url": "https://claude.ai/artifact/example-daily-brief"}, {"name": "commitments", "title": "Commitments", "url": "https://claude.ai/artifact/example-commitments"}, {"name": "projects", "title": "Projects", "url": "https://claude.ai/artifact/example-projects"}, {"name": "week-ahead", "title": "Week Ahead", "url": "https://claude.ai/artifact/example-week-ahead"}, {"name": "goals", "title": "Goals", "url": "https://claude.ai/artifact/example-goals"}, {"name": "people", "title": "People", "url": "https://claude.ai/artifact/example-people"}, {"name": "decisions-risks", "title": "Decisions & Risks", "url": "https://claude.ai/artifact/example-decisions-risks"}, {"name": "records", "title": "Records", "url": "https://claude.ai/artifact/example-records"}, {"name": "about-you", "title": "About You", "url": "https://claude.ai/artifact/example-about-you"}, {"name": "control-center", "title": "Control Center", "url": "https://claude.ai/artifact/example-control-center"}, {"name": "atlas-guide", "title": "Atlas Guide", "url": "https://claude.ai/artifact/example-atlas-guide"}],
+    "notices": [],
+    "truncated": {}
+  },
+  "version": "1.0.0",
+  "intro": "Talk to Atlas in your Atlas project the way you would to a capable assistant who has read all your notes. You never need to manage files or settings; just ask.",
+  "whats_new": [
+    { "version": "1.0.0", "date": "2026-10-12", "items": ["First public release of Atlas.", "Nine pages that keep themselves up to date, including this guide.", "Three automation profiles matched to your Claude plan."] },
+    { "version": "0.9.0", "date": "2026-09-28", "items": ["Preview release for early testers."] }
+  ],
+  "sections": [
+    {
+      "id": "features", "title": "What Atlas does", "source": "system/guide/features.md",
+      "intro": "Atlas remembers your work, keeps it organized, and moves it forward, without you asking each time.",
+      "items": [
+        { "id": "daily-brief", "title": "Daily Brief", "body": ["Every morning: today's meetings with prep notes, what's due or slipping, what changed overnight, who you're waiting on, and your top priorities."], "bullets": [], "steps": [], "examples": ["What's on today?", "Catch me up", "What changed since yesterday?"] },
+        { "id": "recall", "title": "Remembers everything you've told it", "body": ["Ask about any decision, promise, person, or project. Atlas answers with where the information came from."], "bullets": [], "steps": [], "examples": ["What did we decide about enterprise pricing, and why?", "What have I promised Jordan this month?"] },
+        { "id": "drafts", "title": "Writes in your voice", "body": ["Emails, documents, decks, and status updates, grounded in what Atlas knows and written the way you write. Atlas never sends anything without your OK."], "bullets": [], "steps": [], "examples": ["Draft my pricing feedback for Jordan", "Turn this week's progress into a status update"] }
+      ]
+    },
+    {
+      "id": "automations", "title": "What runs on its own", "source": "system/guide/automations.md",
+      "intro": "Automations run on a schedule that fits your Claude plan. See them in the Control Center.",
+      "items": [
+        { "id": "ingest", "title": "Bring in new information", "body": ["Reads new email, meetings, messages, and files you drop in Atlas Drop, and files what matters."], "bullets": [], "steps": [], "examples": [] },
+        { "id": "email-drafts", "title": "Draft emails", "body": ["Drafts replies and follow-ups and leaves them in your drafts folder. Sending is always up to you."], "bullets": [], "steps": [], "examples": ["Stop drafting follow-ups on weekends"] }
+      ]
+    },
+    {
+      "id": "controls", "title": "You're in control", "source": "system/guide/controls.md",
+      "intro": null,
+      "items": [
+        { "id": "pause", "title": "Pause or reschedule anything", "body": ["Every automation can be paused, moved, or switched off in plain language."], "bullets": [], "steps": [], "examples": ["Pause the weekly review while I'm on vacation", "Move my brief to 6 AM"] },
+        { "id": "forget", "title": "Forget something", "body": ["Atlas can forget a record and stop collecting it. It always confirms first, and explains what stays in history."], "bullets": [], "steps": [], "examples": ["Forget everything about the Harbor side project"] }
+      ]
+    },
+    {
+      "id": "troubleshooting", "title": "If something looks wrong", "source": "system/guide/troubleshooting.md",
+      "intro": "Most problems are a connection that needs signing in again.",
+      "items": [
+        { "id": "reconnect", "title": "A connection expired", "body": ["The Control Center shows which tool needs attention."], "bullets": [], "steps": ["In Claude, open Settings, then Connectors.", "Find the tool marked as disconnected and choose Connect.", "Come back to your Atlas project and say \"I reconnected Outlook\"."], "examples": [] },
+        { "id": "stale-brief", "title": "My brief looks out of date", "body": ["If the nightly run was skipped, Atlas catches up the first time you open a chat. You can also ask directly."], "bullets": [], "steps": [], "examples": ["Refresh my brief", "Why didn't last night's run work?"] }
+      ]
+    }
+  ]
+}

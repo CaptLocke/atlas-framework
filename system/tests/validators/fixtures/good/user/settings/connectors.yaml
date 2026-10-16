@@ -1,0 +1,23 @@
+connectors:
+  - connector: outlook
+    mcp_prefix: mcp__outlook__
+    categories: [mail, calendar]
+    operations:
+      mail.list_recent: { tool: list_messages, since_param: receivedDateTime }
+      mail.read_item: { tool: get_message }
+      mail.create_draft: { tool: create_draft }
+      mail.send: { tool: send_message }
+      calendar.list_range: { tool: list_events, range_params: [start, end] }
+    tool_risk:
+      list_messages: read
+      get_message: read
+      create_draft: draft
+      send_message: send
+      delete_message: delete
+      list_events: read
+    id_format: "opaque string"
+    link_format: "https://outlook.office.com/mail/id/{id}"
+    limits: "50 items per page"
+    available_in_routines: unknown
+    mapped_on: 2026-10-12
+    tool_fingerprint: 3f9a

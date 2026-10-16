@@ -1,0 +1,11 @@
+autonomy:
+  read: auto
+  records_write: sometimes
+  send_communication: auto
+  financial_legal_security: approve
+  teleport: auto
+overrides:
+  - scope: "organizations/acme"
+    destructive: auto
+  - scope: "everything"
+    records_write: propose

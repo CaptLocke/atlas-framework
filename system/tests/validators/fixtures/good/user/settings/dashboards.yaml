@@ -1,0 +1,15 @@
+# Dashboard URLs. Copied to user/settings/dashboards.yaml by atlas-setup; filled at step 11.
+# Format: system/schemas/settings.md.
+dashboards:
+  daily-brief: { url: null, last_published: null }
+  commitments: { url: null, last_published: null }
+  projects: { url: null, last_published: null }
+  goals: { url: null, last_published: null }
+  week-ahead: { url: null, last_published: null }
+  people: { url: null, last_published: null }
+  decisions-risks: { url: null, last_published: null }
+  control-center: { url: null, last_published: null }
+  about-you: { url: null, last_published: null }
+  atlas-guide: { url: null, last_published: null }
+  records: { url: null, last_published: null }
+project_pages: {}                # project ID -> url, created on request
