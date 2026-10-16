@@ -39,27 +39,8 @@ BLOCKS = {  # inlined canonical files: (opening tag, closing tag, source file)
 }
 
 
-def safe_json(data):
-    """JSON that can sit inside <script type="application/json"> safely."""
-    text = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
-    for ch, esc in (("<", "\\u003c"), (">", "\\u003e"), ("&", "\\u0026"),
-                    (" ", "\\u2028"), (" ", "\\u2029")):
-        text = text.replace(ch, esc)
-    return text
-
-
-def safe_css(css):
-    """Theme CSS may only contain declarations; never let it close the style element."""
-    return re.sub(r"<\s*/", "", css or "")
-
-
-def inject(template, data, theme_css=""):
-    if template.count(DATA_PH) != 1:
-        raise ValueError("template must contain exactly one %s" % DATA_PH)
-    if template.count(THEME_PH) != 1:
-        raise ValueError("template must contain exactly one %s" % THEME_PH)
-    page = template.replace(DATA_PH, safe_json(data))
-    return page.replace(THEME_PH, safe_css(theme_css))
+sys.path.insert(0, str(HERE.parent.parent / "tools"))
+from render import safe_json, safe_css, inject  # noqa: E402  (the shipped renderer)
 
 
 def block_span(text, opening, closing):
@@ -142,6 +123,8 @@ def check_template(name, text):
         problems.append("theme placeholder is not in <style id=\"atlas-theme\">")
     if re.search(r"https?://(?!www\.w3\.org/2000/svg)", text):
         problems.append("template references an external URL")
+    if "Content-Security-Policy" not in text or "connect-src 'none'" not in text:
+        problems.append("template is missing the content security policy meta tag")
     if "innerHTML" in text:
         problems.append("template uses innerHTML (render untrusted text with textContent)")
     return problems
