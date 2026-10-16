@@ -53,6 +53,8 @@ Each release's "What's new" section is shown to users in the Atlas Guide and the
 - Playbooks: a process stated in a source, by the user or someone they work with, is created `active`; only a playbook Atlas infers from recurring work starts as `draft`.
 - Daily Brief: "Questions from Atlas" shows questions raised since the last brief first, then the oldest, each linked to its record or source; the template's example lines now carry links.
 - Insights link every record they name or put at risk (the risk, each affected project, the goal) and name the dates at stake.
+- Provenance: a record whose key field (role, owner, date) is inferred rather than stated in a source is `inferred`, with the inference explained in its body.
+- Insights: a risk that only appears when facts from different sources are combined gets its own insight naming both facts.
 - Topics: created when a theme recurs across three or more records from at least two sources, linking those records.
 - Daily Brief "Waiting on": open `waiting_on` items overdue or due within 7 days (soonest first), plus anything waiting 7+ days without a date, instead of aging items only.
 - Routine run reports: counts checked before committing; the run report commit carries any activity-log lines not yet written, and needs none of its own.
