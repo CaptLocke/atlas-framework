@@ -10,7 +10,8 @@ which would let the call through.
 Decision:
 1. Upstream product repo (origin = system/manifest.yaml upstream, default
    CaptLocke/atlas-framework): allow (maintainers develop Atlas here).
-2. Routine (ATLAS_CONTEXT=routine, case-insensitive): block.
+2. Routine (ATLAS_CONTEXT=routine, case-insensitive, or a session marked by
+   routine_mark.py in .atlas-tmp/routine-sessions/): block.
 3. Chat (anything else, including missing): allow only clearly harmless calls (MCP tools whose names start with a
    read verb and contain no risky word; file writes under user/ outside the
    governance files; shell commands with no risky word). Block everything else.
@@ -53,9 +54,22 @@ def _upstream(proj):
     try:
         r = subprocess.run(["git", "-C", proj, "remote", "get-url", "origin"], capture_output=True,
                            text=True, timeout=3)
-        return r.returncode == 0 and _slug(r.stdout) == _slug(up)
+        # same rule as context.is_upstream: only the maintainer's marked copy bypasses
+        return r.returncode == 0 and _slug(r.stdout) == _slug(up) and \
+            os.path.isfile(os.path.join(proj, ".atlas-maintainer"))
     except Exception:
         return False
+
+
+def _routine(payload, proj):
+    if os.environ.get("ATLAS_CONTEXT", "").strip().lower() == "routine":
+        return True
+    sid = payload.get("session_id")
+    if not isinstance(sid, str) or not sid:
+        return False
+    import hashlib
+    name = hashlib.sha256(sid.encode("utf-8", "replace")).hexdigest()[:24]
+    return os.path.exists(os.path.join(proj, ".atlas-tmp", "routine-sessions", name))
 
 
 def _harmless(payload, proj):
@@ -96,7 +110,7 @@ def fail_safe(hook, exc, raw=None):
         if _upstream(proj):
             os._exit(0)
         detail = "%s: %s" % (type(exc).__name__, exc)
-        routine = os.environ.get("ATLAS_CONTEXT", "").strip().lower() == "routine"
+        routine = _routine(payload, proj)
         if not routine and _harmless(payload, proj):
             sys.stderr.write("Atlas guard (%s) warning: hook failed (%s); allowed because this is a chat and "
                              "the call looks harmless. Record a known issue for atlas-health.\n" % (hook, detail))

@@ -34,7 +34,7 @@ A failed smoke-test item creates a known issue with a fix; if the fix is outside
 
 ## Audits
 1. **Locked actions approved.** For the period, find activity-log lines whose action is a locked class (`send_communication`, `share_expose`, `destructive`, `governance_settings`). Each must: say `(approved)`, have actor `chat` (or `setup` during setup), and match an `approvals.md` entry or a chat commit whose `Atlas-Reason` quotes or references the user's confirmation. Any miss → high issue, told to the user.
-2. **No locked action in routines.** No activity line or commit with actor `routine:*` performs a locked class; no routine commit changes `governance.yaml`, `data-rules.yaml`, or `connectors.yaml`. Look hardest at runs flagged `routine-env-missing`: the hooks didn't treat them as routines.
+2. **No locked action in routines.** No activity line or commit with actor `routine:*` performs a locked class; no routine commit changes `governance.yaml`, `data-rules.yaml`, or `connectors.yaml`. Look hardest at runs flagged `routine-env-missing` from before 1.0.2: until then the hooks didn't treat them as routines.
 3. **Governance files only in chat.** `git log --format='%H %(trailers:key=Atlas-Actor,valueonly)' -- user/settings/governance.yaml user/settings/data-rules.yaml user/settings/connectors.yaml` shows only `chat` (or `setup`).
 4. **Trailers present.** Commits in the period all carry `Atlas-Actor` and `Atlas-Reason` (N12).
 5. **Data rules (N11), sampling.** Pick up to 10 recent sources; check excluded senders/channels/series don't appear, and `pointer`/`summary` handling matches categories. Fix over-stored content by reducing it to the allowed handling (a records change, logged), and tell the user.

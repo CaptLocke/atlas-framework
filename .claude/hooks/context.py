@@ -19,12 +19,18 @@ https://code.claude.com/docs/en/tools-reference, checked 2026-10-12):
 
 Policy (system/rules/governance.md):
 - Routines are identified by a marker: ATLAS_CONTEXT=routine (case-insensitive,
-  trimmed) means routine; anything else (missing, empty, "chat", other
-  values) means chat. Rationale: Claude Code routines run in cloud
-  environments that can set the variable reliably, while the chat surfaces
-  users work in (Cowork / desktop Project chats) can't. Chats are still
-  guarded: every locked action needs a single-use approval record, so
-  "unknown = chat" never lets a locked action through unconfirmed.
+  trimmed) means routine. A session whose first prompt was an Atlas routine
+  prompt ("Run the Atlas routine ...") is a routine too, even without the
+  variable: routine_mark.py (UserPromptSubmit) records it in
+  .atlas-tmp/routine-sessions/, which no tool may write or delete. Anything
+  else means chat. Rationale: Claude Code routines run in cloud environments
+  that can set the variable, while the chat surfaces users work in (Cowork /
+  desktop Project chats) can't; the session marker covers a routine attached
+  to the wrong environment. Chats are still guarded: every locked action
+  needs a single-use approval record.
+- In routines the update lock counts only for a signed release at or above
+  the installed version (update_lock): a lock file alone proves nothing,
+  because the session that wrote it may be following injected content.
 - Every hook is a no-op in the upstream product repo: origin points to
   system/manifest.yaml: upstream (DEFAULT_UPSTREAM when the manifest is
   missing). A missing manifest does NOT switch the hooks off; owned paths
@@ -44,6 +50,13 @@ MAINTAINER_MARKER = ".atlas-maintainer"
 APPROVAL = ".atlas-tmp/approval.json"
 UPDATE_LOCK = ".atlas-tmp/update.lock"
 PURGE_LOCK = ".atlas-tmp/purge.lock"
+ROUTINE_SESSIONS = ".atlas-tmp/routine-sessions"
+# Files Claude Code (or git) loads as instructions, servers or hooks when found
+# in the repo. Atlas never writes them (H3); the root CLAUDE.md is owned anyway.
+AUTOLOAD_NAMES = {"claude.md", "claude.local.md", "agents.md", ".mcp.json", ".gitattributes", ".gitmodules"}
+AUTOLOAD_DIRS = {".claude", ".githooks", ".husky"}
+# Places outside the repo a routine may write (M4): temp files and the null device.
+OUTSIDE_WRITE_OK = ("/tmp/", "/var/tmp/", "/dev/null", "/dev/stdout", "/dev/stderr", "/dev/fd/")
 GOVERNANCE_FILES = (
     "user/settings/governance.yaml",
     "user/settings/data-rules.yaml",
@@ -95,10 +108,23 @@ def allow(warning=None):
 
 
 # --------------------------------------------------------------- context
-def atlas_context():
-    """'routine' only when ATLAS_CONTEXT is 'routine' (case-insensitive,
-    trimmed); otherwise 'chat' (routines carry the marker, chats can't)."""
-    return "routine" if os.environ.get("ATLAS_CONTEXT", "").strip().lower() == "routine" else "chat"
+def atlas_context(payload=None, proj=None):
+    """'routine' when ATLAS_CONTEXT is 'routine' (case-insensitive, trimmed) or
+    this session started with an Atlas routine prompt; otherwise 'chat'."""
+    if os.environ.get("ATLAS_CONTEXT", "").strip().lower() == "routine":
+        return "routine"
+    if proj and os.path.exists(routine_mark_path(proj, (payload or {}).get("session_id"))):
+        return "routine"
+    return "chat"
+
+
+def routine_mark_path(proj, session_id):
+    """Marker file for a session that began with a routine prompt ('' when there's no session id)."""
+    if not isinstance(session_id, str) or not session_id:
+        return ""
+    import hashlib
+    name = hashlib.sha256(session_id.encode("utf-8", "replace")).hexdigest()[:24]
+    return os.path.join(proj, ROUTINE_SESSIONS, name)
 
 
 def project_dir(payload):
@@ -180,12 +206,16 @@ def origin_slug(proj):
 # --------------------------------------------------------------- yaml
 def load_yaml(path, proj):
     """safe_load a YAML file with the vendored PyYAML (system/tools/vendor)."""
+    with open(path, encoding="utf-8") as f:
+        return load_yaml_text(f.read(), proj)
+
+
+def load_yaml_text(text, proj):
     vendor = os.path.join(proj, "system", "tools", "vendor")
     if os.path.isdir(vendor) and vendor not in sys.path:
         sys.path.insert(0, vendor)
     import yaml  # noqa: E402  (vendored, falls back to an installed PyYAML)
-    with open(path, encoding="utf-8") as f:
-        return yaml.safe_load(f)
+    return yaml.safe_load(text)
 
 
 def owned_paths(proj):
@@ -223,6 +253,87 @@ def in_history(proj, ref):
         return False
     rc, _ = _git(proj, ["merge-base", "--is-ancestor", sha.strip(), "HEAD"], timeout=5)
     return rc == 0
+
+
+def release_verified(proj, full_ref):
+    """True when refs/atlas-upstream/v<x> is a tag signed by a release key
+    (system/tools/release_check.py; fails closed when it can't run)."""
+    if not full_ref.startswith("refs/atlas-upstream/"):
+        return False
+    key = ("verified", proj, full_ref)
+    if key not in _CACHE:
+        tool = os.path.join(proj, "system", "tools", "release_check.py")
+        name = full_ref[len("refs/atlas-upstream/"):]
+        try:
+            r = subprocess.run([sys.executable, "-I", tool, "verify", full_ref, name], cwd=proj,
+                               capture_output=True, timeout=30, stdin=subprocess.DEVNULL)
+            _CACHE[key] = r.returncode == 0
+        except (OSError, subprocess.SubprocessError):
+            _CACHE[key] = False
+    return _CACHE[key]
+
+
+def version_tuple(text):
+    m = re.match(r"^v?(\d+)\.(\d+)\.(\d+)$", str(text or "").strip())
+    return tuple(int(x) for x in m.groups()) if m else None
+
+
+def installed_version(proj):
+    """Version committed at HEAD (system/VERSION); (0, 0, 0) when there is none."""
+    rc, out = _git(proj, ["show", "HEAD:system/VERSION"], timeout=5)
+    return version_tuple(out) if rc == 0 and version_tuple(out) else (0, 0, 0)
+
+
+def update_lock(proj, ctx):
+    """(ok, reason, release_ref). In a chat: a valid, unexpired lock (release_ref
+    None). In a routine the lock must also name `version_to`, whose release ref
+    refs/atlas-upstream/v<version_to> is fetched and signed by a release key,
+    at or above the installed version (routines never downgrade)."""
+    ok, why = valid_lock(proj, "update")
+    if not ok or ctx == "chat":
+        return ok, why, None
+    data, _ = read_record(proj, UPDATE_LOCK)
+    to = version_tuple(data.get("version_to"))
+    if to is None:
+        return False, "%s has no valid version_to" % UPDATE_LOCK, None
+    ref = "refs/atlas-upstream/v%d.%d.%d" % to
+    if not release_verified(proj, ref):
+        return False, "%s isn't a fetched release signed by Atlas's maker" % ref, None
+    if to < installed_version(proj):
+        return False, "a routine never installs an older version than the one installed", None
+    return True, "", ref
+
+
+def in_tree(proj, ref, rel):
+    """True when path 'rel' (file or folder; '' = root) exists in commit 'ref'."""
+    rc, _ = _git(proj, ["cat-file", "-e", "%s:%s" % (ref, rel)], timeout=5)
+    return rc == 0
+
+
+def outside_write_ok(path):
+    """May a routine write or delete this absolute path outside the repo? Only temp
+    folders' contents and the standard streams (M4)."""
+    import tempfile
+    raw = os.path.normpath(path)
+    if raw in ("/dev/null", "/dev/stdout", "/dev/stderr", "/dev/tty") or raw.startswith(("/dev/fd/",
+                                                                                          "/proc/self/fd/")):
+        return True
+    real = os.path.realpath(path)
+    for root in ("/tmp", "/var/tmp", tempfile.gettempdir()):
+        r = os.path.realpath(root)
+        if r not in ("/", "") and real.startswith(r + "/"):
+            return True
+    return False
+
+
+def autoload_path(rel):
+    """True for a repo path Claude Code or git would load as instructions, a server or a hook (H3).
+    The owned .claude/ and root CLAUDE.md are left to the owned-path check."""
+    r = rel.rstrip("/")
+    if not r or r == ".claude" or r.startswith(".claude/") or r == "CLAUDE.md":
+        return False
+    parts = r.lower().split("/")
+    return parts[-1] in AUTOLOAD_NAMES or any(p in AUTOLOAD_DIRS for p in parts)
 
 
 def full_ref_name(proj, ref):
@@ -418,6 +529,10 @@ def run(hook_name, handler):
         input_error = None
 
     proj = project_dir(payload)
+    try:
+        STATE.context = atlas_context(payload, proj)
+    except Exception:
+        STATE.context = "routine"  # can't tell: the stricter rules
     try:
         if is_upstream(proj):
             sys.exit(0)

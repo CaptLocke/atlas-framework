@@ -14,7 +14,14 @@ Chat only; the user's request plus a one-line confirmation is enough (`updates_m
 5. **Reverse migrations first (newest to oldest)**, while the newer migration specs are still present: for each migration applied since `<X>` (ids between X's `data_version` and the current one):
    - `additive: true` → nothing to do (older versions ignore new fields). Leave `data_version` unchanged.
    - `additive: false` → run its **Reverse step**, validate, then set `atlas.yaml: data_version` to its `from_data_version`. If a non-additive migration has no reverse step, stop: release the lock, tell the user rollback isn't safe for this release, and offer `atlas-report-issue`.
-6. **Restore owned paths** from `pre-update-<X>` exactly (add, change, remove), as in `procedure.md` "Forward revert", in one commit (`Atlas-Actor: update`, reason "user rollback to X").
+6. **Restore owned paths** from `pre-update-<X>` exactly (add, change, remove), in one commit (`Atlas-Actor: update`, reason "user rollback to X"). Use both lists of owned paths (the installed release's and X's). For each path P, one command per line, with the tag written out:
+   ```bash
+   git ls-files -- P | sort > /tmp/now.txt
+   git ls-tree -r --name-only pre-update-1.0.0 -- P | sort > /tmp/old.txt
+   comm -23 /tmp/now.txt /tmp/old.txt > /tmp/gone.txt
+   git rm -q --pathspec-from-file=/tmp/gone.txt      # skip if /tmp/gone.txt is empty
+   git checkout pre-update-1.0.0 -- P                # skip if P doesn't exist there
+   ```
 7. Set `atlas.yaml: installed_version: <X>`. If `data_version` is still higher than X's manifest (additive migrations kept), that is expected; note it in `health.yaml` known issues (severity `low`, status `open` until the next update) so validators and later updates know.
 8. Validate, release the lock, push, log (`update · rolled back 1.1.0 → 1.0.0 at user request · commit <sha>`), republish Atlas Guide and Control Center.
 9. Ask whether to stay on X (pause automatic update checks) or let the next check reinstall the newer version.
