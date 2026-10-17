@@ -439,9 +439,10 @@ class SeededSystemErrors(TempRepo):
         self.replace("CHANGELOG.md", "### Under the hood", "### Notes")
         r = self.system_errors()
         self.assertError(r, "CHANGELOG.md", "unknown heading '### Notes'")
-        self.write("system/VERSION", "1.0.1\n")
-        self.replace("system/manifest.yaml", "version: 1.0.0", "version: 1.0.1")
-        self.assertError(self.system_errors(), "CHANGELOG.md", "no '## 1.0.1' section")
+        current = open(self.path("system/VERSION")).read().strip()
+        self.write("system/VERSION", "9.8.7\n")
+        self.replace("system/manifest.yaml", "version: %s" % current, "version: 9.8.7")
+        self.assertError(self.system_errors(), "CHANGELOG.md", "no '## 9.8.7' section")
 
     def test_owned_path_missing(self):
         os.remove(self.path("CHANGELOG.md"))
