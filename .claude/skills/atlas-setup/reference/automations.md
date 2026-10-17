@@ -68,10 +68,7 @@ For each routine in `routines.yaml`:
 | Model | `system/manifest.yaml: models.<role>` for the routine's `model` role; if a routine mixes fast and strongest jobs, strongest |
 | Schedule | The cron from `routines.yaml`, in the user's time zone |
 
-The prompt (exact, with the name filled in):
-```
-Run the Atlas routine `nightly-cycle`. First run `echo $ATLAS_CONTEXT`: if it doesn't print `routine`, add a high-severity known issue `routine-env-missing` naming this routine to user/.state/health.yaml, commit and push it, and do nothing else. Otherwise read `timezone` in user/settings/atlas.yaml and run `TZ=<timezone> date`; use that as the current date and time for this whole run and ignore the session's stated date. Then look up the routine in user/settings/routines.yaml and run its jobs in order. Push all changes directly to main.
-```
+The prompt: exactly the routine prompt in `system/jobs/README.md` §Routine prompt, with the routine's name filled in.
 
 If this session can create routines (a routine or scheduled-task tool), create each, then save its ID as `routine_id` and commit. Check the result shows the right repo, environment, and model.
 
@@ -88,7 +85,7 @@ Connectors:  Gmail, Google Calendar, Google Drive   (turn off any others)
 Branches:    allow pushing to main (if you see this option)
 
 Instructions (copy exactly):
-Run the Atlas routine `nightly-cycle`. First run `echo $ATLAS_CONTEXT`: if it doesn't print `routine`, add a high-severity known issue `routine-env-missing` naming this routine to user/.state/health.yaml, commit and push it, and do nothing else. Otherwise read `timezone` in user/settings/atlas.yaml and run `TZ=<timezone> date`; use that as the current date and time for this whole run and ignore the session's stated date. Then look up the routine in user/settings/routines.yaml and run its jobs in order. Push all changes directly to main.
+<the routine prompt from system/jobs/README.md, with this routine's name filled in>
 ```
 Translate cron to plain words for the user ("Every Friday at 2:07 PM", "Weekdays every hour from 9:07 AM to 4:07 PM"). Values in the example are fictional; fill in the user's. When the user says it's done, set `routine_id: "manual:<routine name>"` (so health checks know it exists but can't be edited from chat) and commit.
 

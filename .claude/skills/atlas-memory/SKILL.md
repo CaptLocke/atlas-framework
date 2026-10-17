@@ -26,19 +26,19 @@ The user owns their knowledge. Every record can be viewed, corrected, superseded
 ### A. Correct a fact
 1. Find every record stating the wrong fact (the main record and linked records that repeated it; text-search the value).
 2. Update each: new value in the field/body, `updated`, Updates line "Corrected by user: was X, now Y" with `provenance: stated` for the corrected fact. If the whole record is wrong (wrong person merged, wrong project), split or supersede: new record with `supersedes`, old with `superseded_by`; move links that belong to the new one.
-3. Update indexes; commit (`Atlas-Reason: user correction`); log with the word "correction" (the monthly indicators count it). If the correction undoes triage (a commitment that was never a promise, something wrongly closed), also log the matching `feedback` line (`.claude/skills/atlas-triage/reference/learning.md` §1).
+3. Run `python3 -I system/tools/index.py`; commit (`Atlas-Reason: user correction`); log with the word "correction" (the monthly indicators count it). If the correction undoes triage (a commitment that was never a promise, something wrongly closed), also log the matching `feedback` line (`.claude/skills/atlas-triage/reference/learning.md` §1).
 4. Confirm in one line with links. If the wrong fact came from a source, note that in the source's Updates so it isn't re-learned.
 
 ### B. Archive / unarchive
-- Archive: `archived: true`, Updates line, move index lines from `_index/<type>.md` and `hot.md` to `archive.md`. `archive` class (normally auto). Linked records keep their links.
-- Unarchive: `archived: false`, restore index lines. Confirm in one line.
+- Archive: `archived: true`, Updates line, then run `python3 -I system/tools/index.py` (the record moves to `archive.md`). `archive` class (normally auto). Linked records keep their links.
+- Unarchive: `archived: false`, then run `python3 -I system/tools/index.py`. Confirm in one line.
 
 ### C. Forget (destructive, approval required)
 Rule: `system/rules/knowledge.md` § Forget.
-1. **Scope.** Resolve exactly what will be removed: the record(s); Sources whose only purpose was this subject (ask about mixed sources); library files; index lines. List mentions in other records' bodies that will be replaced with plain text.
+1. **Scope.** Resolve exactly what will be removed: the record(s); Sources whose only purpose was this subject (ask about mixed sources); library files. List mentions in other records' bodies that will be replaced with plain text.
 2. **Show the plan** in plain language: records to delete, links to unlink, the exclusion to add (`record: <id>`, plus a source exclusion such as `mail: from:…` if the user wants future capture stopped), and this disclosure: *"A copy will remain in Atlas's version history (that's what makes undo possible). If you want it gone from history too, I can permanently erase it."*
 3. **Get an explicit yes** in the user's words (`system/rules/governance.md` approval-record procedure). The same confirmation covers the plan shown, but write one approval record per call: one `destructive` record for the deletion, one `governance_settings` record for the `data-rules.yaml` exclusion (N6).
-4. **Execute:** remove links to the record from other records (replace with plain text where context matters; no ID); delete index lines; delete the files with a single `git rm` of the listed paths; add the exclusion lines to `data-rules.yaml`; commit (`Atlas-Reason: user asked to forget <type>`; record IDs in `Atlas-Records` only if they reveal nothing sensitive, otherwise "-"); push.
+4. **Execute:** remove links to the record from other records (replace with plain text where context matters; no ID); delete the files with a single `git rm` of the listed paths, then run `python3 -I system/tools/index.py`; add the exclusion lines to `data-rules.yaml`; commit (`Atlas-Reason: user asked to forget <type>`; record IDs in `Atlas-Records` only if they reveal nothing sensitive, otherwise "-"); push.
 5. **Log** without content: `destructive (approved) · forgot 3 records · commit …` and `governance_settings (approved) · added 1 exclusion`.
 6. **Tell the user** it's done, repeat the history disclosure in one line, and offer purge.
 
@@ -64,7 +64,7 @@ Convert stored content to pointers or summaries for the categories the user choo
 1. **Scope** by the import's id (`user/.state/import.yaml: id`, or an earlier one in its `previous` list): records whose every source is `kind: import` with that `import_id` are removed; records that existed before keep their content but lose the import sources and the `## Updates` lines citing them; the import sources themselves are removed. Profile changes the user confirmed stay (they were the user's own answers).
 2. **Show the plan** with counts by type, plus the history disclosure from §C.
 3. **Explicit yes** and one `destructive` approval record (`system/rules/governance.md`).
-4. **Execute** in batches with commits (`Atlas-Reason: undo import <id>`), update indexes, set `status: undone` in `import.yaml` (for the current import). The data-rule exclusion stays unless the user asks to remove it (a separate `governance_settings` change). The import folder is never touched, so a new import can run afterwards.
+4. **Execute** in batches with commits (`Atlas-Reason: undo import <id>`), run `python3 -I system/tools/index.py`, set `status: undone` in `import.yaml` (for the current import). The data-rule exclusion stays unless the user asks to remove it (a separate `governance_settings` change). The import folder is never touched, so a new import can run afterwards.
 
 ## Outputs
 - Updated, superseded, archived, or deleted records; updated indexes; `data-rules.yaml` exclusions/handling (confirmed).

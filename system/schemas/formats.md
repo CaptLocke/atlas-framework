@@ -228,7 +228,7 @@ Regenerable; never edited by hand.
 - `people-map.md`: `- [[people/dana-ruiz]] | Dana Ruiz | Acme (customer) | legal counsel | aliases`.
 - `archive.md`: archived records, same line format.
 
-`maintenance` rebuilds all indexes from the records; any session that writes records updates the affected lines.
+All of these are built by `system/tools/index.py` from the records, never written by hand: run `python3 -I system/tools/index.py` after writing records (it rewrites only the files that change), and `maintenance` runs it too. `--check` reports indexes that are out of date without changing them.
 
 ## 6. Journal (`user/journal/YYYY/MM/YYYY-MM-DD.md`)
 ```markdown

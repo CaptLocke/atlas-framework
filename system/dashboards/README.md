@@ -27,19 +27,19 @@ The `atlas-dashboards` skill owns rendering and publishing. This folder holds wh
 Any chat may also republish any dashboard after changing the records it shows (`dashboards_refresh: auto`). `atlas-setup` publishes all eleven for the first time. A dashboard added by an update is published at the user's next chat (`atlas-dashboards`, Publish).
 
 Shared files:
-- `_base.css`: canonical base styles. **Every template inlines it verbatim** inside `<style id="atlas-base">`.
-- `_base.js`: canonical runtime helpers (DOM builder, date formatting, record references, sections, filters, theme toggle). **Every template inlines it verbatim** inside `<script id="atlas-base-js">`.
-- After editing either file, sync every template with the maintainer tools (release checklist on the `maintainers` branch). Templates must never drift from the canonical copies.
+- `_base.css`: base styles. Templates hold `{{ATLAS_BASE_CSS}}` inside `<style id="atlas-base">`; `system/tools/render.py` fills it with this file when it builds a page.
+- `_base.js`: runtime helpers (DOM builder, date formatting, record references, sections, filters, theme toggle). Templates hold `{{ATLAS_BASE_JS}}` inside `<script id="atlas-base-js">`, filled the same way.
+- These are the only copies, so every page always uses the current base. Published pages stay self-contained: the base is inside each page, not loaded from anywhere.
 
 ## Template anatomy
 ```html
-<style id="atlas-base">…_base.css…</style>
+<style id="atlas-base">{{ATLAS_BASE_CSS}}</style>
 <style id="atlas-page">…page styles…</style>
 <style id="atlas-theme">{{ATLAS_THEME_CSS}}</style>
 …
 <div id="app"></div>
 <script id="atlas-data" type="application/json">{{ATLAS_DATA}}</script>
-<script id="atlas-base-js">…_base.js…</script>
+<script id="atlas-base-js">{{ATLAS_BASE_JS}}</script>
 <script id="atlas-page-js">…renders the page from the data…</script>
 ```
 Each template contains each placeholder **exactly once**. No other text is substituted.
@@ -163,7 +163,7 @@ Routines republish unattended only when an artifact is **private, page-only, and
 If a republish fails (artifact deleted, permission lost), the job records a known issue (`health.yaml`) and the next chat offers to publish a fresh page and update `dashboards.yaml`.
 
 ## User dashboards
-User dashboards live in `user/extensions/dashboards/` (registered in `registry.yaml`, kind `dashboard`) and follow the same pattern: a contract using the outline in `system/guide/authoring.md` and a template with the same placeholders. They may inline `_base.css`/`_base.js` to match. A user dashboard with `overrides: <name>` replaces the built-in one.
+User dashboards live in `user/extensions/dashboards/` (registered in `registry.yaml`, kind `dashboard`) and follow the same pattern: a contract using the outline in `system/guide/authoring.md` and a template with the same placeholders. They may use `{{ATLAS_BASE_CSS}}`/`{{ATLAS_BASE_JS}}` to match. A user dashboard with `overrides: <name>` replaces the built-in one.
 
 ## Testing
-The dashboard test suite lives on the upstream repo's `maintainers` branch, not here: one fictional fixture per contract and `render.py`, which injects each fixture, writes `out/<name>.html`, and checks: valid HTML structure, placeholders replaced, embedded JSON round-trips, required `meta` fields, data within budget, base files in sync, no external URLs, no `innerHTML`. `--shots` adds Playwright screenshots (desktop and phone, light and dark) and fails on horizontal overflow or console errors.
+The dashboard test suite lives on the upstream repo's `maintainers` branch, not here: one fictional fixture per contract and `render.py`, which injects each fixture, writes `out/<name>.html`, and checks: valid HTML structure, placeholders replaced, embedded JSON round-trips, required `meta` fields, data within budget, base placeholders present, no external URLs, no `innerHTML`. `--shots` adds Playwright screenshots (desktop and phone, light and dark) and fails on horizontal overflow or console errors.

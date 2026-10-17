@@ -1,8 +1,7 @@
 /* Atlas dashboard base styles.
-   CANONICAL COPY. Every template in system/dashboards/*.html inlines this file
-   verbatim inside <style id="atlas-base">. Edit this file, then run
-   `python3 system/tests/dashboards/render.py --sync` to copy it into the
-   templates, and `--check` to confirm they match.
+   THE ONLY COPY. Templates hold a placeholder in their base style element,
+   and system/tools/render.py puts this file there when it builds a
+   page, so every published page stays self-contained.
 
    Theming: atlas-dashboards fills <style id="atlas-theme"> with --brand-* values
    from user/profile/design-system.md. Nothing here sets --brand-*, so an empty

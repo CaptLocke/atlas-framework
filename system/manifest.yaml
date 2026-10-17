@@ -1,6 +1,6 @@
 # Atlas system manifest. System-owned; replaced on every update.
 name: Atlas
-version: 1.0.2            # must match system/VERSION
+version: 1.1.0            # must match system/VERSION
 data_version: 1           # user data format version this release expects (see system/migrations/)
 min_plan: pro             # minimum Claude plan
 support_email: atlas.framework.support@gmail.com # issue reports (atlas-report-issue)
@@ -19,6 +19,7 @@ owned_paths:
   - docs/
   - .claude/
   - system/
+  - .gitattributes   # last: updates replace paths in this order, and the new hooks must be in place first
 
 # Model roles. Routines are configured from these; an update can change them.
 models:

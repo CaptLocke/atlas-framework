@@ -24,7 +24,7 @@ Atlas maintains itself. Clear problems are fixed automatically and logged; ambig
 ## Procedure
 ### 1. Maintenance (fast, mechanical)
 0. **Routine environment:** run the "Routine environment" check from `reference/system-health.md` over the last 8 days of run reports (any routine run without `atlas_context: routine` → known issue `routine-env-missing` naming the routine).
-1. **Rebuild indexes** from records (`system/schemas/formats.md` §5): every `_index/<folder>.md` for system and registered user types, `hot.md`, `people-map.md`, `archive.md`.
+1. **Rebuild indexes:** run `python3 -I system/tools/index.py` (`system/schemas/formats.md` §5). It rebuilds every `_index/<folder>.md` for system and registered user types, `hot.md`, `people-map.md` and `archive.md`, and reports how many changed.
 2. **Repair links:** for each `[[id]]` that doesn't resolve, fix it when the target is clear (renamed alias, superseded → follow `superseded_by`, merged duplicate); otherwise leave it and list it for the user health check.
 3. **Obvious dedupes** per `system/rules/knowledge.md` (same email; same domain; same full name + same org): merge (`merge_supersede`) only clear cases; ambiguous → `user/inbox/questions.md`.
 4. **Sweep:** journal days with unprocessed sections (`processed` missing a section that has text) and files left in `user/inbox/drop/` → process with `atlas-capture` (or leave for `ingest` if it runs next in the same routine).
