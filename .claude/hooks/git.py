@@ -381,7 +381,10 @@ ROUTINE_SUBS = {"status", "diff", "log", "show", "ls-files", "ls-tree", "ls-remo
                 "blame", "cat-file", "merge-base", "branch", "remote", "config", "rebase", "reset", "stash",
                 "describe", "shortlog", "for-each-ref", "count-objects", "show-ref", "diff-tree", "name-rev",
                 "check-ignore", "revert", "update-ref", "merge", "version", "help", "reflog", "whatchanged"}
-ORIGIN_REF = re.compile(r"^(origin/[A-Za-z0-9._/-]+|refs/remotes/origin/[A-Za-z0-9._/-]+|@\{u\}|@\{upstream\})$")
+# origin's main only: other branches on origin could have been pushed by this same session
+ORIGIN_REF = re.compile(r"^(origin/main|refs/remotes/origin/main|origin/HEAD|@\{u\}|@\{upstream\})$")
+PUSH_REFSPEC = re.compile(r"^(HEAD|main|HEAD:main|HEAD:refs/heads/main|main:main|refs/heads/main|"
+                          r"(refs/tags/)?pre-update-[0-9][0-9A-Za-z.-]*)$")
 HEAD_REFS = ("HEAD", "@")
 RELEASE_REFSPEC = re.compile(r"^refs/tags/(v\d+\.\d+\.\d+(-[A-Za-z0-9.]+)?):refs/atlas-upstream/\1$")
 PULL_FLAGS = {"--rebase", "--rebase=true", "--no-rebase", "--ff-only", "--ff", "--autostash", "--no-autostash",
@@ -468,7 +471,11 @@ def routine_problem(sub, args, cwd, proj):
             return "git ls-remote %s" % flag
         return None  # the repo is checked by fetch_problem
     if sub == "push":
-        return "git push --all" if "--all" in args else None
+        if "--all" in args or "--tags" in args:
+            return "git push %s" % ("--all" if "--all" in args else "--tags")
+        refs = shell.positional(["git"] + args, value_opts=("-o", "--push-option"))[1:]
+        bad = [r for r in refs if not PUSH_REFSPEC.match(r)]
+        return "git push origin %s (routines push only main and pre-update tags)" % bad[0] if bad else None
     if sub == "tag" and any(a in ("-f", "--force") for a in args):
         return "git tag -f (moving a tag)"
     if sub == "remote":
@@ -739,7 +746,10 @@ def main(payload, proj, ctx):
             continue
         sub, args = shell.git_subcommand(seg.argv)
         cdir = shell.git_dir_option(seg.argv)
-        cwd = os.path.normpath(os.path.join(seg.cwd, cdir)) if cdir else seg.cwd
+        cwd = os.path.normpath(os.path.join(seg.cwd, os.path.expanduser(cdir))) if cdir else seg.cwd
+        if ctx != "chat" and atlas.rel_to_project(cwd, cwd, proj) is None:
+            atlas.STATE.locked = True
+            atlas.block("In a routine git runs only in the Atlas repo, not in %s." % cwd)
         if sub == "add":
             staged_by_command = True
 

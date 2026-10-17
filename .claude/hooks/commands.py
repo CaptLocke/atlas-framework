@@ -30,7 +30,7 @@ ALLOWED = {
     "cmp", "stat", "file", "du", "df", "date", "echo", "printf", "pwd", "basename", "dirname", "realpath",
     "readlink", "true", "false", "test", "[", ":", "sleep", "which", "md5sum", "sha1sum", "sha256sum",
     "column", "nl", "tac", "paste", "join", "fold", "seq", "printenv", "id", "whoami", "hostname", "uname",
-    "tree", "od", "jq", "base64", "zcat", "sed", "awk", "find",
+    "od", "jq", "base64", "zcat", "sed", "awk", "find",
     # shell state
     "cd", "export", "unset", "set",
     # simple file work (targets checked by paths.py and actions.py)
@@ -39,7 +39,10 @@ ALLOWED = {
     "git", "gh", "curl", "wget", "wget2",
 }
 SAFE_VARS = {"ATLAS_CONTEXT", "HOME", "PWD", "CLAUDE_PROJECT_DIR", "TZ", "USER", "TMPDIR", "?"}
-BLOCKED_WRAPPERS = {"xargs", "sudo"}
+BLOCKED_WRAPPERS = {"xargs", "sudo", "env", "exec", "builtin"}  # their options can rename or hide the command
+# Variables a routine may set for one command (PATH, HOME and the like would change what runs or which
+# config git reads).
+SAFE_ASSIGN = {"TZ", "LANG", "LC_ALL", "LC_CTYPE", "LC_MESSAGES", "LC_COLLATE", "TERM", "NO_COLOR", "COLUMNS"}
 FIND_ACTIONS = {"-exec", "-execdir", "-ok", "-okdir", "-fprint", "-fprint0", "-fprintf", "-fls"}
 AWK_RISKY = re.compile(r"system|getline|close|fflush|ENVIRON|PROCINFO|@load|@include|[|>]")
 HEREDOC_CAT = re.compile(r"\$\(\s*cat\s+<<-?\s*['\"]?[A-Za-z_][A-Za-z0-9_]*['\"]?\s*\)")
@@ -48,7 +51,7 @@ HEREDOC_CAT = re.compile(r"\$\(\s*cat\s+<<-?\s*['\"]?[A-Za-z_][A-Za-z0-9_]*['\"]
 def expansion_problem(command):
     """Why the command line uses shell expansion a routine may not, or None."""
     for m in shell.HEREDOC_RE.finditer(command):
-        if not m.group(2) and re.search(r"\$\(|`", m.group(4)):
+        if not m.group("q") and re.search(r"\$\(|`", m.group("body")):
             return "a command substitution inside a heredoc"
     text = shell.strip_heredocs(command)
     i, n, sq, dq = 0, len(text), False, False
@@ -223,6 +226,12 @@ def python_problem(seg, proj):
 
 def segment_problem(seg, proj):
     """Why one simple command isn't allowed in a routine, or None."""
+    names = [a.split("=", 1)[0] for a in seg.assigns]
+    if seg.argv and seg.name in ("export", "readonly"):
+        names += [a.split("=", 1)[0] for a in seg.argv[1:] if "=" in a]
+    bad = [n for n in names if n not in SAFE_ASSIGN]
+    if bad:
+        return "setting the variable %s (routines set only %s)" % (bad[0], ", ".join(sorted(SAFE_ASSIGN)))
     if not seg.argv:
         return None
     blocked = [w for w in seg.wrappers if w in BLOCKED_WRAPPERS]
@@ -247,6 +256,8 @@ def segment_problem(seg, proj):
     if name == "cp" and any(a in ("-s", "-l", "--symbolic-link", "--link") or
                             re.match(r"^-[a-zA-Z]*[sl]", a) and not a.startswith("--") for a in seg.argv[1:]):
         return "cp making links"
+    if name == "sort" and any(a.startswith("--compress-program") for a in seg.argv[1:]):
+        return "sort --compress-program (it runs a program)"
     if name == "cd" and any("$" in a for a in seg.argv[1:]):
         return "cd to a variable"
     return None

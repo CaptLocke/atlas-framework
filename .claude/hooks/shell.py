@@ -32,7 +32,8 @@ def is_separator(token):
 REDIRECTS = {">", ">>", ">|", "&>", "&>>", "<>", ">&"}
 WRAPPERS = {"sudo", "env", "command", "nohup", "time", "nice", "xargs", "builtin", "exec", "stdbuf", "timeout"}
 SHELLS = {"bash", "sh", "zsh", "dash"}
-HEREDOC_RE = re.compile(r"<<(-?)[ \t]*(['\"]?)([A-Za-z_][A-Za-z0-9_]*)\2[^\n]*\n(.*?)\n[ \t]*\3[ \t]*(?=\n|$)", re.S)
+HEREDOC_RE = re.compile(r"<<(?P<dash>-?)[ \t]*(?P<q>['\"]?)(?P<name>[A-Za-z_][A-Za-z0-9_]*)(?P=q)(?P<rest>[^\n]*)\n"
+                        r"(?P<body>.*?)\n[ \t]*(?P=name)[ \t]*(?=\n|$)", re.S)
 
 
 class Segment:
@@ -40,12 +41,13 @@ class Segment:
     'overwrites' are the redirect targets that truncate (>, >|, &>, <>; not >>),
     'wrappers' the wrapper commands stripped from the front (xargs, env, ...)."""
 
-    def __init__(self, argv, redirects, cwd, overwrites=None, wrappers=None):
+    def __init__(self, argv, redirects, cwd, overwrites=None, wrappers=None, assigns=None):
         self.argv = argv
         self.redirects = redirects
         self.cwd = cwd
         self.overwrites = overwrites or []
         self.wrappers = wrappers or []
+        self.assigns = assigns or []  # NAME=value words before the command
 
     @property
     def name(self):
@@ -56,17 +58,18 @@ class Segment:
 
 
 def heredoc_bodies(command):
-    return [m.group(4) for m in HEREDOC_RE.finditer(command)]
+    return [m.group("body") for m in HEREDOC_RE.finditer(command)]
 
 
 def strip_heredocs(command):
-    # keep the operator line, drop the body and terminator
-    return HEREDOC_RE.sub(lambda m: "<<" + m.group(1) + m.group(3) + "\n", command)
+    # keep the whole operator line (commands can follow the delimiter on it: `cat <<EOF | x`),
+    # drop the body and terminator
+    return HEREDOC_RE.sub(lambda m: "<<" + m.group("dash") + m.group("name") + m.group("rest") + "\n", command)
 
 
 def tokenize(command):
     """Shell-like tokens; operators are separate tokens. Never raises."""
-    text = strip_heredocs(command)
+    text = strip_heredocs(command).replace("\\\n", "")  # backslash-newline joins lines, as in the shell
     try:
         lex = shlex.shlex(text, posix=True, punctuation_chars=";&|<>()\n")
         lex.whitespace = " \t\r"
@@ -79,13 +82,15 @@ def tokenize(command):
         return [t.strip("'\"") for t in spaced.split(" ") if t]
 
 
-def _strip_prefix(argv, wrappers=None):
+def _strip_prefix(argv, wrappers=None, assigns=None):
     """Drop VAR=value assignments and wrapper commands from the front
-    (their names are appended to 'wrappers' when given)."""
+    (appended to 'assigns' and 'wrappers' when given)."""
     i = 0
     while i < len(argv):
         w = argv[i]
         if re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", w):
+            if assigns is not None:
+                assigns.append(w)
             i += 1
             continue
         base = os.path.basename(w)
@@ -112,8 +117,8 @@ def segments(command, cwd, _depth=0):
 
     def flush():
         nonlocal cur, redirects, overwrites, cur_cwd
-        wrappers = []
-        argv = _strip_prefix(cur, wrappers)
+        wrappers, assigns = [], []
+        argv = _strip_prefix(cur, wrappers, assigns)
         if argv:
             name = os.path.basename(argv[0])
             if name == "cd":
@@ -131,9 +136,9 @@ def segments(command, cwd, _depth=0):
                 out.append(Segment(["eval"], redirects, cur_cwd, overwrites, wrappers))
                 out.extend(segments(" ".join(argv[1:]), cur_cwd, _depth + 1))
             else:
-                out.append(Segment(argv, redirects, cur_cwd, overwrites, wrappers))
-        elif redirects:
-            out.append(Segment([], redirects, cur_cwd, overwrites, wrappers))
+                out.append(Segment(argv, redirects, cur_cwd, overwrites, wrappers, assigns))
+        elif redirects or assigns:
+            out.append(Segment([], redirects, cur_cwd, overwrites, wrappers, assigns))
         cur, redirects, overwrites = [], [], []
 
     while i < len(tokens):

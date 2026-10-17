@@ -77,7 +77,7 @@ Hooks in `.claude/hooks/` enforce N1–N6, N8–N10 and N12 deterministically **
 
 **In routines** the hooks assume any content may be hostile:
 - Routines get no send, share or delete connectors, and every locked action is blocked even with an approval record.
-- The shell runs only plain commands the hooks can follow: reading and text tools, simple file work, git, read-only `gh`, curl/wget to allowed sites, and Atlas's own tools in `system/tools/`. There are no other interpreters, no `xargs`, no shells or `eval`, and no variables or command substitution (`$(cat <<'EOF' … EOF)` for commit messages excepted).
+- The shell runs only plain commands the hooks can follow: reading and text tools, simple file work, git, read-only `gh`, curl/wget to allowed sites, and Atlas's own tools in `system/tools/`. There are no other interpreters, no `xargs`, `env` or `exec` wrappers, no shells or `eval`, no variable assignments beyond time zone and locale, and no variables or command substitution (`$(cat <<'EOF' … EOF)` for commit messages excepted).
 - The web is reachable (WebFetch, curl, wget) only on the employer's own sites (`atlas.yaml: company`, which routines can't change) and GitHub, because a link can carry data out.
 - Writes go only inside the repo and to temp folders. The shell never overwrites existing files under `user/` (use Write/Edit; appending is fine).
 - git keeps to Atlas's own steps: pull and push only with origin, fetch releases only from the official upstream, and never move the working tree to an older commit. `gh` only reads, so the repo can't be made public or copied.
