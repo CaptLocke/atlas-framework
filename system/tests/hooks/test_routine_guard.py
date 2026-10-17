@@ -78,7 +78,8 @@ class C2HiddenWrites(RoutineCase):
                     "echo $ATLAS_CONTEXT", "TZ=America/Denver date", "date -u +%Y-%m-%dT%H:%M:%SZ",
                     "mkdir -p .atlas-tmp && printf '%s' '{\"by\":\"atlas-update\"}' > .atlas-tmp/update.lock",
                     "python3 -I system/tools/release_check.py verify refs/atlas-upstream/v1.0.0 v1.0.0",
-                    "python3 system/tools/validate.py --all", "python3 system/tools/normalize.py --fix "
+                    "python3 system/tools/validate.py --all", "python3 -I system/tools/index.py",
+                    "python3 -I system/tools/index.py --check", "python3 system/tools/normalize.py --fix "
                     "user/knowledge/people/dana-ruiz.md", "python3 -I -m zipfile -e /tmp/a.zip /tmp/out/",
                     "mktemp -d", "cat user/knowledge/people/dana-ruiz.md 2>/dev/null || true",
                     "cat <<'EOF' > user/work/new-note.md\nprice is $5\nEOF",
@@ -113,6 +114,13 @@ class HiddenCommands(RoutineCase):
         for cmd in ("TZ=America/Denver date", "LC_ALL=C sort -u user/a > /tmp/b", "timeout 30 git fetch origin",
                     "git push origin pre-update-1.0.1", "git rebase origin/main", "git merge --ff-only origin/main"):
             self.allowed(cmd)
+
+
+class AtlasToolWrites(RoutineCase):
+    def test_index_tool_writes_only_its_folder(self):
+        self.allowed("python3 -I system/tools/index.py")
+        self.blocked("python3 -I system/tools/index.py --root /etc")
+        self.blocked("python3 -I system/tools/render.py system/dashboards/x.html /tmp/d.json - .claude/x.html")
 
 
 class C3UpdateLock(RoutineCase):

@@ -436,7 +436,7 @@ class SeededSystemErrors(TempRepo):
         self.assertError(self.system_errors(), "system/VERSION", "does not match")
 
     def test_changelog_section_and_headings(self):
-        self.replace("CHANGELOG.md", "### Under the hood", "### Notes")
+        self.replace("CHANGELOG.md", "### What's new", "### Notes")
         r = self.system_errors()
         self.assertError(r, "CHANGELOG.md", "unknown heading '### Notes'")
         current = open(self.path("system/VERSION")).read().strip()

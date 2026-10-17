@@ -7,7 +7,7 @@ This branch holds files for building and releasing Atlas that don't ship to user
 | `docs/maintainers/releasing.md` | The release checklist: changelog rules, version and boot-marker bumps, checks, tagging, the release zip. |
 | `system/tests/regression/` | The regression suite: fictional work inputs and the records Atlas should produce from them. Run before every release. |
 | `system/tests/hooks/`, `system/tests/validators/` | Unit tests for the safety hooks and the validator. |
-| `system/tests/dashboards/` | Dashboard fixtures and `render.py` (sync, check, screenshots). |
+| `system/tests/dashboards/` | Dashboard fixtures and `render.py` (render, check, screenshots). |
 | `system/tests/README.md` | How to run the tests, and what the hook tests cover. |
 
 The paths match where these files sat on `main`, so their instructions work unchanged. To use them, from a checkout of `main`:
