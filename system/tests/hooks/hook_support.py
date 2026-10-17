@@ -33,6 +33,7 @@ class HookTestCase(unittest.TestCase):
     """Each test gets a fresh git repo that looks like a user's Atlas repo."""
 
     origin = USER_ORIGIN
+    hooks_dir = None  # run hooks from here instead of the test repo's own .claude/hooks
 
     def setUp(self):
         self.tmp = tempfile.mkdtemp(prefix="atlas-hooktest-")
@@ -117,7 +118,8 @@ class HookTestCase(unittest.TestCase):
                    "cwd": cwd or self.root, "permission_mode": "default",
                    "hook_event_name": "PreToolUse", "tool_name": tool_name,
                    "tool_input": tool_input, "tool_use_id": "toolu_test"}
-        r = subprocess.run(["python3", os.path.join(self.root, ".claude", "hooks", hook + ".py")],
+        hooks = self.hooks_dir or os.path.join(self.root, ".claude", "hooks")
+        r = subprocess.run(["python3", os.path.join(hooks, hook + ".py")],
                            input=json.dumps(payload), capture_output=True, text=True, env=env,
                            cwd=self.root, timeout=60)
         return r

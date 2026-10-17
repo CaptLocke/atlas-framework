@@ -119,9 +119,10 @@ class RepoVisibility(HookTestCase):
             self.assertBlocked(self.bash("git", cmd, "chat"), "N9")
 
     def test_reads_allowed(self):
-        for cmd in ("gh repo view", "gh api repos/maya-chen/atlas/collaborators",
-                    "gh repo edit --description 'Atlas'"):
+        for cmd in ("gh repo view", "gh api repos/maya-chen/atlas/collaborators"):
             self.assertAllowed(self.bash("git", cmd, "routine"))
+        # 1.0.2: gh only reads
+        self.assertBlocked(self.bash("git", "gh repo edit --description 'Atlas'", "routine"), "N9")
 
 
 class CommitTrailers(HookTestCase):

@@ -345,6 +345,9 @@ class ImportFailure(HookTestCase):
         self.break_module("context")
         subprocess.run(["git", "remote", "set-url", "origin", "git@github.com:CaptLocke/atlas-framework.git"],
                        cwd=self.root, check=True)
+        # 1.0.2: like the hooks themselves, the fail-safe bypasses only the maintainer's marked copy
+        self.assertBlocked(self.run_hook("actions", "mcp__mail__send_message", {}, "routine"))
+        self.write(".atlas-maintainer", "")
         self.assertAllowed(self.run_hook("actions", "mcp__mail__send_message", {}, "routine"))
 
     def test_exit_codes_only_0_or_2(self):

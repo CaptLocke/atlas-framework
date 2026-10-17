@@ -80,7 +80,8 @@ class OwnedPaths(HookTestCase):
         sh(["git", "update-ref", "refs/atlas-upstream/v1.1.0", "HEAD"], self.root)  # unsigned
         self.assertBlocked(self.bash("paths", "git checkout refs/atlas-upstream/v1.1.0 -- system", "routine"),
                            "owned")
-        self.assertAllowed(self.bash("paths", "git rm -q -- system/old.md", "routine"))
+        self.assertAllowed(self.bash("paths", "git rm -q -- system/old.md", "chat"))
+        self.assertBlocked(self.bash("paths", "git rm -q -- system/old.md", "routine"), "owned")  # unsigned lock
         self.assertBlocked(self.bash("paths", "unzip -o atlas-1.1.0.zip && cp -r x/system .", "routine"),
                            "owned")
         self.assertBlocked(self.bash("paths", "git checkout some-branch -- system", "routine"), "owned")
