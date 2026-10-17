@@ -1,0 +1,3 @@
+# Atlas (system-owned; changed only by updates). Activity logs are one line per change set,
+# newest last, so when a chat and a routine add lines at the same time git keeps both.
+user/logs/activity/*.md merge=union

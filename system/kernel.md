@@ -37,7 +37,7 @@ Do these quietly, then answer the user. Never narrate them unless something need
 1. **Sync and check write access:** pull the repo, then confirm this session can push (`git push --dry-run origin HEAD:main`; the session-start hook reports the result). If it can't, the repo is attached read-only: re-attach it **with write (push) access** and clone it again before doing anything else. If write access is refused, tell the user in one line how to fix it (`system/rules/sync.md`, Session start). Never work in a read-only copy: nothing could be saved.
 2. **Orient (L0):** read `user/profile/profile.md`, the `## Summary` sections of the voice guides, `user/settings/rhythms.yaml`, `user/knowledge/_index/hot.md`, and the open-item counts from the `counts` block at the top of each `user/inbox/` file (pending approvals, open questions, new insights). Read `user/.state/health.yaml` for known issues.
 3. **Catch up:** if this is the first chat of the day and `user/.state/jobs.yaml` shows `ingest` last succeeded more than 3 hours ago, run a quick catch-up ingest of mail and calendar (`atlas-capture`), add new items to today's brief under "Since last night", and republish the Daily Brief (`atlas-brief`, `atlas-dashboards`). Keep it short; don't block the user's request on it—answer first if they asked something urgent, then catch up.
-4. **Check triggers:** evaluate `system/triggers.md` conditions against what you now know; act on any that fire (once each).
+4. **Triggers:** whenever this chat files or changes records (capture, triage, the catch-up above), read `system/triggers.md` then and act on any that fire (once each). A chat that only answers questions doesn't need it: the nightly jobs check every trigger too.
 5. **Surface only what matters:** if there are open `action` questions (things only the user can do, such as updating their Project instructions), pending approvals, open questions, or high-severity known issues, mention them in one line after addressing the user's request (or before, if the user just said hello). Actions come first, in every chat until they're done. For `routine-env-missing`, say which automation ran without its routine environment and offer to fix it (`atlas-setup`, `reference/automations.md` §3).
 6. **Away:** if `rhythms.yaml: away` is active, tell the user once, and offer to end away mode.
 
@@ -89,13 +89,7 @@ Do these quietly, then answer the user. Never narrate them unless something need
 Load detail only when a task needs it.
 
 ## 6. Running a routine
-1. **Set the clock.** Run `TZ=<atlas.yaml timezone> date` and use that as the current date and time for the whole run (run dates, file names, timestamps); ignore the session's stated date, which is UTC.
-2. Sync. Read `user/settings/routines.yaml`, find the named routine, and run its jobs **in order**, honoring modifiers (`when`, `target`, `mode`).
-3. For each job, read `system/jobs/<job>.md` (or the registered user job) and follow it, including its away/paused check, readiness check, and early exit.
-4. You are unattended: never wait for a reply. Anything needing approval goes to `user/inbox/approvals.md`. Locked actions are blocked in routines.
-5. **Check the routine marker.** Read `ATLAS_CONTEXT` (`echo $ATLAS_CONTEXT`) and record the value you observe in the run report (`atlas_context`). Routines must run in the "Atlas routine" cloud environment, which sets `ATLAS_CONTEXT=routine`; the safety hooks treat anything unmarked as a chat. If the value isn't `routine` (any case), the safety hooks aren't guarding this run, so **stop**: add or update a high-severity known issue `routine-env-missing` in `user/.state/health.yaml` naming the routine, with the fix ("attach this routine to the 'Atlas routine' environment"), commit it as `Atlas-Actor: routine:<name>`, push, write the run report with `atlas_context` and status `stopped`, and run no jobs. The next chat surfaces it (§2 step 5) and offers to fix it.
-6. Commit after each job. Update `user/.state/jobs.yaml`. Write one run report (`system/schemas/formats.md` §4).
-7. If a job fails, record it and continue with the next job unless it depends on the failed one.
+Follow `system/jobs/README.md` §Running a routine exactly: it checks the routine marker first, sets the clock, and runs the routine's jobs. You are unattended: never wait for a reply.
 
 ## 7. Extensions
 Read `user/extensions/registry.yaml` at session start. Registered user skills, jobs, triggers, types, dashboards, and playbooks are part of Atlas: read their files on demand from `user/extensions/`. Never copy them into `.claude/` (updates replace it). Precedence: `system/rules/extensions.md`.

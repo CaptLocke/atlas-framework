@@ -333,7 +333,7 @@ def write_targets(seg):
 PYTHON_RE = re.compile(r"^python(3(\.\d+)?)?$")
 PYTHON_FLAGS = {"-I", "-B", "-u", "-E", "-s"}
 # Atlas's own tools (system/tools/), the only scripts routines may run.
-ATLAS_TOOLS = ("validate.py", "normalize.py", "render.py", "release_check.py", "redact_check.py")
+ATLAS_TOOLS = ("validate.py", "normalize.py", "render.py", "release_check.py", "redact_check.py", "index.py")
 
 
 def python_parts(argv):
@@ -356,7 +356,8 @@ def python_parts(argv):
 
 def python_writes(argv, cwd):
     """Files Atlas's tools write: render.py's output, normalize.py --fix
-    (its files, or its --root), and `python3 -m zipfile -e <zip> <dir>`."""
+    (its files, or its --root), index.py (the index folder, unless --check),
+    and `python3 -m zipfile -e <zip> <dir>`."""
     _, script, module, args = python_parts(argv)
     tool = os.path.basename(script) if script else ""
     if tool == "render.py" and len(args) >= 4:
@@ -365,6 +366,9 @@ def python_writes(argv, cwd):
         root = option_value(["x"] + args, None, "--root")
         files = positional(["x"] + args, value_opts=("--root",))
         return files + ([root] if root else []) or ["user/knowledge"]
+    if tool == "index.py" and "--check" not in args:
+        root = option_value(["x"] + args, None, "--root")
+        return [os.path.join(root or ".", "user", "knowledge", "_index")]
     if module == "zipfile" and args[:1] in (["-e"], ["--extract"]) and len(args) >= 3:
         return [args[-1]]
     return []

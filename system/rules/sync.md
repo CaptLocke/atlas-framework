@@ -34,8 +34,8 @@ Hooks reject commits without `Atlas-Actor` and `Atlas-Reason` (N12). Commit mess
 
 ## Conflict resolution
 - **Records:** merge both sides. Frontmatter: take the side with the later `updated` per field; union list fields (aliases, links, sources). Body: keep both sides' content; `## Updates` is the union in date order.
-- **Indexes:** take either side, then rebuild the affected index file from records.
-- **Logs, journals, inbox files:** union of entries, ordered by date/ID.
+- **Indexes:** take either side, then run `python3 -I system/tools/index.py` once the rebase is done.
+- **Logs, journals, inbox files:** union of entries, ordered by date/ID. Activity logs merge this way on their own (`.gitattributes`); the others are merged by hand.
 - **Settings:** take the side from a `chat` commit over a routine commit; if both are chats, take the later and add a `questions.md` entry if values differ meaningfully.
 - **System-owned paths:** take `origin` (only updates change them).
 

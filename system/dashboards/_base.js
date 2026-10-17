@@ -1,7 +1,7 @@
 /* Atlas dashboard runtime.
-   CANONICAL COPY. Every template inlines this file verbatim inside
-   <script id="atlas-base-js">. Edit here, then run
-   `python3 system/tests/dashboards/render.py --sync`.
+   THE ONLY COPY. Templates hold a placeholder in their base script element,
+   and system/tools/render.py puts this file there when it builds a
+   page.
 
    Safety: dashboard data comes from emails, documents, and meetings, so it is
    untrusted text. Everything is rendered with textContent / createElement,

@@ -40,7 +40,10 @@ Run the Atlas routine `<name>`. First run `echo $ATLAS_CONTEXT`: if it doesn't p
 
 All behavior lives in the repo, so changing which jobs a routine runs is a settings edit. Only schedule and model changes touch the routine on the platform.
 
-## Running a routine (summary of `system/kernel.md` §6)
+## Running a routine
+The kernel (§6) sends every routine here; this is the only full description.
+
+0. **Check the routine marker.** Read `ATLAS_CONTEXT` (`echo $ATLAS_CONTEXT`) and record the value in the run report (`atlas_context`). Routines must run in the "Atlas routine" cloud environment, which sets `ATLAS_CONTEXT=routine`. The safety hooks still apply routine rules to a session started by a routine prompt, but a routine without its environment is misconfigured, so if the value isn't `routine` (any case), **stop**: add or update a high-severity known issue `routine-env-missing` in `user/.state/health.yaml` naming the routine, with the fix ("attach this routine to the 'Atlas routine' environment"), commit it as `Atlas-Actor: routine:<name>`, push, write the run report with `atlas_context` and status `stopped`, and run no jobs. The next chat surfaces it (kernel §2 step 5) and offers to fix it.
 1. Set the clock: run `TZ=<atlas.yaml timezone> date` and use it as the current date and time for the run, not the session's stated (UTC) date. Sync (`system/rules/sync.md`). Read `user/settings/routines.yaml` and find the routine by name. If it isn't there, write a failed run report saying so and stop.
 2. For each job entry, in order:
    - **Modifiers.** `when` is checked against the run date in the user's time zone (`atlas.yaml: timezone`): `always` (default), `weekdays` (Mon–Fri), `weekends` (Sat–Sun), `sundays`. If it doesn't match, skip the job: add a run-report row `skipped · not scheduled today` and leave `jobs.yaml` unchanged. Pass `target` (`today` | `tomorrow`) and `mode` (`full` default | `light`) to the job.

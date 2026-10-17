@@ -23,7 +23,7 @@ For every input (chat statement, journal entry, connector item, file):
    - Replacement: new record with `supersedes`; old record gets `superseded_by` (content kept).
 7. **Link both ways where it helps.** At minimum, the new or changed record links to its related records. Add reciprocal links on people, projects, and topics so they act as hubs.
 8. **Normalize.** Write field values in their declared formats (`system/schemas/schema.yaml: field_formats`): references as `"[[folder/slug]]"`, lists as lists, emails lowercase, dates `YYYY-MM-DD`, enum values lowercase snake_case. Then run `python3 system/tools/normalize.py --fix <the records you wrote>`; it fixes anything mechanical you missed and leaves everything else alone.
-9. **Index.** Update the affected lines in `_index/` (`formats.md` §5).
+9. **Index.** Run `python3 -I system/tools/index.py` (`formats.md` §5); never edit index files by hand.
 10. **Log and commit** per `system/rules/sync.md`.
 
 ## Commitments

@@ -29,7 +29,7 @@ All paths are relative to `user/extensions/` (the registry `path`). Outlines: `s
 
 ## type
 - **Path:** `types/<type>.md`, the schema outline (frontmatter `type: schema`, `name: <type>`, `folder: user/knowledge/<folder>/`), plus machine-readable `fields`, `required`, and `enums` (including `status`) in the frontmatter in the same shape as a type entry in `system/schemas/schema.yaml`, so the validator can check records.
-- **Wiring:** create `user/knowledge/<folder>/` (with `.gitkeep`) and `user/knowledge/_index/<folder>.md` (empty index with the standard header); other records link to records of the new type under `related` (the common link groups in `schema.yaml` are fixed); ingest and capture classify into the type once registered.
+- **Wiring:** create `user/knowledge/<folder>/` (with `.gitkeep`), register the type, then run `python3 -I system/tools/index.py` to create its index; other records link to records of the new type under `related` (the common link groups in `schema.yaml` are fixed); ingest and capture classify into the type once registered.
 - **Example (fictional):** `types/deal.md` with `folder: user/knowledge/deals/`, fields `account` (ID), `stage` (enum: discovery, proposal, negotiation, closed_won, closed_lost), `value` (number), `close_date` (date); `status` enum `open, won, lost`.
 
 ## dashboard

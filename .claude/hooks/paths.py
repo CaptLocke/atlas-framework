@@ -216,7 +216,8 @@ def check(rels, tool_name, proj, ctx, payload):
         if rel == atlas.MAINTAINER_MARKER:
             atlas.block("%s marks the maintainer's own copy of Atlas's source repo and switches the guards off "
                        "there; Atlas never creates, changes or removes it." % rel)
-        if any(atlas.overlaps(rel, e) for e in owned):
+        is_owned = any(atlas.overlaps(rel, e) for e in owned)
+        if is_owned:
             if via == "head":
                 pass  # restoring committed content never introduces anything new
             elif via is not None:
@@ -228,7 +229,9 @@ def check(rels, tool_name, proj, ctx, payload):
                 owned_hits.append(rel or ".")
         marker = r == atlas.ROUTINE_SESSIONS or r.startswith(atlas.ROUTINE_SESSIONS + "/") or (
             kind == "delete" and r and atlas.ROUTINE_SESSIONS.startswith(r + "/"))
-        if marker or (kind != "delete" and atlas.autoload_path(rel)):
+        # an owned auto-loaded file (.gitattributes) is left to the owned-path rule above: only a
+        # signed update writes it
+        if marker or (kind != "delete" and atlas.autoload_path(rel) and not is_owned):
             load_hits.append(rel or ".")
         # a write names the file it changes; a delete of a parent folder also
         # removes the governance files inside it
