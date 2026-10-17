@@ -36,6 +36,9 @@ What it enforces (system/rules/governance.md):
   with tool "Bash". Exempt: user/inbox/drop/ (staging copies removed after
   filing, system/schemas/formats.md section 3) and user/knowledge/_index/
   (regenerable indexes, section 5). Governance files are left to paths.py.
+- Routines (1.0.2): shell commands must pass the routine allowlist
+  (commands.py), and curl/wget may use only a few known options with every
+  address a written-out URL on an allowed host.
 """
 import os
 import re
@@ -62,6 +65,7 @@ sys.excepthook = lambda _t, _e, _tb: fail_safe("actions", _e, _raw_stdin())
 try:
     import context as atlas  # noqa: E402
     import shell  # noqa: E402
+    import commands  # noqa: E402
 except BaseException as _imp:  # includes SystemExit raised while importing
     fail_safe("actions", _imp, _raw_stdin())
 
@@ -350,10 +354,11 @@ def github_extra_risks(server, bare, tool_input, proj):
     return set()
 
 
-def check_github_write(tool_name, paths, proj):
+def check_github_write(tool_name, paths, proj, ctx="chat"):
     owned = atlas.owned_paths(proj)
     bad = [p for p in paths if any(atlas.overlaps(p, e) for e in owned) or p in atlas.GOVERNANCE_FILES
-           or p.startswith((".atlas-tmp", ".git/")) or p in (".", ".git")]
+           or p.startswith((".atlas-tmp", ".git/")) or p in (".", ".git") or atlas.autoload_path(p)
+           or (ctx != "chat" and p == "user/settings/atlas.yaml")]
     if bad:
         atlas.STATE.locked = True
         atlas.block("%s would write %s in the Atlas repo through GitHub. System files change only through "
@@ -461,7 +466,7 @@ def handle_mcp(payload, proj, ctx):
     risks |= github_extra_risks(server, bare, payload.get("tool_input"), proj)
     gh_paths = github_paths(server, bare, payload.get("tool_input"), proj)
     if gh_paths:
-        check_github_write(tool_name, gh_paths, proj)
+        check_github_write(tool_name, gh_paths, proj, ctx)
     if event_write:
         # creating/changing an event with attendees sends invitations; only a
         # tool tagged 'write' called without attendees manages the own calendar
@@ -522,14 +527,67 @@ def uploads(seg):
     return False
 
 
-def url_args(seg):
-    out = []
-    for i, a in enumerate(seg.argv[1:], 1):
-        if a.split("=", 1)[0] == "--url":
-            out.append(a.split("=", 1)[1] if "=" in a else (seg.argv[i + 1] if i + 1 < len(seg.argv) else ""))
-        elif re.match(r"^[a-z][a-z0-9+.-]*://", a, re.I):
-            out.append(a)
-    return out
+# Routines: the only curl/wget options allowed (anything else, such as a proxy, a config file,
+# --resolve or an upload, is refused). Short flags may be bundled (-fsSL); the letters in
+# *_VALUE_LETTERS take a value (-o FILE, -qO-).
+CURL_FLAG_LETTERS = set("sSLfIiv#gO")
+CURL_VALUE_LETTERS = set("oHAmwre")
+CURL_VALUE_OPTS = {"--output", "--header", "--user-agent", "--max-time", "--connect-timeout", "--write-out",
+                   "--range", "--retry", "--referer", "--url"}
+CURL_LONG_FLAGS = {"--silent", "--show-error", "--location", "--fail", "--fail-with-body", "--head", "--include",
+                   "--compressed", "--remote-name", "--verbose", "--globoff"}
+WGET_FLAG_LETTERS = set("qSv")
+WGET_VALUE_LETTERS = set("OTtPU")
+WGET_VALUE_OPTS = {"--output-document", "--timeout", "--tries", "--max-redirect", "--directory-prefix",
+                   "--user-agent"}
+WGET_LONG_FLAGS = {"--quiet", "--spider", "--no-verbose", "-nv", "--server-response"}
+
+
+def download_problem(seg, proj):
+    """Why this curl/wget call isn't allowed in a routine, or None (C1)."""
+    curl = seg.name == "curl"
+    letters, value_letters = (CURL_FLAG_LETTERS, CURL_VALUE_LETTERS) if curl else \
+        (WGET_FLAG_LETTERS, WGET_VALUE_LETTERS)
+    value_opts, long_flags = (CURL_VALUE_OPTS, CURL_LONG_FLAGS) if curl else (WGET_VALUE_OPTS, WGET_LONG_FLAGS)
+    args, urls, i = seg.argv[1:], [], 0
+    while i < len(args):
+        a = args[i]
+        opt = a.split("=", 1)[0]
+        if opt in ("-X", "--request", "--method") or (a.startswith("-X") and len(a) > 2):
+            method = a[2:] if a.startswith("-X") and len(a) > 2 else (
+                a.split("=", 1)[1] if "=" in a else (args[i + 1] if i + 1 < len(args) else ""))
+            if method.upper() not in ("GET", "HEAD"):
+                return "%s %s %s" % (seg.name, opt, method)
+            i += 1 if "=" not in a and not (a.startswith("-X") and len(a) > 2) else 0
+        elif a.startswith("--"):
+            if opt in value_opts:
+                if "=" not in a:
+                    i += 1
+                if opt == "--url":
+                    urls.append(a.split("=", 1)[1] if "=" in a else (args[i] if i < len(args) else ""))
+            elif a not in long_flags:
+                return "%s option %s" % (seg.name, a)
+        elif a in long_flags:
+            pass
+        elif a.startswith("-") and len(a) > 1:
+            for j, ch in enumerate(a[1:]):
+                if ch in value_letters:
+                    if j == len(a) - 2:
+                        i += 1  # the value is the next word
+                    break
+                if ch not in letters:
+                    return "%s option -%s" % (seg.name, ch)
+        else:
+            urls.append(a)
+        i += 1
+    if not urls:
+        return "%s without a written-out address" % seg.name
+    for u in urls:
+        if not re.match(r"^https?://", u, re.I):
+            return "%s %s (write the address out in full, starting with https://)" % (seg.name, u[:60])
+        if not host_allowed(url_host(u), proj):
+            block_host("Reaching", url_host(u) or u[:60])
+    return None
 
 
 def handle_bash(payload, proj, ctx):
@@ -537,15 +595,26 @@ def handle_bash(payload, proj, ctx):
     if not isinstance(command, str) or not command.strip():
         atlas.allow()
     base = atlas.session_cwd(payload, proj)
+    if ctx != "chat":
+        why = commands.problem(command, base, proj)
+        if why:
+            atlas.STATE.locked = True
+            atlas.block("Routines run only plain commands the safety checks can follow, and this uses %s. "
+                        "Do this step another way (one plain command, Atlas's tools in system/tools/, or the "
+                        "Read/Write/Edit tools), or note it in the run report for the next chat "
+                        "(system/rules/governance.md)." % why)
     hits = []
     for seg in shell.segments(command, base):
         if seg.name in ("curl", "wget", "wget2"):
             if uploads(seg):
                 guard_locked("Bash", ["share"], proj, ctx, "Sending data with %s" % seg.name)
             if ctx != "chat":
-                for u in url_args(seg):
-                    if not host_allowed(url_host(u), proj):
-                        block_host("Reaching", url_host(u) or u[:60])
+                why = download_problem(seg, proj)
+                if why:
+                    atlas.STATE.locked = True
+                    atlas.block("In a routine, curl and wget fetch only written-out https:// addresses on the "
+                                "employer's sites and GitHub, with a few plain options; this call uses %s."
+                                % why)
         writes, deletes = shell.write_targets(seg)
         if seg.name == "mv" or (seg.name == "git" and shell.git_subcommand(seg.argv)[0] == "mv"):
             # moving within user/ is a rename, not a delete

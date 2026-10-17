@@ -12,7 +12,9 @@ heredoc bodies (removed before tokenizing; kept for commit messages).
 Known limits (covered by the hook tests on the maintainers branch): variables and command
 substitutions are not expanded, globs are reduced to their literal prefix,
 and writes made by interpreters (python -c, node -e, perl without -i, awk
-with redirection inside its program) are not detected.
+with redirection inside its program) are not detected. In routines these
+limits don't matter: commands.py allows only commands whose effects this
+module can see, and blocks expansions and interpreters outright.
 """
 import os
 import re
@@ -30,16 +32,22 @@ def is_separator(token):
 REDIRECTS = {">", ">>", ">|", "&>", "&>>", "<>", ">&"}
 WRAPPERS = {"sudo", "env", "command", "nohup", "time", "nice", "xargs", "builtin", "exec", "stdbuf", "timeout"}
 SHELLS = {"bash", "sh", "zsh", "dash"}
-HEREDOC_RE = re.compile(r"<<(-?)[ \t]*(['\"]?)([A-Za-z_][A-Za-z0-9_]*)\2[^\n]*\n(.*?)\n[ \t]*\3[ \t]*(?=\n|$)", re.S)
+HEREDOC_RE = re.compile(r"<<(?P<dash>-?)[ \t]*(?P<q>['\"]?)(?P<name>[A-Za-z_][A-Za-z0-9_]*)(?P=q)(?P<rest>[^\n]*)\n"
+                        r"(?P<body>.*?)\n[ \t]*(?P=name)[ \t]*(?=\n|$)", re.S)
 
 
 class Segment:
-    """One simple command: argv words plus output redirection targets."""
+    """One simple command: argv words plus output redirection targets.
+    'overwrites' are the redirect targets that truncate (>, >|, &>, <>; not >>),
+    'wrappers' the wrapper commands stripped from the front (xargs, env, ...)."""
 
-    def __init__(self, argv, redirects, cwd):
+    def __init__(self, argv, redirects, cwd, overwrites=None, wrappers=None, assigns=None):
         self.argv = argv
         self.redirects = redirects
         self.cwd = cwd
+        self.overwrites = overwrites or []
+        self.wrappers = wrappers or []
+        self.assigns = assigns or []  # NAME=value words before the command
 
     @property
     def name(self):
@@ -50,17 +58,18 @@ class Segment:
 
 
 def heredoc_bodies(command):
-    return [m.group(4) for m in HEREDOC_RE.finditer(command)]
+    return [m.group("body") for m in HEREDOC_RE.finditer(command)]
 
 
 def strip_heredocs(command):
-    # keep the operator line, drop the body and terminator
-    return HEREDOC_RE.sub(lambda m: "<<" + m.group(1) + m.group(3) + "\n", command)
+    # keep the whole operator line (commands can follow the delimiter on it: `cat <<EOF | x`),
+    # drop the body and terminator
+    return HEREDOC_RE.sub(lambda m: "<<" + m.group("dash") + m.group("name") + m.group("rest") + "\n", command)
 
 
 def tokenize(command):
     """Shell-like tokens; operators are separate tokens. Never raises."""
-    text = strip_heredocs(command)
+    text = strip_heredocs(command).replace("\\\n", "")  # backslash-newline joins lines, as in the shell
     try:
         lex = shlex.shlex(text, posix=True, punctuation_chars=";&|<>()\n")
         lex.whitespace = " \t\r"
@@ -73,16 +82,21 @@ def tokenize(command):
         return [t.strip("'\"") for t in spaced.split(" ") if t]
 
 
-def _strip_prefix(argv):
-    """Drop VAR=value assignments and wrapper commands from the front."""
+def _strip_prefix(argv, wrappers=None, assigns=None):
+    """Drop VAR=value assignments and wrapper commands from the front
+    (appended to 'assigns' and 'wrappers' when given)."""
     i = 0
     while i < len(argv):
         w = argv[i]
         if re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", w):
+            if assigns is not None:
+                assigns.append(w)
             i += 1
             continue
         base = os.path.basename(w)
         if base in WRAPPERS:
+            if wrappers is not None:
+                wrappers.append(base)
             i += 1
             # skip wrapper options and their simple values (e.g. timeout 10, env -u X)
             while i < len(argv) and (argv[i].startswith("-") or re.match(r"^\d+[smhd]?$", argv[i])):
@@ -97,13 +111,14 @@ def segments(command, cwd, _depth=0):
     `bash -c` strings and `eval`."""
     tokens = tokenize(command)
     out = []
-    cur, redirects = [], []
+    cur, redirects, overwrites = [], [], []
     cur_cwd = cwd
     i = 0
 
     def flush():
-        nonlocal cur, redirects, cur_cwd
-        argv = _strip_prefix(cur)
+        nonlocal cur, redirects, overwrites, cur_cwd
+        wrappers, assigns = [], []
+        argv = _strip_prefix(cur, wrappers, assigns)
         if argv:
             name = os.path.basename(argv[0])
             if name == "cd":
@@ -113,15 +128,18 @@ def segments(command, cwd, _depth=0):
                     cur_cwd = os.path.normpath(os.path.join(cur_cwd, t))
             elif name in SHELLS and "-c" in argv[1:] and _depth < 3:
                 idx = argv.index("-c")
+                # the shell itself is kept too, so a caller can refuse shells outright
+                out.append(Segment(argv[:idx + 1], redirects, cur_cwd, overwrites, wrappers))
                 if idx + 1 < len(argv):
                     out.extend(segments(argv[idx + 1], cur_cwd, _depth + 1))
             elif name == "eval" and len(argv) > 1 and _depth < 3:
+                out.append(Segment(["eval"], redirects, cur_cwd, overwrites, wrappers))
                 out.extend(segments(" ".join(argv[1:]), cur_cwd, _depth + 1))
             else:
-                out.append(Segment(argv, redirects, cur_cwd))
-        elif redirects:
-            out.append(Segment([], redirects, cur_cwd))
-        cur, redirects = [], []
+                out.append(Segment(argv, redirects, cur_cwd, overwrites, wrappers, assigns))
+        elif redirects or assigns:
+            out.append(Segment([], redirects, cur_cwd, overwrites, wrappers, assigns))
+        cur, redirects, overwrites = [], [], []
 
     while i < len(tokens):
         t = tokens[i]
@@ -137,6 +155,8 @@ def segments(command, cwd, _depth=0):
                 cur.pop()  # the fd number in '2>file'
             if target and not is_separator(target):
                 redirects.append(target)
+                if ">>" not in t:
+                    overwrites.append(target)
                 i += 2
                 continue
         elif t.startswith("<"):
@@ -214,8 +234,9 @@ def write_targets(seg):
         if any(a == "-i" or a.startswith("-i") or a.startswith("--in-place") or
                (re.match(r"^-[a-zA-Z]*i", a) and not a.startswith("--")) for a in argv[1:]):
             # first positional is the script for sed unless -e/-f given
-            script_given = any(a in ("-e", "-f") or a.startswith("--expression") for a in argv[1:])
-            files = args if script_given else args[1:]
+            script_given = any(a in ("-e", "-f") or a.startswith(("--expression", "--file")) for a in argv[1:])
+            pos = positional(argv, value_opts=("-e", "--expression", "-f", "--file", "-l", "--line-length"))
+            files = pos if script_given else pos[1:]
             writes += files
     elif name in ("cp", "install", "rsync", "ln", "link"):
         t = option_value(argv, "-t", "--target-directory")
@@ -258,28 +279,150 @@ def write_targets(seg):
     elif name == "unzip":
         d = option_value(argv, "-d")
         writes.append(d if d else ".")
+    elif name in ("curl", "wget", "wget2"):
+        writes += download_targets(argv)
+    elif name == "sort":
+        o = option_value(argv, "-o", "--output")
+        if o:
+            writes.append(o)
+    elif name == "uniq":
+        pos = positional(argv, value_opts=("-f", "-s", "-w", "--skip-fields", "--skip-chars", "--check-chars"))
+        if len(pos) >= 2:
+            writes.append(pos[1])
+    elif name == "mktemp":
+        # no template: the system temp folder; -t: under $TMPDIR; -p DIR: in DIR
+        d = option_value(argv, "-p", "--tmpdir")
+        pos = positional(argv, value_opts=("-p", "--suffix"))
+        if d:
+            writes.append(d)
+        elif pos and "-t" not in argv:
+            writes.append(pos[0])
+    elif PYTHON_RE.match(name):
+        writes += python_writes(argv, seg.cwd)
     elif name == "tar":
         if any(re.match(r"^-?[a-zA-Z]*x", a) for a in argv[1:2]) or "--extract" in argv or "-x" in argv:
             d = option_value(argv, "-C", "--directory")
             writes.append(d if d else ".")
     elif name == "git" and len(argv) > 1:
         sub, sargs = git_subcommand(argv)
+        listed = pathspec_file(sargs, seg.cwd)
+        out_file = option_value(["git"] + sargs, "-o" if sub == "format-patch" else None, "--output") \
+            if sub in ("diff", "log", "show", "format-patch", "diff-tree", "range-diff") else None
+        if out_file:
+            writes.append(out_file)
         if sub == "rm":
-            deletes += [a for a in positional(["git"] + sargs)]
+            deletes += [a for a in positional(["git"] + sargs,
+                                              value_opts=("--pathspec-from-file",))] + listed
         elif sub == "mv":
             pos = positional(["git"] + sargs)
             if len(pos) >= 2:
                 writes.append(pos[-1])
                 deletes += pos[:-1]
         elif sub in ("checkout", "restore"):
+            writes += listed
             if "--" in sargs:
                 writes += sargs[sargs.index("--") + 1:]
             elif sub == "restore":
-                writes += positional(["git"] + sargs, value_opts=("-s", "--source"))
+                writes += positional(["git"] + sargs, value_opts=("-s", "--source", "--pathspec-from-file"))
         elif sub == "clean" and any(re.match(r"^-[a-zA-Z]*f", a) or a == "--force" for a in sargs):
             pos = positional(["git"] + sargs, value_opts=("-e", "--exclude"))
             deletes += pos or ["."]
     return writes, deletes
+
+
+PYTHON_RE = re.compile(r"^python(3(\.\d+)?)?$")
+PYTHON_FLAGS = {"-I", "-B", "-u", "-E", "-s"}
+# Atlas's own tools (system/tools/), the only scripts routines may run.
+ATLAS_TOOLS = ("validate.py", "normalize.py", "render.py", "release_check.py", "redact_check.py")
+
+
+def python_parts(argv):
+    """(flags, script, module, args) for a python command line. script and
+    module are None when absent; flags are the interpreter options before them.
+    flags may contain anything (e.g. '-c'): callers decide what is allowed."""
+    i, flags = 1, []
+    while i < len(argv) and argv[i].startswith("-") and argv[i] != "-":
+        if argv[i] in ("-m", "-c"):
+            if argv[i] == "-m" and i + 1 < len(argv):
+                return flags, None, argv[i + 1], argv[i + 2:]
+            flags.append(argv[i])
+            return flags, None, None, argv[i + 1:]
+        flags.append(argv[i])
+        i += 1
+    if i < len(argv):
+        return flags, argv[i], None, argv[i + 1:]
+    return flags, None, None, []
+
+
+def python_writes(argv, cwd):
+    """Files Atlas's tools write: render.py's output, normalize.py --fix
+    (its files, or its --root), and `python3 -m zipfile -e <zip> <dir>`."""
+    _, script, module, args = python_parts(argv)
+    tool = os.path.basename(script) if script else ""
+    if tool == "render.py" and len(args) >= 4:
+        return [args[3]]
+    if tool == "normalize.py" and "--fix" in args:
+        root = option_value(["x"] + args, None, "--root")
+        files = positional(["x"] + args, value_opts=("--root",))
+        return files + ([root] if root else []) or ["user/knowledge"]
+    if module == "zipfile" and args[:1] in (["-e"], ["--extract"]) and len(args) >= 3:
+        return [args[-1]]
+    return []
+
+
+def short_value(argv, letter):
+    """Value of a one-letter option, also inside a bundle: -o F, -oF, -sSLo F, -qO-."""
+    for i, w in enumerate(argv[1:], 1):
+        if w.startswith("-") and not w.startswith("--") and len(w) > 1:
+            idx = w.find(letter, 1)
+            if idx > 0 and (idx == 1 or w[1:idx].isalpha()):
+                rest = w[idx + 1:]
+                return rest if rest else (argv[i + 1] if i + 1 < len(argv) else None)
+    return None
+
+
+def download_targets(argv):
+    """Files curl/wget write: -o/--output, wget -O/-P, and the URL's own file
+    name for curl -O / --remote-name and plain wget."""
+    name = os.path.basename(argv[0])
+    out = []
+    urls = [a for a in argv[1:] if re.match(r"^[a-z][a-z0-9+.-]*://", a, re.I)]
+
+    def url_file(u):
+        path = re.sub(r"^[a-z][a-z0-9+.-]*://[^/]*", "", u, flags=re.I).split("?")[0].split("#")[0]
+        return os.path.basename(path) or "index.html"
+
+    if name == "curl":
+        o = short_value(argv, "o") or option_value(argv, None, "--output")
+        if o and o != "-":
+            out.append(o)
+        if any(a in ("--remote-name", "--remote-name-all") or re.match(r"^-[a-zA-Z]*O", a) for a in argv[1:]):
+            out += [url_file(u) for u in urls]
+        return out
+    o = short_value(argv, "O") or option_value(argv, None, "--output-document")
+    p = short_value(argv, "P") or option_value(argv, None, "--directory-prefix")
+    if o and o != "-":
+        out.append(o)
+    elif not o:
+        out += [os.path.join(p or "", url_file(u)) for u in urls] or ([p] if p else [])
+    return out
+
+
+def pathspec_file(sargs, cwd):
+    """Paths listed in a git --pathspec-from-file file. A list that can't be
+    read (stdin, missing file) counts as the whole repo: fail closed."""
+    f = option_value(["git"] + sargs, None, "--pathspec-from-file")
+    if f is None:
+        return []
+    if f == "-":
+        return ["."]
+    try:
+        with open(os.path.join(cwd, os.path.expanduser(f)), encoding="utf-8", errors="replace") as fh:
+            text = fh.read()
+    except OSError:
+        return ["."]
+    sep = "\0" if "--pathspec-file-nul" in sargs else "\n"
+    return [p.strip() for p in text.split(sep) if p.strip()] or []
 
 
 def copy_sources(seg):

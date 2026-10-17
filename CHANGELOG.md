@@ -7,6 +7,20 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Atlas Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. "Under the hood" notes are for maintainers and are not shown to users. How to write this file and cut a release: the release checklist, `docs/maintainers/releasing.md` on the upstream repo's `maintainers` branch.
 
+## 1.0.2 (2026-10-17)
+
+### What's new
+- Stronger safety checks for automatic runs. Atlas's overnight and scheduled work now runs only plain, checkable steps, so a misleading email, document or web page can't get it to send data out, delete your knowledge, change GitHub settings, or weaken its own safeguards. Nothing changes in how you use Atlas.
+
+### Under the hood
+- Routine command allowlist (`.claude/hooks/commands.py`): in routines the shell runs only listed commands, called by name; Atlas's own tools are the only Python; no other interpreters, shells, `eval`, `xargs`, `sudo`, `env` or `exec` wrappers; no variables (except a few read-only ones) and no assignments except time zone and locale, command, process, arithmetic or brace expansion (the `$(cat <<'EOF' … EOF)` commit-message form excepted); sed and awk only with programs that can't run commands or write files; find without -exec/-fprint; no links. curl/wget take only a few known options and written-out https URLs on allowed hosts.
+- Update lock (C3): in routines the lock counts only for a fetched, signed release at or above the installed version; owned paths change only from that release's ref; `git rm` removes only files the release doesn't have (read from `--pathspec-from-file`, which replaces `xargs` in the procedure); and a commit touching owned paths must match the release file for file. Routines never move HEAD or the working tree to an older commit (git subcommand allowlist, in the repo only; checkout/switch only `main`, merge/rebase/reset only to `origin/main`, pull only from origin, push only `main` and `pre-update-*` tags, revert only commits that don't touch owned paths). A failed update is undone with `git reset --hard origin/main` under the lock, before anything is pushed (procedure, SKILL step 10).
+- `gh` only reads, in any context. `git config` writes and `git -c` take only user.name/email and display keys; `--exec-path`, `--git-dir`, `--work-tree`, `--upload-pack`, `rebase --exec` and `grep -O` are refused; `git ls-remote` reaches only origin and the upstream. `branch -f/-M/-C`, `checkout -B`, `switch -C`, `reset --keep/--merge` and `push --prune` count as history rewrites; `update-ref -d refs/atlas-upstream/*` is allowed.
+- Files Claude Code or git load as instructions, servers or hooks (CLAUDE.md, CLAUDE.local.md, AGENTS.md, .mcp.json, .gitattributes, .gitmodules, .githooks/, nested .claude/) are never written. In routines: writes outside the repo go only to temp folders; paths built from variables are refused; `atlas.yaml: company` (the allowed sites) can't change; the shell doesn't overwrite existing files under `user/` (Write/Edit instead; `>>` is fine).
+- Routine marker: `routine_mark.py` (UserPromptSubmit) marks a session that starts with "Run the Atlas routine", and the hooks apply routine rules to it even without `ATLAS_CONTEXT=routine`. The fail-safe now also requires `.atlas-maintainer` for the upstream bypass.
+- The shell parser no longer drops the rest of a heredoc's first line (`cat <<EOF | …` hid that command from every check, in any context), joins backslash-newline continuations as the shell does, and sees writes by curl/wget, `sort -o`, `uniq`, `mktemp`, `git diff/log --output`, Atlas's tools (render, normalize, zipfile) and `--pathspec-from-file`, keeps `bash -c` and redirects on the outer command, and no longer reads `sed -e` scripts as file names.
+- Governance: the hooks paragraph says plainly that chats are guarded by the user's yes and Cowork's approval card (the approval record is procedural), and lists what routines may do.
+
 ## 1.0.1 (2026-10-16)
 
 ### What's new

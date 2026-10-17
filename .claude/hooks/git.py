@@ -26,8 +26,21 @@ What it enforces (system/rules/governance.md, system/rules/sync.md):
   update lock or a purge lock in a chat; deleting branches on origin
   (`git push --delete`, `git push origin :branch`, `git branch -d/-D` of a
   branch that exists on origin) only under a purge lock in a chat.
-- N9: blocks `gh repo edit --visibility` and non-GET `gh api` calls touching
-  collaborators, invitations or visibility.
+- N9: `gh` only reads (repo/pr/issue/release/run view and list, auth status,
+  GET `gh api` without fields), in any context: Atlas never changes GitHub
+  through it, so it can't make the repo public or copy content out (C4/H1).
+- `git config` writes only user.name/email and a few display settings, and
+  `git -c` takes only those keys; --exec-path, --git-dir, --work-tree,
+  --namespace and --config-env are refused, as are `rebase --exec` and
+  `grep -O` (each could run a command outside the guards; H2).
+- Routines (1.0.2) use a short list of git subcommands, can't move HEAD or
+  the working tree to any commit but HEAD and origin/main (checkout/switch
+  only `main`, branches only at HEAD, merge/rebase only origin/*, pull only
+  from origin without refspecs), revert only commits that don't touch owned
+  paths, and commit owned paths only when they match, file for file, the
+  signed release named in the update lock (C3). `git reset --hard
+  origin/main` is allowed under a valid update lock (undoing a failed update
+  before it is pushed).
 - N12: `git commit` must carry `Atlas-Actor:` and `Atlas-Reason:` trailers
   (parsed from -m/--message, -F/--file and heredocs). When the message source
   can't be determined (editor, -C/-c, -F - without a heredoc) the commit is
@@ -112,15 +125,28 @@ def rewrite_reason(sub, args, cwd):
         for p in positional(args):
             if p.startswith("+"):
                 return "force push (+refspec %s)" % p
-    elif sub == "reset" and "--hard" in args:
+    elif sub == "reset" and any(a in ("--hard", "--keep", "--merge") for a in args):
         targets = [p for p in positional(args)]
-        if targets and targets[0] not in ("HEAD", "@"):
-            return "reset --hard %s" % targets[0]
+        if targets and targets[0] not in ("HEAD", "@") and "--" not in args[:args.index(targets[0])]:
+            mode = [a for a in args if a in ("--hard", "--keep", "--merge")][0]
+            return "reset %s %s" % (mode, targets[0])
     elif sub == "rebase":
-        if any(a in ("-i", "--interactive", "--root") or (re.match(r"^-[a-zA-Z]+$", a) and "i" in a)
-               for a in args):
-            return "interactive/root rebase"
-    elif sub in ("filter-branch", "filter-repo", "replace", "update-ref"):
+        if any(a in ("-i", "--interactive", "--root", "-x", "--exec") or a.startswith(("--exec=", "--rebase-merges"))
+               or (re.match(r"^-[a-zA-Z]+$", a) and ("i" in a or "x" in a)) for a in args):
+            return "interactive, root or --exec rebase"
+    elif sub == "branch" and any(a in ("-f", "--force", "-M", "-C") or
+                                 (re.match(r"^-[a-zA-Z]+$", a) and re.search(r"[fMC]", a)) for a in args):
+        return "git branch -f/-M/-C (moving or overwriting a branch)"
+    elif sub == "checkout" and any(a == "-B" or (re.match(r"^-[a-zA-Z]+$", a) and "B" in a) for a in args):
+        return "git checkout -B (resetting a branch)"
+    elif sub == "switch" and any(a in ("-C", "--force-create") or a.startswith("--force-create=") for a in args):
+        return "git switch -C (resetting a branch)"
+    elif sub == "update-ref":
+        pos = positional(args)
+        if args[:1] == ["-d"] and pos and pos[0].startswith("refs/atlas-upstream/") and len(pos) <= 2:
+            return None  # dropping a fetched release ref (atlas-update, after a failed signature check)
+        return "git update-ref"
+    elif sub in ("filter-branch", "filter-repo", "replace"):
         return "git %s" % sub
     elif sub == "reflog" and args and args[0] in ("expire", "delete"):
         return "git reflog %s" % args[0]
@@ -137,6 +163,8 @@ def ref_deletion(sub, args, cwd):
     if sub == "tag" and any(a in ("-d", "--delete") or (re.match(r"^-[a-zA-Z]+$", a) and "d" in a)
                             for a in args):
         return "git tag -d (deleting tags)", "tag"
+    if sub == "push" and "--prune" in args:
+        return "git push --prune (deletes branches on origin)", "branch"
     if sub == "push":
         pos = positional(args)
         refs = pos[1:] if len(pos) > 1 else pos
@@ -158,31 +186,33 @@ def ref_deletion(sub, args, cwd):
     return None
 
 
+GH_READS = {("auth", "status"), ("repo", "view"), ("repo", "list"), ("pr", "list"), ("pr", "view"),
+            ("pr", "status"), ("pr", "diff"), ("pr", "checks"), ("issue", "list"), ("issue", "view"),
+            ("issue", "status"), ("release", "list"), ("release", "view"), ("run", "list"), ("run", "view"),
+            ("gist", "list"), ("gist", "view")}
+
+
 def gh_change(argv):
-    """Description when a gh command changes repo visibility or collaborators
-    (N9), else None."""
+    """Description when a gh command does anything but read (N9: Atlas never changes GitHub through gh),
+    else None."""
     args = list(argv[1:])
     while args and args[0].startswith("-"):  # global flags: --repo x, -R x, --hostname x
+        if args[0] in ("--version", "--help", "-h"):
+            return None
         args = args[2:] if args[0] in ("-R", "--repo", "--hostname") else args[1:]
-    if args[:2] == ["alias", "set"] or args[:1] == ["extension"]:
-        return "gh %s (can hide other gh commands)" % " ".join(args[:2])
-    if len(args) >= 2 and args[0] == "gist" and args[1] not in ("list", "view"):
-        return "gh gist %s (a gist copies content out of the repo)" % args[1]
-    if len(args) >= 2 and args[0] == "repo" and args[1] in ("create", "fork"):
-        return "gh repo %s (copies the repo elsewhere)" % args[1]
-    if len(args) >= 2 and args[0] == "repo" and args[1] == "edit":
-        if any(a == "--visibility" or a.startswith("--visibility=") for a in args):
-            return "gh repo edit --visibility"
-    if args and args[0] == "api":
-        text = " ".join(args).lower()
-        if any(w in text for w in ("collaborator", "visibility", "/invitations", "gists", "/forks", "user/repos",
-                                   "/generate", "/transfer")):
-            method = shell.option_value(argv, "-X", "--method") or "GET"
-            writes = any(a in ("-f", "-F", "--field", "--raw-field", "--input") or
-                         a.startswith(("--field=", "--raw-field=", "--input=", "-f", "-F")) for a in args)
-            if method.upper() != "GET" or writes:
-                return "gh api changing collaborators or visibility, or copying content out"
-    return None
+    if not args or args[0] in ("version", "help"):
+        return None
+    if args[0] == "api":
+        method = (shell.option_value(argv, "-X", "--method") or "GET").upper()
+        fields = any(a in ("-f", "-F", "--field", "--raw-field", "--input") or
+                     a.startswith(("--field=", "--raw-field=", "--input=", "--method=", "-f", "-F"))
+                     and not a.startswith("--method=GET") for a in args)
+        if method != "GET" or fields:
+            return "gh api with %s" % ("method " + method if method != "GET" else "fields (a write)")
+        return None
+    if tuple(args[:2]) in GH_READS:
+        return None
+    return "gh %s" % " ".join(args[:2])
 
 
 def head_is_pushed(cwd):
@@ -300,6 +330,226 @@ def config_redirect(sub, args, argv):
     return None
 
 
+CONFIG_SAFE_KEY = re.compile(r"^(user\.(name|email)|pull\.rebase|rebase\.autostash|core\.(quotepath|filemode|autocrlf)"
+                             r"|color\.[a-z.]+|advice\.[a-z]+|init\.defaultbranch)$", re.I)
+CONFIG_WRITE_FLAGS = ("--unset", "--unset-all", "--add", "--replace-all", "--rename-section", "--remove-section",
+                      "-e", "--edit")
+BLOCKED_GLOBAL_OPTS = ("--exec-path", "--git-dir", "--work-tree", "--namespace", "--config-env", "--super-prefix")
+
+
+def config_problem(sub, args, argv):
+    """git -c / config writes beyond a few safe keys, and global options that relocate git (H2)."""
+    i = 1
+    while i < len(argv) and argv[i] != sub:
+        a = argv[i]
+        if a.split("=", 1)[0] in BLOCKED_GLOBAL_OPTS:
+            return "git %s" % a.split("=", 1)[0]
+        if a == "-c" and i + 1 < len(argv):
+            key = argv[i + 1].split("=", 1)[0]
+            if not CONFIG_SAFE_KEY.match(key):
+                return "git -c %s" % key
+            i += 2
+            continue
+        i += 1
+    if sub in ("fetch", "pull", "ls-remote", "clone", "archive") and any(
+            a.startswith("--upload-pack") or (sub in ("clone", "ls-remote") and a == "-u") for a in args):
+        return "git %s --upload-pack (it runs a program)" % sub
+    if sub == "grep" and any(a in ("-O", "--open-files-in-pager") or a.startswith(("-O", "--open-files-in-pager="))
+                             for a in args):
+        return "git grep -O (it runs a program)"
+    if sub != "config":
+        return None
+    pos = shell.positional(["git"] + args, value_opts=CONFIG_VALUE_OPTS)
+    if pos[:1] in (["get"], ["list"]):
+        return None
+    if pos[:1] in (["set"], ["unset"], ["rename-section"], ["remove-section"], ["edit"]):
+        key, writes = (pos[1] if len(pos) > 1 else ""), True
+    else:
+        key = pos[0] if pos else ""
+        writes = len(pos) >= 2 or any(a in CONFIG_WRITE_FLAGS for a in args)
+    if not writes:
+        return None
+    if any(a in ("-f", "--file", "--blob") or a.startswith(("--file=", "--blob=")) for a in args):
+        return "git config writing another file"
+    if not CONFIG_SAFE_KEY.match(key):
+        return "git config %s (Atlas sets only user.name, user.email and display settings)" % (key or "--edit")
+    return None
+
+
+ROUTINE_SUBS = {"status", "diff", "log", "show", "ls-files", "ls-tree", "ls-remote", "rev-parse", "rev-list", "add",
+                "commit", "pull", "push", "fetch", "tag", "checkout", "switch", "rm", "mv", "restore", "grep",
+                "blame", "cat-file", "merge-base", "branch", "remote", "config", "rebase", "reset", "stash",
+                "describe", "shortlog", "for-each-ref", "count-objects", "show-ref", "diff-tree", "name-rev",
+                "check-ignore", "revert", "update-ref", "merge", "version", "help", "reflog", "whatchanged"}
+# origin's main only: other branches on origin could have been pushed by this same session
+ORIGIN_REF = re.compile(r"^(origin/main|refs/remotes/origin/main|origin/HEAD|@\{u\}|@\{upstream\})$")
+PUSH_REFSPEC = re.compile(r"^(HEAD|main|HEAD:main|HEAD:refs/heads/main|main:main|refs/heads/main|"
+                          r"(refs/tags/)?pre-update-[0-9][0-9A-Za-z.-]*)$")
+HEAD_REFS = ("HEAD", "@")
+RELEASE_REFSPEC = re.compile(r"^refs/tags/(v\d+\.\d+\.\d+(-[A-Za-z0-9.]+)?):refs/atlas-upstream/\1$")
+PULL_FLAGS = {"--rebase", "--rebase=true", "--no-rebase", "--ff-only", "--ff", "--autostash", "--no-autostash",
+              "-q", "--quiet", "-v", "--verbose", "--no-edit", "-r"}
+FETCH_FLAGS = {"--no-tags", "--tags", "-q", "--quiet", "-v", "--verbose", "--prune", "-p", "--dry-run",
+               "--unshallow"}
+FETCH_VALUE_FLAGS = ("--depth", "--deepen", "--shallow-since")
+REBASE_FLAGS = {"--continue", "--abort", "--skip", "--quit", "--autostash", "--no-autostash", "-q", "--quiet"}
+LS_REMOTE_FLAGS = {"--tags", "--refs", "--heads", "--branches", "-t", "-h", "-b", "-q", "--quiet", "--symref",
+                   "--exit-code"}
+
+
+def _flags_outside(args, allowed, value_flags=()):
+    for a in args:
+        if a.startswith("-") and a not in allowed and a.split("=", 1)[0] not in value_flags:
+            return a
+    return None
+
+
+def routine_problem(sub, args, cwd, proj):
+    """Why a routine may not run this git command, or None. Routines never move HEAD or the working tree
+    to an older commit, so system files can't be swapped for an earlier release's (C3)."""
+    if not sub:
+        return None
+    if sub not in ROUTINE_SUBS:
+        return "git %s" % sub
+    pos = positional(args)
+    if sub == "checkout":
+        if "--" in args or any(a.startswith("--pathspec-from-file") for a in args):
+            return None  # paths: checked by the paths hook
+        if "-b" in args:
+            return None if pos[1:2] in ([], ["HEAD"], ["main"]) else "git checkout -b at %s" % pos[1]
+        return None if pos == ["main"] else (
+            "git checkout %s (routines use `git checkout main` or `git checkout -- <path>`)" % " ".join(args))
+    if sub == "switch":
+        if any(a in ("-c", "--create") for a in args):
+            return None if pos[1:2] in ([], ["HEAD"], ["main"]) else "git switch -c at %s" % pos[1]
+        return None if pos in ([], ["main"]) else "git switch %s (routines switch only to main)" % " ".join(args)
+    if sub == "branch":
+        if any(a in ("-d", "-D", "--delete", "-m", "--move", "-c", "--copy", "-l", "--list", "-a", "--all", "-r",
+                     "--remotes", "-v", "-vv", "--show-current") or a.startswith(("--contains", "--merged",
+                                                                                  "--no-merged", "--points-at",
+                                                                                  "--sort", "--format"))
+               for a in args):
+            return None
+        return None if len(pos) < 2 or pos[1] in HEAD_REFS else "git branch at %s" % pos[1]
+    if sub == "merge":
+        if "--allow-unrelated-histories" in args:
+            return "git merge --allow-unrelated-histories"
+        refs = shell.positional(["git"] + args, value_opts=("-m", "--message", "-s", "--strategy", "-X",
+                                                            "--strategy-option", "-F", "--file"))
+        bad = [r for r in refs if not ORIGIN_REF.match(r)]
+        return "git merge %s (routines merge only origin/...)" % bad[0] if bad else None
+    if sub == "rebase":
+        flag = _flags_outside(args, REBASE_FLAGS)
+        if flag:
+            return "git rebase %s" % flag
+        bad = [r for r in pos if not ORIGIN_REF.match(r)]
+        return "git rebase onto %s (routines rebase only onto origin/...)" % bad[0] if bad or len(pos) > 1 else None
+    if sub == "pull":
+        flag = _flags_outside(args, PULL_FLAGS)
+        if flag:
+            return "git pull %s" % flag
+        return None if pos in ([], ["origin"], ["origin", "main"]) else (
+            "git pull %s (routines pull only from origin main)" % " ".join(pos))
+    if sub == "fetch":
+        flag = _flags_outside(args, FETCH_FLAGS, FETCH_VALUE_FLAGS)
+        if flag:
+            return "git fetch %s" % flag
+        pos = shell.positional(["git"] + args, value_opts=FETCH_VALUE_FLAGS)
+        repo, refspecs = (pos[0] if pos else "origin"), pos[1:]
+        if repo == "origin":
+            return None if refspecs in ([], ["main"]) else "git fetch origin %s" % " ".join(refspecs)
+        if fetch_problem(sub, args, proj):
+            return None  # not an allowed source: fetch_problem refuses it with its own reason
+        bad = [r for r in refspecs if not RELEASE_REFSPEC.match(r)]
+        if bad or not refspecs:
+            return "git fetch %s %s (from the upstream, fetch only refs/tags/vX.Y.Z:refs/atlas-upstream/vX.Y.Z)" \
+                % (repo[:60], (bad or [""])[0])
+        return None
+    if sub == "ls-remote":
+        flag = _flags_outside(args, LS_REMOTE_FLAGS, ("--sort",))
+        if flag:
+            return "git ls-remote %s" % flag
+        return None  # the repo is checked by fetch_problem
+    if sub == "push":
+        if "--all" in args or "--tags" in args:
+            return "git push %s" % ("--all" if "--all" in args else "--tags")
+        refs = shell.positional(["git"] + args, value_opts=("-o", "--push-option"))[1:]
+        bad = [r for r in refs if not PUSH_REFSPEC.match(r)]
+        return "git push origin %s (routines push only main and pre-update tags)" % bad[0] if bad else None
+    if sub == "tag" and any(a in ("-f", "--force") for a in args):
+        return "git tag -f (moving a tag)"
+    if sub == "remote":
+        return None if not args or args[0] in ("-v", "--verbose", "get-url", "show", "add") else \
+            "git remote %s" % args[0]  # add: fetch_problem allows only the official upstream
+    if sub == "reset":
+        cut = args.index("--") if "--" in args else len(args)
+        targets = positional(args[:cut])
+        if targets and targets[0] not in HEAD_REFS and not ORIGIN_REF.match(targets[0]):
+            return "git reset to %s (routines reset only to HEAD or origin/main)" % targets[0]
+        return None
+    if sub == "revert":
+        if any(a in ("--continue", "--abort", "--quit", "--skip") for a in args):
+            return None
+        owned = atlas.owned_paths(proj)
+        for c in shell.positional(["git"] + args, value_opts=("-m", "--mainline", "-X", "--strategy-option",
+                                                               "--strategy")):
+            rc, out = git(["diff-tree", "--no-commit-id", "--name-only", "-r", "-m", c], cwd)
+            if rc != 0:
+                return "git revert %s (can't tell what it changes)" % c
+            if any(atlas.overlaps(f, e) for f in out.split() for e in owned):
+                return "git revert %s (it changes system files, which only atlas-update changes)" % c
+    return None
+
+
+def ls_remote_problem(sub, args, proj):
+    """git ls-remote only asks origin or the official upstream (a URL can carry data out)."""
+    if sub != "ls-remote":
+        return None
+    pos = shell.positional(["git"] + args, value_opts=("--sort", "--upload-pack"))
+    if any(a.startswith(("--upload-pack", "-u")) for a in args):
+        return "git ls-remote --upload-pack"
+    if not pos or pos[0] == "origin":
+        return None
+    upstream = atlas.upstream_slug(proj)
+    if GITHUB_URL.match(pos[0]) and atlas.repo_slug(pos[0]) == upstream:
+        return None
+    return "git ls-remote %s: Atlas asks only its own repo (origin) and the official upstream" % pos[0][:60]
+
+
+def release_mismatch(proj, cwd, release, include_worktree):
+    """In a routine, owned paths may be committed only as the signed release has them, file for file
+    (C3). Returns a description of the difference, or None."""
+    owned = [e.rstrip("/") for e in atlas.owned_paths(proj)]
+    rc, text = git(["show", "%s:system/manifest.yaml" % release], cwd)
+    try:
+        rel_owned = (atlas.load_yaml_text(text, proj) or {}).get("owned_paths") if rc == 0 else None
+    except Exception:
+        rel_owned = None
+    if not isinstance(rel_owned, list):
+        return "%s has no readable owned_paths" % release
+    paths = sorted(set(owned) | {str(e).rstrip("/") for e in rel_owned})
+    checks = [["diff", "--cached", "--quiet", release, "--"] + paths]
+    if include_worktree:
+        checks.append(["diff", "--quiet", release, "--"] + paths)
+    for args in checks:
+        rc, _ = git(args, cwd, timeout=20)
+        if rc != 0:
+            return "system files differ from %s (a routine commits them only exactly as released)" % release
+    if include_worktree:
+        rc, out = git(["ls-files", "--others", "--exclude-standard", "--"] + paths, cwd, timeout=20)
+        if rc != 0 or out.strip():
+            return "there are new files under system paths that %s doesn't have" % release
+    return None
+
+
+def lock_reset(sub, args, proj, ctx):
+    """`git reset --hard origin/main` while a valid update lock exists: undoing a failed update."""
+    if sub != "reset" or "--hard" not in args:
+        return False
+    targets = positional(args)
+    return bool(targets) and bool(ORIGIN_REF.match(targets[0])) and atlas.update_lock(proj, ctx)[0]
+
+
 def committed_paths(cwd, include_worktree):
     """Repo-relative paths this commit would include, or None if git can't tell."""
     rc, out = git(["diff", "--cached", "--name-only", "-z"], cwd, timeout=20)
@@ -315,7 +565,7 @@ def committed_paths(cwd, include_worktree):
     return paths
 
 
-def owned_commit_problem(proj, cwd, include_worktree, message):
+def owned_commit_problem(proj, cwd, include_worktree, message, ctx="chat"):
     """Why this commit may not touch owned paths, or None."""
     paths = committed_paths(cwd, include_worktree)
     if paths is None:
@@ -324,10 +574,10 @@ def owned_commit_problem(proj, cwd, include_worktree, message):
     hits = sorted(p for p in paths if any(atlas.overlaps(p, e) for e in owned))
     if not hits:
         return None
-    ok, why = atlas.valid_lock(proj, "update")
+    ok, why, release = atlas.update_lock(proj, ctx)
     actor = re.search(r"(?mi)^Atlas-Actor:[ \t]*(\S+)", message or "")
     if ok and actor and actor.group(1) == "update":
-        return None
+        return release_mismatch(proj, cwd, release, include_worktree) if release else None
     return ("this commit changes system-owned files (%s), which only atlas-update may commit, with "
             "'Atlas-Actor: update' while .atlas-tmp/update.lock is valid (%s)"
             % (", ".join(hits[:5]), why if not ok else "the commit isn't marked Atlas-Actor: update"))
@@ -488,14 +738,18 @@ def main(payload, proj, ctx):
             change = gh_change(seg.argv)
             if change:
                 atlas.STATE.locked = True
-                atlas.block("%s is not allowed: the Atlas repo stays private and no collaborators are added "
-                           "(N9). If the user wants this, they change it themselves in GitHub." % change)
+                atlas.block("%s is not allowed: Atlas only reads GitHub through gh, so the repo stays private "
+                           "and nothing is copied out (N9). If the user wants a change on GitHub, they make it "
+                           "themselves." % change)
             continue
         if seg.name != "git":
             continue
         sub, args = shell.git_subcommand(seg.argv)
         cdir = shell.git_dir_option(seg.argv)
-        cwd = os.path.normpath(os.path.join(seg.cwd, cdir)) if cdir else seg.cwd
+        cwd = os.path.normpath(os.path.join(seg.cwd, os.path.expanduser(cdir))) if cdir else seg.cwd
+        if ctx != "chat" and atlas.rel_to_project(cwd, cwd, proj) is None:
+            atlas.STATE.locked = True
+            atlas.block("In a routine git runs only in the Atlas repo, not in %s." % cwd)
         if sub == "add":
             staged_by_command = True
 
@@ -528,7 +782,25 @@ def main(payload, proj, ctx):
         if fetch_why:
             atlas.STATE.locked = True
             atlas.block("%s (N5)." % fetch_why)
+        cfg = config_problem(sub, args, seg.argv)
+        if cfg:
+            atlas.STATE.locked = True
+            atlas.block("%s isn't allowed: it could make git run a program or read and write somewhere "
+                        "else, outside the safety checks." % cfg)
+        lsr = ls_remote_problem(sub, args, proj)
+        if lsr:
+            atlas.STATE.locked = True
+            atlas.block("%s (N9)." % lsr)
+        if ctx != "chat":
+            why = routine_problem(sub, args, cwd, proj)
+            if why:
+                atlas.STATE.locked = True
+                atlas.block("In a routine, git keeps to Atlas's own steps (sync, commit, push, and updates "
+                            "from signed releases); %s isn't one of them. Do this step another way or leave it "
+                            "for a chat (system/rules/sync.md)." % why)
         reason = rewrite_reason(sub, args, cwd)
+        if reason and lock_reset(sub, args, proj, ctx):
+            reason = None  # undoing a failed update before it is pushed (atlas-update)
         if reason:
             if purge_ok is None:
                 ok, why = atlas.valid_lock(proj, "purge")
@@ -555,7 +827,7 @@ def main(payload, proj, ctx):
                 a in ("-a", "--all", "--include", "-i", "--only", "-o") or
                 (re.match(r"^-[a-zA-Z]+$", a) and "a" in a and not a.startswith("-m"))
                 for a in args)
-            owned_why = owned_commit_problem(proj, cwd, include_wt, message)
+            owned_why = owned_commit_problem(proj, cwd, include_wt, message, ctx)
             if owned_why:
                 atlas.STATE.locked = True
                 atlas.block("%s (N5). If a system file needs fixing, record it for atlas-health, which "
