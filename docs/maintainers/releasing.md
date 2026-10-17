@@ -17,11 +17,11 @@ This is the one place that says how an Atlas release is made. Other files (`syst
 1. **Changelog.** Add lines to the version being built (`## 1.0.0` now; `## Unreleased` after 1.0.0 ships):
    - `### What's new`: one plain line per change the user will notice, written as what they can now say or do.
    - `### Action needed`: one plain line per thing **only the user can do** (Atlas can't do it for them), e.g. "Update your Atlas Project's instructions." Leave the heading out if there's nothing. `atlas-update` turns each line into a "Needs you" item that stays until it's done (see below).
-   - `### Under the hood`: maintainer notes. Not shown to users.
+   - Maintainer notes go in `docs/maintainers/under-the-hood.md` on this branch (since 1.1.0), not in `CHANGELOG.md`, so users' copies stay short. Add them in the companion pull request to `maintainers`.
 2. **Bootstrap stub.** If the Project-instructions text in `system/templates/bootstrap-stub.md` changes, raise `bootstrap_version` in `system/manifest.yaml` and the `Atlas bootstrap <N>` marker in the stub and in `docs/setup/04-create-the-atlas-project.md`. That alone tells every user to update their instructions (no `Action needed` line required for it).
 3. **Kernel.** If `system/kernel.md` changes in a way old Project instructions or sessions must notice, raise `kernel_version` in the manifest and the `atlas-kernel-<N>` marker in the kernel.
 4. **Data shape.** If anything under `user/` must change shape, add a migration (`system/migrations/README.md`) and raise `manifest.yaml: data_version`. Non-additive or needs-input migrations make the release major.
-5. **Dashboards.** If a template's shared code changed, run `python3 system/tests/dashboards/render.py --sync`.
+5. **Dashboards.** `_base.css` and `_base.js` are the only copies of the shared page code (since 1.1.0 `render.py` puts them into each page), so there's nothing to sync. `render.py --check` confirms every template still holds the base placeholders.
 6. **Checks** (all must pass):
    ```bash
    python3 system/tools/validate.py --all

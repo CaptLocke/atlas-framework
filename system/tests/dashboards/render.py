@@ -7,7 +7,6 @@ Standard library only (Playwright is used for screenshots only if installed).
     python3 system/tests/dashboards/render.py goals        # one dashboard
     python3 system/tests/dashboards/render.py --theme theme-sample.css
     python3 system/tests/dashboards/render.py --shots      # also screenshot (Playwright)
-    python3 system/tests/dashboards/render.py --sync       # copy _base.css/_base.js into templates
     python3 system/tests/dashboards/render.py --check      # verify templates only (no output)
 
 Output goes to system/tests/dashboards/out/ (git-ignored).
@@ -33,28 +32,14 @@ NAMES = ["daily-brief", "commitments", "projects", "goals", "week-ahead", "peopl
 DATA_PH = "{{ATLAS_DATA}}"
 THEME_PH = "{{ATLAS_THEME_CSS}}"
 REQUIRED_META = ["dashboard", "schema_version", "generated_at", "as_of", "timezone", "headline"]
-BLOCKS = {  # inlined canonical files: (opening tag, closing tag, source file)
-    "css": ('<style id="atlas-base">', "</style>", DASH / "_base.css"),
-    "js": ('<script id="atlas-base-js">', "</script>", DASH / "_base.js"),
+BASE = {  # the shared files render.py puts into every page: (element, placeholder, source file)
+    "css": ('<style id="atlas-base">', "{{ATLAS_BASE_CSS}}", DASH / "_base.css"),
+    "js": ('<script id="atlas-base-js">', "{{ATLAS_BASE_JS}}", DASH / "_base.js"),
 }
 
 
 sys.path.insert(0, str(HERE.parent.parent / "tools"))
 from render import safe_json, safe_css, inject  # noqa: E402  (the shipped renderer)
-
-
-def block_span(text, opening, closing):
-    start = text.index(opening) + len(opening)
-    end = text.index(closing, start)
-    return start, end
-
-
-def sync_template(path):
-    text = path.read_text(encoding="utf-8")
-    for opening, closing, src in BLOCKS.values():
-        start, end = block_span(text, opening, closing)
-        text = text[:start] + "\n" + src.read_text(encoding="utf-8").rstrip() + "\n" + text[end:]
-    path.write_text(text, encoding="utf-8")
 
 
 def contract_budget(name):
@@ -106,14 +91,11 @@ class Checker(HTMLParser):
 
 def check_template(name, text):
     problems = []
-    for key, (opening, closing, src) in BLOCKS.items():
-        try:
-            start, end = block_span(text, opening, closing)
-        except ValueError:
-            problems.append("missing %s block" % opening)
-            continue
-        if text[start:end].strip() != src.read_text(encoding="utf-8").strip():
-            problems.append("inlined %s is out of date (run --sync)" % src.name)
+    for element, ph, src in BASE.values():
+        if text.count(element + ph) != 1:
+            problems.append("expected %s%s (the shared %s, filled by render.py)" % (element, ph, src.name))
+    # the base files are part of every page: check them with the template
+    text = text + "".join(src.read_text(encoding="utf-8") for _, _, src in BASE.values())
     for ph in (DATA_PH, THEME_PH):
         if text.count(ph) != 1:
             problems.append("expected exactly one %s" % ph)
@@ -197,16 +179,10 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("names", nargs="*", help="dashboards to render (default: all)")
     ap.add_argument("--theme", help="CSS file to inject as the theme (path relative to this folder or absolute)")
-    ap.add_argument("--sync", action="store_true", help="copy _base.css and _base.js into every template")
     ap.add_argument("--check", action="store_true", help="check templates only; do not render")
     ap.add_argument("--shots", action="store_true", help="take screenshots with Playwright (desktop/phone, light/dark)")
     args = ap.parse_args()
     names = args.names or NAMES
-
-    if args.sync:
-        for n in names:
-            sync_template(DASH / ("%s.html" % n))
-        print("Synced base CSS/JS into %d templates." % len(names))
 
     theme = ""
     if args.theme:
