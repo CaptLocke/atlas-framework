@@ -43,7 +43,7 @@ If this session has a tool to create or edit cloud environments, create it (defa
 ```
 "If it looks different: look for wherever you can add environment variables for cloud runs. The name and the line above are all that matter. Capitals and the underscore matter in ATLAS_CONTEXT; the value is routine in lower case, with no spaces or quotes."
 
-**Why it matters:** the marker is how the safety hooks know a run is unattended. Since 1.0.2 they also treat a session that starts with an Atlas routine prompt as a routine, but the environment is still required: the routine prompt checks the marker first and stops without running any job if it's missing. Every run records the `ATLAS_CONTEXT` it saw in its run report (`atlas_context`); a run that doesn't see `routine` raises the high-severity known issue `routine-env-missing` naming the routine, and the weekly health check (`atlas-health`, via `maintenance`) looks for unmarked runs too.
+**Why it matters:** the marker is how the safety hooks know a run is unattended. Since 1.0.2 they also treat a session that starts with an Atlas routine prompt as a routine, but the environment is still required: a run that doesn't see `ATLAS_CONTEXT=routine` stops at step 0 of `system/jobs/README.md` §Running a routine, before any job, and leaves a failed run report saying why. Every run records the `ATLAS_CONTEXT` it saw in its run report (`atlas_context`); a run that doesn't see `routine` raises the high-severity known issue `routine-env-missing` naming the routine, and the weekly health check (`atlas-health`, via `maintenance`) looks for unmarked runs too.
 
 **Fixing `routine-env-missing`** (offer this in the next chat):
 ```
@@ -94,3 +94,24 @@ Translate cron to plain words for the user ("Every Friday at 2:07 PM", "Weekdays
 ## 6. Changing later
 - Job list or modifiers: settings edit only (`routines.yaml`).
 - Schedule, model, connectors, or a new/removed routine: also update the platform routine (same tool or copy-paste path). Every new routine uses the "Atlas routine" environment (§3, §4) and gets a test run as in §5. Removing a platform routine counts as deleting (`destructive`, approval); prefer turning it off.
+- The prompt itself, after a release changed it: §7.
+
+## 7. Re-pasting routine prompts
+When the routine prompt in `system/jobs/README.md` §Routine prompt changes, every automation the user already created keeps the old text until they replace it by hand, so the release carries an `Action needed` line and they arrive saying "update my automation prompts". Their automations keep running meanwhile: the old prompt still works.
+
+Go **one automation at a time, with the count up front**. The user is switching between two apps, and a single pass of copy-paste blocks is where they lose their place.
+1. Read `routines.yaml`, then say how many there are and which one is first: "You have three automations. Here's the first — nightly-cycle." Never show more than one block at a time.
+2. For that routine, show only the name to open and the exact text to paste:
+   ```
+   In the Claude desktop app, open the Code tab, then Routines, and open "Atlas · nightly-cycle".
+   Replace everything in its Instructions box with this one line, then save:
+
+   Run the Atlas routine `nightly-cycle`.
+   ```
+   The line is the prompt from `system/jobs/README.md` §Routine prompt with this routine's name filled in — never retyped from memory. Nothing else about the routine changes: same schedule, model, environment and connectors.
+3. Wait for the user to say that one is done. Then name the next one and how many are left ("Done — two to go. Next: weekly."), and repeat until the last.
+4. When the last one is done, say so, mark the `action` question answered (`Action key: release-<version>-<n>`), log it (`system/rules/sync.md`), and republish the Control Center. If the user stops partway, leave the question open, say which routines are still on the old prompt, and that those keep running until they get to them.
+
+If this session can edit routines (a routine or scheduled-task tool), set each routine's instructions itself — still one at a time, saying what it changed — then read the next run report of one of them to confirm it still shows `atlas_context: routine` (§5).
+
+If the user asks why it matters: the old prompt works, except that an automation that starts outside its "Atlas routine" environment stops without leaving a report, so they'd see nothing at all rather than a run that says what was wrong.

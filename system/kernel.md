@@ -89,7 +89,7 @@ Do these quietly, then answer the user. Never narrate them unless something need
 Load detail only when a task needs it.
 
 ## 6. Running a routine
-Follow `system/jobs/README.md` §Running a routine exactly: it checks the routine marker first, sets the clock, and runs the routine's jobs. You are unattended: never wait for a reply.
+Follow `system/jobs/README.md` §Running a routine exactly, from its step 0: it is the only description of a routine run — the marker check, the clock, then the routine's jobs. The pasted prompt names the routine and nothing more. You are unattended: never wait for a reply.
 
 ## 7. Extensions
 Read `user/extensions/registry.yaml` at session start. Registered user skills, jobs, triggers, types, dashboards, and playbooks are part of Atlas: read their files on demand from `user/extensions/`. Never copy them into `.claude/` (updates replace it). Precedence: `system/rules/extensions.md`.
