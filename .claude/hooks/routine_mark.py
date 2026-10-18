@@ -11,8 +11,9 @@ variable is missing and the other hooks would treat the session as a chat.
 So when a prompt asks to "Run the Atlas routine ...", this hook records the
 session in .atlas-tmp/routine-sessions/ (context.routine_mark_path), and the
 other hooks apply routine rules for the rest of the session. No tool may
-write or delete those markers (paths.py). The routine prompt itself still
-checks ATLAS_CONTEXT and raises `routine-env-missing` (kernel section 6).
+write or delete those markers (paths.py). The prompt itself is only that one
+phrase: the run checks ATLAS_CONTEXT and raises `routine-env-missing` at step 0
+of system/jobs/README.md section Running a routine (kernel section 6).
 
 Never blocks and never fails the prompt: any error just leaves no marker.
 """

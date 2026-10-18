@@ -97,7 +97,7 @@
       body: N.items(asks.map(function (a) {
         return N.item({ tone: "warn", title: a.action, text: a.why,
           meta: [a.prepared ? "Prepared: " + a.prepared : null, a.requested_by ? "Requested by " + a.requested_by : null],
-          aside: [h("span", null, "Asked " + N.date(a.requested_on)), a.expires_on ? h("span", null, "Expires " + N.date(a.expires_on)) : null] });
+          aside: [h("span", null, "Asked " + N.date(a.requested_on))] });
       }), "Nothing is waiting for approval.") }));
 
     main.appendChild(N.section({ id: "questions", title: "Questions from Atlas", count: N.total("questions", qs.length), key: "questions",

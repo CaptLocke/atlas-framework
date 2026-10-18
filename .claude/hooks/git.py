@@ -384,9 +384,9 @@ ROUTINE_SUBS = {"status", "diff", "log", "show", "ls-files", "ls-tree", "ls-remo
 # origin's main only: other branches on origin could have been pushed by this same session
 ORIGIN_REF = re.compile(r"^(origin/main|refs/remotes/origin/main|origin/HEAD|@\{u\}|@\{upstream\})$")
 PUSH_REFSPEC = re.compile(r"^(HEAD|main|HEAD:main|HEAD:refs/heads/main|main:main|refs/heads/main)$")
-# An update creates no rollback tag since 1.1.2, so a routine pushes only main. Deleting a tag left
-# from an earlier version stays allowed (atlas-memory's purge); the deletion itself needs the update
-# or purge lock, checked by ref_deletion.
+# An update creates no rollback tag since 1.1.2, so a routine pushes only main. Removing a tag left
+# by an earlier version stays allowed, under the update lock in any context or a purge lock in a chat
+# (ref_deletion checks that); nothing in the shipped procedures reaches it from a routine any more.
 PUSH_DELETE_REFSPEC = re.compile(r"^(refs/tags/)?pre-update-[0-9][0-9A-Za-z.-]*$")
 HEAD_REFS = ("HEAD", "@")
 RELEASE_REFSPEC = re.compile(r"^refs/tags/(v\d+\.\d+\.\d+(-[A-Za-z0-9.]+)?):refs/atlas-upstream/\1$")

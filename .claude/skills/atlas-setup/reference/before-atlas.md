@@ -41,7 +41,7 @@ Ask what they see on screen if the fix below doesn't match. Screens change; desc
 - Goal: Claude's GitHub app is installed with access to **only** their Atlas repository.
 - In Claude: **Settings → Connectors** (or **Integrations**) → **GitHub** → **Connect**; on GitHub choose **Only select repositories** → pick their Atlas repo → **Install / Authorize**.
 - **"Claude can't save to your repository"** (push fails): the app was installed with read-only access or on other repos. Fix: github.com → **Settings → Applications → Installed GitHub Apps → Claude → Configure** → ensure their Atlas repo is selected and access includes writing contents. Then say "try again".
-- **Pushes land on a branch named `claude/...` instead of `main`:** routines push to a `claude/` branch unless their prompt says otherwise, and the Atlas routine prompt says to push to `main`, so check that the routine's instructions were pasted in full. A GitHub branch rule on `main` can also block pushes; the user can remove it in the repository's settings. Note it (`setup.yaml: notes`) and continue; routine pushes are checked during testing.
+- **Pushes land on a branch named `claude/...` instead of `main`:** a cloud routine starts on its own `claude/…` branch, and Atlas always pushes `HEAD:main` from there (`system/rules/sync.md`); the session-start hook reports whether that push works. So this is usually push access, not the routine: check the access fix above first. A GitHub branch rule on `main` can also block pushes; the user can remove it in the repository's settings. Note it (`setup.yaml: notes`) and continue; routine pushes are checked during testing.
 - **Repository not in the list:** reopen the app configuration and add it.
 
 ### Step 4: the Atlas project

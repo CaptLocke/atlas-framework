@@ -9,7 +9,7 @@ Chat only; the user's request plus a one-line confirmation is enough (`updates_m
 
 1. **Find the target**, from this repo's own history. The commit that installed the running version is the owned-path commit carrying `Atlas-Actor: update` and `Atlas-Reason: apply release v<installed>`; its **parent** is the tree the previous version ran. That parent is `<sha>`, what the restore reads from, and `git show <sha>:system/VERSION` is the version `<X>` to return to. `user/logs/activity/YYYY-MM.md` records every transition with its commit (`update · Atlas 1.1.0 → 1.1.1 · commit <sha>`), which is the cross-check.
    ```bash
-   git log -n 1 --format=%H --grep='Atlas-Reason: apply release v1.1.1'
+   git log -n 1 --format=%H --grep='Atlas-Reason: apply release v1\.1\.1$'   # anchored: v1.1.1, not v1.1.10
    git rev-parse <that commit>^        # <sha>
    git show <sha>:system/VERSION       # <X>
    ```

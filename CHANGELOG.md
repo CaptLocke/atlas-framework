@@ -7,7 +7,7 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Atlas Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
-## 1.1.2 (2026-10-17)
+## 1.1.2 (2026-10-18)
 
 ### What's new
 - Updates no longer depend on Atlas being able to push a tag first, so an update can't be blocked by that step. "Go back to the previous version" still works: Atlas finds the version to return to in your own repo's history, and still reads the markers earlier versions left behind.
