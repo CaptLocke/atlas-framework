@@ -12,4 +12,4 @@ Atlas's hooks (`.claude/hooks/`) and validator (`system/tools/validate.py`) use 
 
 **How it is used:** callers put this folder first on `sys.path` (`sys.path.insert(0, "<repo>/system/tools/vendor")`) and call `yaml.safe_load` only. The optional C accelerator (`_yaml`) is not shipped; PyYAML falls back to pure Python automatically.
 
-**Updating:** download the new sdist from PyPI, verify its sha256 against PyPI's published digest, replace `yaml/` with the sdist's `lib/yaml/` and `LICENSE`, update this table, and run the hook and validator tests from the `maintainers` branch (they must pass).
+**Updating:** download the new sdist from PyPI, verify its sha256 against PyPI's published digest, replace `yaml/` with the sdist's `lib/yaml/` and `LICENSE`, update this table, and run the hook and validator tests, kept in the maintainer's private repo (they must pass).

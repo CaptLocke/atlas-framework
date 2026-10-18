@@ -9,7 +9,7 @@ nohup, time, xargs), `bash -c` / `sh -c` / `eval` strings (recursively),
 `cd` within one command line, output redirections (> >> >| &> &>> <>), and
 heredoc bodies (removed before tokenizing; kept for commit messages).
 
-Known limits (covered by the hook tests on the maintainers branch): variables and command
+Known limits (covered by the hook tests in the maintainer's private repo): variables and command
 substitutions are not expanded, globs are reduced to their literal prefix,
 and writes made by interpreters (python -c, node -e, perl without -i, awk
 with redirection inside its program) are not detected. In routines these
