@@ -7,7 +7,17 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Atlas Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
-## 1.1.1 (2026-10-18)
+## 1.1.2 (2026-10-17)
+
+### What's new
+- Updates no longer depend on Atlas being able to push a tag first, so an update can't be blocked by that step. "Go back to the previous version" still works: Atlas finds the version to return to in your own repo's history, and still reads the markers earlier versions left behind.
+- Your automations' instructions are now a single line. An automation that can't start properly leaves you a report saying so, instead of stopping without a trace.
+- Your Control Center no longer puts an expiry date on a request waiting for your OK. It says the rule once instead — requests expire after 14 days that you're not away — since time away doesn't count towards it.
+
+### Action needed
+- Replace the prompt in each of your Atlas automations with the shorter one Atlas now uses — it lets an automation that can't start properly leave you a report instead of stopping silently. Your automations keep working until you do. Ask Atlas "update my automation prompts" and it walks you through it.
+
+## 1.1.1 (2026-10-17)
 
 ### What's new
 - Atlas follows one set of rules everywhere, so the same question gets the same answer on every page and in every brief:
