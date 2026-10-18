@@ -93,7 +93,7 @@
       }), "No known issues. Everything Atlas checks is working.") }));
 
     main.appendChild(N.section({ id: "approvals", title: "Waiting for your OK", count: N.total("approvals", asks.length), key: "approvals",
-      note: "Nothing here happens until you say yes in chat. Requests expire after 14 days.",
+      note: "Nothing here happens until you say yes in chat. Requests expire after 14 days that you're not away.",
       body: N.items(asks.map(function (a) {
         return N.item({ tone: "warn", title: a.action, text: a.why,
           meta: [a.prepared ? "Prepared: " + a.prepared : null, a.requested_by ? "Requested by " + a.requested_by : null],

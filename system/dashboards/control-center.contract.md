@@ -24,7 +24,7 @@ Republished by `daily-brief` (each cycle) and `monthly` (after health checks and
                       "summary": "Outlook connection expired", "fix": "Reconnect Outlook in Settings, then Connectors.", "status": "open" } ],
   "approvals": [ { "id": "A-2026-10-12-01", "action": "Send follow-up to Dana Ruiz", "why": "…",
                    "prepared": "Outlook draft \"Contract review: quick check-in\"", "requested_by": "routine:nightly-cycle",
-                   "requested_on": "2026-10-12", "expires_on": "2026-10-26", "status": "pending" } ],
+                   "requested_on": "2026-10-12", "status": "pending" } ],
   "questions": [ { "id": "Q-2026-10-13-01", "kind": "action", "text": "Update your Atlas Project's instructions …",
                    "how": "In the Claude app, open the Atlas Project, replace its instructions, and save.",
                    "copy_text": "This Project is my Atlas (Atlas bootstrap 3). …", "asked": "2026-10-13" },
@@ -70,7 +70,7 @@ Republished by `daily-brief` (each cycle) and `monthly` (after health checks and
 | `jobs[]` | `user/.state/jobs.yaml` (`last_success, last_status`); `detail` from the latest run report row for the job |
 | `away` | `rhythms.yaml: away` (`active` when today is within `start`–`end`) |
 | `known_issues[]` | `user/.state/health.yaml: known_issues` with `status` not resolved |
-| `approvals[]` | `user/inbox/approvals.md`, status `pending`; `expires_on` = requested + 14 days |
+| `approvals[]` | `user/inbox/approvals.md`, status `pending`. **No expiry date:** the entry records none, and expiry pauses while the user is away (`system/jobs/maintenance.md` step 6), so no date computed here would be honoured. Each entry shows its request date; the rule itself is the section's static line (Rendering notes) |
 | `questions[]` | `user/inbox/questions.md`, status `open`; `how` and `copy_text` (the entry's How and Copy text, filled in for this user) for `action` entries |
 | `connections[]` | `user/settings/connectors.yaml` (`connector, categories, available_in_routines`), health from the latest run reports' "Connector health" and `health.yaml`; `last_seen` from `user/.state/cursors.yaml`; fallbacks from `sources.yaml: fallbacks`. The GitHub connection is listed from the last successful push |
 | `activity[]` | `user/logs/activity/YYYY-MM.md`, newest first |
@@ -82,4 +82,5 @@ Republished by `daily-brief` (each cycle) and `monthly` (after health checks and
 - Section order: action needed (open `action` questions, only if any, each with its `how` and `copy_text` ready to copy), known issues, approvals, questions (the rest), automations, jobs, connections, recent runs, activity, suspicious content (only if any), Atlas itself. Empty sections say so plainly ("No known issues").
 - Sorting: issues by severity (high, medium, low) then `since`; approvals and questions newest first, except open `action` questions, which come first, oldest first; routines in `routines.yaml` order; jobs in pipeline order (ingest, triage, intelligence, email-drafts, meeting-prep, daily-brief, weekly-review, status-updates, monthly, quarterly, maintenance, update-check, then user jobs); activity and runs newest first.
 - Caps: `activity` 25 (last 7 days), `runs` 10, `approvals` 20, `questions` 20 (`action` entries never cut), `suspicious` 10, `known_issues` 20. Record left-out counts in `meta.truncated`.
+- The approvals section carries one static line for the whole section — approvals expire after 14 days that the user is not away — and no expiry date on any entry: it is the general rule, not a promise about the entry in front of the user.
 - Never show approval draft bodies, suspicious content text beyond a one-line description, or any secret. Activity summaries follow `formats.md` §4 (no sensitive content).
