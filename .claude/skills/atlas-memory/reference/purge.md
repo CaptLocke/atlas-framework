@@ -17,7 +17,7 @@ The only exception to N8 (`system/rules/governance.md`; `system/rules/knowledge.
 ## 2. Confirm
 Tell the user, plainly:
 - This cannot be undone. Earlier versions of the listed files will be gone, including for undo.
-- All branches and tags in the repo are rewritten, including `pre-update-*` rollback tags.
+- All branches and tags in the repo are rewritten, including any rollback tags left from earlier versions.
 - GitHub may keep cached copies for a while; if it matters, GitHub Support can be asked to clear cached views.
 - Copies outside Atlas (the original email, the drive file, an export zip) are not affected.
 Wait for explicit words (e.g. "yes, permanently erase"). Anything less: stop.
@@ -82,7 +82,7 @@ Delete `.atlas-tmp/purge-keep/` and `.atlas-tmp/purge.lock`.
 
 ## 10. Log and tell
 - Activity log: `- <date> <time> · chat · purge (approved) · erased history for 2 paths: user/knowledge/people/jane-doe.md, … · commit <sha>`. Paths only, never content. If even a path reveals sensitive content, log "2 paths (named in conversation)".
-- Tell the user: done; rollback tags were rewritten; GitHub may hold cached copies for a period; copies outside Atlas are unaffected.
+- Tell the user: done; any rollback tags left from earlier versions were rewritten; GitHub may hold cached copies for a period; copies outside Atlas are unaffected.
 
 ## If something fails midway
 - Before the push: nothing on the remote changed. While the lock is still valid, reset each local branch to its remote (`git fetch origin && git reset --hard origin/<branch>`; local only, nothing pushed is rewritten), then delete the lock and report. If the lock has expired and a hook blocks the reset, re-clone the repo instead.

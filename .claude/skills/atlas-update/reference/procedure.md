@@ -16,11 +16,10 @@ Parse `refs/tags/vMAJOR.MINOR.PATCH`; skip tags with a pre-release suffix. Compa
 ```bash
 git status --porcelain                          # must be empty (commit user work first)
 git pull --rebase
-git tag pre-update-1.0.0                        # if it doesn't already exist
-git push origin pre-update-1.0.0
-mkdir -p .atlas-tmp && printf '%s' '{"by":"atlas-update","version_from":"1.0.0","version_to":"1.1.0","created":"2026-10-18T03:09:00-07:00","expires":"2026-10-18T03:39:00-07:00"}' > .atlas-tmp/update.lock
+git rev-parse HEAD                              # the rollback point; write it into the lock as base_commit
+mkdir -p .atlas-tmp && printf '%s' '{"by":"atlas-update","version_from":"1.0.0","version_to":"1.1.0","base_commit":"9f41c0d8e2b7a5641f0c3d9ab8e7520146c3bd5e","created":"2026-10-18T03:09:00-07:00","expires":"2026-10-18T03:39:00-07:00"}' > .atlas-tmp/update.lock
 ```
-If pushing the tag fails (permissions), stop before changing anything, release the lock, and record a known issue: without a remote rollback point the update doesn't proceed (N13).
+No tag is created and nothing is pushed here. The rollback point is the commit itself, which is already in this repo's history: a failure can name it, a lock left behind by an interrupted update still says which commit the repo was on, and a later rollback finds its target from history rather than from a tag (`rollback.md` step 1). So nothing in this step can fail and stop the update — which is why N13's rollback point no longer depends on a push.
 
 ## Fetch the release (upstream)
 ```bash
