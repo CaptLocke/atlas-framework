@@ -35,7 +35,7 @@ Period check above. If `monthly` is due in the same run and hasn't run yet, it r
 
 ## Outputs
 - `user/work/reports/YYYY-Qn.md` and `user/work/reports/YYYY-Qn-performance.md` (the reviewed quarter).
-- Goal status updates and draft goals; questions in `user/inbox/questions.md`.
+- Proposed goal outcomes (in the quarterly review, for the user to confirm) and draft goals; questions in `user/inbox/questions.md`.
 
 ## Early exit
 Period not due or already done → `early_exit`. All three moments off → set `period_done` and `early_exit`.

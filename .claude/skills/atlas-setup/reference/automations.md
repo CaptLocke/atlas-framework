@@ -35,7 +35,7 @@ So Atlas needs exactly one cloud environment:
 
 If this session has a tool to create or edit cloud environments, create it (default network access; never put secrets in variables). Otherwise give the user the steps one at a time:
 ```
-1. In the Claude desktop app, open the Code tab, then Routines, and open the Atlas routine (or start a new one). Below the Instructions box, click the cloud icon that shows the environment's name (for example "Default") and choose to add a new cloud environment. (There's no Settings page for environments.)
+1. In the Claude desktop app, open the Code tab, then Routines, and start a new routine (you don't need to save it now: this is only to reach the environment menu). Below the Instructions box, click the cloud icon that shows the environment's name (for example "Default") and choose to add a new cloud environment. (There's no Settings page for environments.)
 2. Name the new environment: Atlas routine
 3. Under "Environment variables" (or similar), add exactly one line:
    ATLAS_CONTEXT=routine
@@ -63,7 +63,7 @@ For each routine in `routines.yaml`:
 | Prompt | The thin pointer from `system/jobs/README.md`, with the routine name filled in |
 | Repository | The user's Atlas repo only |
 | Environment | `Atlas routine` (always; a routine without it isn't guarded by the safety hooks) |
-| Connectors | The connectors in `connectors.yaml` that the routine's jobs read from or draft into (for example mail, calendar, files), and no others. Their send, share and delete tools stay attached but are blocked in routines by Atlas's guard, along with any tool it can't confirm is read-only, so routines only read and draft |
+| Connectors | The connectors in `connectors.yaml` that the routine's jobs read from or draft into (for example mail, calendar, files), and no others. Their send, share and delete tools stay attached but are blocked in routines by Atlas's guard, along with any unmapped tool whose name doesn't show what it does, so a routine never sends, shares, or deletes |
 | Model | `system/manifest.yaml: models.<role>` for the routine's `model` role; if a routine mixes fast and strongest jobs, strongest |
 | Schedule | The cron from `routines.yaml`, in the user's time zone |
 

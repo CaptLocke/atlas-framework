@@ -57,7 +57,7 @@ Produce the requested review on demand for the period the user names (default: t
 ## Guardrails
 - Governance: `system/rules/governance.md`. Classes touched: `read`, `records_write` (accomplishments, goal `current`, draft goals), `profile_update` (role refresh findings are proposals unless `auto`), `behavior_settings` (automation-review suggestions are proposals only), `dashboards_refresh`, `external_read` (calendar for next week).
 - Indicators are computed and stored only in the user's repo; nothing is sent anywhere. They leave the repo only if the user includes them in an issue report (`atlas-report-issue`).
-- Never mark a goal achieved or missed, activate a goal, or change role facts without the user's confirmation.
+- Never mark a goal achieved, missed, or dropped, activate a goal, or change role facts without the user's confirmation.
 - Never record or renew an attestation without the user's explicit words in chat.
 - Accomplishments must be real and evidenced; never inflate. No `notes_private` in any report.
 - The performance pack is for the user; sharing it is `share_expose` (locked) and sending it is `send_communication` (locked).

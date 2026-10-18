@@ -39,7 +39,7 @@ fired:
   - { trigger: deadline_approaching, record: commitments/send-pricing-feedback, key: "2026-10-15", fired_on: "2026-10-12" }
   - { trigger: commitment_overdue, record: commitments/redlines-from-dana, key: "2026-11-10", held_on: "2026-11-11", held: true }
 ```
-A trigger fires at most once per `(trigger, record, key)`; `key` is the occurrence (e.g. the due date). During away mode a trigger whose condition is met is recorded with `held: true` and `held_on` instead of `fired_on`, and its user-facing action is not taken. A `held` entry does not count as fired. The catch-up brief lists the held entries whose condition still holds (an occasion that has already passed, such as a deadline before the return day, is left out), then removes every `held` entry, so the next runs act on the conditions that are still true in the normal way (`atlas-brief` §B).
+A trigger fires at most once per `(trigger, record, key)`; `key` is the occurrence (e.g. the due date). During away mode a trigger whose condition is met is recorded with `held: true` and `held_on` instead of `fired_on`, and its user-facing action is not taken. A `held` entry does not count as fired. Each `(trigger, record, key)` is held at most once: a run that finds an entry already held adds nothing. The catch-up brief lists the held entries whose condition still holds (an overdue item that is still open still counts; a `deadline_approaching` or `key_meeting_upcoming` whose date passed while the user was away is left out), then removes every `held` entry, so the next runs act on the conditions that are still true in the normal way (`atlas-brief` §B).
 
 ### setup.yaml
 ```yaml

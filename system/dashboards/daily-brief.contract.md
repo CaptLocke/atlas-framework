@@ -72,7 +72,7 @@ Envelope: `meta` as in `system/dashboards/README.md`; `meta.as_of` = the brief's
 
 ## Rendering notes
 - Order on the page: action needed (if any), while you were away (catch-up only), top priorities (numbered: they are ranked), today, due and slipping, waiting on others, needs you (if any), worth knowing (if any), drafts ready (if any). Every section has a one-line description under its title and no count. The brief file's "What changed" and "Since last night" sections are not shown on the page.
-- Sorting: `priorities` in rank order (3 to 5 items); `today` by `start`, all-day items last; `due` overdue first, then by `due`, then priority; `waiting_on` slipped first, then by `due` (nulls last).
+- Sorting: `priorities` in rank order (3 to 5 items); `today` by `start`, all-day items last; `due` as in the brief (`atlas-brief` §A step 4.2): items due tomorrow first, then slipped, then by `due`, then priority; `waiting_on` slipped first, then by `due` (nulls last).
 - Caps (then `meta.truncated`): `today` 15, `due` 5, `waiting_on` 5, `drafts` 8, `approvals` 5, `questions` 3, `while_away` 8 (catch-up). `actions` is never capped. `due`, `waiting_on` and `questions` use the brief file's caps (`atlas-brief` §A step 5), so the page and the file list the same items; `meta.truncated` carries the "+N more" count.
 - Text limits: `headline` 200 characters, `why`/`next_step`/`summary` 240.
 - The page is typically under 15 KB of data; the budget only matters after long away periods (catch-up), where `while_away` is truncated first.

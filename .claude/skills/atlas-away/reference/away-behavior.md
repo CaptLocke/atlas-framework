@@ -34,7 +34,7 @@ Each job's own spec (`system/jobs/<job>.md`, section "Away and paused") is autho
 - Pausing `ingest` or `maintenance` is allowed only on explicit request, with a warning.
 
 ## Catch-up brief contents
-Produced by `atlas-brief` §B, which defines the sections (Needs you first, What happened, What changed, Can wait) and their template (`.claude/skills/atlas-brief/reference/catch-up-template.md`). Held trigger actions appear under Needs you first, minus any whose occasion passed while the user was away. Readable in five minutes; every item linked to its record.
+Produced by `atlas-brief` §B, which defines the sections (Needs you first, What happened, What changed, Can wait) and their template (`.claude/skills/atlas-brief/reference/catch-up-template.md`). Held trigger actions appear under Needs you first, minus upcoming-deadline and upcoming-meeting reminders whose date passed while the user was away (`system/schemas/formats.md` §triggers.yaml). Readable in five minutes; every item linked to its record.
 
 ## Date examples (fictional, today = 2026-11-06, Friday)
 - "I'm off next week" → `start: 2026-11-09`, `end: 2026-11-13`; catch-up = the first brief targeting a day after Nov 13 (Mon 2026-11-16 on weekday briefs; Sat Nov 14 if briefs run daily).

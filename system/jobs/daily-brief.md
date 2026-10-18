@@ -7,7 +7,7 @@ skills: [atlas-brief, atlas-dashboards]
 # Job: daily-brief
 
 ## Purpose
-Have the Daily Brief ready before the workday starts and the dashboards fresh: today's events with prep notes, due and slipping commitments, overnight changes, waiting-on items, top priorities, up to `brief_max` insights, drafts ready to review, approvals and questions waiting. After away, produce the catch-up brief instead.
+Have the Daily Brief ready before the workday starts and the dashboards fresh: today's events with prep notes, due and slipping commitments, overnight changes, waiting-on items, top priorities, up to `brief_max` insights, drafts ready to review, approvals and questions waiting. After away, also produce the catch-up brief, linked from the top of that day's brief.
 
 ## Runs when
 - Lean: `nightly-cycle` with `target: tomorrow` (last job). Standard: `morning-cycle` (last job). Full: `morning-brief` after `monthly` and `quarterly`.
@@ -17,7 +17,7 @@ Have the Daily Brief ready before the workday starts and the dashboards fresh: t
 Let T be the target date.
 - **T within away:** exit with `skipped_away`.
 - **T within an open-ended away** (`away.start <= T`, `away.end: null`): exit with `skipped_away`; the user ends it in chat (`atlas-away`), which sets `end`.
-- **Catch-up:** the first daily-brief run whose target date is after `away.end` (or, for an open-ended away, after the user ends it) writes the catch-up brief instead of a normal brief (steps below), then clears `away` in `rhythms.yaml` (`start`, `end`, `set_on` to null) and commits. This happens once.
+- **Catch-up:** the first daily-brief run whose target date is after `away.end` (or, for an open-ended away, after the user ends it) writes the catch-up brief as well as the normal brief, which links to it at the top (`atlas-brief` §B), then clears `away` in `rhythms.yaml` (`start`, `end`, `set_on` to null) and commits. This happens once.
 - **Paused** (`{ job: daily-brief }` or moment `daily_brief` paused/off): exit with `skipped_paused`. A catch-up brief is still written when away ends.
 
 ## Readiness check

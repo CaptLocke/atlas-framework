@@ -11,7 +11,7 @@ Each release's "What's new" section is shown to users in the Atlas Guide and the
 
 ### What's new
 - Atlas follows one set of rules everywhere, so the same question gets the same answer on every page and in every brief:
-  - Your Daily Brief page and the brief itself now always list the same things, in the same order.
+  - Your Daily Brief page and the brief itself now pick the same items for what's due, who you're waiting on, drafts, and questions.
   - "Gone quiet", how long a piece of work takes, and how much free time you have are worked out the same way in your brief, insights, reviews, and pages.
   - Something due tomorrow goes to the top of your brief without changing its priority.
 - At the end of each quarter, Atlas suggests how each goal went and waits for you to confirm before marking it achieved or missed.
