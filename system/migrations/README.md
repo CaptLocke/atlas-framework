@@ -26,11 +26,11 @@ A migration changes the shape of the user's data (`user/`) when an Atlas release
 - **Scoped.** Touch only the paths listed under Affected paths; extensions' folders (`user/extensions/`, user-type knowledge folders) only when the migration says so explicitly.
 
 ## How `atlas-update` runs migrations
-1. After replacing the owned paths (under the update lock, with the rollback tag `pre-update-<old-version>` already created), compare `atlas.yaml: data_version` (D) with `manifest.yaml: data_version` (M).
+1. After replacing the owned paths (under the update lock, whose `base_commit` is the commit the repo was on before the update — the rollback point), compare `atlas.yaml: data_version` (D) with `manifest.yaml: data_version` (M).
 2. If D > M: stop; the release is older than the data (a rollback without reverse steps). Restore and report.
 3. For each version from D to M−1, run the migration whose `from_data_version` equals it, in order:
    - Follow its Transformation for every affected file.
-   - Run its Validation. If validation fails, stop: restore the owned paths and every migrated user file from the rollback tag with a forward revert commit, release the lock, record a known issue, and report (N13).
+   - Run its Validation. If validation fails, stop and undo the update the one way the guards accept: `atlas-update` §B step 10 (a reset to `origin/main` while the lock is still valid, since nothing has been pushed), then release the lock, record a known issue, and report (N13).
    - Set `atlas.yaml: data_version` to its `to_data_version` and commit (`Atlas-Actor: update`, `Atlas-Reason: migration NNNN`).
 4. Run full validation (`system/tools/validate.py`: schemas, links, settings, extension registry).
 5. Ask any questions at the next chat; until answered, defaults apply.
@@ -42,7 +42,7 @@ A migration changes the shape of the user's data (`user/`) when an Atlas release
 - The migration's own checks (listed in its Validation section) pass.
 
 ## Reverse steps and rollback
-User-initiated rollback ("go back to the previous version") restores the owned paths from the previous release with a forward revert commit. Additive migrations need nothing more: the older version ignores new fields, and `data_version` stays as it is. Non-additive migrations are undone by running their Reverse step, newest first, each lowering `data_version` by one. User content created since the update is kept.
+User-initiated rollback ("go back to the previous version") restores the owned paths, in a forward commit, from the commit the previous version ran — found from history, with an old `pre-update-*` tag as the fallback (`.claude/skills/atlas-update/reference/rollback.md`). Additive migrations need nothing more: the older version ignores new fields, and `data_version` stays as it is. Non-additive migrations are undone by running their Reverse step, newest first, each lowering `data_version` by one. User content created since the update is kept.
 
 ## Index
 | ID | From → to | Additive | Needs input | Summary |

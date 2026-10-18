@@ -98,10 +98,10 @@ Hooks consume (delete) it on the matching call. One record authorizes one call.
 
 ### update.lock / purge.lock
 ```json
-{"by": "atlas-update", "version_from": "1.0.0", "version_to": "1.1.0", "created": "…", "expires": "…"}
+{"by": "atlas-update", "version_from": "1.0.0", "version_to": "1.1.0", "base_commit": "9f41c0d…", "created": "…", "expires": "…"}
 {"by": "atlas-memory", "targets": ["user/knowledge/people/jane-doe.md"], "user_confirmation": "yes, permanently erase", "created": "…", "expires": "…"}
 ```
-Update lock expires after 30 minutes; purge lock after 15. Purge locks can only be created in a chat: the hooks refuse them in a session marked `ATLAS_CONTEXT=routine`.
+`base_commit` is the commit the repo was on before the update: the rollback point, read by a failure or a left-behind lock (`atlas-update`). Update lock expires after 30 minutes; purge lock after 15. Purge locks can only be created in a chat: the hooks refuse them in a session marked `ATLAS_CONTEXT=routine`.
 
 ## 3. Inbox (`user/inbox/`)
 

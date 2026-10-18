@@ -245,7 +245,8 @@ def _git(proj, args, timeout=10):
 
 def in_history(proj, ref):
     """True when 'ref' names a commit that is HEAD or one of its ancestors
-    (rollback tags, installed_from_commit): content this repo already had."""
+    (the commit a rollback derives from history, an old rollback tag,
+    installed_from_commit): content this repo already had."""
     if not ref or ref.startswith("-"):
         return False
     rc, sha = _git(proj, ["rev-parse", "--verify", "-q", ref + "^{commit}"], timeout=5)

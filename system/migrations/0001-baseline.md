@@ -27,7 +27,7 @@ Establish data version 1, the layout Atlas 1.0.0 expects. For a brand-new instal
 ## Validation
 - `user/settings/atlas.yaml` parses and has `data_version: 1`.
 - Every folder and starter file listed in Affected paths exists.
-- No pre-existing file under `user/` changed except `atlas.yaml` (check with `git diff --stat` against the rollback tag).
+- No pre-existing file under `user/` changed except `atlas.yaml` (check with `git diff --stat` against the update lock's `base_commit`).
 - `system/tools/validate.py` reports no new errors.
 
 ## Questions for the user
