@@ -5,7 +5,7 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 - **Minor** (1.x.0): additive features, new optional fields, additive migrations. Applied automatically by default.
 - **Major** (x.0.0): a migration that needs user input, a non-additive data change, or a breaking change for extensions. Applied after the user says yes.
 
-Each release's "What's new" section is shown to users in the Atlas Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release (`docs/maintainers/under-the-hood.md`) and the release checklist (`docs/maintainers/releasing.md`) are kept in the maintainer's private repo.
+Each release's "What's new" section is shown to users in the Atlas Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
 ## 1.1.1 (2026-10-18)
 
