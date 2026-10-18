@@ -74,14 +74,14 @@ Atlas's automations run in the cloud in an **environment** (a small behind-the-s
 
 1. **Say "Fix my automation environment"** in a chat in the Atlas Project. Atlas fixes it for you where it can, or walks you through it one step at a time.
 2. **Or do it yourself:**
-   1. In the Claude desktop app, open **Routines** (it may be in the sidebar, or under a **Claude Code** section).
+   1. In the Claude desktop app, open the **Code** tab, then **Routines**.
    2. Open the automation Atlas named (they're called **Atlas · …**, for example **Atlas · nightly-cycle**).
-   3. Find its **Environment** setting and choose **Atlas routine**. Save.
-3. **If there's no "Atlas routine" environment:** open **Settings** and look for **Environments** (or **Cloud environments**). Create one named **Atlas routine** and add one variable: name `ATLAS_CONTEXT` (capitals, with an underscore), value `routine` (lower case, no spaces or quotes). Save, then go back to step 2.
+   3. Below its instructions, click the cloud icon showing the environment's name and choose **Atlas routine**. Save.
+3. **If there's no "Atlas routine" environment:** in that same cloud-icon menu, choose to add a new cloud environment (there's no Settings page for environments). Name it **Atlas routine** and add one variable: name `ATLAS_CONTEXT` (capitals, with an underscore), value `routine` (lower case, no spaces or quotes). Save, then go back to step 2.
 
 4. **Tell Atlas "Done"**. Atlas runs the automation once as a test and checks it used the right environment.
 
-> **If it looks different:** these settings may be labeled differently, or sit under **Claude Code**, **Code**, or **Routines** in Settings. If you can't find them, tell Atlas: it will help, or draft an issue report.
+> **If it looks different:** these settings may be labeled differently. Routines are in the desktop app's **Code** tab, and environments are always picked from a routine's cloud icon, not from Settings. If you can't find them, tell Atlas: it will help, or draft an issue report.
 
 ---
 

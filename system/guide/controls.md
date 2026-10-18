@@ -88,7 +88,7 @@ Both need your approval.
 - "Permanently erase everything about that candidate."
 
 ## Away mode
-Tell Atlas when you're away. It keeps filing everything, but pauses your brief, email drafts, status updates, meeting prep, and reminders, and holds approvals. On your first day back, a catch-up brief is waiting: what happened, what changed, what needs you first, and what can wait. Away mode ends on its own, and you can set it up in advance.
+Tell Atlas when you're away. It keeps filing everything, but pauses your brief, email drafts, status updates, meeting prep, and reminders, and holds approvals. On your first day back, a catch-up brief is waiting: what happened, what changed, what needs you first, and what can wait. If you give a return date, away mode ends on its own that day; if you don't ("I'm off, not sure when I'm back"), it lasts until you tell Atlas you're back. You can set it up in advance.
 
 **Try:**
 - "I'm out from the 12th to the 20th."

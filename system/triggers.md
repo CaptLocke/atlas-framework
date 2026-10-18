@@ -8,7 +8,7 @@ Triggers are conditions Atlas checks every time it runs; they are not scheduled.
 
 **Imported history** (records whose every source is `kind: import`; `.claude/skills/atlas-capture/reference/import.md` §10) never fires `new_project`, `new_key_person`, or `playbook_start`; live items it brought in are ordinary open work for the date-driven triggers.
 
-**Fire once:** before acting, check `user/.state/triggers.yaml` for `(trigger, record, key)`; after acting, record it. **Away/paused:** during away mode, triggers are evaluated but their user-facing actions are held for the catch-up brief (record creation still happens).
+**Fire once:** before acting, check `user/.state/triggers.yaml` for `(trigger, record, key)`; after acting, record it. **Away/paused:** during away mode, triggers are evaluated and recorded as held (`held: true`, `system/schemas/formats.md` §triggers.yaml), and their user-facing actions wait for the catch-up brief (record creation still happens). A held entry does not count as fired.
 
 | Trigger | Evaluated by | Condition | Key | Action |
 |---|---|---|---|---|

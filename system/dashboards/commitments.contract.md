@@ -11,7 +11,7 @@ stale_after_hours: 36
 ## Purpose
 Every open commitment, in two sections so the direction is never in doubt: **Waiting on** (what other people have promised the user) and **I owe** (what the user has promised others). Each shows who, when it's due, priority, project, a short insight, and one recommended next step. One filter row applies to both sections: All / Overdue / High priority, plus a search by title, person, or project. Projects have their own dashboard (`projects`).
 
-Republished by `daily-brief` every run. `triage` may republish it after a full (not `light`) run that changed commitments, so Standard and Full profiles see fresher priorities during the day.
+Republished by `daily-brief` every run, and by `triage` when this run changed its data and the routine does not run `daily-brief` later (the brief republishes it then; `system/jobs/triage.md` step 7), so Standard and Full profiles see fresher priorities during the day.
 
 ## Data (JSON shape embedded in the page)
 ```json

@@ -26,7 +26,7 @@ Starter files for the user half. `atlas-setup` copies every template to its dest
 | `inbox/questions.md` | `user/inbox/questions.md` | as needed | all skills and jobs |
 | `logs/README.md` | `user/logs/README.md` | (static) | — |
 | `extensions/registry.yaml` | `user/extensions/registry.yaml` | (empty at setup) | `atlas-extend` |
-| `settings/atlas.yaml` | `user/settings/atlas.yaml` | 5 (identity, versions, attestation); 9–10 (deliverables and drop folders) | `daily-brief` (`first_brief_delivered`), `atlas-update` |
+| `settings/atlas.yaml` | `user/settings/atlas.yaml` | 5 (identity, versions, attestation); 9 (deliverables and drop folders) | `daily-brief` (`first_brief_delivered`), `atlas-update` |
 | `settings/governance.yaml` | `user/settings/governance.yaml` | defaults kept; adjusted only if the user asks | `atlas-settings` (chat only, N6) |
 | `settings/data-rules.yaml` | `user/settings/data-rules.yaml` | 9 (reviewed and adjusted with the user) | `atlas-settings` (chat only, N6), `atlas-memory` (exclusions) |
 | `settings/connectors.yaml` | `user/settings/connectors.yaml` | 9 | `atlas-connectors` (chat only, N6) |
@@ -34,9 +34,9 @@ Starter files for the user half. `atlas-setup` copies every template to its dest
 | `settings/rhythms.yaml` | `user/settings/rhythms.yaml` | 10 (moments, work hours) | `atlas-settings`, `atlas-away` |
 | `settings/routines.yaml` | `user/settings/routines.yaml` | 10: replaced by a copy of the chosen `system/routine-profiles/<profile>.yaml`, cron hours adjusted to `rhythms.yaml: work_hours`; `routine_id`s filled as routines are created | `atlas-settings` |
 | `settings/dashboards.yaml` | `user/settings/dashboards.yaml` | 11 | `atlas-dashboards` |
-| `profile/profile.md`, `working-style.md`, `communication-style.md`, `thinking-style.md`, `preferences.md` | `user/profile/` | 6 (interview), 7 (research) | proposals via `questions.md` |
-| `profile/voice-personal.md`, `voice-house.md`, `design-system.md` | `user/profile/` | 7 (research), 8 (uploads); personal voice also from sent mail after 9 | refined from the user's edits |
+| `profile/profile.md`, `working-style.md`, `communication-style.md`, `thinking-style.md`, `preferences.md` | `user/profile/` | 8 (written once confirmed; drafted at 7 from imported notes, uploads, and research) | proposals via `questions.md` |
+| `profile/voice-personal.md`, `voice-house.md`, `design-system.md` | `user/profile/` | 8 (drafted at 7 from uploads and research, written once confirmed); personal voice also from sent mail after 9 | refined from the user's edits |
 
-**Placeholders set at step 5:** `atlas.yaml: installed_version` from `system/VERSION`, `data_version` from `system/manifest.yaml: data_version`, `timezone`, `repo`, `user_display_name`, `plan`, and `attestation` (with `reconfirm_due` = first business day of next quarter). `company` (website, email domains, fiscal year) is filled at steps 6–8; `deliverables_folder` and `drop_folder` are filled at steps 9–10; `first_brief_delivered` by the first `daily-brief`.
+**Placeholders set at step 5:** `atlas.yaml: installed_version` from `system/VERSION`, `data_version` from `system/manifest.yaml: data_version`, `timezone`, `repo`, `user_display_name`, `plan`, and `attestation` (with `reconfirm_due` = first business day of next quarter). `company` (website, email domains, fiscal year) is filled at steps 6–8; `deliverables_folder` and `drop_folder` are filled at step 9; `first_brief_delivered` by the first `daily-brief`.
 
 **Folders** (`user/knowledge/<type>/`, `user/journal/`, `user/work/`, `user/library/`, `user/inbox/drop/`, `user/logs/activity/`, `user/logs/runs/`, `user/extensions/<kind>/`, `user/profile/assets/`) ship in the template repo with `.gitkeep` files and need no template. `user/work/` subfolders (`briefs/`, `prep/`, `reviews/`, `status/`, `reports/`, `deliverables/`) are created by the jobs that first write to them.

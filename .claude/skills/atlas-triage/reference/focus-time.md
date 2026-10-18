@@ -19,7 +19,7 @@ If the user states a size ("that'll take me a couple of hours"), use theirs. Use
 The condition is in `system/triggers.md` (`focus_time_needed`). Read the calendar from now to the due date with `calendar.list_range`.
 - **Busy:** every event counts, including ones the meeting filter hides (tentative, unanswered, all-day) and the user's own holds.
 - **Free:** only time inside `rhythms.yaml: work_hours` on work days counts, and `working-style.md` / `preferences.md` are respected ("no focus time on Friday afternoons", "mornings are best for writing").
-- **Needed:** `hour` = 60 min, `half_day` = 3 h, `day` = 6 h. A `day` may be split into two blocks on different days.
+- **Needed:** `hour` = 1 h, `half_day` = 4 h, `day` = 8 h (the same hours the Week Ahead uses for `work_due_hours`). A `day` may be split into two blocks on different days.
 
 Skip it when:
 - The user already has a focus or hold event that names the work.

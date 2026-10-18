@@ -33,13 +33,8 @@ Each job's own spec (`system/jobs/<job>.md`, section "Away and paused") is autho
 - A paused **moment** stops the user-facing output of that moment (e.g., `daily_brief` stops the brief; `status_updates` stops the drafts) while the underlying records keep updating.
 - Pausing `ingest` or `maintenance` is allowed only on explicit request, with a warning.
 
-## Catch-up brief contents (produced by `atlas-brief`)
-1. **Needs you first:** open `action` questions (things only the user can do), approvals waiting, slipped `i_owe` commitments, deadlines in the next 3 days, held trigger actions.
-2. **What changed:** decisions, new projects and people, risk changes, grouped by project.
-3. **Waiting on others:** overdue `waiting_on` items, with offered follow-up drafts.
-4. **Top insights** held during away (max 3; the rest stay in the inbox).
-5. **Can wait:** everything else, one line each.
-Readable in five minutes; every item linked to its record.
+## Catch-up brief contents
+Produced by `atlas-brief` §B, which defines the sections (Needs you first, What happened, What changed, Can wait) and their template (`.claude/skills/atlas-brief/reference/catch-up-template.md`). Held trigger actions appear under Needs you first, minus any whose occasion passed while the user was away. Readable in five minutes; every item linked to its record.
 
 ## Date examples (fictional, today = 2026-11-06, Friday)
 - "I'm off next week" → `start: 2026-11-09`, `end: 2026-11-13`; catch-up = the first brief targeting a day after Nov 13 (Mon 2026-11-16 on weekday briefs; Sat Nov 14 if briefs run daily).

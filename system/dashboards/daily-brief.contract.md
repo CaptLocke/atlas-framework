@@ -62,17 +62,17 @@ Envelope: `meta` as in `system/dashboards/README.md`; `meta.as_of` = the brief's
 | `brief.*`, `priorities`, `while_away` (catch-up briefs only) | The brief file `user/work/briefs/<as_of>.md` (or `-catch-up.md`) written by `atlas-brief` in the same run; `priorities[].ref` and `[[…]]` mentions are the record IDs cited there |
 | `today[]` | Event records (`user/knowledge/events/`) with `start` on `as_of`, `status: scheduled`, and shown by the meeting filter (`rhythms.yaml: meetings`, rule in `system/schemas/settings.md`): `id, title, kind, start, end, all_day, location, attendees` (→ person refs); `prep.path` = event `prep`; `prep.summary` = first line of the prep note's suggested agenda |
 | `due[]` | Commitments, `direction: i_owe`, `status: open|slipped`, `due` ≤ `as_of` + `rhythms.yaml: triggers.deadline_approaching.days` (default 3): `id, title, direction, status, due, priority, counterparty, next_step` |
-| `waiting_on[]` | Commitments, `direction: waiting_on`, `status: open|slipped`; `since` = `created` |
+| `waiting_on[]` | The brief's Waiting on items (`atlas-brief` §A step 4.3): commitments, `direction: waiting_on`, `status: open|slipped`, that are overdue or due within 7 days, plus any waiting 7+ days with no `due`; soonest first; `since` = `created` |
 | `insights[]` | `user/inbox/insights.md`, status `new`, highest `score` first, max `rhythms.yaml: insights.brief_max` (default 3): heading ID, Insight, Why it matters, Suggested action, Links |
-| `drafts[]` | The `email-drafts` job's list for the brief (titles, recipients, reasons) from this run |
+| `drafts[]` | Drafts created since the previous brief, from run reports and the activity log (`email-drafts`, `status-updates`, triage follow-ups), the same list the brief file shows: titles, recipients, reasons, where each draft is |
 | `approvals[]` | `user/inbox/approvals.md`, status `pending` |
 | `actions[]` | `user/inbox/questions.md`, kind `action`, status `open`, oldest first: heading ID, Question, How, whether Copy text exists |
-| `questions[]` | `user/inbox/questions.md`, status `open`, kind not `action`, newest first |
+| `questions[]` | `user/inbox/questions.md`, status `open`, kind not `action`, in the brief's order (`atlas-brief` §A step 4.9): those raised since the previous brief first, then the oldest |
 | `meta.notices` | `user/.state/health.yaml` open high-severity issues affecting ingestion; staleness found by the job's readiness check (`user/.state/jobs.yaml`) |
 
 ## Rendering notes
 - Order on the page: action needed (if any), while you were away (catch-up only), top priorities (numbered: they are ranked), today, due and slipping, waiting on others, needs you (if any), worth knowing (if any), drafts ready (if any). Every section has a one-line description under its title and no count. The brief file's "What changed" and "Since last night" sections are not shown on the page.
 - Sorting: `priorities` in rank order (3 to 5 items); `today` by `start`, all-day items last; `due` overdue first, then by `due`, then priority; `waiting_on` slipped first, then by `due` (nulls last).
-- Caps (then `meta.truncated`): `today` 15, `due` 10, `waiting_on` 8, `drafts` 8, `approvals` 5, `questions` 3, `while_away` 8 (catch-up). `actions` is never capped. The brief file keeps the full lists.
+- Caps (then `meta.truncated`): `today` 15, `due` 5, `waiting_on` 5, `drafts` 8, `approvals` 5, `questions` 3, `while_away` 8 (catch-up). `actions` is never capped. `due`, `waiting_on` and `questions` use the brief file's caps (`atlas-brief` §A step 5), so the page and the file list the same items; `meta.truncated` carries the "+N more" count.
 - Text limits: `headline` 200 characters, `why`/`next_step`/`summary` 240.
 - The page is typically under 15 KB of data; the budget only matters after long away periods (catch-up), where `while_away` is truncated first.

@@ -56,9 +56,10 @@ Give the user a two-minute, trustworthy picture of where they stand: what's on, 
    - **What happened:** by project or person: decisions made, commitments made to/by the user, meetings held with outcomes. Max ~10 bullets; group the rest.
    - **What changed:** project health changes, new risks and issues, status changes, new people.
    - **Can wait:** FYIs, ideas, insights still `new` from the away period (lower-scoring ones; the top ones go to the normal brief's Insights), noise-adjacent items worth knowing.
-3. Also produce the target date's normal Daily Brief (A) with a link to the catch-up brief at the top.
-4. Clear `rhythms.yaml: away` (`start`, `end`, `set_on` to null) as `system/jobs/daily-brief.md` directs; this completes the user's own instruction, so no confirmation is needed (`atlas-away`). In chat on an early return, `atlas-away` clears it and calls this mode.
-5. Republish, commit, log.
+3. **Held triggers.** In `user/.state/triggers.yaml`, take the `held: true` entries: list under Needs you first those whose condition still holds today, leave out those whose occasion has passed (a deadline or meeting before today), then remove every `held` entry. The next triage and email-drafts runs act on the conditions that are still true, as normal triggers (`system/schemas/formats.md` §triggers.yaml).
+4. Also produce the target date's normal Daily Brief (A) with a link to the catch-up brief at the top.
+5. Clear `rhythms.yaml: away` (`start`, `end`, `set_on` to null) as `system/jobs/daily-brief.md` directs; this completes the user's own instruction, so no confirmation is needed (`atlas-away`). In chat on an early return, `atlas-away` clears it and calls this mode.
+6. Republish, commit, log.
 
 ### C. "Since last night" (after the morning quick catch-up)
 1. Input: the items `atlas-capture` filed in the quick catch-up ingest.
@@ -67,7 +68,7 @@ Give the user a two-minute, trustworthy picture of where they stand: what's on, 
 
 ### D. Week Ahead planning data
 Used by A and by `atlas-review`'s weekly review. The range is set by `system/dashboards/week-ahead.contract.md` (Purpose, "Which seven days"): next Monday to Sunday once this week's weekly review has run, otherwise the 7 days from the target date. Field definitions: `system/dashboards/week-ahead.contract.md`. From event records (events hidden by the meeting filter still count as busy), `rhythms.yaml: work_hours`, open commitments with `effort`, `working-style.md`, and `preferences.md`:
-1. **Focus suggestions** (`focus[]`): free gaps of at least 90 minutes inside work hours on work days, each matched to the highest-priority `i_owe` work due within the week that isn't already scheduled; at most 1 per day and 4 per week; respect working style and preferences (e.g. no Friday afternoons). Each has `start`, `end`, `label`, and a one-line `reason`. A focus block awaiting approval (`focus_time_needed`) is shown as the suggestion for its slot. Suggestions only: putting a hold on the calendar is `own_calendar_manage` (propose, in chat).
+1. **Focus suggestions** (`focus[]`): free gaps of at least 60 minutes (the same gaps `free_hours` counts) inside work hours on work days, each matched to the highest-priority `i_owe` work due within the week that isn't already scheduled; at most 1 per day and 4 per week; respect working style and preferences (e.g. no Friday afternoons). Each has `start`, `end`, `label`, and a one-line `reason`. A focus block awaiting approval (`focus_time_needed`) is shown as the suggestion for its slot. Suggestions only: putting a hold on the calendar is `own_calendar_manage` (propose, in chat).
 2. **Time:** each day's `free_hours`; the week's `summary.focus_hours`, `work_due_hours`, and `unsized`.
 3. **Watch-outs** (`watchouts[]`): overloaded days, no-break stretches, double bookings, unprotected deadlines.
 4. **Meetings:** `note` (one line on why it matters or what to raise; from the event's `insight` or the prep note), `project` (the event's first linked project), `prep.summary` (first line of the prep note's suggested agenda) and `prep.todo` (what to prepare, or when `meeting-prep` will write the note).

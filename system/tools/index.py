@@ -84,8 +84,10 @@ def types(root):
         if not isinstance(ext, dict) or ext.get("kind") != "type" or not ext.get("path"):
             continue
         fm = read_frontmatter(os.path.join(root, "user", "extensions", str(ext["path"]))) or {}
-        folder = fm.get("folder")
-        if folder and re.match(r"^[a-z][a-z0-9-]*$", str(folder)):
+        # Accept the documented form (folder: user/knowledge/deals/) as well as a bare name (deals),
+        # the same way validate.py reads it.
+        folder = str(fm.get("folder") or "").strip().strip("/").split("/")[-1]
+        if folder and re.match(r"^[a-z][a-z0-9-]*$", folder):
             out.setdefault(str(ext.get("name") or folder), (str(folder), set(fm.get("closed_statuses") or [])))
     return out
 

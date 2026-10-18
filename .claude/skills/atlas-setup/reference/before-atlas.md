@@ -12,7 +12,7 @@ The canonical text is `system/templates/bootstrap-stub.md`; use it exactly, repl
 How to present it:
 > Here's the text for your Atlas project. Copy all of it, then in Claude open your **Atlas** project → **Project instructions** (sometimes shown as "Set custom instructions" or a pencil icon), paste it in, and save. After that, every new chat in that project starts as Atlas.
 
-If the user doesn't know their repo name (they're in a chat without the repo attached, so this skill isn't running): the setup guide tells them to open github.com, click their profile picture → **Your repositories**; the name is shown as `their-username/repo-name`.
+If the user doesn't know their repo name (they're in a chat without the repo attached, so this skill isn't running): the setup guide explains it as their GitHub username, a slash, and the name they gave the repository (`docs/setup/04-create-the-atlas-project.md`, "Replace YOUR-USERNAME/YOUR-REPO"). If they've forgotten either, they can find it on github.com under their profile picture → **Your repositories**, shown as `their-username/repo-name`.
 
 ## Quiet checks on the first run of setup
 | Step | Check | If it fails |
@@ -41,7 +41,7 @@ Ask what they see on screen if the fix below doesn't match. Screens change; desc
 - Goal: Claude's GitHub app is installed with access to **only** their Atlas repository.
 - In Claude: **Settings → Connectors** (or **Integrations**) → **GitHub** → **Connect**; on GitHub choose **Only select repositories** → pick their Atlas repo → **Install / Authorize**.
 - **"Claude can't save to your repository"** (push fails): the app was installed with read-only access or on other repos. Fix: github.com → **Settings → Applications → Installed GitHub Apps → Claude → Configure** → ensure their Atlas repo is selected and access includes writing contents. Then say "try again".
-- **Pushes land on a branch named `claude/...` instead of `main`:** there may be a setting to allow pushing to the default branch in the session or routine settings; turn it on. If they can't find it, note it (`setup.yaml: notes`) and continue. If routines can't push to main, Atlas will tell you; this is checked during testing.
+- **Pushes land on a branch named `claude/...` instead of `main`:** routines push to a `claude/` branch unless their prompt says otherwise, and the Atlas routine prompt says to push to `main`, so check that the routine's instructions were pasted in full. A GitHub branch rule on `main` can also block pushes; the user can remove it in the repository's settings. Note it (`setup.yaml: notes`) and continue; routine pushes are checked during testing.
 - **Repository not in the list:** reopen the app configuration and add it.
 
 ### Step 4: the Atlas project

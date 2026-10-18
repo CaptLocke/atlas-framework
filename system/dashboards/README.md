@@ -12,7 +12,7 @@ The `atlas-dashboards` skill owns rendering and publishing. This folder holds wh
 | Dashboard | Template | Contract | Republished by | Page budget |
 |---|---|---|---|---|
 | Daily Brief | `daily-brief.html` | `daily-brief.contract.md` | `daily-brief` job; chat catch-up | 120 KB |
-| Commitments | `commitments.html` | `commitments.contract.md` | `daily-brief`; `triage` (optional) | 300 KB |
+| Commitments | `commitments.html` | `commitments.contract.md` | `daily-brief`, `triage` | 300 KB |
 | Projects | `projects.html` | `projects.contract.md` | `daily-brief`, `triage`, `weekly-review` | 250 KB |
 | Goals (with accomplishments) | `goals.html` | `goals.contract.md` | `weekly-review`, `monthly`, `quarterly` | 200 KB |
 | Week Ahead | `week-ahead.html` | `week-ahead.contract.md` | `daily-brief`, `weekly-review` | 150 KB |

@@ -62,6 +62,6 @@ If you pay for Claude yourself (Pro or Max), skip this and go to Part A.
 
 ---
 
-That's the last thing you need to do on GitHub. You won't need to visit it again for day-to-day use.
+That's all you need to do on GitHub for setup. You won't need it for day-to-day use; if something ever needs fixing there (for example, GitHub asks you to accept new permissions for the Claude app), Atlas tells you and walks you through it.
 
 **Next:** [Step 4: Create the Atlas Project in Claude](04-create-the-atlas-project.md)

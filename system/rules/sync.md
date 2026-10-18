@@ -15,12 +15,12 @@ The user never sees or manages git. Pull at the start, commit and push after eac
 ## Procedure
 | Moment | Action |
 |---|---|
-| Session start | `git pull --rebase` on `main`, then `git push --dry-run origin HEAD:main` to confirm write access (the `SessionStart` hook does both; if it reports a failure, retry before reading or writing Atlas files). **Read-only attachment** (the dry run is refused): re-attach the repository with write (push) access and clone it again; if that is refused too, tell the user in one line to give the Claude GitHub App write access to the repository (GitHub → Settings → Applications → Claude → Configure → Repository permissions) and start a new chat |
+| Session start | `git pull --rebase` on `main`, then `git push --dry-run origin HEAD:main` to confirm write access (in routines the `SessionStart` hook does both and reports the result; if it reports a failure, retry before reading or writing Atlas files. Repo hooks don't load in Cowork chats, so in a chat Atlas runs both itself: kernel §2 step 1). **Read-only attachment** (the dry run is refused): re-attach the repository with write (push) access and clone it again; if that is refused too, tell the user in one line to give the Claude GitHub App write access to the repository (GitHub → Settings → Applications → Claude → Configure → Repository permissions) and start a new chat |
 | Before acting on a new request in a long chat (last pull > 15 minutes ago) | `git pull --rebase`, so routine runs made meanwhile are included |
 | After each logical change set (a filed input, a job, a settings change, a deliverable) | `git add -A`, `git commit` with trailers (below), `git pull --rebase`, `git push origin HEAD:main` |
 | Conflict during rebase | Resolve (below), `git rebase --continue`, push |
 | Push rejected or network/auth failure | Keep working; retry after the next change set; if it still fails at the end of the session or run, record a known issue in `user/.state/health.yaml` and tell the user in one line with the fix (usually: reconnect GitHub) |
-| End of every turn | Nothing uncommitted and nothing unpushed. The `Stop` hook enforces this: a turn can't end with unsaved changes; after repeated push failures it records a `sync-push-failing` known issue and warns the user |
+| End of every turn | Nothing uncommitted and nothing unpushed. In routines the `Stop` hook enforces this: a turn can't end with unsaved changes, and after repeated push failures it records a `sync-push-failing` known issue and warns. Repo hooks don't load in Cowork chats, so in a chat Atlas checks this itself before every reply that followed a change (`git status --porcelain` empty and nothing ahead of `origin/main`), and saves first if not |
 
 ## Commit messages
 ```

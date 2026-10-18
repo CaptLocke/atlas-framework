@@ -42,7 +42,7 @@ If `jobs.yaml: daily-brief.last_target` already equals T, refresh the existing b
 5. Set `jobs.yaml: daily-brief.last_target` to T. Commit.
 
 ## Outputs
-- `user/work/briefs/YYYY-MM-DD.md` (T), or `user/work/briefs/YYYY-MM-DD-catch-up.md` after away.
+- `user/work/briefs/YYYY-MM-DD.md` (T); after away, also `user/work/briefs/YYYY-MM-DD-catch-up.md`, linked from the top of T's brief (`atlas-brief` §B).
 - Republished dashboards; `user/settings/dashboards.yaml` `last_published` values.
 - `rhythms.yaml: away` cleared after a catch-up brief; `atlas.yaml: first_brief_delivered` on the first brief.
 
