@@ -588,7 +588,7 @@ CHANGELOG_SUBSECTIONS = ("what's new", "action needed", "under the hood")
 
 def check_changelog(c):
     """CHANGELOG.md has a section for system/VERSION and only the three known ### headings
-    (release checklist: docs/maintainers/releasing.md, kept in the maintainer's private repo)."""
+    (see the release checklist, kept in the maintainer's private repo)."""
     path = c.p("CHANGELOG.md")
     if not os.path.exists(path):
         return  # reported by check_manifest (owned path missing)
