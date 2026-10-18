@@ -76,7 +76,7 @@ Hooks in `.claude/hooks/` enforce N1–N6, N8–N10 and N12 deterministically **
 **In chats** the guard is the user: show exactly what will happen, wait for their yes, and rely on Cowork's own approval card, which appears for every tool the user has set to Needs approval (setup step 9 sets send, share and delete tools that way). The approval record (procedure above) is written by Claude itself, so it keeps locked actions deliberate and auditable but does not stop content that has misled Claude; the approval card does.
 
 **In routines** the hooks assume any content may be hostile:
-- Routines get no send, share or delete connectors, and every locked action is blocked even with an approval record.
+- Routines get only the connectors their jobs read from or draft into. Every send, share and delete tool on those connectors (by mapping or name), and any unmapped tool whose name doesn't show what it does, is blocked in routines, and every locked action is blocked even with an approval record.
 - The shell runs only plain commands the hooks can follow: reading and text tools, simple file work, git, read-only `gh`, curl/wget to allowed sites, and Atlas's own tools in `system/tools/`. There are no other interpreters, no `xargs`, `env` or `exec` wrappers, no shells or `eval`, no variable assignments beyond time zone and locale, and no variables or command substitution (`$(cat <<'EOF' … EOF)` for commit messages excepted).
 - The web is reachable (WebFetch, curl, wget) only on the employer's own sites (`atlas.yaml: company`, which routines can't change) and GitHub, because a link can carry data out.
 - Writes go only inside the repo and to temp folders. The shell never overwrites existing files under `user/` (use Write/Edit; appending is fine).

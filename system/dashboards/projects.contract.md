@@ -11,7 +11,7 @@ stale_after_hours: 36
 ## Purpose
 Every active, proposed, and paused project at a glance: health, status, owner, target date, the goal it serves, a short insight, and one recommended next step. Filters: All / Needs attention (off track or at risk) / On track / Proposed or paused, plus a search by project, owner, or goal. A project with its own project page (`project-page`, made on request) opens that page; any other project opens in the record panel with its open commitments and risks.
 
-Republished by `daily-brief` every run, by `triage` after a full run that changed project health or next steps, and by `weekly-review`.
+Republished by `daily-brief` every run, by `triage` when this run changed its data and the routine does not run `daily-brief` later (the brief republishes it then; `system/jobs/triage.md` step 7), and by `weekly-review`.
 
 ## Data (JSON shape embedded in the page)
 ```json

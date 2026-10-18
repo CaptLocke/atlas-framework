@@ -35,8 +35,8 @@ So Atlas needs exactly one cloud environment:
 
 If this session has a tool to create or edit cloud environments, create it (default network access; never put secrets in variables). Otherwise give the user the steps one at a time:
 ```
-1. In Claude, open Settings and look for "Environments" (it may be under "Claude Code", "Cloud", or "Routines").
-2. Create a new environment. Name it: Atlas routine
+1. In the Claude desktop app, open the Code tab, then Routines, and start a new routine (you don't need to save it now: this is only to reach the environment menu). Below the Instructions box, click the cloud icon that shows the environment's name (for example "Default") and choose to add a new cloud environment. (There's no Settings page for environments.)
+2. Name the new environment: Atlas routine
 3. Under "Environment variables" (or similar), add exactly one line:
    ATLAS_CONTEXT=routine
 4. Save. Every Atlas automation will use this environment.
@@ -47,8 +47,8 @@ If this session has a tool to create or edit cloud environments, create it (defa
 
 **Fixing `routine-env-missing`** (offer this in the next chat):
 ```
-1. In Claude, open Routines (it may be under "Claude Code") and open the routine named "Atlas · <routine name>".
-2. Find its Environment setting and choose: Atlas routine
+1. In the Claude desktop app, open the Code tab, then Routines, and open the routine named "Atlas · <routine name>".
+2. Below its Instructions box, click the cloud icon showing the environment's name and choose: Atlas routine
    (If there's no "Atlas routine" environment, create it first with the steps above.)
 3. Save. Then press "Run now" (if you see it) so I can check it worked.
 ```
@@ -63,8 +63,7 @@ For each routine in `routines.yaml`:
 | Prompt | The thin pointer from `system/jobs/README.md`, with the routine name filled in |
 | Repository | The user's Atlas repo only |
 | Environment | `Atlas routine` (always; a routine without it isn't guarded by the safety hooks) |
-| Branch pushes | Allow pushing to `main` if the option exists |
-| Connectors | Only connectors in `connectors.yaml` that the routine's jobs read from; never a connector with send, share or delete tools (routines only draft), and never extra ones |
+| Connectors | The connectors in `connectors.yaml` that the routine's jobs read from or draft into (for example mail, calendar, files), and no others. Their send, share and delete tools stay attached but are blocked in routines by Atlas's guard, along with any unmapped tool whose name doesn't show what it does, so a routine never sends, shares, or deletes |
 | Model | `system/manifest.yaml: models.<role>` for the routine's `model` role; if a routine mixes fast and strongest jobs, strongest |
 | Schedule | The cron from `routines.yaml`, in the user's time zone |
 
@@ -74,7 +73,7 @@ If this session can create routines (a routine or scheduled-task tool), create e
 
 If not, show one copy-paste block per routine and wait for "done" each time:
 ```
-In Claude, open Routines → New routine → Cloud.
+In the Claude desktop app, open the Code tab → Routines → New routine → Cloud.
 
 Name:        Atlas · nightly-cycle
 Repository:  maya-chen/atlas
@@ -82,7 +81,6 @@ Environment: Atlas routine
 Model:       claude-opus-5-5
 Schedule:    Every day at 8:07 PM (your time zone)
 Connectors:  Gmail, Google Calendar, Google Drive   (turn off any others)
-Branches:    allow pushing to main (if you see this option)
 
 Instructions (copy exactly):
 <the routine prompt from system/jobs/README.md, with this routine's name filled in>

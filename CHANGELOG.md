@@ -7,6 +7,22 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Atlas Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release live on the upstream repo's `maintainers` branch (`docs/maintainers/under-the-hood.md`), as does the release checklist (`docs/maintainers/releasing.md`).
 
+## 1.1.1 (2026-10-18)
+
+### What's new
+- Atlas follows one set of rules everywhere, so the same question gets the same answer on every page and in every brief:
+  - Your Daily Brief page and the brief itself now pick the same items for what's due, who you're waiting on, drafts, and questions.
+  - "Gone quiet", how long a piece of work takes, and how much free time you have are worked out the same way in your brief, insights, reviews, and pages.
+  - Something due tomorrow goes to the top of your brief without changing its priority.
+- At the end of each quarter, Atlas suggests how each goal went and waits for you to confirm before marking it achieved or missed.
+- While you're away, Atlas's suggestions no longer expire before you're back, and the reminders that still matter are waiting in your catch-up brief (ones whose date passed while you were out are left out).
+- Your overnight automations can read your mail, calendar, and files again, so drafts and overnight filing work as designed. They still can't send, share, or delete anything.
+- Custom record types you've added (such as deals) now show up in Atlas's quick-reference lists, so answers and dedupe find them like built-in records.
+- Clearer setup and help pages: the steps now use the same numbers Atlas uses, and they point to where automations and their settings really are in the Claude app.
+
+### Action needed
+- Turn your mail, calendar, and file connectors (for example Gmail, Google Calendar, and Google Drive) back on in each Atlas automation, so overnight filing and email drafts work again. Atlas still blocks every send, share, and delete in automations. Ask Atlas "update my automation connectors" and it walks you through it.
+
 ## 1.1.0 (2026-10-17)
 
 ### What's new

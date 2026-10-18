@@ -18,8 +18,8 @@ Claude answers like an ordinary chat, or says it can't open your Atlas.
 ## Atlas says an automation isn't using its routine environment
 Your automations run in their own environment, called **Atlas routine**, so Atlas's safety checks know nobody is there to approve things. If one runs without it, that run stops without doing anything and Atlas tells you. Your chats don't need any of this.
 1. Say **"Fix my automation environment."** Atlas fixes it for you or walks you through it.
-2. To do it yourself: in the Claude desktop app, open **Routines** (it may be under **Claude Code**), open the automation Atlas named (**Atlas · …**), and set its **Environment** to **Atlas routine**.
-3. If there's no **Atlas routine** environment, create one in **Settings → Environments** (the label may differ) with one variable: `ATLAS_CONTEXT` set to `routine`.
+2. To do it yourself: in the Claude desktop app, open the **Code** tab, then **Routines**, open the automation Atlas named (**Atlas · …**), click the cloud icon below its instructions, and choose **Atlas routine**.
+3. If there's no **Atlas routine** environment, add one from that same cloud-icon menu (there's no Settings page for environments), with one variable: `ATLAS_CONTEXT` set to `routine`.
 4. Tell Atlas **"Done."** It runs the automation once to check.
 
 ## Reconnect GitHub
@@ -33,7 +33,7 @@ Atlas lives in your private GitHub repository. If Claude loses access, chats can
 If Claude can't reach GitHub, scheduled runs are skipped. After about 3 days (72 hours) without access, the platform turns the automations off, and they stay off until they're turned back on.
 1. **Reconnect GitHub** (above).
 2. Open a chat in the Atlas Project and say **"Check my automations"**. Atlas shows which are off and turns them back on for you where it can.
-3. If Atlas asks you to do it yourself: in the Claude desktop app, open **Routines** in the sidebar, open each Atlas routine that shows as off, and switch it back on.
+3. If Atlas asks you to do it yourself: in the Claude desktop app, open the **Code** tab, then **Routines**, open each Atlas routine that shows as off, and switch it back on.
 
 Nothing is lost. Atlas picks up from where it stopped and catches up on everything that arrived in the meantime.
 

@@ -27,7 +27,7 @@ Period check above. If `monthly` is due in the same run and hasn't run yet, it r
 - `user/profile/profile.md` (role, manager, team, responsibilities), `user/settings/atlas.yaml: attestation`.
 
 ## Steps
-1. **Reset Goals** (`atlas-review`, quarterly mode): retrospective on each Q−1 goal (evidence, outcome). Where evidence is clear, set status `achieved` or `missed` with an Updates line (`records_write`); otherwise ask. Draft candidate goals for Q as `status: draft` records and add a question asking the user to confirm, change, or import their Q goals.
+1. **Reset Goals** (`atlas-review`, quarterly mode): retrospective on each Q−1 goal (evidence, outcome). Propose each goal's outcome (`achieved`, `missed`, or `dropped`) with its evidence inside the quarterly review; never set a goal's status here. The user confirms in chat, and only then is the status changed (`atlas-review` §Guardrails). Draft candidate goals for Q as `status: draft` records and add a question asking the user to confirm, change, or import their Q goals.
 2. **Role Refresh** (`atlas-review`): prepare short questions about changes to role, manager, team, priorities, tools, and company context in `user/inbox/questions.md` (`profile` kind). Include company context from the employer record (anything in the company profile that may have changed: size, products, structure, recent news; refresh `## Recent news` by `web_research`; routines open only the employer's own sites and GitHub, so take news from web search results and their snippets, and leave other links for the next chat). Add a `setup` question asking the user to re-confirm the attestation; the re-confirmation itself, and a new `reconfirm_due`, are recorded only in chat.
 3. **Performance Review** (`atlas-review`): a ready-made record of Q−1 accomplishments, decisions, and impact with citations, for self-reviews and 1:1s.
 4. Write `user/work/reports/<Q−1>.md` (reset + role refresh, `type: report`) and `user/work/reports/<Q−1>-performance.md` (`type: performance`), each with `date` and `sources`.
@@ -35,7 +35,7 @@ Period check above. If `monthly` is due in the same run and hasn't run yet, it r
 
 ## Outputs
 - `user/work/reports/YYYY-Qn.md` and `user/work/reports/YYYY-Qn-performance.md` (the reviewed quarter).
-- Goal status updates and draft goals; questions in `user/inbox/questions.md`.
+- Proposed goal outcomes (in the quarterly review, for the user to confirm) and draft goals; questions in `user/inbox/questions.md`.
 
 ## Early exit
 Period not due or already done → `early_exit`. All three moments off → set `period_done` and `early_exit`.

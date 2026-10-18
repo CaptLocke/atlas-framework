@@ -1153,7 +1153,11 @@ def check_registry(c, path):
         if e.get("kind") not in kinds:
             rep.error(path, "%s: kind %r is not one of %s" % (where, e.get("kind"), ", ".join(kinds)))
         p = e.get("path")
-        if not isinstance(p, str) or not p:
+        if e.get("kind") == "routine":
+            # Routines live in user/settings/routines.yaml, so their entries have path: null (formats.md §8).
+            if p is not None:
+                rep.error(path, "%s: a routine entry has path: null (the routine lives in user/settings/routines.yaml)" % where)
+        elif not isinstance(p, str) or not p:
             rep.error(path, "%s: path is required" % where)
         elif p.startswith("/") or ".." in p.split("/"):
             rep.error(path, "%s: path must be relative to user/extensions/" % where)
