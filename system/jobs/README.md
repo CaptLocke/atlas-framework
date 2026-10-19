@@ -38,7 +38,7 @@ Every routine's saved prompt is exactly this, with `<name>` replaced by the rout
 Run the Atlas routine `<name>`.
 ```
 
-That one line is the whole prompt. It is the literal phrase the safety hooks look for, so it marks the session as a routine even when the environment is wrong (`.claude/hooks/routine_mark.py`). Everything else — the marker check, the clock, the job list — is §Running a routine below, which is the only place any of it is written, so the text users paste can't drift from what a run actually does. That matters because changing this text is an `Action needed` line for every user.
+That one line is the whole prompt. It opens with the literal phrase the safety hooks look for at the start of a prompt, so it marks the session as a routine even when the environment is wrong (`.claude/hooks/routine_mark.py`). Everything else — the marker check, the clock, the job list — is §Running a routine below, which is the only place any of it is written, so the text users paste can't drift from what a run actually does. That matters because changing this text is an `Action needed` line for every user.
 
 All behavior lives in the repo, so changing which jobs a routine runs is a settings edit. Only schedule and model changes touch the routine on the platform.
 

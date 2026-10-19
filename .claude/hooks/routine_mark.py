@@ -8,12 +8,17 @@ plus `prompt`; exit 0 with no output lets the prompt through unchanged.
 Routines are meant to run in the "Atlas routine" environment, which sets
 ATLAS_CONTEXT=routine. If a routine is attached to another environment, the
 variable is missing and the other hooks would treat the session as a chat.
-So when a prompt asks to "Run the Atlas routine ...", this hook records the
+So when a prompt starts with "Run the Atlas routine ...", this hook records the
 session in .atlas-tmp/routine-sessions/ (context.routine_mark_path), and the
 other hooks apply routine rules for the rest of the session. No tool may
 write or delete those markers (paths.py). The prompt itself is only that one
 phrase: the run checks ATLAS_CONTEXT and raises `routine-env-missing` at step 0
 of system/jobs/README.md section Running a routine (kernel section 6).
+
+The phrase must open the prompt (leading whitespace aside). Every routine prompt
+ever shipped starts with it, while a chat that only mentions it ("don't run the
+Atlas routine", "what does 'Run the Atlas routine' do?") must stay a chat: the
+marker can't be removed, so a false match costs the user the whole session.
 
 Never blocks and never fails the prompt: any error just leaves no marker.
 """
@@ -23,14 +28,14 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-ROUTINE_PROMPT = re.compile(r"\brun the atlas routine\b", re.I)
+ROUTINE_PROMPT = re.compile(r"\s*run the atlas routine\b", re.I)
 
 
 def main():
     import json
     import context as atlas
     payload = json.loads(sys.stdin.read() or "{}")
-    if not isinstance(payload, dict) or not ROUTINE_PROMPT.search(str(payload.get("prompt") or "")):
+    if not isinstance(payload, dict) or not ROUTINE_PROMPT.match(str(payload.get("prompt") or "")):
         return
     proj = atlas.project_dir(payload)
     if atlas.is_upstream(proj):
