@@ -129,7 +129,7 @@ counts: { pending: 1, approved: 0, rejected: 0, executed: 0, expired: 0 }
 - **Requested by:** routine:nightly-cycle · 2026-10-12
 - **Status history:** pending 2026-10-12
 ```
-Statuses: `pending | approved | rejected | executed | expired` (expires after 14 days). Newest first.
+Statuses: `pending | approved | rejected | executed | expired` (expires after 14 days, not counting days while away mode is on). Newest first.
 
 ### insights.md
 ```markdown

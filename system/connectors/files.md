@@ -22,7 +22,7 @@ Covers cloud drives and document stores (Google Drive, OneDrive, SharePoint, Dro
 - `Atlas Drop/Processed` (already handled).
 
 ## Atlas Drop folder
-**At setup** (`atlas-setup`, step 10): find a folder named `Atlas Drop` at the drive root; if none, `create_folder` it (`docs_create`, auto) and create `Atlas Drop/Processed` inside it. Record `drop_folder.connector`, `path`, and `folder_id` in `atlas.yaml`. Tell the user in one sentence where it is and that anything they put there gets filed.
+**At setup** (`atlas-setup`, step 9): find a folder named `Atlas Drop` at the drive root; if none, `create_folder` it (`docs_create`, auto) and create `Atlas Drop/Processed` inside it. Record `drop_folder.connector`, `path`, and `folder_id` in `atlas.yaml`. Tell the user in one sentence where it is and that anything they put there gets filed.
 
 **Each ingest run:**
 1. `list_folder` on the Drop folder ID (top level only; ignore `Processed`).

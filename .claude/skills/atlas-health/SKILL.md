@@ -36,7 +36,7 @@ Follow `reference/user-health.md`: stale records, orphans, duplicates, broken li
 
 ### 3. System health check
 Follow `reference/system-health.md`:
-1. **Runs:** failures and partial runs in run reports since the last check; routines that missed expected runs (a routine silent for more than twice its interval, or 72h for daily ones, likely turned off by the platform).
+1. **Runs:** failures and partial runs in run reports since the last check; routines that missed expected runs (a routine silent for more than twice its interval, so 48h for daily ones, likely turned off by the platform).
 2. **Connectors:** auth errors in run reports; each mapped connector present in the session; `tool_fingerprint` drift; unmapped connectors → re-map via `atlas-connectors` (chat) or a known issue (routine).
 3. **Hooks present:** `.claude/settings.json` registers the PreToolUse hooks; hook scripts exist.
 3a. **Routine environment:** every routine run report since the last check has `atlas_context: routine`; otherwise a high-severity `routine-env-missing` issue per routine, with the fix (attach it to the "Atlas routine" environment).
@@ -47,7 +47,7 @@ Follow `reference/system-health.md`:
 8. **Attestation due:** `atlas.yaml: attestation.reconfirm_due` reached → known issue and a quarterly-style re-confirmation question (`atlas-review` role refresh handles it in chat).
 9. **GitHub connection:** push works; repository still private and without collaborators (N9) where the session can check.
 10. **Updates:** installed vs latest release.
-11. **Smoke test** of platform dependencies (repo push, connector read, hooks fire, artifact republish) → `health.yaml: smoke_test`.
+11. **Smoke test** of platform dependencies (repo push, connector read, hooks fire (routines only; `skipped` in a chat), artifact republish) → `health.yaml: smoke_test`.
 12. **Audits:** every locked action in the activity log has an approval entry and a matching user confirmation; no routine performed a locked action; governance files changed only in chat commits; data-rule spot checks (N11) and suspicious-content follow-ups (N7).
 Set `health.yaml: last_system_check`.
 

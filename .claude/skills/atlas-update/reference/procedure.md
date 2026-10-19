@@ -16,10 +16,12 @@ Parse `refs/tags/vMAJOR.MINOR.PATCH`; skip tags with a pre-release suffix. Compa
 ```bash
 git status --porcelain                          # must be empty (commit user work first)
 git pull --rebase
+git push origin HEAD:main                       # the user's work must be on origin before anything else
+git rev-list --count origin/main..HEAD          # must print 0; if the push failed or this isn't 0, stop
 git rev-parse HEAD                              # the rollback point; write it into the lock as base_commit
 mkdir -p .atlas-tmp && printf '%s' '{"by":"atlas-update","version_from":"1.0.0","version_to":"1.1.0","base_commit":"9f41c0d8e2b7a5641f0c3d9ab8e7520146c3bd5e","created":"2026-10-18T03:09:00-07:00","expires":"2026-10-18T03:39:00-07:00"}' > .atlas-tmp/update.lock
 ```
-No tag is created and nothing is pushed here. The rollback point is the commit itself, which is already in this repo's history: a failure can name it, a lock left behind by an interrupted update still says which commit the repo was on, and a later rollback finds its target from history rather than from a tag (`rollback.md` step 1). So nothing in this step can fail and stop the update — which is why N13's rollback point no longer depends on a push.
+The push comes first because the undo below resets to `origin/main`: a commit of the user's that only existed locally would be lost with it. If it can't be pushed, the update waits (known issue `update-postponed`) rather than risk that. No tag is created. The rollback point is the commit itself, which is already in this repo's history: a failure can name it, a lock left behind by an interrupted update still says which commit the repo was on, and a later rollback finds its target from history rather than from a tag (`rollback.md` step 1). So nothing in this step can fail and stop the update — which is why N13's rollback point no longer depends on a push.
 
 ## Fetch the release (upstream)
 ```bash
@@ -64,14 +66,15 @@ python3 system/tools/validate.py --all
 ```
 Compare with the result before the update if available: pre-existing problems unrelated to the update are recorded as known issues for `atlas-health`, not treated as an update failure.
 
-## Release the lock and finish
+## Push, then release the lock
 ```bash
-rm -f .atlas-tmp/update.lock      # .atlas-tmp is git-ignored; removing the lock is not a deletion of user data
 git push origin HEAD:main
+rm -f .atlas-tmp/update.lock      # only after the push succeeded; .atlas-tmp is git-ignored
 ```
+The lock stays until the push has succeeded: if the push fails, the undo below still works, because the hooks allow it only while the lock is valid.
 
 ## Undo on failure
-Nothing from the update has been pushed until the final push, so a failure at any earlier step is undone by resetting to `origin/main` while the lock is still valid (the hooks allow this reset only under a valid update lock):
+Nothing from the update has been pushed until the final push, and the preflight pushed everything before it, so a failure at any step, including that final push, is undone by resetting to `origin/main` while the lock is still valid (the hooks allow this reset only under a valid update lock):
 ```bash
 git reset --hard origin/main      # owned paths and user files back exactly as they were before the update
 rm -f .atlas-tmp/update.lock

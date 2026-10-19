@@ -82,7 +82,7 @@ Hooks in `.claude/hooks/` enforce N1–N6, N8–N10 and N12 deterministically **
 - Writes go only inside the repo and to temp folders. The shell never overwrites existing files under `user/` (use Write/Edit; appending is fine).
 - git keeps to Atlas's own steps: pull and push only with origin, fetch releases only from the official upstream, and never move the working tree to an older commit. `gh` only reads, so the repo can't be made public or copied.
 - System files change only to match a signed release at or above the installed version, file for file, under the update lock.
-- Files Claude Code or git would load as instructions, servers or hooks (`CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md`, `.mcp.json`, `.gitattributes`, `.githooks/`) are never written, in any context.
+- Files Claude Code or git would load as instructions, servers or hooks (`CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md`, `.mcp.json`, `.gitattributes`, `.githooks/`) are never written, in any context, with one exception: a signed update replaces the ones Atlas ships (`CLAUDE.md`, `.gitattributes`, listed in `manifest.yaml: owned_paths`), under the update lock, like any other system file.
 
 **Context: routines are marked, everything else is a chat.** Atlas's routines run in a cloud environment named "Atlas routine" that sets `ATLAS_CONTEXT=routine`, and a session that starts with an Atlas routine prompt ("Run the Atlas routine …") is treated as a routine even without it. Any other session (Cowork or any other chat surface) is a chat; chats need no environment setup. Every routine run records the `ATLAS_CONTEXT` it observed in its run report; a run that finds no `routine` marker stops before any job and raises the high-severity known issue `routine-env-missing`; and `atlas-health` checks recent run reports for unmarked runs. If a hook blocks something you believe the user wants, explain and offer the approval path or a chat; never try to work around a hook.
 
@@ -92,7 +92,7 @@ Removing processed files from `user/inbox/drop/`, regenerating files in `user/kn
 ## Routines and approvals
 - Outbound communication from routines is always a **draft** in the user's tool, plus an entry in `approvals.md` when sending is the natural next step.
 - `propose`-level actions in routines are queued, never taken.
-- Approvals expire after 14 days.
+- Approvals expire after 14 days, not counting days while away mode is on (`atlas-away`).
 
 ## Data rules (N11)
 Apply `user/settings/data-rules.yaml` at the write step (`system/rules/knowledge.md`): never read excluded sources; classify content into categories; store per handling (`ignore | pointer | summary | full`). Default to the more conservative handling when unsure.

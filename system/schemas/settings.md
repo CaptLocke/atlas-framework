@@ -168,7 +168,7 @@ moments:
   evening_thoughts: on
   daily_brief: on
   weekly_review: on
-  status_updates: { enabled: true, audiences: ["[[people/jordan-lee]]"], day: fri }
+  status_updates: { enabled: true, audiences: ["[[people/jordan-lee]]"], day: fri }   # a routine must run status-updates on `day` (only the weekly one does, on Fridays); atlas-settings adds one when the day changes
   goal_progress: on
   user_health_check: on
   system_health_check: on

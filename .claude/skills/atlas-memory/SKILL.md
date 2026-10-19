@@ -34,7 +34,7 @@ The user owns their knowledge. Every record can be viewed, corrected, superseded
 - Unarchive: `archived: false`, then run `python3 -I system/tools/index.py`. Confirm in one line.
 
 ### C. Forget (destructive, approval required)
-Rule: `system/rules/knowledge.md` § Forget.
+Rule: `system/rules/knowledge.md` § Archive, forget, purge.
 1. **Scope.** Resolve exactly what will be removed: the record(s); Sources whose only purpose was this subject (ask about mixed sources); library files. List mentions in other records' bodies that will be replaced with plain text.
 2. **Show the plan** in plain language: records to delete, links to unlink, the exclusion to add (`record: <id>`, plus a source exclusion such as `mail: from:…` if the user wants future capture stopped), and this disclosure: *"A copy will remain in Atlas's version history (that's what makes undo possible). If you want it gone from history too, I can permanently erase it."*
 3. **Get an explicit yes** in the user's words (`system/rules/governance.md` approval-record procedure). The same confirmation covers the plan shown, but write one approval record per call: one `destructive` record for the deletion, one `governance_settings` record for the `data-rules.yaml` exclusion (N6).

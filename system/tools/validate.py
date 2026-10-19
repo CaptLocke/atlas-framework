@@ -957,7 +957,10 @@ def check_routines(c, path, data, template):
         rep.error(path, "must be a YAML mapping")
         return
     prof = data.get("profile")
-    if prof is None and not template or prof is not None and prof not in PROFILES:
+    if prof is None and not template and not data.get("routines"):
+        # setup's placeholder from step 5 until step 10 picks a profile: not an error in between
+        rep.warn(path, "no routines are set up yet (atlas-setup step 10 chooses a profile)")
+    elif prof is None and not template or prof is not None and prof not in PROFILES:
         rep.error(path, "profile must be one of %s" % ", ".join(PROFILES))
     routines = data.get("routines")
     if not isinstance(routines, list):

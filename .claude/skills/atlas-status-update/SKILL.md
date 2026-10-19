@@ -12,7 +12,7 @@ Remove the weekly status-writing chore: an accurate, audience-shaped update is w
 - **Chat:** "Draft my weekly update for Jordan", "Status for the Orion steering group", "Update Acme on the integration", "What should I tell my boss this week?"
 
 ## Inputs
-- Audiences: `rhythms.yaml: moments.status_updates` (`on`, `audiences` as person IDs, `day`); in chat, whoever the user names (a person, a group, or a project's stakeholders).
+- Audiences: `rhythms.yaml: moments.status_updates` (`enabled`, `audiences` as person IDs, `day`); in chat, whoever the user names (a person, a group, or a project's stakeholders).
 - For each audience: the person record (relationship, role, organization, what they care about, preferred format), their linked projects and goals, and the previous update to them (latest `user/work/status/*-<audience-slug>.md`).
 - Period: since that previous update, else the last 7 days (or what the user says).
 - Records changed in the period for the audience's scope: projects (status, health, insight, next_step), decisions made, commitments done/slipped/new/due next, risks opened/changed/resolved, questions needing the audience, goal progress (`current`, accomplishments), the latest Weekly Review (`user/work/reviews/`) if it exists.
