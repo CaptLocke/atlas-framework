@@ -7,6 +7,20 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Atlas Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
+## 1.1.4 (2026-10-19)
+
+### What's new
+- Your Records page now refreshes in your automations as well as in chats.
+- An update can no longer lose changes that hadn't synced yet: Atlas saves your work to GitHub first, and waits for the next check if it can't.
+- One mistyped date, such as February 30, no longer stops Atlas's nightly upkeep. Atlas flags that record and carries on with the rest.
+- Tidying a record never drops a field Atlas doesn't recognise.
+- Records of the types you added are now checked against the fields and values you declared, and a field that should hold one value is checked for that. If any of your records don't match, the next health check lists them for you to fix.
+- Issue reports now catch more details before you see the draft: project and topic names, phone numbers written without spaces, and every one of your company's email domains.
+- Your automations are stricter about which websites they may reach.
+- If you move your status updates to another day, the health check tells you when no automation runs on that day.
+- A health check in a chat no longer reports a false problem with Atlas's safety checks.
+- A chat that mentions "run the Atlas routine" is no longer treated as an automation.
+
 ## 1.1.3 (2026-10-18)
 
 ### What's new
