@@ -372,12 +372,15 @@ SHARED_HOSTS = {"github.io", "githubusercontent.com", "gitlab.io", "netlify.app"
 
 
 def url_host(url):
-    """Host of an http(s) URL as a browser would parse it ('' when unclear)."""
-    u = str(url or "").strip().replace("\\", "/")
+    """Host of an http(s) URL ('' when unclear, which is never allowed).
+
+    A backslash or an @ before the path is refused outright: browsers read a backslash as a slash
+    and curl doesn't, so github.com\\@other.host is GitHub to one and other.host to the other."""
+    u = str(url or "").strip()
     m = re.match(r"^https?://([^/?#]*)", u, re.I)
-    if not m:
+    if not m or re.search(r"[\\@]", m.group(1)):
         return ""
-    host = m.group(1).rsplit("@", 1)[-1].split(":")[0].lower().rstrip(".")
+    host = m.group(1).split(":")[0].lower().rstrip(".")
     return host if re.match(r"^[a-z0-9.-]+$", host) else ""
 
 

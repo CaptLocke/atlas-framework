@@ -12,8 +12,9 @@ or no Atlas repo around this script).
 What it looks for:
 - email addresses, phone numbers, and IP addresses (Atlas's support address is fine);
 - links, with or without https://, except to Atlas's own public repo;
-- names, aliases and slugs of the user's people and organizations
-  (user/knowledge/_index/people.md, organizations.md, archive.md), the user's own
+- names, aliases and slugs of the user's people, organizations, projects, topics and
+  commitments (user/knowledge/_index/people.md, organizations.md, projects.md,
+  topics.md, commitments.md, archive.md), the user's own
   name, their employer's website and email domains (user/settings/atlas.yaml),
   and the repo's owner/name. A first or last name on its own counts only when
   capitalized, and never when it's a common English word.
@@ -34,7 +35,11 @@ lane park hall king young green brown white black gray grey long short ward rich
 sky summer autumn winter spring dawn eve jean ray roy max ben sam pat chris kim lee rob ed al day
 none null daily brief week goals people records project projects commitments decisions risks""".split())
 EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
-PHONE = re.compile(r"(?<![\w.:-])(?:\+\d[\d ().-]{6,}\d|\(?\d{3}\)?[ .-]\d{3}[ .-]\d{4})(?![\w-])")
+PHONE = re.compile(r"(?<![\w.:-])(?:\+\d[\d ().-]{6,}\d|\(?\d{3}\)?[ .-]\d{3}[ .-]\d{4}"
+                   # unseparated: a national number from 0 (07700900123), or a North American one
+                   # (2125550123); a run starting with 1 is left alone, since timestamps look like that
+                   # ... but not a compact date or timestamp (2026101912), which starts like a year and month
+                   r"|(?!(?:19|20)\d\d(?:0[1-9]|1[0-2]))(?:0[1-9]\d{8,9}|[2-9]\d{2}[2-9]\d{6}))(?![\w-])")
 IP = re.compile(r"(?<![\w.])\d{1,3}(?:\.\d{1,3}){3}(?![\w.])")
 URL = re.compile(r"\b(?:https?://[^\s)\]>\"']+|(?:[a-z0-9-]+\.)+[a-z]{2,}/[^\s)\]>\"']*)", re.I)
 PLACEHOLDER = re.compile(r"\[[A-Z]+(?:-\d+)?\]")
@@ -71,10 +76,11 @@ def terms(repo, warnings):
         found.setdefault(key, (kind, not part))
 
     idx = os.path.join(repo, "user", "knowledge", "_index")
-    for name, kind in (("people.md", "person"), ("organizations.md", "organization"), ("archive.md", "record")):
+    for name, kind in (("people.md", "person"), ("organizations.md", "organization"), ("projects.md", "project"),
+                       ("topics.md", "topic"), ("commitments.md", "commitment"), ("archive.md", "record")):
         text = _read(os.path.join(idx, name))
         if text is None:
-            if name != "archive.md":
+            if name in ("people.md", "organizations.md"):
                 warnings.append("%s not found; names from it weren't checked" % name)
             continue
         for line in text.splitlines():
@@ -100,10 +106,18 @@ def terms(repo, warnings):
         add(m.group(1), "user's name")
         for p in m.group(1).split():
             add(p, "user's name", part=True)
+    in_list = False
     for line in settings.splitlines():
+        value = None
         if re.match(r"^\s*(website|email_domains):", line):
-            for d in re.findall(r"([a-z0-9-]+(?:\.[a-z0-9-]+)+)", line.split(":", 1)[1], re.I):
-                add(re.sub(r"^www\.", "", d), "employer domain")
+            value = re.sub(r"(^|\s)#.*$", "", line.split(":", 1)[1])     # drop a trailing comment
+            in_list = not value.strip()          # email_domains written as a block list follows
+        elif in_list and re.match(r"^\s*-\s", line):
+            value = line.split("-", 1)[1]
+        else:
+            in_list = False
+        for d in re.findall(r"([a-z0-9-]+(?:\.[a-z0-9-]+)+)", value or "", re.I):
+            add(re.sub(r"^www\.", "", d), "employer domain")
     try:
         url = subprocess.run(["git", "-C", repo, "remote", "get-url", "origin"], capture_output=True,
                              text=True, timeout=5).stdout.strip()
@@ -119,7 +133,7 @@ def terms(repo, warnings):
 def _is_upstream_link(link, upstream):
     m = re.match(r"^(?:https?://)?([^/?#]+)(/[^?#]*)?", link, re.I)
     return bool(m) and m.group(1).lower() in ("github.com", "www.github.com") and \
-        (m.group(2) or "").lower().startswith("/" + upstream)
+        re.match(r"^/%s(?:\.git)?(?:[/?#]|$)" % re.escape(upstream), (m.group(2) or "").lower()) is not None
 
 
 def check(text, found, upstream, support):

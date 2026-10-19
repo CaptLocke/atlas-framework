@@ -36,8 +36,9 @@ What it enforces (system/rules/governance.md, system/schemas/formats.md s2):
   redirects can't overwrite existing files under user/ (L2: use Write/Edit).
 - In any context: files Claude Code or git load as instructions, servers or
   hooks (CLAUDE.md, CLAUDE.local.md, AGENTS.md, .mcp.json, .gitattributes,
-  .gitmodules, .githooks/, nested .claude/) are never written, and the
-  routine session markers are never written or deleted (H3, M3).
+  .gitmodules, .githooks/, nested .claude/) are never written, except the
+  owned ones (root CLAUDE.md, .gitattributes) by a signed update under the
+  lock, and the routine session markers are never written or deleted (H3, M3).
 Bash detection is pragmatic (see shell.py for what is and isn't detected).
 """
 import os

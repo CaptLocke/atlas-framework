@@ -4,6 +4,7 @@
     python3 -I system/tools/index.py              # rebuild user/knowledge/_index/
     python3 -I system/tools/index.py --check      # exit 1 if any index is out of date; change nothing
     python3 -I system/tools/index.py --today 2026-10-20 --root DIR
+    python3 -I system/tools/index.py --records-json .atlas-tmp/dashboards/records.json [--by routine:upkeep]
 
 Writes one `<folder>.md` per record type (system types and registered user
 types), `hot.md`, `people-map.md` and `archive.md`. A file is rewritten only
@@ -11,9 +12,15 @@ when its content changes, so running it after every filing creates no empty
 commits. "Today" is the date in `user/settings/atlas.yaml: timezone` unless
 --today is given. Standard library plus the vendored YAML parser; never
 reads anything outside the repo.
+
+--records-json writes the Records dashboard's data instead
+(system/dashboards/records.contract.md), already fitted to its size budget, for
+render.py to embed. --meta merges a JSON object of Atlas's own into `meta`
+(a better headline, notices); without it the headline is a plain count.
 """
 import argparse
 import datetime
+import json
 import os
 import re
 import sys
@@ -21,6 +28,9 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "vendor"))
 import yaml  # noqa: E402  (vendored)
+
+# A well-formed but impossible value (created: 2026-02-30) raises ValueError, not YAMLError.
+YAML_ERRORS = (yaml.YAMLError, ValueError, OverflowError)
 
 HOT_MAX = 75
 HOT_NEVER = ("source", "person", "organization")
@@ -39,7 +49,7 @@ def read_frontmatter(path):
         return None
     try:
         fm = yaml.safe_load(m.group(1))
-    except yaml.YAMLError:
+    except YAML_ERRORS:
         return None
     return fm if isinstance(fm, dict) else None
 
@@ -48,7 +58,7 @@ def load_yaml(path):
     try:
         with open(path, encoding="utf-8") as f:
             return yaml.safe_load(f) or {}
-    except (OSError, yaml.YAMLError):
+    except (OSError,) + YAML_ERRORS:
         return {}
 
 
@@ -88,7 +98,9 @@ def types(root):
         # the same way validate.py reads it.
         folder = str(fm.get("folder") or "").strip().strip("/").split("/")[-1]
         if folder and re.match(r"^[a-z][a-z0-9-]*$", folder):
-            out.setdefault(str(ext.get("name") or folder), (str(folder), set(fm.get("closed_statuses") or [])))
+            closed = fm.get("closed_statuses")
+            closed = {str(x) for x in closed if isinstance(x, (str, int))} if isinstance(closed, list) else set()
+            out.setdefault(str(ext.get("name") or folder), (str(folder), closed))
     return out
 
 
@@ -130,6 +142,8 @@ def hot(recs, tmap, today):
         if name in HOT_NEVER or fm.get("archived") is True or fm.get("superseded_by"):
             continue
         status = fm.get("status")
+        if isinstance(status, (list, dict)):    # invalid (validate.py says so); treat as unknown
+            status = None
         if status in tmap[name][1]:
             continue
         upd = as_date(fm.get("updated"))
@@ -205,6 +219,449 @@ def build(root, today):
     return {"user/knowledge/_index/%s.md" % k: HEADER + "\n".join(v) + "\n" for k, v in files.items()}
 
 
+# ---------------------------------------------------------------- Records dashboard data (--records-json)
+# Builds the JSON that system/dashboards/records.contract.md describes, so a routine can refresh the
+# Records page without writing a thousand records out by hand. render.py then embeds it.
+RECORD_ORDER = ["person", "organization", "project", "goal", "commitment", "decision", "event", "risk",
+                "question", "idea", "topic", "playbook", "source"]
+TYPE_LABELS = {"person": "People", "organization": "Organizations", "project": "Projects", "goal": "Goals",
+               "commitment": "Commitments", "decision": "Decisions", "event": "Events", "risk": "Risks",
+               "question": "Questions", "idea": "Ideas", "topic": "Topics", "playbook": "Playbooks",
+               "source": "Sources"}
+NEVER_FIELDS = {"notes_private", "emails", "phone", "location"}
+NOT_DETAILS = NEVER_FIELDS | {"id", "type", "title", "summary", "status", "created", "updated", "aliases", "links",
+                              "sources", "sensitivity", "provenance", "archived", "supersedes", "superseded_by",
+                              "insight", "full_text_commit", "retention", "import_id", "original_path"}
+FIELD_LABELS = {"org": "Organization", "decided_on": "Decided", "deciders": "Decided by", "revisit_on": "Revisit",
+                "completed_on": "Completed", "asked_by": "Asked by", "asked_on": "Asked", "answered_on": "Answered",
+                "last_contact": "Last contact", "last_used": "Last used", "captured_on": "Captured",
+                "occurred_on": "Occurred", "next_step": "Next step", "all_day": "All day"}
+REF_FIELDS = ("org", "owner", "counterparty", "goal", "attendees")
+USER_CLOSED = {"done", "closed", "won", "lost", "cancelled", "canceled", "completed", "dropped", "resolved"}
+NAV_TITLES = {"decisions-risks": "Decisions & Risks", "about-you": "About You"}
+BODY_MAX = 2000
+
+
+def _label(key):
+    return FIELD_LABELS.get(key) or str(key).replace("_", " ").capitalize()
+
+
+def _words(value):
+    return str(value).replace("_", " ").capitalize()
+
+
+def _day(d):
+    return "%s %d, %d" % (d.strftime("%b"), d.day, d.year)
+
+
+def _short_day(d):
+    return "%s %d" % (d.strftime("%b"), d.day)
+
+
+def _refs(value):
+    vals = value if isinstance(value, list) else [value]
+    return [r for r in (ref_id(v) for v in vals) if r]
+
+
+def _title(rid, by_id):
+    rec = by_id.get(rid)
+    return clean(rec.get("title")) if rec else None
+
+
+def _display(value, by_id):
+    """A frontmatter value as display text: references as titles, dates formatted, enums in words."""
+    if value is None or value == "" or value == []:
+        return ""
+    if isinstance(value, bool):
+        return "Yes" if value else "No"
+    if isinstance(value, list):
+        return ", ".join(t for t in (_display(v, by_id) for v in value) if t)
+    if isinstance(value, dict):
+        return ""
+    if isinstance(value, datetime.datetime):
+        return "%s, %s" % (_day(value), value.strftime("%H:%M"))
+    if isinstance(value, datetime.date):
+        return _day(value)
+    s = clean(value)
+    if "[[" in s:
+        if re.fullmatch(r"\[\[[^\]]+\]\]", s):
+            rid = ref_id(s)
+            return (_title(rid, by_id) or "") if rid else ""
+        return clean(_wiki(s, by_id))
+    m = re.match(r"^(\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2})", s)
+    if m and as_date(m.group(1)):
+        return "%s, %s" % (_day(as_date(m.group(1))), m.group(2))
+    if as_date(s) and re.match(r"^\d{4}-\d{2}-\d{2}$", s):
+        return _day(as_date(s))
+    if re.match(r"^[a-z]+(_[a-z]+)+$", s) or re.match(r"^[a-z]+$", s):
+        return _words(s)
+    return s
+
+
+def _cap(text, n):
+    text = clean(text)
+    return text if len(text) <= n else text[:n - 1].rstrip() + "…"
+
+
+def _facts(name, fm, by_id, user_fields):
+    d = lambda k: _display(fm.get(k), by_id)
+    if name == "person":
+        out = [d("role"), d("org"), d("relationship")]
+    elif name == "organization":
+        out = [d("kind"), d("industry"), d("relationship_status")]
+    elif name == "project":
+        out = [d("health"), "Target %s" % _short_day(as_date(fm["target"])) if as_date(fm.get("target")) else "",
+               d("owner")]
+    elif name == "goal":
+        rank = fm.get("rank")
+        prog = "%s of %s" % (fm["current"], fm["target"]) if fm.get("current") is not None and fm.get("target") \
+            else ""
+        out = ["#%s" % rank if isinstance(rank, int) and not isinstance(rank, bool) else "", d("period"), prog]
+    elif name == "commitment":
+        who = ("You owe %s" % d("counterparty")) if fm.get("direction") == "i_owe" and d("counterparty") else \
+            ("Waiting on %s" % d("owner")) if fm.get("direction") == "waiting_on" and d("owner") else ""
+        due = as_date(fm.get("due"))
+        out = [who, "Due %s" % _short_day(due) if due else "No date",
+               "%s priority" % _words(fm["priority"]) if fm.get("priority") else ""]
+    elif name == "decision":
+        when = as_date(fm.get("decided_on"))
+        names = [t for t in (_title(r, by_id) for r in _refs(fm.get("deciders"))) if t][:2]
+        out = ["Decided %s" % _short_day(when) if when else "", ", ".join(names)]
+    elif name == "event":
+        out = [d("kind"), d("start") if not fm.get("all_day") else (_day(as_date(fm.get("start")))
+                                                                   if as_date(fm.get("start")) else ""),
+               "Prep ready" if fm.get("prep") else ""]
+    elif name == "risk":
+        out = ["%s likelihood" % _words(fm["likelihood"]) if fm.get("likelihood") else "",
+               "%s impact" % _words(fm["impact"]) if fm.get("impact") else "", d("owner")]
+    elif name == "question":
+        out = ["Asked by %s" % d("asked_by") if d("asked_by") else "",
+               "Answered %s" % _short_day(as_date(fm["answered_on"])) if as_date(fm.get("answered_on")) else ""]
+    elif name == "idea":
+        out = [d("origin")]
+    elif name == "topic":
+        out = [d("scope")]
+    elif name == "playbook":
+        used = as_date(fm.get("last_used"))
+        out = [d("trigger"), "Last used %s" % _short_day(used) if used else ""]
+    elif name == "source":
+        when = as_date(fm.get("occurred_on")) or as_date(fm.get("captured_on"))
+        out = [d("kind"), "From %s" % d("connector") if d("connector") else "", _day(when) if when else ""]
+    else:   # a user type: the first three of its own declared fields, the same for every record of the type
+        out = [d(k) for k in user_fields]
+    return [_cap(f, 60) for f in out if f][:3]
+
+
+def _aliases(fm):
+    vals = fm.get("aliases") or []
+    vals = [vals] if isinstance(vals, str) else vals
+    return [clean(a) for a in vals if isinstance(a, (str, int)) and not re.search(r"@|^\+?[\d ().-]{7,}$", str(a))]
+
+
+def _links(fm, by_id):
+    groups = fm.get("links") if isinstance(fm.get("links"), dict) else {}
+    order = ["people", "organizations", "projects", "goals"]
+    ids = []
+    for g in order + sorted(k for k in groups if k not in order):
+        ids += _refs(groups.get(g))
+    for k in REF_FIELDS:
+        ids += _refs(fm.get(k))
+    ids += _refs(fm.get("sources"))
+    out, seen = [], set()
+    for rid in ids:
+        if rid in seen or rid == fm.get("id") or rid not in by_id:
+            continue
+        seen.add(rid)
+        out.append({"id": rid, "title": _title(rid, by_id)})
+    return out[:8]
+
+
+def _wiki(text, by_id):
+    """[[type/id]] and [[type/id|text]] as display text. A record not on the page (hidden by the data
+    rules, archived, or missing) is never named, not even by its slug."""
+    def wiki(m):
+        rid, alias = m.group(1), m.group(2)
+        if rid in by_id:
+            return alias or _title(rid, by_id) or ""
+        return "[not shown]"
+    return re.sub(r"\[\[([a-z]+/[a-z0-9][a-z0-9-]*)(?:\|([^\]]+))?\]\]", wiki, text)
+
+
+def _plain(text, by_id):
+    text = _wiki(text, by_id)
+    text = re.sub(r"!?\[([^\]]*)\]\([^)]*\)", r"\1", text)
+    text = re.sub(r"(\*\*|__|`)", "", text)
+    text = re.sub(r"(?m)^\s*(?:[*+]|\d+[.)])\s+", "- ", text)
+    text = re.sub(r"<!--.*?-->", "", text, flags=re.S)
+    return re.sub(r"\n{3,}", "\n\n", text).strip()
+
+
+def _body(path, by_id):
+    """[{heading, text}] from a record's body, at most BODY_MAX characters; (sections, truncated)."""
+    try:
+        with open(path, encoding="utf-8") as f:
+            text = f.read()
+    except OSError:
+        return None, False
+    m = re.match(r"^---\s*\n.*?\n---\s*(\n|$)", text, re.S)
+    text = text[m.end():] if m else text
+    sections, heading, lines, private = [], None, [], 0     # private: the level of an open Private notes heading
+    for line in text.split("\n") + ["# "]:
+        h = re.match(r"^(#{1,6})(?:\s+(.*))?$", line)        # Markdown needs the space: "#1 concern" is text
+        if h:
+            level, title = len(h.group(1)), (h.group(2) or "").strip()
+            if private and level > private:
+                continue                                       # a sub-heading inside Private notes stays private
+            if not private:
+                body = _plain("\n".join(lines), by_id)
+                if body:
+                    sections.append({"heading": heading, "text": body})
+            private = level if title.lower().startswith("private notes") else 0
+            heading = None if level == 1 else (title or None)
+            lines = []
+        elif not private:
+            lines.append(line)
+    out, used, cut = [], 0, False
+    for s in sections:
+        room = BODY_MAX - used
+        if room <= 0:
+            cut = True
+            break
+        t = s["text"]
+        if len(t) > room:
+            t, cut = _trim(t, room), True
+        if t:
+            out.append({"heading": s["heading"], "text": t})
+            used += len(t)
+        if cut:
+            break
+    return out or None, cut
+
+
+def _trim(text, n):
+    """Cut text to at most n characters at a line or sentence end."""
+    if len(text) <= n:
+        return text
+    head = text[:n]
+    end = max(head.rfind("\n"), head.rfind(". "), head.rfind("! "), head.rfind("? "))
+    return head[:end + 1].rstrip() if end > 0 else head.rstrip()
+
+
+HANDLING_RANK = {"full": 0, "summary": 1, "pointer": 2, "ignore": 3}
+
+
+def _data_rules(root):
+    """({sensitivity: handling}, excluded record ids). Unset or `normal` is full; a listed category
+    takes its handling; `custom` takes the strictest custom rule's (a record doesn't say which);
+    anything else, or a handling that isn't one of the four, is treated as `pointer` (hidden)."""
+    rules = load_yaml(os.path.join(root, "user", "settings", "data-rules.yaml"))
+    handling = {"normal": "full"}
+    for k, v in (rules.get("categories") or {}).items():
+        handling[str(k)] = str(v) if str(v) in HANDLING_RANK else "pointer"
+    customs = []
+    for c in rules.get("custom") or []:
+        if isinstance(c, dict) and c.get("name"):
+            h = str(c.get("handling") or "pointer")
+            handling[str(c["name"])] = h if h in HANDLING_RANK else "pointer"
+            customs.append(handling[str(c["name"])])
+    handling["custom"] = max(customs, key=HANDLING_RANK.get) if customs else "pointer"
+    excluded = set()
+    for e in rules.get("exclusions") or []:
+        m = re.match(r"^\s*record:\s*([a-z]+/[a-z0-9][a-z0-9-]*)", str(e))
+        if m:
+            excluded.add(m.group(1))
+    return handling, excluded
+
+
+def _user_fields(root, ext_path):
+    fm = read_frontmatter(os.path.join(root, "user", "extensions", ext_path)) or {}
+    fields = fm.get("fields") if isinstance(fm.get("fields"), list) else []
+    return [f for f in fields if isinstance(f, str)][:3]
+
+
+def _page_bytes(data, overhead):
+    s = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
+    return overhead + len(s.encode("utf-8")) + 5 * sum(s.count(ch) for ch in "<>&  ")
+
+
+def _contract(root):
+    return read_frontmatter(os.path.join(root, "system", "dashboards", "records.contract.md")) or {}
+
+
+def _overhead(root):
+    total = 2048
+    for f in ("records.html", "_base.css", "_base.js"):
+        try:
+            total += os.path.getsize(os.path.join(root, "system", "dashboards", f))
+        except OSError:
+            pass
+    return total
+
+
+def _fit(data, budget, overhead):
+    """Apply the contract's truncation steps, in order, until the page fits. Returns records dropped.
+
+    Each record's serialized size is kept and updated as it changes, so this stays linear in the
+    number of records rather than re-serializing the whole page after every step."""
+    recs = data["records"]
+    size = {id(r): _page_bytes(r, 0) + 1 for r in recs}              # +1 for the comma between records
+    total = [_page_bytes(dict(data, records=[]), overhead) + sum(size.values())]
+    fits = lambda: total[0] <= budget
+
+    def changed(r):
+        new = _page_bytes(r, 0) + 1
+        total[0] += new - size[id(r)]
+        size[id(r)] = new
+
+    if fits():
+        return 0
+    key = lambda r: str(r.get("updated") or "")
+    for r in recs:                                                       # (1) bodies to 800 characters
+        if r.get("body"):
+            used, kept = 0, []
+            for sec in r["body"]:
+                room = 800 - used
+                if room <= 0:
+                    r["body_truncated"] = True
+                    break
+                t = _trim(sec["text"], room)
+                if t != sec["text"]:
+                    r["body_truncated"] = True
+                kept.append({"heading": sec["heading"], "text": t})
+                used += len(t)
+            r["body"] = kept or None
+            changed(r)
+    if fits():
+        return 0
+    for current in (False, True):                                       # (2), (3) drop bodies, oldest first
+        for r in sorted([r for r in recs if r["current"] is current and r.get("body")], key=key):
+            r["body"], r["body_truncated"] = None, True
+            changed(r)
+            if fits():
+                return 0
+    for r in recs:                                                       # (4) summaries to 120
+        r["summary"] = _cap(r.get("summary") or "", 120)
+        changed(r)
+    if fits():
+        return 0
+    for r in recs:                                                       # (5) links beyond 3
+        r["links"] = r["links"][:3]
+        changed(r)
+    if fits():
+        return 0
+    dropped = set()
+    for pick in (lambda r: not r["current"], lambda r: r["current"] and r["type"] == "source",
+                 lambda r: r["current"]):                                # (6), (7), (8) drop records
+        for r in sorted([r for r in recs if pick(r) and id(r) not in dropped], key=key):
+            dropped.add(id(r))
+            total[0] -= size[id(r)]
+            if fits():
+                break
+        if fits():
+            break
+    data["records"] = [r for r in recs if id(r) not in dropped]
+    return len(dropped)
+
+
+def records_json(root, today, by=None, extra_meta=None):
+    """The Records page's data, per system/dashboards/records.contract.md."""
+    tmap = types(root)
+    recs = records(root, tmap)
+    handling, excluded = _data_rules(root)
+    reg = load_yaml(os.path.join(root, "user", "extensions", "registry.yaml"))
+    ext_paths = {str(e.get("name")): str(e.get("path")) for e in reg.get("extensions") or []
+                 if isinstance(e, dict) and e.get("kind") == "type" and e.get("path")}
+    user_types = sorted(n for n in tmap if n not in RECORD_ORDER)
+    order = {n: i for i, n in enumerate(RECORD_ORDER + user_types)}
+    restricted = archived = 0
+    shown = []
+    for name, folder, fm in recs:
+        rid = str(fm.get("id"))
+        if fm.get("archived") is True:
+            archived += 1
+            continue
+        if fm.get("superseded_by"):
+            continue
+        how = handling.get(str(fm.get("sensitivity") or "normal"), "pointer")
+        if rid in excluded or how in ("ignore", "pointer"):
+            restricted += 1
+            continue
+        shown.append((name, folder, fm, how))
+    by_id = {str(fm.get("id")): fm for _, _, fm, _ in shown}      # only records on the page may be named
+    out = []
+    for name, folder, fm, how in shown:
+        rid = str(fm.get("id"))
+        status = fm.get("status")
+        status = None if isinstance(status, (list, dict)) else status
+        closed = set(tmap[name][1])
+        if name not in RECORD_ORDER:
+            closed |= USER_CLOSED
+        current = not (status in closed and not (name == "source" and status == "processed"))
+        shown_type = name if name in RECORD_ORDER else str(fm.get("type") or name)
+        rec = {"_name": name, "id": rid, "type": shown_type, "title": _cap(fm.get("title") or rid, 140),
+               "summary": _cap(fm.get("summary") or "", 240), "status": clean(status) or None,
+               "current": current, "updated": str(as_date(fm.get("updated")) or ""),
+               "created": str(as_date(fm.get("created")) or ""), "aliases": _aliases(fm),
+               "links": _links(fm, by_id)}
+        if how == "summary":
+            rec.update(facts=[], details=[], body=None, body_truncated=False)
+        else:
+            ufields = _user_fields(root, ext_paths.get(name, "")) if name not in RECORD_ORDER else []
+            rec["facts"] = _facts(name, fm, by_id, ufields)
+            rec["details"] = [{"label": _label(k), "value": _cap(_display(v, by_id), 200)}
+                              for k, v in fm.items() if k not in NOT_DETAILS and _display(v, by_id)][:12]
+            body, cut = (None, False) if name == "source" else \
+                _body(os.path.join(root, "user", "knowledge", folder, rid.split("/")[-1] + ".md"), by_id)
+            rec["body"], rec["body_truncated"] = body, cut
+        out.append(rec)
+    out.sort(key=lambda r: r["updated"], reverse=True)          # newest first within each type
+    out.sort(key=lambda r: order.get(r["_name"], 99))
+    atlas = load_yaml(os.path.join(root, "user", "settings", "atlas.yaml"))
+    dashboards = (load_yaml(os.path.join(root, "user", "settings", "dashboards.yaml")).get("dashboards") or {})
+    nav = [{"name": str(n), "title": NAV_TITLES.get(str(n)) or str(n).replace("-", " ").title(),
+            "url": str(v["url"])} for n, v in dashboards.items()
+           if isinstance(v, dict) and str(v.get("url") or "").startswith("https://")]
+    contract = _contract(root)
+    tz = str(atlas.get("timezone") or "UTC")
+    try:
+        from zoneinfo import ZoneInfo
+        now = datetime.datetime.now(ZoneInfo(tz))
+    except Exception:
+        now = datetime.datetime.now().astimezone()
+    total = len(out)
+    newest = [r["title"] for r in sorted(out, key=lambda r: r["updated"], reverse=True)[:2]]
+    headline = "%d records filed, %d current." % (total, sum(r["current"] for r in out))
+    if newest:
+        headline += " Most recently updated: %s." % " and ".join(newest)
+    data = {"meta": {"dashboard": "records", "schema_version": 1, "title": "Records", "headline": headline,
+                     "generated_at": now.isoformat(timespec="seconds"), "generated_by": by or "chat",
+                     "as_of": str(today), "timezone": tz, "locale": str(atlas.get("locale") or "en-US"),
+                     "user_display_name": atlas.get("user_display_name"),
+                     "atlas_version": atlas.get("installed_version"), "nav": nav},
+            "summary": {"total": total, "current": sum(r["current"] for r in out), "restricted": restricted,
+                        "archived": archived},
+            "types": [], "records": out}
+    if contract.get("stale_after_hours"):
+        data["meta"]["stale_after_hours"] = contract["stale_after_hours"]
+    data["meta"].update(extra_meta or {})
+    budget = int(contract.get("size_budget_kb") or 1500) * 1024
+    dropped = _fit(data, budget, _overhead(root))
+    if dropped:
+        data["meta"]["truncated"] = {"records": dropped}
+    counts, shown = {}, {}
+    for r in data["records"]:
+        counts[r["_name"]] = counts.get(r["_name"], 0) + 1
+        shown[r["_name"]] = r["type"]
+    for n in RECORD_ORDER + user_types:
+        if counts.get(n):
+            t = shown[n]
+            label = TYPE_LABELS.get(t) or (t[:1].upper() + t[1:] + ("" if t.endswith("s") else "s"))
+            data["types"].append({"type": t, "label": label, "count": counts[n]})
+    for r in data["records"]:
+        del r["_name"]
+    return data
+
+
 def local_today(root):
     tz = (load_yaml(os.path.join(root, "user", "settings", "atlas.yaml")) or {}).get("timezone")
     try:
@@ -215,15 +672,41 @@ def local_today(root):
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap = argparse.ArgumentParser(allow_abbrev=False, description=__doc__.split("\n")[0])
     ap.add_argument("--root", default=os.path.abspath(os.path.join(HERE, "..", "..")))
     ap.add_argument("--today", help="YYYY-MM-DD (default: today in atlas.yaml's time zone)")
     ap.add_argument("--check", action="store_true", help="report indexes that are out of date; change nothing")
+    ap.add_argument("--records-json", metavar="OUT",
+                    help="instead, write the Records dashboard's data to OUT (records.contract.md)")
+    ap.add_argument("--meta", metavar="FILE", help="with --records-json: a JSON object merged into meta "
+                                                   "(e.g. a headline or notices written by Atlas)")
+    ap.add_argument("--by", help="with --records-json: meta.generated_by (chat or routine:<name>)")
     a = ap.parse_args(argv)
     today = as_date(a.today) if a.today else local_today(a.root)
     if today is None:
         print("--today must be YYYY-MM-DD", file=sys.stderr)
         return 2
+    if a.records_json:
+        extra = {}
+        if a.meta:
+            try:
+                with open(a.meta, encoding="utf-8") as f:
+                    extra = json.load(f)
+            except (OSError, ValueError) as e:
+                print("can't read --meta %s: %s" % (a.meta, e), file=sys.stderr)
+                return 2
+            if not isinstance(extra, dict):
+                print("--meta must hold a JSON object", file=sys.stderr)
+                return 2
+        data = records_json(a.root, today, a.by, extra)
+        os.makedirs(os.path.dirname(os.path.abspath(a.records_json)), exist_ok=True)
+        with open(a.records_json, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
+        trunc = (data["meta"].get("truncated") or {}).get("records")
+        print("Records data: %d record(s) on the page%s, %d restricted, %d archived -> %s" % (
+            len(data["records"]), " (%d left out to fit the budget)" % trunc if trunc else "",
+            data["summary"]["restricted"], data["summary"]["archived"], a.records_json))
+        return 0
     stale = []
     for rel, text in build(a.root, today).items():
         path = os.path.join(a.root, rel)

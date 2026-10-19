@@ -28,7 +28,7 @@ Record in `health.yaml: smoke_test` `{ last_run: <date>, results: { repo_push, c
 |---|---|---|
 | `repo_push` | Commit the updated `health.yaml` and push to `main` | Push accepted on `main` (not a `claude/` branch) |
 | `connectors` | One read-only call (1 item) per mapped connector's required read operation | Every connector returns without auth error (list failures by name) |
-| `hooks` | `git push --force --dry-run origin HEAD:main` (no effect even if allowed) | The hook blocks it. If it isn't blocked, the hook didn't fire: high issue |
+| `hooks` | Routines only: `git push --force --dry-run origin HEAD:main` (no effect even if allowed). In a chat, record `skipped`: repo hooks never load in chats, so the probe can't pass there | The hook blocks it. If it isn't blocked in a routine, the hook didn't fire: high issue |
 | `artifact_republish` | Republish the Control Center to its stored URL (`atlas-dashboards`) | Same URL, publish succeeded (in a routine this tests unattended republish) |
 A failed smoke-test item creates a known issue with a fix; if the fix is outside the user's control (platform change), suggest `atlas-report-issue`.
 

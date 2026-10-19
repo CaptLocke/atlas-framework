@@ -31,10 +31,14 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "vendor"))
 import yaml  # noqa: E402  (vendored)
 
+# A well-formed but impossible value (created: 2026-02-30) raises ValueError, not YAMLError.
+YAML_ERRORS = (yaml.YAMLError, ValueError, OverflowError)
+
 ID_RE = re.compile(r"^[a-z]+/[a-z0-9][a-z0-9-]*$")
 LINK_RE = re.compile(r"^\[\[\s*([a-z]+/[a-z0-9][a-z0-9-]*)\s*\]\]$")
 DT_PREFIX_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})[T ]\d{2}:\d{2}")
-TOP_KEY_RE = re.compile(r"^([A-Za-z_][A-Za-z0-9_]*)\s*:")
+# A top-level key: plain (custom-field), double- or single-quoted ("scope").
+TOP_KEY_RE = re.compile(r"""^(?:"((?:[^"\\]|\\.)*)"|'((?:[^']|'')*)'|([^\s"'#\-?:][^:#]*?|-[^\s:][^:#]*?))\s*:(?:\s|$)""")
 
 
 def load_schema(root):
@@ -174,12 +178,17 @@ def split_frontmatter(text):
 
 
 def top_blocks(fm_text):
-    """[(key or None, [lines])]: each top-level key with its continuation lines."""
+    """[(key or None, [lines])]: each top-level key with its continuation lines.
+
+    Any unindented line that isn't a comment or a "- " sequence item starts a block of its own,
+    so a key this can't name is kept apart rather than glued to the key above it."""
     blocks = []
     for line in fm_text.split("\n"):
-        m = TOP_KEY_RE.match(line)
-        if m and not line.startswith((" ", "\t")):
-            blocks.append([m.group(1), [line]])
+        top = line[:1] not in ("", " ", "\t", "#") and not re.match(r"^-(\s|$)", line)
+        if top:
+            m = TOP_KEY_RE.match(line)
+            key = next((g for g in m.groups() if g is not None), None) if m else None
+            blocks.append([key.strip() if key else None, [line]])
         elif blocks:
             blocks[-1][1].append(line)
         else:
@@ -195,7 +204,7 @@ def normalize_text(text, schema, rtype=None):
     fm_text, rest = parts
     try:
         fm = yaml.safe_load(fm_text) or {}
-    except yaml.YAMLError:
+    except YAML_ERRORS:
         return text, []
     if not isinstance(fm, dict):
         return text, []
@@ -242,11 +251,10 @@ def normalize_text(text, schema, rtype=None):
     new_fm = "\n".join(out) + "\n"
     try:
         check = yaml.safe_load(new_fm) or {}
-    except yaml.YAMLError:
+    except YAML_ERRORS:
         return text, []
-    for key, want in fixed.items():
-        if check.get(key) != want:
-            return text, []      # never write something that doesn't read back as intended
+    if check != {**fm, **fixed}:
+        return text, []      # never write something that doesn't read back exactly as intended
     return "---\n" + new_fm + "---" + rest, changes
 
 
@@ -264,7 +272,7 @@ def record_paths(root):
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap = argparse.ArgumentParser(allow_abbrev=False, description=__doc__.split("\n")[0])
     ap.add_argument("--root", default=os.path.abspath(os.path.join(HERE, "..", "..")))
     ap.add_argument("--fix", action="store_true", help="write the fixes (default: report only)")
     ap.add_argument("files", nargs="*")

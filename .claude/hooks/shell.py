@@ -356,7 +356,8 @@ def python_parts(argv):
 
 def python_writes(argv, cwd):
     """Files Atlas's tools write: render.py's output, normalize.py --fix
-    (its files, or its --root), index.py (the index folder, unless --check),
+    (its files, or its --root), index.py (the index folder, unless --check;
+    or the --records-json file),
     and `python3 -m zipfile -e <zip> <dir>`."""
     _, script, module, args = python_parts(argv)
     tool = os.path.basename(script) if script else ""
@@ -366,9 +367,14 @@ def python_writes(argv, cwd):
         root = option_value(["x"] + args, None, "--root")
         files = positional(["x"] + args, value_opts=("--root",))
         return files + ([root] if root else []) or ["user/knowledge"]
-    if tool == "index.py" and "--check" not in args:
-        root = option_value(["x"] + args, None, "--root")
-        return [os.path.join(root or ".", "user", "knowledge", "_index")]
+    if tool == "index.py":
+        # --records-json writes its file instead of the indexes (tools refuse abbreviated options)
+        if any(a == "--records-json" or a.startswith("--records-json=") for a in args):
+            out = option_value(["x"] + args, None, "--records-json")
+            return [out] if out else ["--records-json"]
+        if "--check" not in args:
+            root = option_value(["x"] + args, None, "--root")
+            return [os.path.join(root or ".", "user", "knowledge", "_index")]
     if module == "zipfile" and args[:1] in (["-e"], ["--extract"]) and len(args) >= 3:
         return [args[-1]]
     return []

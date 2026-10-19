@@ -148,7 +148,7 @@
       main.appendChild(N.section({ id: "runs", title: "Recent runs", count: N.total("runs", runs.length), key: "runs",
         body: N.items(runs.map(function (r) {
           return N.item({ tone: RUN_TONE[r.status] || "muted", title: r.routine + ", " + N.dateTime(r.started), text: r.summary,
-            meta: [r.duration_min != null ? r.duration_min + " min" : null, r.report], aside: [state(N.label(r.status), RUN_TONE[r.status])] });
+            meta: [r.duration_min != null ? r.duration_min + " min" : null], aside: [state(N.label(r.status), RUN_TONE[r.status])] });
         })) }));
     }
 

@@ -129,7 +129,7 @@ counts: { pending: 1, approved: 0, rejected: 0, executed: 0, expired: 0 }
 - **Requested by:** routine:nightly-cycle · 2026-10-12
 - **Status history:** pending 2026-10-12
 ```
-Statuses: `pending | approved | rejected | executed | expired` (expires after 14 days). Newest first.
+Statuses: `pending | approved | rejected | executed | expired` (expires after 14 days, not counting days while away mode is on). Newest first.
 
 ### insights.md
 ```markdown
@@ -307,7 +307,7 @@ extensions:
 ```
 - `kind: routine` entries have `path: null` (the routine lives in `user/settings/routines.yaml`).
 - `kind: playbook` entries point to a `type: playbook-extension` file that links to a knowledge playbook record.
-- User types use the schema outline in `system/guide/authoring.md`, get their own folder under `user/knowledge/` (frontmatter `folder:`), and declare machine-readable `fields:` and `enums:` in their frontmatter so the validator can check their records.
+- User types use the schema outline in `system/guide/authoring.md`, get their own folder under `user/knowledge/` (frontmatter `folder:`), and declare machine-readable `fields:` and `enums:` (and `closed_statuses:`) in their frontmatter so the validator can check their records. A user type can't mark a field as a list, so its enum fields accept a single value or a list of allowed values.
 - Removed extensions move to `user/extensions/_retired/` (not deleted) and leave the registry.
 
 ## 9. Manifest (`system/manifest.yaml`)

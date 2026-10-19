@@ -29,14 +29,14 @@ Chat only; the user's request plus a one-line confirmation is enough (`updates_m
    ```
    The hooks accept a commit already in this repo's history as a source for owned paths in a chat (`paths.py`, `context.py` `in_history`), which is what makes this work without a tag.
 6. Set `atlas.yaml: installed_version: <X>`. If `data_version` is still higher than X's manifest (additive migrations kept), that is expected; note it in `health.yaml` known issues (severity `low`, status `open` until the next update) so validators and later updates know.
-7. Validate, release the lock, push, log (`update · rolled back 1.1.0 → 1.0.0 at user request · commit <sha>`), republish Atlas Guide and Control Center.
+7. Validate, push, then release the lock, log (`update · rolled back 1.1.0 → 1.0.0 at user request · commit <sha>`), republish Atlas Guide and Control Center.
 8. Ask whether to stay on X (pause automatic update checks) or let the next check reinstall the newer version.
 
 ## Repair (system files modified outside an update; chat only)
 - Triggered by `atlas-health` in a chat (owned paths differ from the baseline with changes not made by `Atlas-Actor: update` commits). In a routine, health records a known issue and nothing is restored.
 - Baseline: the tag `v<installed>` fetched from upstream into `refs/atlas-upstream/v<installed>` (as in `procedure.md`); before the first real update (or if that tag doesn't exist upstream), `atlas.yaml: installed_from_commit`, the template's starting commit, which is already in the repo (no fetch needed). If upstream is unreachable and no `installed_from_commit` exists, record a known issue and try again later.
 - First, always: show what changed and offer to keep intentional edits (the user or a helper edited a skill) as a user extension with `atlas-extend` (`overrides: <component>`); never silently discard them.
-- Then restore from the baseline: take the update lock and make owned paths match it exactly, validate, release the lock, commit (`Atlas-Actor: update`, reason "repair: restore system files to 1.0.0"), push.
+- Then restore from the baseline: take the update lock and make owned paths match it exactly, validate, commit (`Atlas-Actor: update`, `Atlas-Reason: repair: restore system files to 1.0.0`, never `apply release v<x>`, which step 1 above reads as the installing commit), push, then release the lock.
 
 ## Data version ahead of the system
 After a rollback over additive migrations, `atlas.yaml: data_version` can exceed `manifest.data_version`. Updates then run only migrations with `from_data_version` ≥ the user's value; validators should accept extra optional fields. Never lower `data_version` without running a reverse step.
