@@ -15,6 +15,8 @@ It is a finder, not an editor. Clicking a record opens it in a panel on the page
 
 Republished by `maintenance` (after indexes are rebuilt) and `weekly-review`. Any chat may republish it on request ("refresh my records page").
 
+**The data is built by a tool, never by hand:** `python3 -I system/tools/index.py --records-json .atlas-tmp/dashboards/records.json --by <chat or routine:name>` writes this whole shape, already fitted to the budget. Its headline is a plain count; to write a better one (or add `notices`), put them in a small JSON object and pass it as `--meta <file>`. Then render as usual.
+
 ## Data (JSON shape embedded in the page)
 ```json
 {
@@ -52,7 +54,7 @@ Republished by `maintenance` (after indexes are rebuilt) and `weekly-review`. An
 | `body` | For the record panel: the record's body as plain text, one `{ heading, text }` per section (`heading` is the section's heading or `null`; `text` keeps line breaks, list items as lines starting with "- ", no Markdown). At most 2,000 characters in all; cut at a sentence or line end and set `body_truncated: true`. Omitted (`null`) for sources (their summary stands in), for records with `summary` handling, and when the body is empty. |
 | `body_truncated` | `true` when `body` was cut; the panel says the rest is in chat. |
 
-**Closed statuses** (`current: false`): `system/schemas/schema.yaml: closed_statuses`, except that a source with status `processed` stays **current** on this page (sources are reference material). For user types, statuses that clearly mean finished (done, closed, won, lost, cancelled, and the like) count as closed; anything else counts as current.
+**Closed statuses** (`current: false`): `system/schemas/schema.yaml: closed_statuses`, except that a source with status `processed` stays **current** on this page (sources are reference material). For user types, the type file's `closed_statuses` plus done, closed, won, lost, cancelled, completed, dropped and resolved count as closed; anything else counts as current.
 
 **Facts per type:**
 | Type | Facts (in order, skip empty ones) |
@@ -70,7 +72,7 @@ Republished by `maintenance` (after indexes are rebuilt) and `weekly-review`. An
 | topic | `scope`, trimmed |
 | playbook | trigger, trimmed, "Last used <date>" |
 | source | kind label, "From <connector>" if any, occurred or captured date |
-| user types | up to 3 of the type's own fields that best identify the record (Atlas's judgment, the same 3 for every record of that type) |
+| user types | the first 3 of the type's declared `fields:`, the same for every record of that type |
 
 ## Sources (file → field)
 | Field | Source |
