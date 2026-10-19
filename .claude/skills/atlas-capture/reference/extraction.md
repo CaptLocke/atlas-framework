@@ -25,12 +25,12 @@ Capture when a choice is clearly made ("we're going with per-seat", "approved", 
 - **Idea:** a possibility someone floats ("what if we offered a partner tier?"). Low ceremony, link to a topic.
 
 ## Topics and dated events: the two that get missed
-Every schema's `## Capture guidance` says when that type is warranted. Read it; don't infer the threshold. The two types nothing else in the write path prompts you towards:
+Nothing else in the write path prompts you towards these two, so they go unfiled. Neither threshold is restated here: `system/schemas/topic.md` and `system/schemas/event.md` each carry a `## Capture guidance` section, and that is the rule. Read it rather than inferring one.
 
-- **Topic** (`system/schemas/topic.md`): a theme recurring across three or more records from at least two sources — pricing appearing in a decision, a commitment and an idea. Create it and link those records to it. Without it there is no hub for "what do we know about pricing?", and `_index/topics.md` stays empty.
-- **Event** (`system/schemas/event.md`): a dated plan named in a document or transcript is an event, not just a field. A pilot that starts 2026-11-09 and ends 2026-12-18 is two events (`kind: milestone`); "next in the series is Tuesday 20 October" is a `scheduled` one. Project `start`/`target` and body prose hold the date but put nothing on a timeline, which is what `atlas-brief` reads for Today and the Week Ahead.
+- **Topic:** the subject that keeps coming back. One source discussing a theme is a source; the same theme turning up again in a decision, then in a commitment, is a topic with those records linked to it. Without one there is no hub for "what do we know about this?", and `_index/topics.md` stays empty.
+- **Event:** a date you can read is a date you can file — but as the kind the schema names, and not when a calendar connector is going to deliver the same occurrence. Maya's team agrees in a planning document that the office move starts the first Monday of March and finishes at the end of April: two milestones, `all_day: true`, linked to the project. A date left in prose, or only in a project's `start`/`target`, reaches no timeline.
 
-A date you can read is a date you can file. The test is whether the user could later ask "what's coming up on the pilot?" and be answered from records rather than prose.
+The test is whether the user could later ask what is coming up on a piece of work and be answered from records rather than from prose.
 
 ## Facts about existing records
 Role changes, new email addresses, project target dates, preferences of a contact ("the auditor prefers PDFs") → update the existing record with an Updates line. Preferences of the **user** about Atlas or their work → a `questions.md` profile proposal (unless the user explicitly told you to remember it; then it is `stated` and may be written via `profile_update` if allowed, else proposed).

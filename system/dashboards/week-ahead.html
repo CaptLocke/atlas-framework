@@ -204,9 +204,10 @@
       });
       var dues = L(day.due).map(function (c) {
         var late = c.status === "slipped";
-        return N.item({ tone: late ? "danger" : (c.direction === "waiting_on" ? "muted" : "warn"), title: c.title, id: c.id,
-          meta: [N.label(c.direction), c.counterparty ? (c.direction === "i_owe" ? "For " : "From ") + N.name(c.counterparty) : null],
-          aside: [c.kind === "deadline" ? N.chip("Deadline", "danger") : N.chip("Due")] });
+        var isEvent = c.kind === "deadline" || c.kind === "milestone";
+        return N.item({ tone: late ? "danger" : (isEvent ? "warn" : (c.direction === "waiting_on" ? "muted" : "warn")), title: c.title, id: c.id,
+          meta: isEvent ? [] : [N.label(c.direction), c.counterparty ? (c.direction === "i_owe" ? "For " : "From ") + N.name(c.counterparty) : null],
+          aside: [c.kind === "deadline" ? N.chip("Deadline", "danger") : c.kind === "milestone" ? N.chip("Milestone") : N.chip("Due")] });
       });
       var hours = day.meeting_hours;
       var n = N.daysFromToday(day.date);
