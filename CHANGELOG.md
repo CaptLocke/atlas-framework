@@ -7,6 +7,12 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Atlas Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
+## Unreleased
+
+### What's new
+- Atlas now files the dates it reads. A pilot that starts next month, a deadline in a document, the next meeting in a series: these become events you can see coming, instead of sentences inside a project page.
+- Recurring themes get their own page. When the same subject keeps turning up across your decisions, commitments and ideas, Atlas creates a topic for it and links them together, so you can ask what it knows about pricing and get an answer.
+
 ## 1.1.2 (2026-10-18)
 
 ### What's new
