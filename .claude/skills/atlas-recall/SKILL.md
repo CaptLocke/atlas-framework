@@ -51,7 +51,7 @@ Apply `system/rules/retrieval.md` (levels L0–L4 and the search steps). Do not 
 1. Start from the topic record if one exists (`_index/topics.md`); otherwise search for the theme and its variants (churn → attrition, cancellations, non-renewal, downgrade).
 2. Collect linked and matching records and group them: decisions, risks, questions, ideas, projects, people/organizations, key sources; add a short timeline of how the theme developed.
 3. Summarize what is known, what is uncertain, and what is missing (e.g. "no decision recorded on…"). For patterns and recommendations, hand off to `atlas-insights` (exploration mode).
-4. If the theme recurs across ≥3 records and no topic exists, offer to create one (`atlas-capture`).
+4. If the theme meets the bar in `system/schemas/topic.md` § Capture guidance and no topic exists, offer to create one (`atlas-capture`).
 
 ### E. List questions ("what have I committed to this quarter?")
 Filter the type index by status, direction, dates, and links; open records only when needed for detail. Group sensibly (by due date, project, or counterparty) and give counts.

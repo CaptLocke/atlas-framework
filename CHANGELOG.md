@@ -10,8 +10,8 @@ Each release's "What's new" section is shown to users in the Atlas Guide and the
 ## 1.1.3 (2026-10-18)
 
 ### What's new
-- Atlas now files the dates it reads. A pilot that starts next month, a deadline in a document, the next meeting in a series: these become events you can see coming, instead of sentences inside a project page.
-- Recurring themes get their own page. When the same subject keeps turning up across your decisions, commitments and ideas, Atlas creates a topic for it and links them together, so you can ask what it knows about pricing and get an answer.
+- Atlas now files the dates it reads. A programme that starts next month, a go-live, a review date: from now on these become milestones you can see coming on the Week Ahead, under Due, instead of a line buried in a project's notes. Dates already filed before this update stay as they are.
+- Recurring subjects now get a record of their own. From now on, when the same subject keeps coming back across your decisions, commitments and ideas, Atlas creates a topic for it and links them together, so you can ask what it knows about that subject and get an answer rather than a list of documents.
 
 ## 1.1.2 (2026-10-18)
 

@@ -45,7 +45,7 @@ Republished by `daily-brief` each cycle and by `weekly-review`. Both compute the
 | Field | Notes |
 |---|---|
 | `prep.status` | As in the Daily Brief contract: `ready`, `planned`, `none`, `not_needed`. |
-| `due[].kind` | `"deadline"` for deadline events (then `id` is the event), otherwise `null` for commitments. |
+| `due[].kind` | `"deadline"` or `"milestone"` for events (then `id` is the event), otherwise `null` for commitments. A milestone or deadline carries no `direction` or `counterparty`. |
 | `note` | One line on why the meeting matters or what to raise, if any. |
 | `prep.summary`, `prep.todo` | `summary`: the first line of the prep note's suggested agenda (when `ready`). `todo`: one line on what to prepare, for meetings with `none` or `planned` ("Atlas will write the prep note Wednesday evening."). |
 | `free_hours` | Free time that can hold focused work on that day: the sum of gaps of at least 60 minutes inside work hours, after meetings (hidden ones included) and holds. `0` on non-work days. |
@@ -57,9 +57,9 @@ Republished by `daily-brief` each cycle and by `weekly-review`. Both compute the
 ## Sources (file → field)
 | Field | Source |
 |---|---|
-| `events[]` | Event records with `start` in the range, `status: scheduled`, `kind` not `deadline`, and shown by the meeting filter (`rhythms.yaml: meetings`, rule in `system/schemas/settings.md`): `id, title, kind, start, end, location, attendees`; `prep.path` = `prep` |
+| `events[]` | Event records with `start` in the range, `status: scheduled`, `kind` neither `deadline` nor `milestone` (both go to `due[]`, per the meeting filter in `system/schemas/settings.md`), and shown by the meeting filter (`rhythms.yaml: meetings`, rule in `system/schemas/settings.md`): `id, title, kind, start, end, location, attendees`; `prep.path` = `prep` |
 | `prep.status` | `ready` if `prep` is set; `planned` if the meeting meets `key_meeting_upcoming` (`system/triggers.md`) and has no note yet but `meeting-prep` will run before it; `none` if it meets it and no run will; else `not_needed` |
-| `due[]` | Commitments (`open|slipped`) with `due` in the range, both directions; deadline events (`kind: deadline`) in the range |
+| `due[]` | Commitments (`open|slipped`) with `due` in the range, both directions; deadline and milestone events (`kind: deadline | milestone`) in the range |
 | `meeting_hours` | Sum over the day's `events[]` (all-day items excluded) |
 | `work_day`, `work_hours_per_day` | `rhythms.yaml: work_hours` (`days`, `start`, `end`) |
 | `meta.headline` | One line on the shape of the week (`atlas-brief` §D) |

@@ -29,4 +29,8 @@ scheduled, held, cancelled
 Typically links to: people, projects, decisions, commitments, sources (transcript).
 
 ## Capture guidance
-Create for meaningful meetings (external attendees, 1:1s, decision forums, anything with a transcript) and real deadlines. Skip holds, focus blocks, and personal calendar items unless the user asks. Record `response` and `all_day` for calendar events even when the meeting filter skips them: the filter decides what is shown, not what is known.
+Create for meaningful meetings (external attendees, 1:1s, decision forums, anything with a transcript) and real deadlines. Skip holds, focus blocks, and personal calendar items unless the user asks.
+
+**Dated plans in a document or transcript are events too**, not just fields on the project they belong to: a programme's start and end, a go-live, a review date. File each as `kind: milestone` (or `deadline` where something is owed by then), with `all_day: true` when the source gives a date and no time. A date left only in prose or in a project's `start`/`target` reaches no timeline.
+
+**A calendar connector owns the meetings it syncs.** When a transcript mentions a future meeting the calendar will also deliver — the next in a series, a scheduled follow-up — leave it to calendar sync: it matches on the connector's event ID (`system/connectors/calendar.md`), so a copy filed from prose has no `origin_uri` to match and becomes a second record for one occurrence. Capture it from prose only where no calendar covers it. Record `response` and `all_day` for calendar events even when the meeting filter skips them: the filter decides what is shown, not what is known.
