@@ -30,6 +30,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "vendor"))
 import yaml  # noqa: E402  (vendored)
 
+# A well-formed but impossible value (created: 2026-02-30) raises ValueError, not YAMLError.
+YAML_ERRORS = (yaml.YAMLError, ValueError, OverflowError)
+
 SKILLS = ["atlas-recall", "atlas-capture", "atlas-brief", "atlas-triage", "atlas-insights", "atlas-memory",
           "atlas-thoughts", "atlas-review", "atlas-status-update", "atlas-prep", "atlas-write", "atlas-setup",
           "atlas-settings", "atlas-extend", "atlas-health", "atlas-update", "atlas-dashboards", "atlas-away",
@@ -108,7 +111,7 @@ def load_yaml(path, rep):
     try:
         with open(path, encoding="utf-8") as f:
             return yaml.safe_load(f), True
-    except (OSError, yaml.YAMLError) as e:
+    except (OSError,) + YAML_ERRORS as e:
         rep.error(path, "cannot parse YAML: %s" % str(e).replace("\n", " "))
         return None, False
 
@@ -131,7 +134,7 @@ def read_frontmatter(path, rep):
         return None, text
     try:
         fm = yaml.safe_load(m.group(1))
-    except yaml.YAMLError as e:
+    except YAML_ERRORS as e:
         rep.error(path, "frontmatter is not valid YAML: %s" % str(e).replace("\n", " "))
         return None, text[m.end():]
     if not isinstance(fm, dict):
@@ -140,10 +143,16 @@ def read_frontmatter(path, rep):
     return fm, text[m.end():]
 
 
-def enum_misses(value, allowed):
-    """Values not in 'allowed'. A list field (e.g. a source's flags) is checked entry by entry."""
+LIST_FORMATS = ("list", "refs", "emails")
+
+
+def enum_misses(value, allowed, is_list=False):
+    """Values not in 'allowed'. A list field (e.g. a source's flags) is checked entry by entry;
+    a list in any other field is itself a miss, since one value is expected."""
     if value is None:
         return []
+    if isinstance(value, list) and not is_list:
+        return [value]
     values = value if isinstance(value, list) else [value]
     return [v for v in values if v not in allowed]
 
@@ -225,7 +234,7 @@ class Ctx:
                 with open(path, encoding="utf-8") as f:
                     try:
                         data = yaml.safe_load(f)
-                    except yaml.YAMLError:
+                    except YAML_ERRORS:
                         data = None
             self.manifest = data if isinstance(data, dict) else {}
         return self.manifest
@@ -239,7 +248,7 @@ class Ctx:
                     with open(path, encoding="utf-8") as f:
                         data = yaml.safe_load(f) or {}
                     entries = [e for e in (data.get("extensions") or []) if isinstance(e, dict)]
-                except (OSError, yaml.YAMLError, AttributeError):
+                except (OSError, AttributeError) + YAML_ERRORS:
                     entries = []
             self._registry = entries
         return self._registry
@@ -254,6 +263,12 @@ class Ctx:
 
     def user_types(self):
         """{folder: type name} for registered user types."""
+        return {folder: name for folder, (name, _) in self.user_type_defs().items()}
+
+    def user_type_defs(self):
+        """{folder: (type name, definition or None)} for registered user types. The definition holds
+        whichever of fields:, required: and enums: the type file declares (formats.md §8); a type
+        that declares none of them gets None, and its records are checked against _common only."""
         out = {}
         for e in self.registry():
             if e.get("kind") != "type" or not e.get("path"):
@@ -266,11 +281,15 @@ class Ctx:
                     text = f.read()
                 m = re.match(r"^---\s*\n(.*?)\n---", text, re.S)
                 fm = yaml.safe_load(m.group(1)) if m else {}
-            except (OSError, yaml.YAMLError):
+            except (OSError,) + YAML_ERRORS:
                 fm = {}
             folder = str((fm or {}).get("folder", "")).strip("/").split("/")[-1]
             if folder:
-                out[folder] = str((fm or {}).get("name") or e.get("name"))
+                fm = fm if isinstance(fm, dict) else {}
+                tdef = {k: fm[k] for k in ("fields", "required", "enums") if fm.get(k)}
+                if not isinstance(tdef.get("enums", {}), dict):
+                    tdef.pop("enums")
+                out[folder] = (str(fm.get("name") or e.get("name")), tdef or None)
         return out
 
     def record_exists(self, target):
@@ -838,7 +857,7 @@ def _connector_names(c):
         with open(path, encoding="utf-8") as f:
             data = yaml.safe_load(f) or {}
         return {cn.get("connector") for cn in (data.get("connectors") or []) if isinstance(cn, dict)}
-    except (OSError, yaml.YAMLError, AttributeError):
+    except (OSError, AttributeError) + YAML_ERRORS:
         return None
 
 
@@ -1186,11 +1205,11 @@ def check_record(c, path):
         return
     folder, slug = parts[0], parts[1][:-3]
     folder_type = {t.get("folder"): name for name, t in types.items() if isinstance(t, dict)}
-    utypes = c.user_types()
+    utypes = c.user_type_defs()
     if folder in folder_type:
         expected, tdef = folder_type[folder], types[folder_type[folder]]
     elif folder in utypes:
-        expected, tdef = utypes[folder], None
+        expected, tdef = utypes[folder]
     else:
         rep.error(path, "folder %r is not a known type folder or registered user type" % folder)
         return
@@ -1215,8 +1234,9 @@ def check_record(c, path):
             rep.error(path, "%s must be YYYY-MM-DD (got %r)" % (k, fm[k]))
     if is_date(fm.get("created")) and is_date(fm.get("updated")) and str(fm["updated"]) < str(fm["created"]):
         rep.error(path, "updated is earlier than created")
+    list_fields = list_fields_for(c, expected)
     for k, allowed in (common.get("enums") or {}).items():
-        for bad in enum_misses(fm.get(k), allowed):
+        for bad in enum_misses(fm.get(k), allowed, k in list_fields):
             rep.error(path, "%s %r is not one of %s" % (k, bad, ", ".join(allowed)))
     if fm.get("archived") is not None and not isinstance(fm["archived"], bool):
         rep.error(path, "archived must be true or false")
@@ -1225,7 +1245,7 @@ def check_record(c, path):
             if k not in fm:
                 rep.error(path, "required field '%s' is missing (use null if unknown)" % k)
         for k, allowed in (tdef.get("enums") or {}).items():
-            for bad in enum_misses(fm.get(k), allowed):
+            for bad in enum_misses(fm.get(k), allowed, k in list_fields):
                 rep.error(path, "%s %r is not one of %s" % (k, bad, ", ".join(allowed)))
         if expected == "event" and fm.get("all_day") is not None and not isinstance(fm["all_day"], bool):
             rep.error(path, "all_day must be true or false")
@@ -1307,6 +1327,13 @@ def steps_problem(v):
     return None
 
 
+def list_fields_for(c, rtype):
+    """Fields that hold a list for this type (schema.yaml field_formats: list, refs, emails)."""
+    ff = (c.load_schema() or {}).get("field_formats") or {}
+    merged = dict(ff.get("common") or {}, **(ff.get(rtype) or {}))
+    return {k for k, f in merged.items() if f in LIST_FORMATS}
+
+
 def check_field_formats(c, path, fm, rtype):
     """Enforce schema.yaml field_formats (ref, refs, list, emails, bool, int, date, dt) and lowercase enums."""
     rep, schema = c.rep, c.load_schema()
@@ -1352,7 +1379,7 @@ def setup_step5_done(c):
                 st = yaml.safe_load(f) or {}
             if 5 in (st.get("completed") or []) or "5" in [str(x) for x in (st.get("completed") or [])]:
                 return True
-        except (OSError, yaml.YAMLError, AttributeError):
+        except (OSError, AttributeError) + YAML_ERRORS:
             pass
     np = c.p("user", "settings", "atlas.yaml")
     if os.path.exists(np):
@@ -1360,7 +1387,7 @@ def setup_step5_done(c):
             with open(np, encoding="utf-8") as f:
                 nv = yaml.safe_load(f) or {}
             return bool(isinstance(nv, dict) and nv.get("attestation"))
-        except (OSError, yaml.YAMLError):
+        except (OSError,) + YAML_ERRORS:
             return False
     return False
 

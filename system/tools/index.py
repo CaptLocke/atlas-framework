@@ -22,6 +22,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "vendor"))
 import yaml  # noqa: E402  (vendored)
 
+# A well-formed but impossible value (created: 2026-02-30) raises ValueError, not YAMLError.
+YAML_ERRORS = (yaml.YAMLError, ValueError, OverflowError)
+
 HOT_MAX = 75
 HOT_NEVER = ("source", "person", "organization")
 HOT_ORDER = ["commitment", "event", "goal", "project", "risk", "question", "decision", "idea", "playbook", "topic"]
@@ -39,7 +42,7 @@ def read_frontmatter(path):
         return None
     try:
         fm = yaml.safe_load(m.group(1))
-    except yaml.YAMLError:
+    except YAML_ERRORS:
         return None
     return fm if isinstance(fm, dict) else None
 
@@ -48,7 +51,7 @@ def load_yaml(path):
     try:
         with open(path, encoding="utf-8") as f:
             return yaml.safe_load(f) or {}
-    except (OSError, yaml.YAMLError):
+    except (OSError,) + YAML_ERRORS:
         return {}
 
 
@@ -130,6 +133,8 @@ def hot(recs, tmap, today):
         if name in HOT_NEVER or fm.get("archived") is True or fm.get("superseded_by"):
             continue
         status = fm.get("status")
+        if isinstance(status, (list, dict)):    # invalid (validate.py says so); treat as unknown
+            status = None
         if status in tmap[name][1]:
             continue
         upd = as_date(fm.get("updated"))
