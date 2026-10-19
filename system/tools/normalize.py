@@ -272,7 +272,7 @@ def record_paths(root):
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap = argparse.ArgumentParser(allow_abbrev=False, description=__doc__.split("\n")[0])
     ap.add_argument("--root", default=os.path.abspath(os.path.join(HERE, "..", "..")))
     ap.add_argument("--fix", action="store_true", help="write the fixes (default: report only)")
     ap.add_argument("files", nargs="*")

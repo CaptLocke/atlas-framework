@@ -98,7 +98,9 @@ def types(root):
         # the same way validate.py reads it.
         folder = str(fm.get("folder") or "").strip().strip("/").split("/")[-1]
         if folder and re.match(r"^[a-z][a-z0-9-]*$", folder):
-            out.setdefault(str(ext.get("name") or folder), (str(folder), set(fm.get("closed_statuses") or [])))
+            closed = fm.get("closed_statuses")
+            closed = {str(x) for x in closed if isinstance(x, (str, int))} if isinstance(closed, list) else set()
+            out.setdefault(str(ext.get("name") or folder), (str(folder), closed))
     return out
 
 
@@ -280,10 +282,12 @@ def _display(value, by_id):
         return "%s, %s" % (_day(value), value.strftime("%H:%M"))
     if isinstance(value, datetime.date):
         return _day(value)
-    rid = ref_id(value)
-    if rid:
-        return _title(rid, by_id) or ""
     s = clean(value)
+    if "[[" in s:
+        if re.fullmatch(r"\[\[[^\]]+\]\]", s):
+            rid = ref_id(s)
+            return (_title(rid, by_id) or "") if rid else ""
+        return clean(_wiki(s, by_id))
     m = re.match(r"^(\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2})", s)
     if m and as_date(m.group(1)):
         return "%s, %s" % (_day(as_date(m.group(1))), m.group(2))
@@ -372,11 +376,19 @@ def _links(fm, by_id):
     return out[:8]
 
 
-def _plain(text, by_id):
+def _wiki(text, by_id):
+    """[[type/id]] and [[type/id|text]] as display text. A record not on the page (hidden by the data
+    rules, archived, or missing) is never named, not even by its slug."""
     def wiki(m):
         rid, alias = m.group(1), m.group(2)
-        return alias or _title(rid, by_id) or rid.split("/")[-1].replace("-", " ")
-    text = re.sub(r"\[\[([a-z]+/[a-z0-9][a-z0-9-]*)(?:\|([^\]]+))?\]\]", wiki, text)
+        if rid in by_id:
+            return alias or _title(rid, by_id) or ""
+        return "[not shown]"
+    return re.sub(r"\[\[([a-z]+/[a-z0-9][a-z0-9-]*)(?:\|([^\]]+))?\]\]", wiki, text)
+
+
+def _plain(text, by_id):
+    text = _wiki(text, by_id)
     text = re.sub(r"!?\[([^\]]*)\]\([^)]*\)", r"\1", text)
     text = re.sub(r"(\*\*|__|`)", "", text)
     text = re.sub(r"(?m)^\s*(?:[*+]|\d+[.)])\s+", "- ", text)
@@ -393,19 +405,21 @@ def _body(path, by_id):
         return None, False
     m = re.match(r"^---\s*\n.*?\n---\s*(\n|$)", text, re.S)
     text = text[m.end():] if m else text
-    sections, heading, lines, private = [], None, [], False
-    for line in text.split("\n") + ["## "]:
-        h = re.match(r"^(#{1,6})\s*(.*)$", line)
+    sections, heading, lines, private = [], None, [], 0     # private: the level of an open Private notes heading
+    for line in text.split("\n") + ["# "]:
+        h = re.match(r"^(#{1,6})(?:\s+(.*))?$", line)        # Markdown needs the space: "#1 concern" is text
         if h:
+            level, title = len(h.group(1)), (h.group(2) or "").strip()
+            if private and level > private:
+                continue                                       # a sub-heading inside Private notes stays private
             if not private:
                 body = _plain("\n".join(lines), by_id)
                 if body:
                     sections.append({"heading": heading, "text": body})
-            level, title = len(h.group(1)), h.group(2).strip()
-            private = title.lower().startswith("private notes")
+            private = level if title.lower().startswith("private notes") else 0
             heading = None if level == 1 else (title or None)
             lines = []
-        else:
+        elif not private:
             lines.append(line)
     out, used, cut = [], 0, False
     for s in sections:
@@ -433,12 +447,24 @@ def _trim(text, n):
     return head[:end + 1].rstrip() if end > 0 else head.rstrip()
 
 
+HANDLING_RANK = {"full": 0, "summary": 1, "pointer": 2, "ignore": 3}
+
+
 def _data_rules(root):
+    """({sensitivity: handling}, excluded record ids). Unset or `normal` is full; a listed category
+    takes its handling; `custom` takes the strictest custom rule's (a record doesn't say which);
+    anything else, or a handling that isn't one of the four, is treated as `pointer` (hidden)."""
     rules = load_yaml(os.path.join(root, "user", "settings", "data-rules.yaml"))
-    handling = {str(k): str(v) for k, v in (rules.get("categories") or {}).items()}
+    handling = {"normal": "full"}
+    for k, v in (rules.get("categories") or {}).items():
+        handling[str(k)] = str(v) if str(v) in HANDLING_RANK else "pointer"
+    customs = []
     for c in rules.get("custom") or []:
         if isinstance(c, dict) and c.get("name"):
-            handling[str(c["name"])] = str(c.get("handling") or "full")
+            h = str(c.get("handling") or "pointer")
+            handling[str(c["name"])] = h if h in HANDLING_RANK else "pointer"
+            customs.append(handling[str(c["name"])])
+    handling["custom"] = max(customs, key=HANDLING_RANK.get) if customs else "pointer"
     excluded = set()
     for e in rules.get("exclusions") or []:
         m = re.match(r"^\s*record:\s*([a-z]+/[a-z0-9][a-z0-9-]*)", str(e))
@@ -450,7 +476,7 @@ def _data_rules(root):
 def _user_fields(root, ext_path):
     fm = read_frontmatter(os.path.join(root, "user", "extensions", ext_path)) or {}
     fields = fm.get("fields") if isinstance(fm.get("fields"), list) else []
-    return [str(f) for f in fields][:3]
+    return [f for f in fields if isinstance(f, str)][:3]
 
 
 def _page_bytes(data, overhead):
@@ -473,57 +499,74 @@ def _overhead(root):
 
 
 def _fit(data, budget, overhead):
-    """Apply the contract's truncation steps, in order, until the page fits. Returns records dropped."""
+    """Apply the contract's truncation steps, in order, until the page fits. Returns records dropped.
+
+    Each record's serialized size is kept and updated as it changes, so this stays linear in the
+    number of records rather than re-serializing the whole page after every step."""
     recs = data["records"]
-    key = lambda r: str(r.get("updated") or "")
-    fits = lambda: _page_bytes(data, overhead) <= budget
+    size = {id(r): _page_bytes(r, 0) + 1 for r in recs}              # +1 for the comma between records
+    total = [_page_bytes(dict(data, records=[]), overhead) + sum(size.values())]
+    fits = lambda: total[0] <= budget
+
+    def changed(r):
+        new = _page_bytes(r, 0) + 1
+        total[0] += new - size[id(r)]
+        size[id(r)] = new
+
     if fits():
         return 0
+    key = lambda r: str(r.get("updated") or "")
     for r in recs:                                                       # (1) bodies to 800 characters
         if r.get("body"):
-            total, kept = 0, []
-            for s in r["body"]:
-                room = 800 - total
+            used, kept = 0, []
+            for sec in r["body"]:
+                room = 800 - used
                 if room <= 0:
                     r["body_truncated"] = True
                     break
-                t = _trim(s["text"], room)
-                if t != s["text"]:
+                t = _trim(sec["text"], room)
+                if t != sec["text"]:
                     r["body_truncated"] = True
-                kept.append({"heading": s["heading"], "text": t})
-                total += len(t)
+                kept.append({"heading": sec["heading"], "text": t})
+                used += len(t)
             r["body"] = kept or None
+            changed(r)
     if fits():
         return 0
     for current in (False, True):                                       # (2), (3) drop bodies, oldest first
         for r in sorted([r for r in recs if r["current"] is current and r.get("body")], key=key):
             r["body"], r["body_truncated"] = None, True
+            changed(r)
             if fits():
                 return 0
     for r in recs:                                                       # (4) summaries to 120
         r["summary"] = _cap(r.get("summary") or "", 120)
+        changed(r)
     if fits():
         return 0
     for r in recs:                                                       # (5) links beyond 3
         r["links"] = r["links"][:3]
+        changed(r)
     if fits():
         return 0
-    dropped = 0
+    dropped = set()
     for pick in (lambda r: not r["current"], lambda r: r["current"] and r["type"] == "source",
                  lambda r: r["current"]):                                # (6), (7), (8) drop records
-        for r in sorted([r for r in data["records"] if pick(r)], key=key):
-            data["records"].remove(r)
-            dropped += 1
+        for r in sorted([r for r in recs if pick(r) and id(r) not in dropped], key=key):
+            dropped.add(id(r))
+            total[0] -= size[id(r)]
             if fits():
-                return dropped
-    return dropped
+                break
+        if fits():
+            break
+    data["records"] = [r for r in recs if id(r) not in dropped]
+    return len(dropped)
 
 
 def records_json(root, today, by=None, extra_meta=None):
     """The Records page's data, per system/dashboards/records.contract.md."""
     tmap = types(root)
     recs = records(root, tmap)
-    by_id = {str(fm.get("id")): fm for _, _, fm in recs}
     handling, excluded = _data_rules(root)
     reg = load_yaml(os.path.join(root, "user", "extensions", "registry.yaml"))
     ext_paths = {str(e.get("name")): str(e.get("path")) for e in reg.get("extensions") or []
@@ -531,7 +574,7 @@ def records_json(root, today, by=None, extra_meta=None):
     user_types = sorted(n for n in tmap if n not in RECORD_ORDER)
     order = {n: i for i, n in enumerate(RECORD_ORDER + user_types)}
     restricted = archived = 0
-    out = []
+    shown = []
     for name, folder, fm in recs:
         rid = str(fm.get("id"))
         if fm.get("archived") is True:
@@ -539,17 +582,23 @@ def records_json(root, today, by=None, extra_meta=None):
             continue
         if fm.get("superseded_by"):
             continue
-        how = handling.get(str(fm.get("sensitivity") or "normal"), "full")
+        how = handling.get(str(fm.get("sensitivity") or "normal"), "pointer")
         if rid in excluded or how in ("ignore", "pointer"):
             restricted += 1
             continue
+        shown.append((name, folder, fm, how))
+    by_id = {str(fm.get("id")): fm for _, _, fm, _ in shown}      # only records on the page may be named
+    out = []
+    for name, folder, fm, how in shown:
+        rid = str(fm.get("id"))
         status = fm.get("status")
         status = None if isinstance(status, (list, dict)) else status
         closed = set(tmap[name][1])
         if name not in RECORD_ORDER:
             closed |= USER_CLOSED
         current = not (status in closed and not (name == "source" and status == "processed"))
-        rec = {"_name": name, "id": rid, "type": name if name in RECORD_ORDER else str(fm.get("type") or name), "title": _cap(fm.get("title") or rid, 140),
+        shown_type = name if name in RECORD_ORDER else str(fm.get("type") or name)
+        rec = {"_name": name, "id": rid, "type": shown_type, "title": _cap(fm.get("title") or rid, 140),
                "summary": _cap(fm.get("summary") or "", 240), "status": clean(status) or None,
                "current": current, "updated": str(as_date(fm.get("updated")) or ""),
                "created": str(as_date(fm.get("created")) or ""), "aliases": _aliases(fm),
@@ -623,7 +672,7 @@ def local_today(root):
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap = argparse.ArgumentParser(allow_abbrev=False, description=__doc__.split("\n")[0])
     ap.add_argument("--root", default=os.path.abspath(os.path.join(HERE, "..", "..")))
     ap.add_argument("--today", help="YYYY-MM-DD (default: today in atlas.yaml's time zone)")
     ap.add_argument("--check", action="store_true", help="report indexes that are out of date; change nothing")

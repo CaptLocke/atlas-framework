@@ -11,7 +11,7 @@ Each release's "What's new" section is shown to users in the Atlas Guide and the
 
 ### What's new
 - Your Records page now refreshes in your automations as well as in chats.
-- An update can no longer lose changes that hadn't synced yet: Atlas saves your work to GitHub first, and waits for the next check if it can't.
+- From the next update on, an update can no longer lose changes that hadn't synced yet: Atlas saves your work to GitHub first, and waits for the next check if it can't. (This update is still installed the old way.)
 - One mistyped date, such as February 30, no longer stops Atlas's nightly upkeep. Atlas flags that record and carries on with the rest.
 - Tidying a record never drops a field Atlas doesn't recognise.
 - Records of the types you added are now checked against the fields and values you declared, and a field that should hold one value is checked for that. If any of your records don't match, the next health check lists them for you to fix.

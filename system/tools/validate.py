@@ -268,7 +268,10 @@ class Ctx:
     def user_type_defs(self):
         """{folder: (type name, definition or None)} for registered user types. The definition holds
         whichever of fields:, required: and enums: the type file declares (formats.md §8); a type
-        that declares none of them gets None, and its records are checked against _common only."""
+        that declares none of them gets None, and its records are checked against _common only.
+        A declaration in the wrong shape is reported on the type file once and left out."""
+        if getattr(self, "_user_type_defs", None) is not None:
+            return self._user_type_defs
         out = {}
         for e in self.registry():
             if e.get("kind") != "type" or not e.get("path"):
@@ -283,13 +286,35 @@ class Ctx:
                 fm = yaml.safe_load(m.group(1)) if m else {}
             except (OSError,) + YAML_ERRORS:
                 fm = {}
-            folder = str((fm or {}).get("folder", "")).strip("/").split("/")[-1]
-            if folder:
-                fm = fm if isinstance(fm, dict) else {}
-                tdef = {k: fm[k] for k in ("fields", "required", "enums") if fm.get(k)}
-                if not isinstance(tdef.get("enums", {}), dict):
-                    tdef.pop("enums")
-                out[folder] = (str(fm.get("name") or e.get("name")), tdef or None)
+            fm = fm if isinstance(fm, dict) else {}
+            folder = str(fm.get("folder", "")).strip("/").split("/")[-1]
+            if not folder:
+                continue
+            tdef = {}
+            for k in ("fields", "required"):
+                v = fm.get(k)
+                if v in (None, []):
+                    continue
+                if isinstance(v, list) and all(isinstance(x, str) for x in v):
+                    tdef[k] = v
+                else:
+                    self.rep.error(path, "%s: must be a list of field names" % k)
+            enums = fm.get("enums")
+            if enums not in (None, {}):
+                if not isinstance(enums, dict):
+                    self.rep.error(path, "enums: must map each field to a list of allowed values")
+                else:
+                    good = {}
+                    for field, allowed in enums.items():
+                        if isinstance(allowed, list) and allowed and \
+                                all(isinstance(x, (str, int, float)) and not isinstance(x, bool) for x in allowed):
+                            good[str(field)] = allowed
+                        else:
+                            self.rep.error(path, "enums: %s must be a list of allowed values" % field)
+                    if good:
+                        tdef["enums"] = good
+            out[folder] = (str(fm.get("name") or e.get("name")), tdef or None)
+        self._user_type_defs = out
         return out
 
     def record_exists(self, target):
@@ -1247,8 +1272,9 @@ def check_record(c, path):
         for k in tdef.get("required") or []:
             if k not in fm:
                 rep.error(path, "required field '%s' is missing (use null if unknown)" % k)
+        user_type = folder not in folder_type     # a user type can't declare list fields, so lists pass
         for k, allowed in (tdef.get("enums") or {}).items():
-            for bad in enum_misses(fm.get(k), allowed, k in list_fields):
+            for bad in enum_misses(fm.get(k), allowed, k in list_fields or user_type):
                 rep.error(path, "%s %r is not one of %s" % (k, bad, ", ".join(allowed)))
         if expected == "event" and fm.get("all_day") is not None and not isinstance(fm["all_day"], bool):
             rep.error(path, "all_day must be true or false")
@@ -1656,7 +1682,7 @@ def check_path(c, path):
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(description="Validate Atlas system and user files.")
+    ap = argparse.ArgumentParser(allow_abbrev=False, description="Validate Atlas system and user files.")
     g = ap.add_mutually_exclusive_group()
     g.add_argument("--system", action="store_true", help="validate the system half")
     g.add_argument("--user", action="store_true", help="validate the user half")

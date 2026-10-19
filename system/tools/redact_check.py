@@ -38,7 +38,8 @@ EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 PHONE = re.compile(r"(?<![\w.:-])(?:\+\d[\d ().-]{6,}\d|\(?\d{3}\)?[ .-]\d{3}[ .-]\d{4}"
                    # unseparated: a national number from 0 (07700900123), or a North American one
                    # (2125550123); a run starting with 1 is left alone, since timestamps look like that
-                   r"|0\d{9,10}|[2-9]\d{2}[2-9]\d{6})(?![\w-])")
+                   # ... but not a compact date or timestamp (2026101912), which starts like a year and month
+                   r"|(?!(?:19|20)\d\d(?:0[1-9]|1[0-2]))(?:0[1-9]\d{8,9}|[2-9]\d{2}[2-9]\d{6}))(?![\w-])")
 IP = re.compile(r"(?<![\w.])\d{1,3}(?:\.\d{1,3}){3}(?![\w.])")
 URL = re.compile(r"\b(?:https?://[^\s)\]>\"']+|(?:[a-z0-9-]+\.)+[a-z]{2,}/[^\s)\]>\"']*)", re.I)
 PLACEHOLDER = re.compile(r"\[[A-Z]+(?:-\d+)?\]")
@@ -109,7 +110,7 @@ def terms(repo, warnings):
     for line in settings.splitlines():
         value = None
         if re.match(r"^\s*(website|email_domains):", line):
-            value = line.split(":", 1)[1]
+            value = re.sub(r"(^|\s)#.*$", "", line.split(":", 1)[1])     # drop a trailing comment
             in_list = not value.strip()          # email_domains written as a block list follows
         elif in_list and re.match(r"^\s*-\s", line):
             value = line.split("-", 1)[1]
