@@ -69,7 +69,7 @@ For each routine in `routines.yaml`:
 
 The prompt: exactly the routine prompt in `system/jobs/README.md` §Routine prompt, with the routine's name filled in.
 
-**Converting the schedule.** Run `python3 system/tools/cron_utc.py` once for all routines. Write the `utc_offset` it prints to `routines.yaml`, and each routine's list as its `utc_schedule`. Never convert by hand. A routine with two UTC crons (hours that cross midnight UTC, such as Full's work-hours routines in the Americas) becomes two platform routines with identical settings and the same prompt: name them `Atlas · <routine name>` and `Atlas · <routine name> (2)`, and save both IDs as a list in `utc_schedule`'s order. Both run the same routine, at different hours.
+**Converting the schedule.** Run `python3 system/tools/cron_utc.py` once for all routines. Write the `utc_offset` it prints to `routines.yaml`, and each routine's list as its `utc_schedule`. Never convert by hand. A routine with more than one UTC cron (hours that cross midnight UTC, such as Full's work-hours routines in the Americas) becomes one platform routine per cron, with identical settings and the same prompt: name them `Atlas · <routine name>`, `Atlas · <routine name> (2)` and so on, and save their IDs as a list in `utc_schedule`'s order. All run the same routine, at different hours. The tool converts only day-of-week schedules; a routine it can't convert is listed under `errors` and the others still convert.
 
 If this session can create routines (a routine or scheduled-task tool), create each with its UTC cron, then save its ID as `routine_id` and commit. Check the result shows the right repo, environment, and model.
 
@@ -88,7 +88,7 @@ Connectors:  Gmail, Google Calendar, Google Drive   (turn off any others)
 Instructions (copy exactly):
 <the routine prompt from system/jobs/README.md, with this routine's name filled in>
 ```
-Translate the local cron to plain words for the user ("Every Friday at 2:07 PM", "Weekdays every hour from 9:07 AM to 4:07 PM"): the platform's time picker takes local time and converts it itself. Where only a cron expression will do, give the `utc_schedule` entry, and for a routine with two, two blocks. Values in the example are fictional; fill in the user's. When the user says it's done, set `routine_id: "manual:<routine name>"` (so health checks know it exists but can't be edited from chat) and commit.
+Translate the local cron to plain words for the user ("Every Friday at 2:07 PM", "Weekdays every hour from 9:07 AM to 4:07 PM"): the platform's time picker takes local time and converts it itself. Where only a cron expression will do, give the `utc_schedule` entry, and for a routine with several, one block each. A schedule with more than one UTC cron always needs the cron path, since one picker setting can't express it; check which the platform offers when the user first creates one, and say plainly if it offers neither. Values in the example are fictional; fill in the user's. When the user says it's done, set `routine_id: "manual:<routine name>"` (for several, a list: `["manual:<routine name>", "manual:<routine name> (2)"]`) (so health checks know it exists but can't be edited from chat) and commit.
 
 ## 5. After creating
 - Start one routine once now ("run now"; if Claude can't, ask the user to press it), ideally `upkeep` (cheap). When it finishes, pull and read its run report: it must show `atlas_context: routine`, which confirms the routine is attached to the "Atlas routine" environment. Anything else: walk the user through the fix in §3 and test again. The run report also confirms `available_in_routines` for connectors (`atlas-connectors`).
@@ -96,8 +96,8 @@ Translate the local cron to plain words for the user ("Every Friday at 2:07 PM",
 
 ## 6. Changing later
 - Job list or modifiers: settings edit only (`routines.yaml`).
-- Schedule, model, connectors, or a new/removed routine: also update the platform routine (same tool or copy-paste path). A changed schedule is converted again (§4) at today's offset, which also refreshes `utc_offset` for every routine: if it changed, re-time them all (§8).
-- Time zone: `atlas.yaml: timezone` changes and every `schedule` stays as it is, since it's local; then re-time every routine (§8). Every new routine uses the "Atlas routine" environment (§3, §4) and gets a test run as in §5. Removing a platform routine counts as deleting (`destructive`, approval); prefer turning it off.
+- Schedule, model, connectors, or a new/removed routine: also update the platform routine (same tool or copy-paste path). A changed schedule is converted again (§4) at today's offset, which also refreshes `utc_offset` for every routine: if it changed, re-time them all (§8). Every new routine uses the "Atlas routine" environment (§3, §4) and gets a test run as in §5. Removing a platform routine counts as deleting (`destructive`, approval); prefer turning it off.
+- Time zone: `atlas.yaml: timezone` changes and every `schedule` stays as it is, since it's local; then re-time every routine (§8).
 - The prompt itself, after a release changed it: §7.
 
 ## 7. Re-pasting routine prompts

@@ -17,8 +17,10 @@ Usage (from the repository root):
     python3 system/tools/cron_utc.py --tz Europe/Berlin --at 2026-12-01 "7 20 * * *"
     python3 system/tools/cron_utc.py --root DIR           # another checkout
 Prints JSON: {"timezone", "utc_offset", "schedules": [...]} for one schedule, or
-{"timezone", "utc_offset", "routines": {name: [...]}} for all.
+{"timezone", "utc_offset", "routines": {name: [...]}} for all, plus "errors": {name: why}
+for any routine it can't convert (the others still convert; exit 2).
 Exit 0 on success, 2 on a schedule it can't convert or a missing time zone.
+The offset is the zone's offset now (or at noon on --at), matching `date +%z` in a run.
 Standard library plus the vendored YAML parser.
 """
 import argparse
@@ -96,12 +98,20 @@ def zone_of(tz):
     try:
         return ZoneInfo(tz)
     except (ZoneInfoNotFoundError, ValueError):
+        try:
+            ZoneInfo("America/New_York")
+        except ZoneInfoNotFoundError:
+            raise CronError("this machine has no time zone data, so %r can't be looked up" % tz)
         raise CronError("unknown time zone %r" % tz)
 
 
-def offset_minutes(zone, at):
-    noon = datetime.datetime.combine(at, datetime.time(12), tzinfo=zone)
-    return int(noon.utcoffset().total_seconds() // 60)
+def offset_minutes(zone, at=None):
+    """The zone's offset now, as `date +%z` would print it during a run, or at noon on `at`."""
+    if at is None:
+        moment = datetime.datetime.now(zone)
+    else:
+        moment = datetime.datetime.combine(at, datetime.time(12), tzinfo=zone)
+    return int(moment.utcoffset().total_seconds() // 60)
 
 
 def offset_text(minutes):
@@ -159,14 +169,23 @@ def main(argv=None):
         if not tz:
             raise CronError("no time zone: pass --tz or set atlas.yaml: timezone")
         zone = zone_of(tz)
-        at = datetime.date.fromisoformat(a.at) if a.at else datetime.datetime.now(zone).date()
-        off = offset_minutes(zone, at)
+        off = offset_minutes(zone, datetime.date.fromisoformat(a.at) if a.at else None)
         result = {"timezone": tz, "utc_offset": offset_text(off)}
         if a.cron:
             result["schedules"] = to_utc(a.cron, off)
         else:
             routines = load(os.path.join(a.root, "user", "settings", "routines.yaml")).get("routines") or []
-            result["routines"] = {r["name"]: to_utc(r["schedule"], off) for r in routines}
+            result["routines"], errors = {}, {}
+            for r in routines:
+                try:
+                    result["routines"][r["name"]] = to_utc(r["schedule"], off)
+                except CronError as e:
+                    errors[r["name"]] = str(e)
+            if errors:
+                # The rest still convert: one routine Atlas can't convert mustn't block the others.
+                result["errors"] = errors
+                print(json.dumps(result, indent=2))
+                return 2
     except (CronError, OSError, KeyError, TypeError, ValueError, yaml.YAMLError) as e:
         print("cron_utc: %s" % e, file=sys.stderr)
         return 2

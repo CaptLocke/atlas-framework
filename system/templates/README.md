@@ -32,7 +32,7 @@ Starter files for the user half. `atlas-setup` copies every template to its dest
 | `settings/connectors.yaml` | `user/settings/connectors.yaml` | 9 | `atlas-connectors` (chat only, N6) |
 | `settings/sources.yaml` | `user/settings/sources.yaml` | 9 | `atlas-connectors`, `atlas-settings` |
 | `settings/rhythms.yaml` | `user/settings/rhythms.yaml` | 10 (moments, work hours) | `atlas-settings`, `atlas-away` |
-| `settings/routines.yaml` | `user/settings/routines.yaml` | 10: replaced by a copy of the chosen `system/routine-profiles/<profile>.yaml`, cron hours adjusted to `rhythms.yaml: work_hours`; `routine_id`s filled as routines are created | `atlas-settings` |
+| `settings/routines.yaml` | `user/settings/routines.yaml` | 10: replaced by a copy of the chosen `system/routine-profiles/<profile>.yaml`, cron hours adjusted to `rhythms.yaml: work_hours`; `utc_offset`, `utc_schedule` and `routine_id`s filled as routines are created | `atlas-settings` |
 | `settings/dashboards.yaml` | `user/settings/dashboards.yaml` | 11 | `atlas-dashboards` |
 | `profile/profile.md`, `working-style.md`, `communication-style.md`, `thinking-style.md`, `preferences.md` | `user/profile/` | 8 (written once confirmed; drafted at 7 from imported notes, uploads, and research) | proposals via `questions.md` |
 | `profile/voice-personal.md`, `voice-house.md`, `design-system.md` | `user/profile/` | 8 (drafted at 7 from uploads and research, written once confirmed); personal voice also from sent mail after 9 | refined from the user's edits |

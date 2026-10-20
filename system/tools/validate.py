@@ -1021,10 +1021,16 @@ def check_routines(c, path, data, template):
         sched = r.get("schedule")
         if not is_cron(sched):
             rep.error(path, "%s: schedule must be a 5-field cron expression (got %r)" % (where, sched))
+        elif sched.split()[2:4] != ["*", "*"]:
+            rep.error(path, "%s: schedule uses day of week only (day of month and month must be *), "
+                      "so it can be converted to UTC (got %r)" % (where, sched))
         utc = r.get("utc_schedule")
         if utc is not None:
             if not isinstance(utc, list) or not utc or not all(is_cron(u) for u in utc):
                 rep.error(path, "%s: utc_schedule must be a list of 5-field cron expressions (got %r)" % (where, utc))
+            elif isinstance(r.get("routine_id"), str) and len(utc) > 1:
+                rep.error(path, "%s: %d utc_schedule entries need a list of %d routine_ids (got one)"
+                          % (where, len(utc), len(utc)))
             elif isinstance(r.get("routine_id"), list) and len(r["routine_id"]) != len(utc):
                 rep.error(path, "%s: routine_id lists one platform routine per utc_schedule entry (%d ids, %d schedules)"
                           % (where, len(r["routine_id"]), len(utc)))
