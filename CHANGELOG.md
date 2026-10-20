@@ -16,7 +16,7 @@ Each release's "What's new" section is shown to users in the Guide and their nex
   - **Guide**: how Atlas is running, what it filed for you in the last two weeks, what it knows about you, and what's new.
 - What you owe now comes before what you're waiting on, everywhere.
 - To look anything up, just ask: "what do I know about Sam?", "what did we decide about pricing?". The Records page is gone, because asking finds everything, however old.
-- Setup now shows you how to approve messages before they're sent right after your first Daily Brief, once you've seen what Atlas does.
+- Setup now asks you to turn on approval for sending, sharing and deleting just before Atlas reads your recent email for your first Daily Brief, and reminds you once you've seen the brief.
 - Atlas carries less of its own instructions into every chat, which leaves more room for your work.
 
 ### Action needed
