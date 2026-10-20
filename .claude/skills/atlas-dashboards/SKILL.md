@@ -1,6 +1,6 @@
 ---
 name: atlas-dashboards
-description: "Render Atlas's dashboards from their templates and data contracts, publish them as private pages (first time, in chat) and republish them with fresh data (chats and routines), keep their links, and make project pages and user dashboards on request. Use when a job or skill needs dashboards refreshed, at setup, or when the user says \"update my dashboards\", \"where's my Commitments page?\", \"make a page for the Orion project\", \"the Goals page looks out of date\", \"send me the link to my brief\"."
+description: "Publish and refresh Atlas's pages (Today, Work, Guide), project pages and user dashboards, and keep their links. Use for \"update my dashboards\", \"where's my Work page?\", \"make a page for Orion\", \"send me the link to my brief\"."
 ---
 # Dashboards
 

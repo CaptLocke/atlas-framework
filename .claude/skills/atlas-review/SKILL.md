@@ -1,6 +1,6 @@
 ---
 name: atlas-review
-description: "Produce Atlas's periodic reviews: the Weekly Review (wins, decisions, commitments kept and slipped, stalled projects, aging waiting-on items, people to reconnect with, next week and suggested priorities, plus accomplishments), the monthly report (goal progress, user and system health, automation review with private success indicators), and the quarterly moments (goal reset, role refresh with permission re-confirmation, performance review pack). Use for the `weekly-review`, `monthly`, and `quarterly` jobs, and for \"review my week\", \"how did this month go?\", \"how are my goals tracking?\", \"prep my self-review\", \"what did I accomplish this quarter?\", \"reset my goals\", \"my role changed\"."
+description: "Weekly review, monthly report, and the quarterly goal reset, role refresh and performance pack. Use for those jobs and \"review my week\", \"how did this month go?\", \"how are my goals tracking?\", \"prep my self-review\", \"my role changed\"."
 ---
 # Reviews
 

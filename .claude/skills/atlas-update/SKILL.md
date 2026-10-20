@@ -1,6 +1,6 @@
 ---
 name: atlas-update
-description: "Check for and apply new Atlas releases (from the public upstream repo) safely: rollback point, update lock, replace only system-owned paths, run data migrations, validate, ask any questions, announce what's new, and restore automatically if anything fails; also roll back to the previous version on request, repair modified system files, and keep routine models current. Use for the `update-check` job, \"update Atlas\", \"is there a new version?\", \"go back to the previous version\", \"what's new?\"."
+description: "Check for and safely install Atlas releases, roll back, or repair system files. Use for the update-check job and \"update Atlas\", \"is there a new version?\", \"go back to the previous version\", \"what's new?\"."
 ---
 # Updates
 

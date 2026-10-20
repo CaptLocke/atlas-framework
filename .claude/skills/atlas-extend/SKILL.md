@@ -1,6 +1,6 @@
 ---
 name: atlas-extend
-description: "Build the user's own additions to Atlas from a plain-language description: skills, automations (jobs), routines, event triggers, record types, dashboards, and playbooks; write them in Atlas's standard formats under user/extensions, register them, wire them in, and keep them working across updates. Use for \"create an automation that\u2026\", \"every Monday, pull\u2026\", \"when a deal moves to negotiation, \u2026\", \"add a Deals record type\", \"make me a dashboard of\u2026\", \"turn this into a playbook\", \"change/remove my extension\", \"what have I added to Atlas?\"."
+description: "Build the user's own additions: skills, automations, triggers, record types, dashboards, playbooks. Use for \"create an automation that…\", \"every Monday, pull…\", \"add a Deals record type\", \"make me a dashboard of…\", \"turn this into a playbook\", \"what have I added?\"."
 ---
 # Extensions
 

@@ -1,6 +1,6 @@
 ---
 name: atlas-health
-description: "Keep Atlas healthy with little or no effort from the user: tidy the knowledge (stale, orphaned, duplicate, broken, unprocessed, expired items), check the system (failed runs, connections, hooks, routine environment, validation, unmodified system files, extensions, repo size, attestation, GitHub), smoke-test the platform features Atlas depends on, audit that every locked action was approved, fix what's clear, and bring only real decisions to the user. Use for the `maintenance` and `monthly` jobs, after updates, and when the user says \"run a health check\", \"is everything working?\", \"why didn't my brief arrive?\", \"clean up my knowledge\"."
+description: "Keep Atlas healthy: tidy the knowledge, check runs, connections and system files, audit approvals, fix what's clear. Use for the maintenance and monthly jobs, after updates, and \"is everything working?\", \"why didn't my brief arrive?\", \"clean up my knowledge\"."
 ---
 # Health
 

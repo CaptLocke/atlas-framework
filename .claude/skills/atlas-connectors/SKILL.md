@@ -1,6 +1,6 @@
 ---
 name: atlas-connectors
-description: "Discover the user's connected tools, work out what each one is (mail, calendar, meetings, messaging, files, CRM, tasks, data, web), which tool does which operation, and how risky each tool is, and record it so jobs can use any vendor; re-map when tools change and set fallbacks for anything not connected. Use at setup, when the user says \"I connected Slack\", \"I removed Outlook\", \"what can you see?\", \"fix my connections\", or when a health check finds connector drift."
+description: "Map the user's connected tools: what each is, which tool does what, how risky each is, and fallbacks. Use at setup and for \"I connected Slack\", \"I removed Outlook\", \"what can you see?\", \"fix my connections\"."
 ---
 # Connectors
 

@@ -1,6 +1,6 @@
 ---
 name: atlas-away
-description: "Turn away mode on, off, or schedule it in advance, and pause or resume individual automations or moments, so Atlas keeps filing everything quietly while the user is out and has a catch-up brief ready when they return. Use for \"I'm out from the 12th to the 20th\", \"I'm on vacation next week\", \"I'm back\", \"cancel my away\", \"pause the weekly review until November\", \"resume status updates\", \"what's paused?\"."
+description: "Away mode and pausing: turn away on or off or schedule it, pause or resume automations or moments, and give the catch-up brief on return. Use for \"I'm out from the 12th to the 20th\", \"I'm back, what did I miss?\", \"pause the weekly review until November\", \"what's paused?\"."
 ---
 # Away mode and pausing
 

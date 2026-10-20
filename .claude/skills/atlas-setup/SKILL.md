@@ -1,6 +1,6 @@
 ---
 name: atlas-setup
-description: "Guide a new user from an empty Atlas repo to a working, personalized Atlas with a first Daily Brief, in a warm, plain-language conversation that can stop and resume at any step. Use when `user/settings/atlas.yaml` is missing or `user/.state/setup.yaml` shows setup in progress, or when the user says \"set up Atlas\", \"continue setup\", \"I'm stuck at step 3\", \"redo my setup\", or \"finish setting up\"."
+description: "Set up a new Atlas step by step, resuming where it stopped. Use when atlas.yaml is missing or setup is in progress, and for \"set up Atlas\", \"continue setup\", \"I'm stuck at step 3\", \"redo my setup\"."
 ---
 # Setup
 

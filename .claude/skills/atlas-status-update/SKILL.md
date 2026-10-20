@@ -1,6 +1,6 @@
 ---
 name: atlas-status-update
-description: "Draft status updates for the user's manager and stakeholders from what actually happened in the period\u2014projects, decisions, commitments kept and slipped, risks, asks\u2014in the right voice, saved for review and optionally as an email draft, never sent without approval. Use when the status-updates job runs and for \"draft my weekly update\", \"write a status for Jordan\", \"update the Acme team on Orion\", \"what should I tell my boss this week\"."
+description: "Draft status updates for the user's manager or stakeholders from what happened, never sent without approval. Use for the status-updates job and \"draft my weekly update\", \"write a status for Jordan\", \"what should I tell my boss this week?\"."
 ---
 # Status updates
 

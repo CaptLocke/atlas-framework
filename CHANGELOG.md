@@ -7,6 +7,21 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Atlas Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
+## Unreleased
+
+### What's new
+- Your dashboards are now three pages, each answering one question:
+  - **Today**: what needs you today, and what's coming this week. It has a week-at-a-glance strip and your upcoming milestones.
+  - **Work**: where everything you're responsible for stands, with your commitments, projects, goals, decisions and risks, and the people you have something open with, on one page.
+  - **Guide**: how Atlas is running, what it filed for you in the last two weeks, what it knows about you, and what's new.
+- What you owe now comes before what you're waiting on, everywhere.
+- To look anything up, just ask: "what do I know about Sam?", "what did we decide about pricing?". The Records page is gone, because asking finds everything, however old.
+- Setup now shows you how to approve messages before they're sent right after your first Daily Brief, once you've seen what Atlas does.
+- Atlas carries less of its own instructions into every chat, which leaves more room for your work.
+
+### Action needed
+- Delete your old Atlas dashboard pages. They no longer update, so they'll show out-of-date information: Projects, Goals, Decisions & Risks, Week Ahead, People, About You, Atlas Guide and Records. Your Today, Work and Guide pages keep their usual links. Ask Atlas "which old pages can I delete?" for the links.
+
 ## 1.1.4 (2026-10-19)
 
 ### What's new

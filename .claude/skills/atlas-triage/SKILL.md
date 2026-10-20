@@ -1,6 +1,6 @@
 ---
 name: atlas-triage
-description: "Review every open commitment against recent evidence and the user's goals\u2014catch missed ones, close finished ones, mark slipped ones, rank priorities, flag aging waiting-on items, and write a one-line insight and next step for each commitment and active project. Use when the triage job runs and in chat for \"what do I owe\", \"what am I waiting on\", \"what's slipping\", \"prioritize my week\", \"mark the Acme deck done\"."
+description: "Review open commitments: catch missed ones, close finished ones, mark slipped ones, rank priorities, set next steps. Use for the triage job and \"what do I owe\", \"what am I waiting on\", \"what's slipping\", \"prioritize my week\", \"mark the Acme deck done\"."
 ---
 # Triage
 

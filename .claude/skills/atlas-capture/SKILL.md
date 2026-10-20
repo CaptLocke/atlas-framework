@@ -1,6 +1,6 @@
 ---
 name: atlas-capture
-description: "File information into Atlas's knowledge, from a sentence in chat (\"remember that\u2026\", \"note that\u2026\", \"Dana will send the redlines Tuesday\"), an attached file, the Atlas Drop folder, a journal entry, a finished deliverable, notes brought in once from another product or framework (import: \"bring in my notes from Notion\"), or new items from connected tools during the ingest job; also the quick catch-up ingest at the first chat of the day."
+description: "File information into Atlas: chat statements, attached files, the Atlas Drop folder, journal entries, imports from other tools, and new items at ingest. Use for \"remember that…\", \"note that…\", \"Dana will send it Tuesday\", \"bring in my notes from Notion\"."
 ---
 # Capture
 

@@ -1,6 +1,6 @@
 ---
 name: atlas-brief
-description: "Assemble the Daily Brief (today's or tomorrow's) and the catch-up brief after away mode, add the \"Since last night\" section after the morning catch-up, and republish the Daily Brief dashboard. Use for \"what's my day look like\", \"brief me\", \"what's on today\", \"what do I need to know\", \"rebuild my brief\", and when the daily-brief job runs."
+description: "Build the Daily Brief or the catch-up brief and refresh the Today page. Use for \"brief me\", \"what does my day look like\", \"what's on today\", \"what do I need to know\", and the daily-brief job."
 ---
 # Daily Brief
 

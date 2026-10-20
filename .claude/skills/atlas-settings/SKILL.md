@@ -1,6 +1,6 @@
 ---
 name: atlas-settings
-description: "Change how Atlas behaves, in plain language: autonomy levels and overrides, data rules and exclusions, moments and rhythms, work hours, triggers, insight volume, the automation profile, routines and schedules, and what sources Atlas reads; protected settings change only after explicit confirmation in chat. Use for \"update my automation prompts\", \"ask me before filing anything about Acme\", \"don't read #random\", \"turn off evening thoughts\", \"move the weekly review to Thursday\", \"switch me to the Standard profile\", \"fewer insights\", \"my hours are 9 to 5\", \"what are my settings?\"."
+description: "Change how Atlas behaves: autonomy, data rules, rhythms, work hours, triggers, profile, schedules, sources. Use for \"don't read #random\", \"move the weekly review to Thursday\", \"fewer insights\", \"my hours are 9 to 5\", \"update my automation prompts\", \"what are my settings?\"."
 ---
 # Settings
 

@@ -1,6 +1,6 @@
 ---
 name: atlas-write
-description: "Produce anything the user will read, send, or share\u2014replies, emails, memos, one-pagers, documents, decks, spreadsheets, PDFs\u2014in the right voice and the company's design, grounded in their knowledge; create email drafts (never sent without approval); save finished files to the deliverables folder and offer them as a download; learn from the user's edits. Use for \"draft a reply to\u2026\", \"write\u2026\", \"turn this into a one-pager\", \"make a deck\", \"build a spreadsheet\", \"send it\" (approval), and when the email-drafts job runs."
+description: "Write anything to read, send or share (replies, emails, memos, docs, decks, spreadsheets) in the user's voice, as drafts. Use for \"draft a reply to…\", \"write…\", \"turn this into a one-pager\", \"make a deck\", \"send it\", and the email-drafts job."
 ---
 # Write
 

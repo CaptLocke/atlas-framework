@@ -1,6 +1,6 @@
 ---
 name: atlas-recall
-description: "Find and use what Atlas knows to answer questions with citations, catch the user up on what changed, tell them where they left off, and explore a theme. Use for any question about the user's work (\"what did we decide about\u2026\", \"who owns\u2026\", \"catch me up\", \"what happened while I was out\", \"where was I on\u2026\", \"what do we know about\u2026\", \"what have I committed to this quarter\") and silently before every draft, prep, or decision."
+description: "Answer any question about the user's work from what Atlas knows, with sources: look up any person, project or record, catch up, find where they left off. Use for \"what did we decide about…\", \"who owns…\", \"what do I know about…\", \"catch me up\", \"where was I on…\"."
 ---
 # Recall
 
