@@ -229,17 +229,9 @@ Job entries are a job name or `{ job, when, target, mode }`. Modifiers: `when` (
 ## dashboards.yaml
 ```yaml
 dashboards:
-  daily-brief: { url: null, last_published: null }
-  commitments: { url: null, last_published: null }
-  projects: { url: null, last_published: null }
-  goals: { url: null, last_published: null }
-  week-ahead: { url: null, last_published: null }
-  people: { url: null, last_published: null }
-  decisions-risks: { url: null, last_published: null }
-  control-center: { url: null, last_published: null }
-  about-you: { url: null, last_published: null }
-  atlas-guide: { url: null, last_published: null }
-  records: { url: null, last_published: null }
+  daily-brief: { url: null, last_published: null }      # Today
+  commitments: { url: null, last_published: null }      # Work
+  control-center: { url: null, last_published: null }   # Guide
 project_pages: {}                       # project ID → url, created on request
 # User dashboards from extensions are additional keys named after the extension.
 ```
