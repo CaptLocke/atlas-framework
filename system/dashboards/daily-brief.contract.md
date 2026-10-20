@@ -70,6 +70,7 @@ Envelope: `meta` as in `system/dashboards/README.md`; `meta.title` = `"Today"`; 
 | `today[].project` | The event's first linked project as a ref, or `null`. |
 | `prep.status` | `ready` (prep note exists), `planned` (meeting-prep will create one before the meeting), `none` (meaningful meeting without prep), `not_needed`. `prep.todo` is one line on what to prepare, for `planned` or `none`; shown when there is no `summary`. |
 | `due[].status`, `waiting_on[].status` | `open` or `slipped`. |
+| `counts` | Optional `{ overdue, due_today }`: totals over every open commitment in both directions, before caps, for the stat cards. Without it the page counts only the items it shows. |
 | `drafts[].where` | Plain words for where the draft is ("Outlook drafts"). Never the draft body. |
 | `actions[]` | Things only the user can do. `how` is optional; `copy_text` is `true` when the entry has text to copy (shown on the Guide page, never on this one). |
 | `insights[].draft` | `{ to, where }` when the insight's suggested action already has a draft (its `Draft:` line in `insights.md`), else `null`. Never the draft body. |
@@ -88,6 +89,7 @@ Envelope: `meta` as in `system/dashboards/README.md`; `meta.title` = `"Today"`; 
 | `today[]` | Event records (`user/knowledge/events/`) with `start` on `as_of`, `status: scheduled`, and shown by the meeting filter (`rhythms.yaml: meetings`, rule in `system/schemas/settings.md`; deadline and milestone events always show): `id, title, kind, start, end, all_day, location, attendees` (→ person refs), `project` (first `links.projects` entry); `prep.path` = event `prep`; `prep.summary` = first line of the prep note's suggested agenda; `prep.todo` as in `atlas-brief` §D step 4 |
 | `due[]` | Commitments, `direction: i_owe`, `status: open|slipped`, `due` ≤ `as_of` + `rhythms.yaml: triggers.deadline_approaching.days` (default 3): `id, title, direction, status, due, priority, counterparty, next_step` |
 | `waiting_on[]` | The brief's Waiting on items (`atlas-brief` §A step 4.3): commitments, `direction: waiting_on`, `status: open|slipped`, that are overdue or due within 7 days, plus any waiting 7+ days with no `due`; `since` = `created` |
+| `counts` | Open commitments in both directions (`commitments/`): `overdue` = slipped or past `due`; `due_today` = `due` on the target date, not slipped |
 | `insights[]` | `user/inbox/insights.md`, status `new`, highest `score` first, max `rhythms.yaml: insights.brief_max` (default 3): heading ID, Insight, Why it matters, Suggested action, Links |
 | `drafts[]` | Drafts created since the previous brief, from run reports and the activity log (`email-drafts`, `status-updates`, triage follow-ups), the same list the brief file shows: titles, recipients, reasons, where each draft is |
 | `approvals[]` | `user/inbox/approvals.md`, status `pending` |

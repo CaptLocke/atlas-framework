@@ -10,7 +10,7 @@ Keep three always-current, browsable pages, Today, Work and Guide, plus project 
 ## When to use
 - Setup step 11: publish all three (`atlas-setup`).
 - Jobs (per each contract's `republished_by`, e.g. `daily-brief`, `triage`, `weekly-review`, `monthly`): republish the dashboards whose data changed.
-- Skills after relevant changes: `atlas-settings`/`atlas-away` (Guide, Today), `atlas-update` (Guide), `atlas-review` (Work, Guide), `atlas-health` (Guide).
+- Skills after relevant changes: `atlas-settings`/`atlas-away` (Guide, Today), `atlas-update` (Guide), `atlas-review` (Work; Guide after the monthly and quarterly reviews), `atlas-health` (Guide).
 - User: "refresh my dashboards", "I lost the link to …", "make a project page for Orion", "add the deals dashboard I built".
 - Dashboards are views only. Requests to change things *from* a dashboard ("mark that done") are handled in chat by the owning skill, then the page is republished.
 

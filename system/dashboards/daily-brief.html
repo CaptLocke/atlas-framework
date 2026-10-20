@@ -237,8 +237,11 @@
 
     var meetings = today.filter(function (e) { return e.kind !== "deadline" && e.kind !== "milestone"; });
     var prepped = meetings.filter(function (e) { return (e.prep || {}).status === "ready"; }).length;
-    var dueToday = due.concat(waiting).filter(function (c) { return c.status !== "slipped" && N.daysFromToday(c.due) === 0; }).length;
-    var late = due.concat(waiting).filter(overdue).length;
+    /* counts covers items cut to fit the budget; without it, count what's shown */
+    var counts = d.counts || {};
+    var dueToday = typeof counts.due_today === "number" ? counts.due_today
+      : due.concat(waiting).filter(function (c) { return c.status !== "slipped" && N.daysFromToday(c.due) === 0; }).length;
+    var late = typeof counts.overdue === "number" ? counts.overdue : due.concat(waiting).filter(overdue).length;
     var stats = [];
     if (acts.length) stats.push([acts.length, ["needs only you", "need only you"]]);
     stats.push([meetings.length, meetings.length === 1 ? "meeting" + (prepped ? ", prepped" : "") : "meetings" + (prepped ? ", " + prepped + " prepped" : "")]);
