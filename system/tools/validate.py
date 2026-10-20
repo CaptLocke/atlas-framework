@@ -39,8 +39,10 @@ SKILLS = ["atlas-recall", "atlas-capture", "atlas-brief", "atlas-triage", "atlas
           "atlas-connectors", "atlas-report-issue"]
 JOBS = ["ingest", "triage", "intelligence", "email-drafts", "meeting-prep", "daily-brief", "weekly-review",
         "status-updates", "monthly", "quarterly", "maintenance", "update-check"]
-DASHBOARDS = ["daily-brief", "commitments", "projects", "goals", "week-ahead", "people", "decisions-risks",
-              "control-center", "about-you", "atlas-guide", "records"]
+DASHBOARDS = ["daily-brief", "commitments", "control-center"]     # Today, Work, Guide
+# Retired in 2.0.0; migration 0002 removes their dashboards.yaml keys.
+RETIRED_DASHBOARDS = ["projects", "goals", "week-ahead", "people", "decisions-risks", "about-you", "atlas-guide",
+                      "records"]
 ON_DEMAND_DASHBOARDS = ["project-page"]
 JOB_SECTIONS = ["Purpose", "Runs when", "Away and paused", "Readiness check", "Inputs", "Steps",
                 "Outputs", "Early exit", "Guardrails", "Run report"]
@@ -1044,7 +1046,9 @@ def check_dashboards_settings(c, path, data, template):
     if isinstance(ds, dict):
         known = set(DASHBOARDS) | set(c.registered("dashboard"))
         for k, v in ds.items():
-            if k not in known:
+            if k in RETIRED_DASHBOARDS and k not in known:
+                rep.warn(path, "dashboards: %s was retired in 2.0.0 (migration 0002 removes it)" % k)
+            elif k not in known:
                 rep.error(path, "dashboards: unknown dashboard %r" % k)
             if not isinstance(v, dict) or "url" not in v:
                 rep.error(path, "dashboards.%s must have url and last_published" % k)
