@@ -5,6 +5,8 @@
 # insights every 3 hours and triage + drafts every 2 hours in work hours.
 # Schedules are cron in the user's time zone (user/settings/atlas.yaml: timezone),
 # minutes off the hour to avoid delayed starts. One schedule per routine.
+# The platform reads cron as UTC, so atlas-setup converts each schedule for it
+# (system/tools/cron_utc.py) and keeps this local one as the truth.
 #
 # WORK HOURS: the hours below assume the default work hours in
 # user/settings/rhythms.yaml (Mon-Fri, 08:00-18:00). atlas-setup (and atlas-settings

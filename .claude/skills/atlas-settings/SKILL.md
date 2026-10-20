@@ -1,6 +1,6 @@
 ---
 name: atlas-settings
-description: "Change how Atlas behaves: autonomy, data rules, rhythms, work hours, triggers, profile, schedules, sources. Use for \"don't read #random\", \"move the weekly review to Thursday\", \"fewer insights\", \"my hours are 9 to 5\", \"update my automation prompts\", \"what are my settings?\"."
+description: "Change how Atlas behaves: autonomy, data rules, rhythms, work hours, triggers, profile, schedules, sources. Use for \"don't read #random\", \"move the weekly review to Thursday\", \"fewer insights\", \"my hours are 9 to 5\", \"update my automation prompts\", \"re-time my automations\", \"what are my settings?\"."
 ---
 # Settings
 
@@ -32,6 +32,7 @@ Let the user control Atlas by talking. Translate a plain-language request into t
 6. **Apply.** Change only what was confirmed, preserving everything else (comments, order), with the single call named in the approval record (protected files) or any edit (behavior settings). Then the follow-ups from the change map:
    - **Schedule, model, routine added/removed, connectors per routine:** update the platform routine with the same procedure and fallback copy-paste text as setup (`.claude/skills/atlas-setup/reference/automations.md` §4–§6). Every new or recreated routine uses the "Atlas routine" environment (`ATLAS_CONTEXT=routine`, §3; create it first if it's missing) and gets a test run whose report shows `atlas_context: routine` (§5). Job-list or modifier changes need no platform change. Removing a platform routine is deleting (`destructive`, approval record); prefer turning it off and say so.
    - **Routine prompts, after a release changed the prompt** ("update my automation prompts"): walk the user through replacing each routine's instructions, **one automation at a time with the count up front** (`automations.md` §7). Nothing in the repo changes, and the routines keep their schedule, model, environment and connectors; the `action` question from the release is what closes at the end.
+   - **Re-timing, after the clocks changed** ("re-time my automations", the known issue `routine-schedules-shifted`, or a new time zone): move each platform routine back to its local time (`automations.md` §8). `schedule` in `routines.yaml` never changes; `utc_offset`, `utc_schedule` and `routine_id` do.
    - **Profile switch:** rebuild `routines.yaml` from `system/routine-profiles/<profile>.yaml` (set `profile`), keep any user-added jobs or routines (registered extensions) and carry them over, then reconcile the platform routines (create new ones in the "Atlas routine" environment, update changed, turn off unused). Use `profile: custom` once the user edits a profile's routines.
    - **Exclusions added:** stop reading those immediately; offer (don't do) to archive or forget already-filed items from that source (`atlas-memory`).
    - **Insight volume / suppressed kinds / triggers / moments:** nothing else; jobs read the file each run.

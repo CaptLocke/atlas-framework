@@ -36,7 +36,7 @@ Follow `reference/user-health.md`: stale records, orphans, duplicates, broken li
 
 ### 3. System health check
 Follow `reference/system-health.md`:
-1. **Runs:** failures and partial runs in run reports since the last check; routines that missed expected runs (a routine silent for more than twice its interval, so 48h for daily ones, likely turned off by the platform).
+1. **Runs:** failures and partial runs in run reports since the last check; routines that missed expected runs (a routine silent for more than twice its interval, so 48h for daily ones, likely turned off by the platform). In a chat that can read platform routines, each one's schedule matches its `utc_schedule` entry in `routines.yaml`, and `python3 system/tools/cron_utc.py` still gives the same crons; a mismatch is the known issue `routine-schedules-shifted` (fix: `atlas-setup` `reference/automations.md` §8).
 2. **Connectors:** auth errors in run reports; each mapped connector present in the session; `tool_fingerprint` drift; unmapped connectors → re-map via `atlas-connectors` (chat) or a known issue (routine).
 3. **Hooks present:** `.claude/settings.json` registers the PreToolUse hooks; hook scripts exist.
 3a. **Routine environment:** every routine run report since the last check has `atlas_context: routine`; otherwise a high-severity `routine-env-missing` issue per routine, with the fix (attach it to the "Atlas routine" environment).

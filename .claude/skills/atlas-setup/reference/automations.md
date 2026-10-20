@@ -19,7 +19,7 @@ Say: heavier profiles use more of their Claude allowance; they can switch any ti
 
 ## 2. Writing routines.yaml
 1. Read `system/routine-profiles/<profile>.yaml`. Copy its `routines` into `user/settings/routines.yaml` with `profile: <profile>` and `routine_id: null` for each (format: `system/schemas/settings.md`).
-2. Schedules are cron in the user's time zone (`atlas.yaml: timezone`), minutes off the hour (e.g. `7`), one schedule per routine.
+2. Schedules are cron in the user's time zone (`atlas.yaml: timezone`), minutes off the hour (e.g. `7`), one schedule per routine. They stay that way here; only the platform gets UTC (§4).
 3. Adjust schedules that depend on work hours (Full profile's "during work hours" routines; Standard's daytime refreshes) to the hours in `rhythms.yaml`. Example for work hours 09:00–17:00 weekdays, hourly ingest: `7 9-16 * * 1-5`.
 4. If the user turned a moment off, leave the job in the routine: jobs read `rhythms.yaml` and skip themselves. Only remove jobs if the user asks.
 5. Validate (`python3 system/tools/validate.py --all`), commit.
@@ -65,11 +65,13 @@ For each routine in `routines.yaml`:
 | Environment | `Atlas routine` (always; a routine without it isn't guarded by the safety hooks) |
 | Connectors | The connectors in `connectors.yaml` that the routine's jobs read from or draft into (for example mail, calendar, files), and no others. Their send, share and delete tools stay attached but are blocked in routines by Atlas's guard, along with any unmapped tool whose name doesn't show what it does, so a routine never sends, shares, or deletes |
 | Model | `system/manifest.yaml: models.<role>` for the routine's `model` role; if a routine mixes fast and strongest jobs, strongest |
-| Schedule | The cron from `routines.yaml`, in the user's time zone |
+| Schedule | The routine's `utc_schedule` (below), never the local cron: the platform reads cron as UTC |
 
 The prompt: exactly the routine prompt in `system/jobs/README.md` §Routine prompt, with the routine's name filled in.
 
-If this session can create routines (a routine or scheduled-task tool), create each, then save its ID as `routine_id` and commit. Check the result shows the right repo, environment, and model.
+**Converting the schedule.** Run `python3 system/tools/cron_utc.py` once for all routines. Write the `utc_offset` it prints to `routines.yaml`, and each routine's list as its `utc_schedule`. Never convert by hand. A routine with two UTC crons (hours that cross midnight UTC, such as Full's work-hours routines in the Americas) becomes two platform routines with identical settings and the same prompt: name them `Atlas · <routine name>` and `Atlas · <routine name> (2)`, and save both IDs as a list in `utc_schedule`'s order. Both run the same routine, at different hours.
+
+If this session can create routines (a routine or scheduled-task tool), create each with its UTC cron, then save its ID as `routine_id` and commit. Check the result shows the right repo, environment, and model.
 
 If not, show one copy-paste block per routine and wait for "done" each time:
 ```
@@ -80,12 +82,13 @@ Repository:  maya-chen/atlas
 Environment: Atlas routine
 Model:       claude-opus-5-5
 Schedule:    Every day at 8:07 PM (your time zone)
+             If it asks for a cron expression instead: 7 3 * * *
 Connectors:  Gmail, Google Calendar, Google Drive   (turn off any others)
 
 Instructions (copy exactly):
 <the routine prompt from system/jobs/README.md, with this routine's name filled in>
 ```
-Translate cron to plain words for the user ("Every Friday at 2:07 PM", "Weekdays every hour from 9:07 AM to 4:07 PM"). Values in the example are fictional; fill in the user's. When the user says it's done, set `routine_id: "manual:<routine name>"` (so health checks know it exists but can't be edited from chat) and commit.
+Translate the local cron to plain words for the user ("Every Friday at 2:07 PM", "Weekdays every hour from 9:07 AM to 4:07 PM"): the platform's time picker takes local time and converts it itself. Where only a cron expression will do, give the `utc_schedule` entry, and for a routine with two, two blocks. Values in the example are fictional; fill in the user's. When the user says it's done, set `routine_id: "manual:<routine name>"` (so health checks know it exists but can't be edited from chat) and commit.
 
 ## 5. After creating
 - Start one routine once now ("run now"; if Claude can't, ask the user to press it), ideally `upkeep` (cheap). When it finishes, pull and read its run report: it must show `atlas_context: routine`, which confirms the routine is attached to the "Atlas routine" environment. Anything else: walk the user through the fix in §3 and test again. The run report also confirms `available_in_routines` for connectors (`atlas-connectors`).
@@ -93,7 +96,8 @@ Translate cron to plain words for the user ("Every Friday at 2:07 PM", "Weekdays
 
 ## 6. Changing later
 - Job list or modifiers: settings edit only (`routines.yaml`).
-- Schedule, model, connectors, or a new/removed routine: also update the platform routine (same tool or copy-paste path). Every new routine uses the "Atlas routine" environment (§3, §4) and gets a test run as in §5. Removing a platform routine counts as deleting (`destructive`, approval); prefer turning it off.
+- Schedule, model, connectors, or a new/removed routine: also update the platform routine (same tool or copy-paste path). A changed schedule is converted again (§4) at today's offset, which also refreshes `utc_offset` for every routine: if it changed, re-time them all (§8).
+- Time zone: `atlas.yaml: timezone` changes and every `schedule` stays as it is, since it's local; then re-time every routine (§8). Every new routine uses the "Atlas routine" environment (§3, §4) and gets a test run as in §5. Removing a platform routine counts as deleting (`destructive`, approval); prefer turning it off.
 - The prompt itself, after a release changed it: §7.
 
 ## 7. Re-pasting routine prompts
@@ -115,3 +119,10 @@ Go **one automation at a time, with the count up front**. The user is switching 
 If this session can edit routines (a routine or scheduled-task tool), set each routine's instructions itself — still one at a time, saying what it changed — then read the next run report of one of them to confirm it still shows `atlas_context: routine` (§5).
 
 If the user asks why it matters: the old prompt works, except that an automation that starts outside its "Atlas routine" environment stops without leaving a report, so they'd see nothing at all rather than a run that says what was wrong.
+
+## 8. Re-timing after the clocks change
+The platform keeps schedules in UTC, so when the user's clocks change (daylight saving, a move, a new `timezone`) every automation fires an hour or more off. A routine run notices (`utc_offset` no longer matches) and raises `routine-schedules-shifted`; the next chat offers this. Users from before 2.0.1 arrive with "re-time my automations", from the release's `Action needed` line.
+1. Run `python3 system/tools/cron_utc.py` and compare with each routine's `utc_schedule`. Say in one line what moves ("Your automations run an hour late since the clocks changed; I'll move them back"). Routines without a `utc_schedule` were never checked against UTC, so treat them all as changed.
+2. If this session can edit routines, set each changed one's schedule, one at a time, saying what it changed; create a second platform routine where one now needs two (§4), and turn off one that is no longer needed (turning off, not deleting). Otherwise, one copy-paste block at a time with the count up front, as in §7.
+3. Write the new `utc_offset`, `utc_schedule` and `routine_id` to `routines.yaml`, validate, commit, and close `routine-schedules-shifted` and the release's `action` question if open.
+

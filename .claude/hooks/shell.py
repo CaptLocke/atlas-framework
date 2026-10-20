@@ -333,7 +333,8 @@ def write_targets(seg):
 PYTHON_RE = re.compile(r"^python(3(\.\d+)?)?$")
 PYTHON_FLAGS = {"-I", "-B", "-u", "-E", "-s"}
 # Atlas's own tools (system/tools/), the only scripts routines may run.
-ATLAS_TOOLS = ("validate.py", "normalize.py", "render.py", "release_check.py", "redact_check.py", "index.py")
+ATLAS_TOOLS = ("validate.py", "normalize.py", "render.py", "release_check.py", "redact_check.py", "index.py",
+               "cron_utc.py")
 
 
 def python_parts(argv):

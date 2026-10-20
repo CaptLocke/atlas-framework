@@ -209,11 +209,13 @@ Events the user organizes (`response: organizer`) and accepted events are always
 ## routines.yaml
 ```yaml
 profile: lean                           # lean | standard | full | custom (custom = user-edited)
+utc_offset: "-0700"                     # offset the platform schedules were converted at (`date +%z` form); null until routines exist
 routines:
   - name: nightly-cycle
     schedule: "7 20 * * *"              # cron in atlas.yaml timezone; one schedule per routine
+    utc_schedule: ["7 3 * * *"]         # what the platform has, in UTC (system/tools/cron_utc.py); one entry per platform routine
     model: strongest                    # role from system/manifest.yaml models
-    routine_id: null                    # platform ID once created
+    routine_id: null                    # platform ID once created; a list in utc_schedule's order when there are several
     jobs:
       - ingest
       - triage
@@ -224,6 +226,8 @@ routines:
       - quarterly
       - { job: daily-brief, target: tomorrow }
 ```
+**Schedules and UTC.** `schedule` is the truth and stays in the user's time zone: dashboards, the guide and every job read it. The platform reads a routine's cron as UTC, so what goes on the platform is `utc_schedule`, converted by `system/tools/cron_utc.py` at the zone's offset that day and recorded in `utc_offset`. A local schedule whose hours cross midnight UTC needs two crons, and so two platform routines running the same routine name. When the clocks change, `utc_offset` no longer matches, and the next routine run raises `routine-schedules-shifted` (`system/jobs/README.md` §Running a routine); re-timing is `.claude/skills/atlas-setup/reference/automations.md` §8. Missing `utc_offset` and `utc_schedule` (routines created before 2.0.1) mean the platform was never checked against UTC.
+
 Job entries are a job name or `{ job, when, target, mode }`. Modifiers: `when` (always | weekdays | weekends | sundays), `target` (today | tomorrow), `mode` (full | light; light = new items only, no re-prioritization). Job names are system jobs or registered user jobs.
 
 ## dashboards.yaml

@@ -7,7 +7,7 @@ version: 1.0.0
 ---
 # Automations
 
-Atlas's background work runs in the cloud on a schedule, whether or not your computer is on. Each automation does one job. Together they bring in new information, keep your commitments in order, draft what you'd otherwise write yourself, and have your brief ready each morning. Times are in your own time zone. They're set a few minutes past the hour on purpose, because runs on the exact hour can start late.
+Atlas's background work runs in the cloud on a schedule, whether or not your computer is on. Each automation does one job. Together they bring in new information, keep your commitments in order, draft what you'd otherwise write yourself, and have your brief ready each morning. Times are in your own time zone. They're set a few minutes past the hour on purpose, because runs on the exact hour can start late. Claude keeps the schedules in UTC, so when your clocks change Atlas notices and asks to move your automations back to their usual times ("re-time my automations").
 
 How much runs, and how often, depends on your **automation profile**. Atlas suggests one that fits your Claude plan, since automations use your plan's allowance. You can switch at any time ("Switch me to the Standard profile"), move any time ("Move my weekly review to Thursday"), or turn things off.
 

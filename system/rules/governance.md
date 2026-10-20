@@ -73,7 +73,7 @@ This is a procedural guard: it forces every locked action through an explicit, l
 
 Hooks in `.claude/hooks/` enforce N1–N6, N8–N10 and N12 deterministically **where they run: in routines.** Cowork chats clone the repo after the chat starts, so repo hooks never load there.
 
-**In chats** the guard is the user: show exactly what will happen, wait for their yes, and rely on Cowork's own approval card, which appears for every tool the user has set to Needs approval (setup step 12 sets send, share and delete tools that way). The approval record (procedure above) is written by Claude itself, so it keeps locked actions deliberate and auditable but does not stop content that has misled Claude; the approval card does.
+**In chats** the guard is the user: show exactly what will happen, wait for their yes, and rely on Cowork's own approval card, which appears for every tool the user has set to Needs approval (setup sets send, share and delete tools that way as each connector is connected, before Atlas reads through it). The approval record (procedure above) is written by Claude itself, so it keeps locked actions deliberate and auditable but does not stop content that has misled Claude; the approval card does.
 
 **In routines** the hooks assume any content may be hostile:
 - Routines get only the connectors their jobs read from or draft into. Every send, share and delete tool on those connectors (by mapping or name), and any unmapped tool whose name doesn't show what it does, is blocked in routines, and every locked action is blocked even with an approval record.
