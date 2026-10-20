@@ -5,7 +5,7 @@ description: "Keep Atlas healthy: tidy the knowledge, check runs, connections an
 # Health
 
 ## Purpose
-Atlas maintains itself. Clear problems are fixed automatically and logged; ambiguous ones become short questions; problems Atlas can't fix become a known issue with a plain-language fix, and, when it's a product problem, a suggested issue report. Results feed the monthly report, the Control Center, and `user/.state/health.yaml`.
+Atlas maintains itself. Clear problems are fixed automatically and logged; ambiguous ones become short questions; problems Atlas can't fix become a known issue with a plain-language fix, and, when it's a product problem, a suggested issue report. Results feed the monthly report, Guide, and `user/.state/health.yaml`.
 
 ## When to use
 | Mode | Invoked by | Scope |
@@ -54,7 +54,7 @@ Set `health.yaml: last_system_check`.
 ### 4. Record results
 - Update `user/.state/health.yaml: known_issues`: add new issues (`id`, `severity: high|medium|low`, `since`, `summary`, `fix`, `status: open`), close fixed ones (`status: resolved`), never duplicate an open issue (same `id`).
 - Write the user-facing summary into the caller's output (monthly report section, run report, or chat). Each problem: what happened, what it affects, how to fix it (one action).
-- Republish the Control Center (`atlas-dashboards`).
+- Republish Guide (`atlas-dashboards`).
 
 ### 5. Can't fix it?
 If a problem persists after the available fix (e.g., a job fails three runs in a row with the same error, an update failed twice, a platform feature fails the smoke test), say so plainly and suggest `atlas-report-issue` ("Want me to draft a short report to Atlas's maker? I'll remove anything personal first."). In routines, add the suggestion to the known issue's `fix`.
@@ -63,7 +63,7 @@ If a problem persists after the available fix (e.g., a job fails three runs in a
 - Rebuilt indexes, repaired links, merged clear duplicates, processed sweep items, expired inbox entries.
 - `user/.state/health.yaml` (`last_user_check`, `last_system_check`, `known_issues`, `smoke_test`); `questions.md` entries for decisions.
 - Sections for the monthly report (`user/work/reports/YYYY-MM.md`) or the run report; one-line chat summaries.
-- Activity-log lines for every fix; Control Center republished.
+- Activity-log lines for every fix; Guide republished.
 
 ## Guardrails
 - Governance: `system/rules/governance.md`. Classes touched: `read`, `records_write`, `merge_supersede` (clear cases only; ambiguous always proposed), `archive` (only records the user agreed to, or per auto rules in the reference), `external_read` (read-only probes), `dashboards_refresh`. Never `destructive`: health checks never delete records, files, events, or messages; deletion suggestions go to the user.

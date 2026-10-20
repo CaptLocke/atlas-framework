@@ -2,9 +2,9 @@
 type: guide-index
 audience: Atlas (atlas-dashboards, atlas-setup, atlas-update) and maintainers
 ---
-# Atlas Guide content
+# Guide content
 
-Source content for the **Atlas Guide** dashboard and for answering "what can you do?" / "how do I…?" in chat. Written for the user, in plain language. The setup guide for new users lives in `docs/setup/` (it must work before Atlas exists); the Guide points to it by name rather than repeating it (dashboard pages link only to other dashboards).
+Source content for the guide part of the **Guide** dashboard and for answering "what can you do?" / "how do I…?" in chat. Written for the user, in plain language. The setup guide for new users lives in `docs/setup/` (it must work before Atlas exists); the Guide points to it by name rather than repeating it (dashboard pages link only to other dashboards).
 
 ## Files
 | File | `section` | Holds |
@@ -23,8 +23,8 @@ Every user-facing file follows the same shape so it maps directly to dashboard d
 - Frontmatter: `type: guide`, `section`, `title`, `order` (display order), `version` (Atlas version the content describes).
 - The `#` title is the section `title`; the paragraph after it is the section `intro`.
 - Each `##` heading is one **item** (`items[].title`; `id` = the heading slug). There is no deeper level.
-- Within an item: paragraphs → `body[]`; a bullet list → `bullets[]`; a numbered list → `steps[]`; a `**Try:**` line followed by a bullet list → `examples[]` (quotes stripped). This matches the data the `atlas-guide.html` template renders (`sections[].items[]` with `body`, `bullets`, `steps`, `examples`).
+- Within an item: paragraphs → `body[]`; a bullet list → `bullets[]`; a numbered list → `steps[]`; a `**Try:**` line followed by a bullet list → `examples[]` (quotes stripped). This matches the guide data the `control-center.html` template renders (`guide.sections[].items[]` with `body`, `bullets`, `steps`, `examples`).
 - Cross-references name the other item in bold ("see **Automations**"), never a file path, so they read well on the dashboard.
-- `whats-new.md` and `attestation.md` are not rendered as sections: What's new comes from `CHANGELOG.md` (`whats_new[]`), and the attestation text is used in conversation only.
+- `whats-new.md` and `attestation.md` are not rendered as sections: What's new comes from `CHANGELOG.md` (`guide.whats_new[]`), and the attestation text is used in conversation only.
 
 Personalize when rendering: replace the generic profile names with the user's actual schedule from `user/settings/routines.yaml` and their autonomy levels from `governance.yaml` where the content says "by default".

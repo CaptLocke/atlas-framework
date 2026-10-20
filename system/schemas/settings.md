@@ -204,7 +204,7 @@ paused: []                              # e.g. [{ job: weekly-review, until: 202
 - `tentative: skip` and the event record's `response` is `tentative`.
 - `not_responded: skip` and `response` is `not_responded`.
 
-Events the user organizes (`response: organizer`) and accepted events are always shown; declined events are already skipped at ingestion (`system/connectors/calendar.md`). A skipped event is still recorded in knowledge, so it appears normally once the user accepts it. It is left out of the Daily Brief's Today, Week Ahead's events and meeting hours, meeting prep, and the `key_meeting_upcoming` trigger. Focus suggestions still avoid its time, so Atlas never suggests focus time on top of a meeting the user may attend. Changing the filter is `behavior_settings`.
+Events the user organizes (`response: organizer`) and accepted events are always shown; declined events are already skipped at ingestion (`system/connectors/calendar.md`). A skipped event is still recorded in knowledge, so it appears normally once the user accepts it. It is left out of the Daily Brief's Today, the Today page's schedule and its week's meetings and meeting hours, meeting prep, and the `key_meeting_upcoming` trigger. Focus suggestions still avoid its time, so Atlas never suggests focus time on top of a meeting the user may attend. Changing the filter is `behavior_settings`.
 
 ## routines.yaml
 ```yaml

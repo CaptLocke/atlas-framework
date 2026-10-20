@@ -39,11 +39,11 @@ Let the user control Atlas by talking. Translate a plain-language request into t
    - **Work hours:** adjust schedules that depend on them (Full profile; Standard daytime refreshes) and update those platform routines.
 7. **Validate** with `python3 system/tools/validate.py --all`. If it fails, fix your edit (never the validator) or restore the previous content and tell the user.
 8. **Commit and log** (`system/rules/sync.md`, `Atlas-Actor: chat`, reason quoting the request briefly). Activity line, e.g. `chat · governance_settings (approved) · records_write: propose for organizations/acme · commit <sha>` or `chat · behavior_settings · weekly routine moved to Thu 14:07 · commit <sha>`.
-9. **Close the loop.** One or two lines: what changed, when it takes effect (now / next run at …), how to undo ("just say *put it back*"). If the change came from an approval or question entry, mark it `executed`/`answered`. Republish the Control Center (`atlas-dashboards`) when automations, schedules, or autonomy changed.
+9. **Close the loop.** One or two lines: what changed, when it takes effect (now / next run at …), how to undo ("just say *put it back*"). If the change came from an approval or question entry, mark it `executed`/`answered`. Republish Guide (`atlas-dashboards`) when automations, schedules, or autonomy changed.
 
 ## Outputs
 - Updated `user/settings/<file>.yaml`; platform routines updated (or copy-paste instructions shown).
-- Activity-log line and commit; inbox entries updated if the change came from them; Control Center republished.
+- Activity-log line and commit; inbox entries updated if the change came from them; Guide republished.
 
 ## Guardrails
 - Governance: `system/rules/governance.md`. Classes touched: `governance_settings` 🔒 (governance, data rules, connector map: chat only, explicit confirmation, approval record, N6), `behavior_settings` (rhythms, routines, sources, dashboards, profile choice), `destructive` 🔒 (deleting a platform routine), `dashboards_refresh`.

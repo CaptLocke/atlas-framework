@@ -20,7 +20,7 @@ skill: atlas-health
 | **Repo size** | `git count-objects -vH` (size-pack), record counts per type, index line counts | none | Medium at >500 MB or an index >2,000 lines: suggest archiving old sources and splitting indexes by year; high at >1 GB |
 | **Attestation due** | `atlas.yaml: attestation.reconfirm_due` ≤ today | none | Issue `attestation-due` (medium); in chat, offer the re-confirmation now (`atlas-review` quarterly role refresh procedure) |
 | **GitHub connection** | Push succeeded this session/run (a `sync_start.read_only` line in `.atlas-tmp/sync.log` means a session started read-only: if the Project instructions predate "with write (push) access", suggest updating them once); repository visibility `private` and no collaborators, where the GitHub connector/API allows checking (N9) | none | Public repo or collaborators: high issue; tell the user immediately with the fix (make private / remove collaborator; Atlas never does it itself) |
-| **Updates** | Installed vs latest release tag | Minor/patch: let `update-check` handle | "Update available: 1.2.0" on the Control Center |
+| **Updates** | Installed vs latest release tag | Minor/patch: let `update-check` handle | "Update available: 1.2.0" on Guide |
 
 ## Smoke test (platform dependencies)
 Record in `health.yaml: smoke_test` `{ last_run: <date>, results: { repo_push, connectors, hooks, artifact_republish } }` with `pass | fail | skipped`.
@@ -29,7 +29,7 @@ Record in `health.yaml: smoke_test` `{ last_run: <date>, results: { repo_push, c
 | `repo_push` | Commit the updated `health.yaml` and push to `main` | Push accepted on `main` (not a `claude/` branch) |
 | `connectors` | One read-only call (1 item) per mapped connector's required read operation | Every connector returns without auth error (list failures by name) |
 | `hooks` | Routines only: `git push --force --dry-run origin HEAD:main` (no effect even if allowed). In a chat, record `skipped`: repo hooks never load in chats, so the probe can't pass there | The hook blocks it. If it isn't blocked in a routine, the hook didn't fire: high issue |
-| `artifact_republish` | Republish the Control Center to its stored URL (`atlas-dashboards`) | Same URL, publish succeeded (in a routine this tests unattended republish) |
+| `artifact_republish` | Republish Guide to its stored URL (`atlas-dashboards`) | Same URL, publish succeeded (in a routine this tests unattended republish) |
 A failed smoke-test item creates a known issue with a fix; if the fix is outside the user's control (platform change), suggest `atlas-report-issue`.
 
 ## Audits

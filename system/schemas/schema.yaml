@@ -96,8 +96,8 @@ types:
       flags: [suspicious]
       retention: [full, summary, pointer]
 
-# Statuses that mean a record is finished. Used by the hot index (formats.md §5), the Records
-# dashboard (current vs closed), and the validator. Types not listed have no closed status.
+# Statuses that mean a record is finished. Used by the hot index (formats.md §5) and the
+# validator. Types not listed have no closed status.
 closed_statuses:
   person: [inactive]
   organization: [inactive]

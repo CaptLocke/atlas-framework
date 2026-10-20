@@ -176,7 +176,7 @@ Kinds: `profile | migration | relationship | commitment | setup | action | other
 ```
 - `Action key` deduplicates: there is at most one open entry per key. `bootstrap` for the Project instructions; `release-<version>-<n>` for the n-th `Action needed` line of a release. `How` and `Copy text` (indented block, filled in for this user) are optional.
 - Done → status `answered` with `- **Done:** <date> · <confirmed by Atlas | user said done>`; the user can also skip it (`dismissed`). Never closed just because time passed.
-- Open action entries come first wherever questions are shown (Daily Brief "Action needed", Control Center, chat), oldest first, and are never cut by question caps.
+- Open action entries come first wherever questions are shown (Daily Brief "Action needed", Guide, chat), oldest first, and are never cut by question caps.
 
 ### drop/
 Files attached in chat land here, then are filed by `atlas-capture` and removed from `drop/` (the source record keeps a pointer; the file itself moves to `user/library/YYYY/<file>` only if its data-rule handling is `full` and it is 10 MB or less). Removing processed files from `drop/` is housekeeping, not a destructive action (hooks allow it).

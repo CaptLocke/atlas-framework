@@ -29,7 +29,7 @@ Chat only; the user's request plus a one-line confirmation is enough (`updates_m
    ```
    The hooks accept a commit already in this repo's history as a source for owned paths in a chat (`paths.py`, `context.py` `in_history`), which is what makes this work without a tag.
 6. Set `atlas.yaml: installed_version: <X>`. If `data_version` is still higher than X's manifest (additive migrations kept), that is expected; note it in `health.yaml` known issues (severity `low`, status `open` until the next update) so validators and later updates know.
-7. Validate, push, then release the lock, log (`update · rolled back 1.1.0 → 1.0.0 at user request · commit <sha>`), republish Atlas Guide and Control Center.
+7. Validate, push, then release the lock, log (`update · rolled back 1.1.0 → 1.0.0 at user request · commit <sha>`), republish Guide (`control-center`).
 8. Ask whether to stay on X (pause automatic update checks) or let the next check reinstall the newer version.
 
 ## Repair (system files modified outside an update; chat only)

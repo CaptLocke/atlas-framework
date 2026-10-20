@@ -11,20 +11,12 @@ The `atlas-dashboards` skill owns rendering and publishing. This folder holds wh
 ## The dashboards
 | Dashboard | Template | Contract | Republished by | Page budget |
 |---|---|---|---|---|
-| Daily Brief | `daily-brief.html` | `daily-brief.contract.md` | `daily-brief` job; chat catch-up | 120 KB |
-| Commitments | `commitments.html` | `commitments.contract.md` | `daily-brief`, `triage` | 300 KB |
-| Projects | `projects.html` | `projects.contract.md` | `daily-brief`, `triage`, `weekly-review` | 250 KB |
-| Goals (with accomplishments) | `goals.html` | `goals.contract.md` | `weekly-review`, `monthly`, `quarterly` | 200 KB |
-| Week Ahead | `week-ahead.html` | `week-ahead.contract.md` | `daily-brief`, `weekly-review` | 150 KB |
-| People | `people.html` | `people.contract.md` | `weekly-review` | 250 KB |
-| Decisions & Risks | `decisions-risks.html` | `decisions-risks.contract.md` | `weekly-review` | 300 KB |
-| Control Center | `control-center.html` | `control-center.contract.md` | `daily-brief`, `monthly` | 200 KB |
-| About You | `about-you.html` | `about-you.contract.md` | `monthly`, `quarterly` | 200 KB |
-| Atlas Guide | `atlas-guide.html` | `atlas-guide.contract.md` | `update-check` (after an update is applied) | 250 KB |
-| Records | `records.html` | `records.contract.md` | `maintenance`, `weekly-review` | 1500 KB |
+| Today | `daily-brief.html` | `daily-brief.contract.md` | `daily-brief` job; chat catch-up | 120 KB |
+| Work | `commitments.html` | `commitments.contract.md` | `daily-brief`, `triage`, `weekly-review`, `monthly`, `quarterly` | 400 KB |
+| Guide | `control-center.html` | `control-center.contract.md` | `daily-brief`, `monthly`, `quarterly`, `update-check` (after an update is applied) | 300 KB |
 | Project page (on request) | `project-page.html` | `project-page.contract.md` | created in chat; then `triage`, `weekly-review` while listed | 250 KB |
 
-Any chat may also republish any dashboard after changing the records it shows (`dashboards_refresh: auto`). `atlas-setup` publishes all eleven for the first time. A dashboard added by an update is published at the user's next chat (`atlas-dashboards`, Publish).
+Any chat may also republish any dashboard after changing the records it shows (`dashboards_refresh: auto`). `atlas-setup` publishes all three for the first time. A dashboard added by an update is published at the user's next chat (`atlas-dashboards`, Publish).
 
 Shared files:
 - `_base.css`: base styles. Templates hold `{{ATLAS_BASE_CSS}}` inside `<style id="atlas-base">`; `system/tools/render.py` fills it with this file when it builds a page.
@@ -44,26 +36,18 @@ Shared files:
 ```
 Each template contains each placeholder **exactly once**. No other text is substituted.
 
-**Page header.** Every page opens the same way (`N.masthead`): the **title**; a **subtitle** (the day or week for the Daily Brief and Week Ahead, the project's summary on a project page, and a fixed line saying what the page is for everywhere else; no "As of" dates); the **headline** (`meta.headline`); then the page's counts as **stat cards**. What each headline leads with:
+**Page header.** Every page opens the same way (`N.masthead`): the **title**; a **subtitle** (the day for Today, the project's summary on a project page, and a fixed line saying what the page is for everywhere else; no "As of" dates); the **headline** (`meta.headline`); then the page's counts as **stat cards**. What each headline leads with:
 
 | Dashboard | Subtitle | The headline says |
 |---|---|---|
-| Daily Brief | The day's date (catch-up: the away dates) | The shape of the day and the one or two things that matter most (the brief's own headline) |
-| Commitments | "Everything you owe, and everything owed to you." | What's slipping or most overdue, in either direction |
-| Projects | "Everything you're moving forward, and how it's going." | Which projects need attention and why |
-| Week Ahead | The week's dates | Where the week is heavy, and the best window for focused work |
-| Goals | "What you're working toward, and how it's going." (the period is the first stat card) | How the top-ranked goals are tracking, and which needs attention |
-| People | "The people who matter to your work." | Who needs attention: gone quiet, owed something, or owing something important |
-| Decisions & Risks | "What's been decided, and what could go wrong." | The most serious open risk or issue, and any decision that changes plans |
+| Today | The day's date (catch-up: the away dates) | The shape of the day and the one or two things that matter most (the brief's own headline) |
+| Work | "Where everything you're responsible for stands." | What's slipping or most overdue, in either direction, and which projects need attention |
+| Guide | "How Atlas is running, and what it knows about you." | Whether Atlas is running well, and the one thing that needs the user if any |
 | Project page | The project's summary | The project's health and the reason for it |
-| Records | "All your knowledge, in one place." | What changed most recently in what Atlas has filed |
-| About You | "How Atlas sees you, and why." | What's waiting for the user's confirmation, or what Atlas learned most recently |
-| Control Center | "How Atlas is running, and what it needs from you." | Whether Atlas is running well, and the one thing that needs the user if any |
-| Atlas Guide | "Everything Atlas can do, and how to ask." | How to talk to Atlas, or what's new after an update |
 
-**Links.** A link on a dashboard only ever opens another dashboard: the nav row under the header, and the name of another dashboard where a page's own wording mentions one (`N.pageLink`), and on Projects, the card of a project that has its own project page. Pages have no jump-to-section links.
+**Links.** A link on a dashboard only ever opens another dashboard: the nav row under the header, and the name of another dashboard where a page's own wording mentions one (`N.pageLink`), and on Work, the card of a project that has its own project page. Work also has jump links to its own sections at the top; no other page has jump-to-section links.
 
-**Record panel.** On Records, Commitments, Projects, Decisions & Risks, and People, and for meetings on Week Ahead, clicking a card (or its title, or Enter on it) opens the item in a panel (`N.recordPanel`, `N.clickable` in `_base.js`): a drawer on the right, full screen on phones. It shows the type and status, title, summary, **Details** (the fields the card shows plus any `details` the data carries), sections the page adds (next step, mitigation, why, who owes what), the item's `body`, **Linked records** (any linked item that is on the same page opens in the panel, with Back; others are listed by name), the created and updated dates, and "Copy a request for Atlas", which copies a ready-made request to paste into chat (`Show me the "<title>" record (<id>).`; the record ID appears there so Atlas finds the right record, and nowhere else on the page). Esc, Close, or a click outside shuts it.
+**Record panel.** On Work (commitments, projects, decisions, risks, and people), clicking a card (or its title, or Enter on it) opens the item in a panel (`N.recordPanel`, `N.clickable` in `_base.js`): a drawer on the right, full screen on phones. It shows the type and status, title, summary, **Details** (the fields the card shows plus any `details` the data carries), sections the page adds (next step, mitigation, why, who owes what), the item's `body`, **Linked records** (any linked item that is on the same page opens in the panel, with Back; others are listed by name), the created and updated dates, and "Copy a request for Atlas", which copies a ready-made request to paste into chat (`Show me the "<title>" record (<id>).`; the record ID appears there so Atlas finds the right record, and nowhere else on the page). Esc, Close, or a click outside shuts it.
 
 **Panel data** (optional on every item those pages open in the panel, same rules everywhere):
 | Field | Rule |
@@ -95,7 +79,7 @@ Every dashboard's JSON has a `meta` object:
 {
   "dashboard": "daily-brief",
   "schema_version": 1,
-  "title": "Daily Brief",
+  "title": "Today",
   "headline": "A customer-heavy day: the Brightline renewal call at 10, and your pricing feedback for Jordan is due by end of day.",
   "generated_at": "2026-10-12T20:31:40-07:00",
   "generated_by": "routine:nightly-cycle",
@@ -104,7 +88,7 @@ Every dashboard's JSON has a `meta` object:
   "locale": "en-US",
   "user_display_name": "Maya Chen",
   "atlas_version": "1.0.0",
-  "nav": [{ "name": "commitments", "title": "Commitments", "url": "https://claude.ai/artifact/…" }],
+  "nav": [{ "name": "commitments", "title": "Work", "url": "https://claude.ai/artifact/…" }],
   "notices": [{ "level": "warn", "text": "Your Outlook connection expired…" }],
   "truncated": { "commitments": 14 }
 }
@@ -117,7 +101,7 @@ Every dashboard's JSON has a `meta` object:
 | `headline` | yes | One plain sentence (at most about 25 words) saying what matters most on this page right now, written fresh from this render's data (see Page header). Never a list of the stat cards' numbers. |
 | `generated_at` | yes | Render time, ISO 8601 with offset in the user's time zone. Shown at the top of every page as the refresh marker ("Refreshed Tue, Oct 13, 6:04 AM"). |
 | `generated_by` | no | `chat` or `routine:<name>` (as in the commit `Atlas-Actor`). Kept for troubleshooting; not shown on the page. |
-| `stale_after_hours` | no | Copied from the contract's frontmatter `stale_after_hours`. When the page is older than this when someone opens it, the refresh marker adds "May be out of date". Omitted for pages that are never stale (Atlas Guide). |
+| `stale_after_hours` | no | Copied from the contract's frontmatter `stale_after_hours`. When the page is older than this when someone opens it, the refresh marker adds "May be out of date". |
 | `as_of` | yes | The calendar day the view is for (`YYYY-MM-DD`). For the brief rendered the night before with `target: tomorrow`, this is tomorrow. All "today", "overdue", and "in N days" wording is computed against it, never against the viewer's clock. |
 | `timezone` | yes | `user/settings/atlas.yaml: timezone`. Datetimes are displayed in it. |
 | `locale` | no | BCP 47 tag for date formatting. Default `en-US` (see gaps in the contract notes). |
@@ -133,7 +117,7 @@ Every dashboard's JSON has a `meta` object:
 - **Dates** are `YYYY-MM-DD` (calendar days) or ISO 8601 datetimes with offset. The page formats them.
 - **Never include** `notes_private`, phone numbers, email addresses, secrets, or content whose data-rule handling is `ignore` or `pointer`. Use `summary` text for `summary` handling. Excluded records (`data-rules.yaml: exclusions`) never appear. Archived and superseded records are left out unless the contract says otherwise.
 - **Absent vs empty:** use `null` for unknown single values and `[]` for empty lists. Pages handle both.
-- **Insights** on People, Decisions & Risks, Goals, Commitments, Projects, and the brief come from `user/inbox/insights.md` (status `new` or `seen`) and from record `insight` fields; each carries its reasoning.
+- **Insights** on Work and Today come from `user/inbox/insights.md` (status `new` or `seen`) and from record `insight` fields; each carries its reasoning.
 
 ## Theming contract
 The theme comes from `user/profile/design-system.md` (`system/schemas/profile.md`). `atlas-dashboards` writes **only** these custom properties, on `:root`:

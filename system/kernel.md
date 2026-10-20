@@ -83,7 +83,7 @@ Do these quietly, then answer the user. Never narrate them unless something need
 - Triggers: `system/triggers.md`
 - Connector guides: `system/connectors/`
 - Dashboards: `system/dashboards/`
-- Atlas Guide content: `system/guide/`
+- Guide content: `system/guide/`
 - User data: `user/` (profile, settings, knowledge, journal, work, library, inbox, extensions, logs, .state)
 
 Load detail only when a task needs it.

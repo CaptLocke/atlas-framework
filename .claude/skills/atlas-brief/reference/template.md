@@ -14,7 +14,7 @@ sources: ["[[events/2026-10-13-acme-msa-call]]", "[[commitments/maya-pricing-fee
 # Tuesday, Oct 13
 
 ## Action needed
-- **Update your Atlas Project's instructions** (Atlas was updated to 1.1.0). The text to copy is on the Control Center, or ask me in chat.
+- **Update your Atlas Project's instructions** (Atlas was updated to 1.1.0). The text to copy is on the Guide page, or ask me in chat.
 
 ## Today
 - **9:30 Acme MSA call** with Dana Ruiz. Two open items both ways. Prep: [prep note](../prep/2026-10-13-acme-msa-call.md) · [[events/2026-10-13-acme-msa-call]]

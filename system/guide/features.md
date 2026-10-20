@@ -115,7 +115,7 @@ Routine work happens on its own, in the cloud, even when your computer is off: b
 - "Move my weekly review to Thursday afternoon."
 
 ## Made for you
-Everything Atlas does is shaped by what it knows about you: your role, company, goals, working style, and how you like to receive information. When Atlas notices something new about how you work, it asks before treating it as fact. You can see and change everything it believes about you on the **About You** dashboard.
+Everything Atlas does is shaped by what it knows about you: your role, company, goals, working style, and how you like to receive information. When Atlas notices something new about how you work, it asks before treating it as fact. You can see and change everything it believes about you in **About you** on the **Guide** dashboard.
 
 Atlas also learns from your corrections. When you keep dropping the same kind of "commitment", raising the same kind of work, or dismissing the same kind of insight, it suggests a rule ("Stop treating 'I'll take a look' as a promise?") and follows it once you say yes. The monthly report shows what it learned.
 
@@ -142,7 +142,7 @@ You decide what Atlas remembers. Correct anything, tell it to stop tracking a so
 - "Correct that: the launch moved to November 9."
 
 ## Seeing and controlling automations
-The **Control Center** dashboard shows every automation, when it last ran, when it runs next, what it did, and anything waiting for your approval. Problems come with a plain fix.
+The **Guide** dashboard shows every automation, when it last ran, when it runs next, what it did, and anything waiting for your approval. Problems come with a plain fix.
 
 **Try:**
 - "What did you do overnight?"
@@ -203,9 +203,9 @@ Tell Atlas something's wrong in one sentence. It gathers the details Atlas's mak
 - "Something's broken with my calendar sync. Can you report it?"
 
 ## Dashboards
-Always-current pages you can open any time: **Daily Brief**, **Commitments** (everything you owe, and everything owed to you), **Projects** (every project and how it's going), **Goals** (with your running list of accomplishments), **Week Ahead**, **People**, **Decisions & Risks**, **Control Center**, **About You**, **Records** (search everything Atlas has filed, by name, type, or status), and this **Atlas Guide**. Ask for a page for any project.
+Three always-current pages you can open any time: **Today** (what needs you today, and what's coming this week), **Work** (your commitments in both directions, projects, goals, decisions and risks, and the people you have something open with), and this **Guide** (how Atlas is running, what it filed lately, what it knows about you, and how to use it). Ask for a page for any project. To look anything else up, just ask in chat.
 
 **Try:**
-- "Open my Commitments page."
+- "Open my Work page."
 - "Make a project page for the enterprise launch."
 - "Add a dashboard of all open customer requests."

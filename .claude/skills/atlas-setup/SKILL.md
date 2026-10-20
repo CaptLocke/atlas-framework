@@ -109,7 +109,7 @@ Use `atlas-dashboards` to publish the three dashboards (Today, Work and Guide) p
 - `user/settings/{atlas,governance,data-rules,connectors,sources,rhythms,routines,dashboards}.yaml`
 - `user/profile/*.md` and `user/profile/assets/`; `user/extensions/registry.yaml`; inbox starters in `user/inbox/`; state starters and `setup.yaml` in `user/.state/`
 - Initial records (employer with its company profile, self, manager, key people, goals, projects, topics) and sources; originals in `user/library/`
-- Cloud-drive folders "Atlas Deliverables" and "Atlas Drop/Processed"; the "Atlas routine" environment and the routines; eleven published dashboards
+- Cloud-drive folders "Atlas Deliverables" and "Atlas Drop/Processed"; the "Atlas routine" environment and the routines; three published dashboards
 - The first brief at `user/work/briefs/YYYY-MM-DD.md`
 - If importing: `user/.state/import.yaml` (`status: complete`), import sources and the records made from them, the "Atlas Import" drive folder (left untouched) and its data-rule exclusion
 - Activity-log lines and commits with `Atlas-Actor: setup` after every step
@@ -128,6 +128,6 @@ Use `atlas-dashboards` to publish the three dashboards (Today, Work and Guide) p
 - The "Atlas routine" environment exists with `ATLAS_CONTEXT=routine`, every routine uses it, and a test run's report shows `atlas_context: routine` (or `setup.yaml: notes` says the test is pending).
 - `atlas.yaml` has a full attestation; every settings file passes `python3 system/tools/validate.py --all`.
 - Each `routines.yaml` routine has a `routine_id` or the user confirmed creating it from the copy-paste text.
-- `dashboards.yaml` has URLs for the eleven dashboards (or a known issue says why not).
+- `dashboards.yaml` has URLs for the three dashboards (or a known issue says why not).
 - The first Daily Brief exists and the user has seen it; `first_brief_delivered` is set.
 - An import, if started, is `complete` (or the user chose to stop it; `notes` says so) before the first brief.

@@ -110,7 +110,7 @@ Go **one automation at a time, with the count up front**. The user is switching 
    ```
    The line is the prompt from `system/jobs/README.md` §Routine prompt with this routine's name filled in — never retyped from memory. Nothing else about the routine changes: same schedule, model, environment and connectors.
 3. Wait for the user to say that one is done. Then name the next one and how many are left ("Done — two to go. Next: weekly."), and repeat until the last.
-4. When the last one is done, say so, mark the `action` question answered (`Action key: release-<version>-<n>`), log it (`system/rules/sync.md`), and republish the Control Center. If the user stops partway, leave the question open, say which routines are still on the old prompt, and that those keep running until they get to them.
+4. When the last one is done, say so, mark the `action` question answered (`Action key: release-<version>-<n>`), log it (`system/rules/sync.md`), and republish Guide. If the user stops partway, leave the question open, say which routines are still on the old prompt, and that those keep running until they get to them.
 
 If this session can edit routines (a routine or scheduled-task tool), set each routine's instructions itself — still one at a time, saying what it changed — then read the next run report of one of them to confirm it still shows `atlas_context: routine` (§5).
 

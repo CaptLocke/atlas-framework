@@ -29,14 +29,14 @@ Runs during away; patch and minor updates apply as usual and "What's new" waits 
 ## Steps
 1. Invoke `atlas-update` in check mode: find the newest upstream release. If it is not newer than `system/VERSION`, record `last_checked_version` and exit `ok`.
 2. Classify the release by semver against the installed version: **major** if the first number changed, the release notes mark a breaking change, or a pending migration is non-additive or needs user input (`system/migrations/README.md`); otherwise **minor** if the second number changed (additive features); otherwise **patch** (fixes only). With several releases pending, classify each one on its own.
-3. **Patch/minor** with `updates_minor: auto`: invoke `atlas-update` in apply mode (rollback point in the update lock, replace owned paths, run pending migrations in order, validate, commit, push, "What's new", which republishes the Atlas Guide this job's contract assigns it). On failure it undoes the update as `atlas-update` §B step 10 describes and records a known issue.
+3. **Patch/minor** with `updates_minor: auto`: invoke `atlas-update` in apply mode (rollback point in the update lock, replace owned paths, run pending migrations in order, validate, commit, push, "What's new", which republishes Guide, whose contract lists this job). On failure it undoes the update as `atlas-update` §B step 10 describes and records a known issue.
 4. **Major**, or `updates_minor` not `auto`: prepare only. Add a pending entry to `user/inbox/approvals.md` (`updates_major` or `updates_minor`) with the version, a plain-language summary, and any questions the migrations will ask. The user applies it in chat.
 5. If `manifest.yaml: models` changed in the applied release, `atlas-update` has queued a `setup` question with copy-paste instructions (a routine never edits routine settings; `atlas-update` §B step 9). Nothing more to do here.
 6. Set `jobs.yaml: update-check.last_checked_version`. Commit.
 
 ## Outputs
 - Replaced owned paths and migrated user files (applied updates only); `atlas.yaml: installed_version`, `data_version`.
-- "What's new" entry for the next brief and the Atlas Guide; open `action` questions for anything only the user can do (shown first in the next brief); approval entry for prepared updates; known issue on failure.
+- "What's new" entry for the next brief and the Guide; open `action` questions for anything only the user can do (shown first in the next brief); approval entry for prepared updates; known issue on failure.
 
 ## Early exit
 Not Sunday (in a routine), already checked today, lock present, or no newer release → `early_exit` / `ok`.
