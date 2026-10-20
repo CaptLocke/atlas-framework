@@ -5,37 +5,98 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
-<title>Control Center</title>
+<title>Guide</title>
 <style id="atlas-base">{{ATLAS_BASE_CSS}}</style>
 <style id="atlas-page">
 .state { display: inline-flex; align-items: center; gap: .45rem; font-weight: 600; font-size: .9rem; white-space: nowrap; }
-.state::before { content: ""; width: .6rem; height: .6rem; border-radius: 50%; background: var(--tone, var(--muted)); }
+.state::before { content: ""; width: .6rem; height: .6rem; border-radius: 50%; flex: none; background: var(--tone, var(--muted)); }
 .state[data-tone="ok"] { --tone: var(--ok); }
 .state[data-tone="warn"] { --tone: var(--warn); }
 .state[data-tone="danger"] { --tone: var(--danger); }
-.jobs-line { font-size: .85rem; color: var(--ink-2); }
-.jobtable { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); font-size: .9rem; }
-.jobtable th, .jobtable td { text-align: left; padding: .55rem .9rem; border-top: 1px solid var(--line); vertical-align: top; }
-.jobtable thead th { border-top: 0; font-size: .8rem; color: var(--ink-2); font-weight: 600; }
-.jobtable td:first-child { font-weight: 600; }
-@media (max-width: 34rem) {
-  .jobtable thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-  .jobtable tr { display: grid; grid-template-columns: 1fr auto; padding: .5rem .8rem; border-top: 1px solid var(--line); }
-  .jobtable td { border: 0; padding: .1rem 0; }
-  .jobtable td:nth-child(3) { grid-column: 1 / -1; color: var(--ink-2); }
-}
-.log { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; font-size: .9rem; }
-.log li { display: grid; grid-template-columns: 8rem minmax(0, 1fr); gap: .1rem 1rem; padding: .45rem 0; border-top: 1px solid var(--line); }
-.log li:first-child { border-top: 0; }
-.log time { color: var(--ink-2); font-variant-numeric: tabular-nums; }
-.log .actor { color: var(--ink-2); font-size: .82rem; }
-@media (max-width: 34rem) { .log li { grid-template-columns: minmax(0, 1fr); } }
-.fix { font-size: .92rem; }
-.fix b { font-weight: 600; }
+.small { font-size: .85rem; color: var(--ink-2); }
+
+/* Health */
+.health { display: flex; flex-wrap: wrap; align-items: baseline; gap: .35rem .9rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: .85rem 1rem; }
+.health .state { font-size: 1rem; }
+.health > span:last-child { min-width: 0; flex: 1 1 18rem; }
+.issues { list-style: none; margin: .6rem 0 0; padding: 0; display: grid; gap: .45rem; }
+.issues li { display: grid; gap: .15rem; padding-left: .8rem; border-left: 3px solid var(--tone, var(--muted)); font-size: .92rem; }
+.issues li[data-tone="danger"] { --tone: var(--danger); }
+.issues li[data-tone="warn"] { --tone: var(--warn); }
+.issues b { font-weight: 600; }
+.health-sub { margin-top: .6rem; font-size: .88rem; color: var(--ink-2); max-width: var(--measure); }
+
+/* Sub-groups inside a section */
+.sub { font-size: 1.02rem; margin: 1.1rem 0 .2rem; }
+.sub:first-child { margin-top: 0; }
+.sub-note { font-size: .88rem; color: var(--ink-2); margin-bottom: .5rem; max-width: var(--measure); }
 .copy { margin-top: .6rem; }
 .copy pre { margin: 0; padding: .7rem .9rem; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius); font-family: var(--font-id); font-size: .82rem; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
 .copy button { margin-top: .45rem; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: .2rem .8rem; cursor: pointer; font-size: .85rem; }
 .copy button:hover { border-color: var(--accent); }
+
+/* Tables (automations, steps) */
+.tbl { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); font-size: .9rem; }
+.tbl th, .tbl td { text-align: left; padding: .55rem .9rem; border-top: 1px solid var(--line); vertical-align: top; }
+.tbl thead th { border-top: 0; font-size: .8rem; color: var(--ink-2); font-weight: 600; }
+.tbl td:first-child { font-weight: 600; }
+.tbl .small { font-weight: 400; display: block; margin-top: .15rem; }
+@media (max-width: 34rem) {
+  .tbl thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .tbl tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .1rem .75rem; padding: .55rem .8rem; border-top: 1px solid var(--line); }
+  .tbl tbody tr:first-child { border-top: 0; }
+  .tbl td { border: 0; padding: 0; }
+  .tbl td[data-wide] { grid-column: 1 / -1; }
+  .tbl td[data-label]::before { content: attr(data-label) " "; color: var(--ink-2); font-weight: 400; }
+}
+.conns { list-style: none; margin: .9rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem 1.1rem; font-size: .9rem; }
+.conns .state { font-weight: 500; white-space: normal; }
+.conns .small { margin-left: .3rem; }
+
+/* Folds */
+details.fold { margin-top: .9rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+details.fold > summary { cursor: pointer; padding: .7rem 1rem; font-weight: 600; color: var(--accent); }
+details.fold > summary .small { font-weight: 400; margin-left: .4rem; }
+details.fold[open] > summary { border-bottom: 1px solid var(--line); }
+.fold-body { padding: .9rem 1rem 1rem; display: grid; gap: .9rem; min-width: 0; }
+.fold-body .items, .fold-body .tbl { background: var(--bg); }
+.fold-body h3 { font-size: 1.05rem; }
+.fold-body h4 { font-size: .95rem; margin-top: .3rem; }
+.runs { list-style: none; margin: 0; padding: 0; display: grid; gap: .45rem; font-size: .9rem; }
+.runs li { display: flex; flex-wrap: wrap; gap: .2rem .8rem; align-items: baseline; }
+
+/* Recently filed */
+.filed-ctl { margin-bottom: .75rem; }
+.item-aside .chips { justify-content: flex-end; }
+@media (max-width: 34rem) { .item-aside .chips { justify-content: flex-start; } }
+
+/* About you */
+.who { margin-bottom: .6rem; max-width: var(--measure); }
+.stmts { list-style: none; margin: 0; padding: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.fold-body .stmts { background: var(--bg); }
+.stmt { display: grid; gap: .25rem; padding: .65rem 1rem; border-top: 1px solid var(--line); }
+.stmt:first-child { border-top: 0; }
+.stmt-text { max-width: var(--measure); }
+.stmt-tag { display: flex; flex-wrap: wrap; gap: .3rem .6rem; align-items: center; font-size: .82rem; color: var(--ink-2); }
+.stmt[data-status="proposed"] .stmt-text { font-style: italic; }
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr)); gap: .6rem; list-style: none; margin: 0; padding: 0; }
+.swatch { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; font-size: .85rem; }
+.swatch i { display: block; height: 2.5rem; border-bottom: 1px solid var(--line); }
+.swatch p { padding: .35rem .6rem 0; font-weight: 600; }
+.swatch span { display: block; padding: 0 .6rem .45rem; color: var(--ink-2); }
+
+/* Guide */
+.entries { display: grid; gap: .7rem; }
+.entry { display: grid; gap: .4rem; padding-top: .7rem; border-top: 1px solid var(--line); }
+.entry:first-child { border-top: 0; padding-top: 0; }
+.entry h3 { font-size: 1rem; display: flex; gap: .6rem; align-items: baseline; flex-wrap: wrap; }
+.entry h3 span { font-family: var(--font-body); font-size: .85rem; color: var(--ink-2); font-weight: 400; }
+.entry p { max-width: var(--measure); }
+.entry ul, .entry ol { margin: 0; padding-left: 1.25rem; display: grid; gap: .25rem; max-width: var(--measure); }
+.say { list-style: none !important; padding: 0 !important; display: flex !important; flex-wrap: wrap; gap: .4rem !important; max-width: none !important; }
+.say li { background: var(--accent-soft); color: var(--ink); border-radius: 1rem 1rem 1rem .25rem; padding: .25rem .75rem; font-size: .9rem; }
+.guide-intro { max-width: var(--measure); }
+@media print { details.fold > summary { color: inherit; } }
 </style>
 <style id="atlas-theme">{{ATLAS_THEME_CSS}}</style>
 </head>
@@ -49,25 +110,47 @@
   var RUN_TONE = { ok: "ok", early_exit: "ok", partial: "warn", failed: "danger", skipped_away: null, skipped_paused: null, never_run: null };
   var SEV_TONE = { high: "danger", medium: "warn", low: null };
   var CONN = { ok: ["Connected", "ok"], issue: ["Needs attention", "danger"], unknown: ["Not checked yet", null], fallback: ["No connector (manual)", null] };
+  var HEALTH = { ok: ["Running well", "ok"], attention: ["Needs a look", "warn"], problem: ["Something's wrong", "danger"] };
+  var STMT = { confirmed: ["Confirmed", "ok"], proposed: ["Not yet confirmed", "warn"] };
+  var PROV = { stated: "You said so", observed: "Observed", researched: "Researched", uploaded: "From your documents", inferred: "Inferred" };
 
   function state(text, tone) { return h("span", { class: "state", "data-tone": tone || null }, text); }
+  function small(text) { return text ? h("span", { class: "small" }, text) : null; }
+  function fold(summary, count, body) {
+    return h("details", { class: "fold" }, h("summary", null, summary, count != null ? small(String(count)) : null), h("div", { class: "fold-body" }, body));
+  }
+  function copyBlock(text) {
+    var pre = h("pre", null, text);
+    var btn = h("button", { type: "button" }, "Copy");
+    btn.addEventListener("click", function () {
+      try {
+        navigator.clipboard.writeText(text).then(function () { btn.textContent = "Copied"; },
+          function () { btn.textContent = "Select the text above to copy it"; });
+      } catch (e) { btn.textContent = "Select the text above to copy it"; }
+    });
+    return h("div", { class: "copy" }, pre, btn);
+  }
+  /* The user's time zone as words ("Pacific Time"), else its name. */
+  function zoneName() {
+    try {
+      var parts = new Intl.DateTimeFormat(N.meta.locale || undefined, { timeZone: N.meta.timezone, timeZoneName: "longGeneric" }).formatToParts(new Date());
+      for (var i = 0; i < parts.length; i++) if (parts[i].type === "timeZoneName") return parts[i].value;
+    } catch (e) { /* fall through */ }
+    return N.meta.timezone || null;
+  }
 
-  N.page({ title: "Control Center" }, function (d, main) {
+  N.page({ title: "Guide" }, function (d, main) {
     var issues = L(d.known_issues).filter(function (i) { return i.status !== "resolved"; });
     var asks = L(d.approvals), routines = L(d.routines);
     var acts = L(d.questions).filter(function (q) { return q.kind === "action"; });
     var qs = L(d.questions).filter(function (q) { return q.kind !== "action"; });
-
-    function copyBlock(text) {
-      var pre = h("pre", null, text);
-      var btn = h("button", { type: "button" }, "Copy");
-      btn.addEventListener("click", function () {
-        try {
-          navigator.clipboard.writeText(text).then(function () { btn.textContent = "Copied"; },
-            function () { btn.textContent = "Select the text above to copy it"; });
-        } catch (e) { btn.textContent = "Select the text above to copy it"; }
-      });
-      return h("div", { class: "copy" }, pre, btn);
+    var titles = {};
+    routines.forEach(function (r) { titles[r.name] = r.title || r.name; });
+    function byWhom(by) {
+      if (!by) return null;
+      if (by === "chat") return "Asked in a chat";
+      var r = String(by).replace(/^routine:/, "");
+      return "From the " + (titles[r] || r) + " automation";
     }
 
     if (d.away && d.away.active) {
@@ -75,124 +158,198 @@
         "Away mode is on until " + N.dateY(d.away.end) + ". Briefs and drafts are paused; information is still collected. Say \"I'm back\" in chat to end it.")));
     }
 
-    if (acts.length) {
-      main.appendChild(N.section({ id: "actions", title: "Action needed",
-        note: ["Only you can do these. Atlas keeps them here, and at the top of your ", N.pageLink("daily-brief", "Daily Brief"), ", until they're done. Tell Atlas in chat when you've done one."],
-        body: N.items(acts.map(function (q) {
-          return N.item({ tone: "warn", title: q.text, text: q.how || null,
-            extra: q.copy_text ? copyBlock(q.copy_text) : null,
-            aside: [q.asked ? h("span", null, "Since " + N.date(q.asked)) : null] });
-        })) }));
-    }
-
-    main.appendChild(N.section({ id: "issues", title: "Known issues", count: N.total("known_issues", issues.length), key: "known_issues",
-      note: "Problems Atlas found that may need you.",
-      body: N.items(issues.map(function (i) {
-        return N.item({ tone: SEV_TONE[i.severity] || "muted", title: i.summary, aside: [N.chip(N.label(i.severity), SEV_TONE[i.severity]), h("span", null, "Since " + N.date(i.since))],
-          extra: i.fix ? h("p", { class: "fix" }, h("b", null, "To fix: "), N.rich(i.fix)) : null });
-      }), "No known issues. Everything Atlas checks is working.") }));
-
-    main.appendChild(N.section({ id: "approvals", title: "Waiting for your OK", count: N.total("approvals", asks.length), key: "approvals",
-      note: "Nothing here happens until you say yes in chat. Requests expire after 14 days that you're not away.",
-      body: N.items(asks.map(function (a) {
-        return N.item({ tone: "warn", title: a.action, text: a.why,
-          meta: [a.prepared ? "Prepared: " + a.prepared : null, a.requested_by ? "Requested by " + a.requested_by : null],
-          aside: [h("span", null, "Asked " + N.date(a.requested_on))] });
-      }), "Nothing is waiting for approval.") }));
-
-    main.appendChild(N.section({ id: "questions", title: "Questions from Atlas", count: N.total("questions", qs.length), key: "questions",
-      note: "Answer in chat whenever it suits you.",
-      body: N.items(qs.map(function (q) {
-        return N.item({ tone: "accent", title: q.text, text: q.proposed_change ? "Proposed: " + q.proposed_change : null,
-          aside: [q.kind ? N.chip(N.label(q.kind)) : null] });
-      }), "No open questions.") }));
-
-    main.appendChild(N.section({ id: "automations", title: "Automations", count: routines.length,
-      note: d.profile ? "Your " + N.label(d.profile).toLowerCase() + " automation profile. Ask Atlas in chat to pause, reschedule, or change one." : null,
-      body: N.items(routines.map(function (r) {
-        var lr = r.last_run || {};
-        var st = lr.status || "never_run";
-        return N.item({ tone: r.enabled === false ? "muted" : (RUN_TONE[st] || "muted"), title: r.title || r.name,
-          meta: [r.schedule_text || r.schedule, r.paused ? "Paused" + (r.paused_until ? " until " + N.date(r.paused_until) : "") : null],
-          text: lr.summary,
-          extra: L(r.jobs).length ? h("p", { class: "jobs-line" }, "Runs: " + L(r.jobs).join(", ")) : null,
-          aside: [state(r.enabled === false ? "Off" : N.label(st), r.enabled === false ? null : RUN_TONE[st]),
-            lr.started ? h("span", null, "Last " + N.dateTime(lr.started)) : null,
-            r.next_run && r.enabled !== false ? h("span", null, "Next " + N.dateTime(r.next_run)) : null] });
-      }), "No automations are set up yet.") }));
-
-    var jobs = L(d.jobs);
-    if (jobs.length) {
-      main.appendChild(N.section({ id: "jobs", title: "Jobs", note: "Each automation runs these steps. Last result of each.",
-        body: h("table", { class: "jobtable" },
-          h("thead", null, h("tr", null, h("th", { scope: "col" }, "Job"), h("th", { scope: "col" }, "Last result"), h("th", { scope: "col" }, "Details"))),
-          h("tbody", null, jobs.map(function (j) {
-            return h("tr", null, h("td", null, j.title || j.name),
-              h("td", null, state(N.label(j.last_status || "never_run"), RUN_TONE[j.last_status])),
-              h("td", null, [j.last_success ? "Last succeeded " + N.dateTime(j.last_success) : "Not run yet", j.detail ? ". " + j.detail : "", j.paused ? ". Paused" + (j.paused_until ? " until " + N.date(j.paused_until) : "") : ""].join("")));
-          }))) }));
-    }
-
-    var conns = L(d.connections);
-    main.appendChild(N.section({ id: "connections", title: "Connections", count: conns.length,
-      note: "The tools Atlas reads from and drafts in.",
-      body: N.items(conns.map(function (c) {
-        var s = CONN[c.status] || CONN.unknown;
-        return N.item({ tone: s[1] || "muted", title: c.name,
-          meta: [L(c.categories).map(N.label).join(", "), c.available_in_routines === false ? "Not available to automations" : null, c.last_seen ? "Last read " + N.dateTime(c.last_seen) : null],
-          text: c.note, aside: [state(s[0], s[1])] });
-      }), "No tools connected yet.") }));
-
-    var runs = L(d.runs);
-    if (runs.length) {
-      main.appendChild(N.section({ id: "runs", title: "Recent runs", count: N.total("runs", runs.length), key: "runs",
-        body: N.items(runs.map(function (r) {
-          return N.item({ tone: RUN_TONE[r.status] || "muted", title: r.routine + ", " + N.dateTime(r.started), text: r.summary,
-            meta: [r.duration_min != null ? r.duration_min + " min" : null], aside: [state(N.label(r.status), RUN_TONE[r.status])] });
-        })) }));
-    }
-
-    var act = L(d.activity);
-    main.appendChild(N.section({ id: "activity", title: "Recent activity", count: N.total("activity", act.length), key: "activity",
-      note: "Every change Atlas made, newest first.",
-      body: act.length ? h("div", { class: "items", style: "padding:.4rem 1rem" }, h("ul", { class: "log" }, act.map(function (a) {
-        return h("li", null, h("time", { datetime: a.at }, N.dateTime(a.at)),
-          h("div", null, h("p", null, N.rich(a.summary)), h("p", { class: "actor" }, [a.actor, a.action].filter(Boolean).join(", "))));
-      }))) : N.empty("No activity yet.") }));
-
-    var flagged = L(d.suspicious);
-    if (flagged.length) {
-      main.appendChild(N.section({ id: "flagged", title: "Suspicious content", note: "Instructions found inside emails or documents. Atlas ignored them.",
-        body: N.items(flagged.map(function (f) { return N.item({ tone: "warn", title: f.summary, meta: [N.dateTime(f.at), f.source ? N.rid(f.source) : null] }); })) }));
-    }
-
-    var sys = d.system || {};
-    var up = sys.update || {};
-    var imp = sys.notes_import;
-    var impText = null;
+    /* 1. Health, in one line, with the known issues and their fixes under it. */
+    var st = d.status || {}, hs = HEALTH[st.overall] || HEALTH.ok;
+    var sys = d.system || {}, up = sys.update || {}, imp = sys.notes_import, impText = null;
     if (imp) {
-      var from = imp.source_system ? " from " + imp.source_system : "";
-      var done = imp.processed || 0;
-      var plural = function (n) { return n + (n === 1 ? " note" : " notes"); };
-      if (imp.status === "complete") impText = "Done: " + plural(done) + " brought in" + from + (imp.skipped ? ", " + imp.skipped + " skipped" : "");
-      else if (imp.status === "undone") impText = "Undone: the notes" + from + " were taken back out";
-      else if (imp.status === "planned") impText = "Getting ready to bring in your notes" + from;
-      else if (imp.status === "sampling") impText = "Checking a few sample notes" + from + " with you first";
-      else if (imp.total) impText = "In progress: " + done + " of " + plural(imp.total) + from;
-      else impText = "In progress: " + plural(done) + from + " so far";
+      var from = imp.source_system ? " from " + imp.source_system : "", done = imp.processed || 0;
+      var notes = function (n) { return n + (n === 1 ? " note" : " notes"); };
+      if (imp.status === "complete") impText = "done: " + notes(done) + " brought in" + from + (imp.skipped ? ", " + imp.skipped + " skipped" : "");
+      else if (imp.status === "undone") impText = "undone: the notes" + from + " were taken back out";
+      else if (imp.status === "planned") impText = "getting ready to bring in your notes" + from;
+      else if (imp.status === "sampling") impText = "checking a few sample notes" + from + " with you first";
+      else if (imp.total) impText = "in progress, " + done + " of " + notes(imp.total) + from;
+      else impText = "in progress, " + notes(done) + from + " so far";
     }
-    main.appendChild(N.section({ id: "system", title: "Atlas itself",
-      body: [N.facts([["Version", sys.installed_version], ["Latest release", up.latest_version ? up.latest_version + (up.available ? " (update available)" : "") : null],
-        ["Last checked for updates", up.last_checked ? N.date(up.last_checked) : null], ["Your health check", sys.last_user_check ? N.date(sys.last_user_check) : null],
-        ["System health check", sys.last_system_check ? N.date(sys.last_system_check) : null], ["Data format", sys.data_version != null ? "Version " + sys.data_version : null], ["Import", impText]]),
-        up.available && up.notes ? h("p", { class: "item-insight", style: "margin-top:.75rem" }, N.rich(up.notes)) : null] }));
+    var sysLine = [
+      sys.installed_version ? "Atlas " + sys.installed_version + (up.available && up.latest_version ? ", update to " + up.latest_version + " available" : ", up to date") +
+        (up.last_checked ? " (checked " + N.date(up.last_checked) + ")" : "") : null,
+      sys.last_user_check ? "Your last health check: " + N.date(sys.last_user_check) : null,
+      impText ? "Notes import " + impText : null
+    ].filter(Boolean).join(". ");
+    var flagged = L(d.suspicious);
+    main.appendChild(N.section({ id: "health", title: "Health",
+      body: [h("p", { class: "health" }, state(hs[0], hs[1]), h("span", null, N.rich(st.headline) || (issues.length ? "" : "Everything Atlas checks is working."))),
+        issues.length ? h("ul", { class: "issues", "aria-label": "Known issues" }, issues.map(function (i) {
+          return h("li", { "data-tone": SEV_TONE[i.severity] || null },
+            h("span", null, h("b", null, i.summary), " ", small("Since " + N.date(i.since))),
+            i.fix ? h("span", null, "To fix: ", N.rich(i.fix)) : null);
+        })) : null,
+        N.more("known_issues"),
+        up.available && up.notes ? h("p", { class: "health-sub" }, N.rich(up.notes)) : null,
+        sysLine ? h("p", { class: "health-sub" }, sysLine + ".") : null,
+        flagged.length ? fold("Suspicious instructions Atlas ignored", flagged.length,
+          [h("p", { class: "small" }, "Found inside emails or documents in the last 14 days. Atlas did not follow them."),
+            h("ul", { class: "runs" }, flagged.map(function (f) { return h("li", null, small(N.dateTime(f.at)), h("span", null, N.rich(f.summary))); }))]) : null] }));
 
-    var failing = routines.filter(function (r) { var s = (r.last_run || {}).status; return s === "failed" || s === "partial"; }).length;
-    var st = d.status || {};
-    return { subtitle: "How Atlas is running, and what it needs from you.", lede: st.headline || (failing ? failing + " automation needs a look" : "Everything is running"),
+    /* 2. Waiting on you: action needed, approvals, questions. */
+    var waiting = [];
+    if (acts.length) {
+      waiting.push(h("h3", { class: "sub" }, "Action needed"),
+        h("p", { class: "sub-note" }, "Only you can do these. They stay here, and at the top of ", N.pageLink("daily-brief", "Today"), ", until they're done. Tell Atlas in chat when you've done one."),
+        N.items(acts.map(function (q) {
+          return N.item({ tone: "warn", title: q.text, text: q.how || null, extra: q.copy_text ? copyBlock(q.copy_text) : null,
+            aside: [q.asked ? h("span", null, "Since " + N.date(q.asked)) : null] });
+        })));
+    }
+    if (asks.length) {
+      waiting.push(h("h3", { class: "sub" }, "Waiting for your OK"),
+        h("p", { class: "sub-note" }, "Nothing here happens until you say yes in chat. Requests expire after 14 days that you're not away."),
+        N.items(asks.map(function (a) {
+          return N.item({ tone: "warn", title: a.action, text: a.why,
+            meta: [a.prepared ? "Prepared: " + a.prepared : null, byWhom(a.requested_by)],
+            aside: [h("span", null, "Asked " + N.date(a.requested_on))] });
+        })), N.more("approvals"));
+    }
+    if (qs.length) {
+      waiting.push(h("h3", { class: "sub" }, "Questions from Atlas"),
+        h("p", { class: "sub-note" }, "Answer in chat whenever it suits you."),
+        N.items(qs.map(function (q) {
+          return N.item({ tone: "accent", title: q.text, text: q.proposed_change ? "Proposed: " + q.proposed_change : null,
+            aside: [q.asked ? h("span", null, "Asked " + N.date(q.asked)) : null] });
+        })), N.more("questions"));
+    }
+    var nWaiting = acts.length + N.total("approvals", asks.length) + N.total("questions", qs.length);
+    main.appendChild(N.section({ id: "waiting", title: "Waiting on you", count: nWaiting,
+      body: waiting.length ? waiting : N.empty("Nothing is waiting on you.") }));
+
+    /* 3. Automations: schedule in the user's time, last run, next run; steps, connections and runs compact. */
+    var zone = zoneName();
+    var autoBody = routines.length ? h("table", { class: "tbl" },
+      h("thead", null, h("tr", null, ["Automation", "When", "Last run", "Next run"].map(function (c) { return h("th", { scope: "col" }, c); }))),
+      h("tbody", null, routines.map(function (r) {
+        var lr = r.last_run || {}, s = lr.status || "never_run", off = r.enabled === false;
+        return h("tr", null,
+          h("td", null, r.title || r.name, r.paused ? small("Paused" + (r.paused_until ? " until " + N.date(r.paused_until) : "")) : null),
+          h("td", null, r.schedule_text || r.schedule),
+          h("td", { "data-wide": "" }, state(off ? "Off" : N.label(s), off ? null : RUN_TONE[s]), lr.started ? " " + N.dateTime(lr.started) : "", small(lr.summary)),
+          h("td", { "data-label": "Next:" }, off || r.paused ? "Not scheduled" : (r.next_run ? N.dateTime(r.next_run) : "")));
+      }))) : N.empty("No automations are set up yet.");
+    var conns = L(d.connections);
+    var connList = conns.length ? h("ul", { class: "conns", "aria-label": "Connections" }, conns.map(function (c) {
+      var s = CONN[c.status] || CONN.unknown;
+      return h("li", null, state(c.name, s[1]), c.status !== "ok" ? small(s[0] + (c.note ? ": " + N.rich(c.note) : "")) : null);
+    })) : null;
+    var jobs = L(d.jobs), runs = L(d.runs);
+    var detail = (jobs.length || runs.length) ? fold("Each step and recent runs", null, [
+      jobs.length ? h("table", { class: "tbl" },
+        h("thead", null, h("tr", null, h("th", { scope: "col" }, "Step"), h("th", { scope: "col" }, "Last result"), h("th", { scope: "col" }, "Details"))),
+        h("tbody", null, jobs.map(function (j) {
+          return h("tr", null, h("td", null, j.title || j.name),
+            h("td", null, state(N.label(j.last_status || "never_run"), RUN_TONE[j.last_status])),
+            h("td", { "data-wide": "" }, [j.last_success ? "Last succeeded " + N.dateTime(j.last_success) : "Not run yet", j.detail ? ". " + j.detail : "",
+              j.paused ? ". Paused" + (j.paused_until ? " until " + N.date(j.paused_until) : "") : ""].join("")));
+        }))) : null,
+      runs.length ? [h("h4", null, "Recent runs"), h("ul", { class: "runs" }, runs.map(function (r) {
+        return h("li", null, state(N.label(r.status), RUN_TONE[r.status]), h("span", null, (r.title || r.routine) + ", " + N.dateTime(r.started) + (r.duration_min != null ? ", " + r.duration_min + " min" : "")), small(r.summary));
+      })), N.more("runs")] : null]) : null;
+    main.appendChild(N.section({ id: "automations", title: "Automations", count: routines.length,
+      note: [zone ? "Times are yours, in " + zone + ". " : "", d.profile ? "Your " + N.label(d.profile).toLowerCase() + " profile. " : "", "Ask Atlas in chat to pause, move or change one."].join(""),
+      body: [autoBody, connList, detail] }));
+
+    /* 4. Recently filed: the last 14 days, new and updated, newest first. */
+    var rf = d.recently_filed || {}, filed = L(rf.items), days = rf.days || 14;
+    var filedEmpty = h("p", { class: "empty", hidden: true }, "Nothing of this kind in the last " + days + " days.");
+    var filedRows = filed.map(function (f) {
+      var isNew = f.change === "new";
+      return N.item({ tone: isNew ? "accent" : "muted", title: f.title,
+        meta: [f.what, f.from ? "From " + f.from : null],
+        attrs: { "data-change": isNew ? "new" : "updated" },
+        aside: [h("span", { class: "chips" }, N.chip(N.label(f.kind)), N.chip(isNew ? "New" : "Updated", isNew ? "ok" : null)), f.at ? h("span", null, N.weekday(f.at)) : null] });
+    });
+    var filedBody = [];
+    if (filed.length) {
+      filedBody.push(h("div", { class: "controls filed-ctl no-print" }, N.segmented("Show", [
+        { value: "all", label: "All" }, { value: "new", label: "New" + (rf["new"] != null ? " (" + rf["new"] + ")" : "") },
+        { value: "updated", label: "Updated" + (rf.updated != null ? " (" + rf.updated + ")" : "") }], "all", function (v) {
+        var shown = 0;
+        filedRows.forEach(function (li) { var ok = v === "all" || li.getAttribute("data-change") === v; li.hidden = !ok; shown += ok ? 1 : 0; });
+        filedEmpty.hidden = shown > 0;
+      })), h("ul", { class: "items" }, filedRows), filedEmpty);
+    } else filedBody.push(N.empty("Atlas hasn't filed anything in the last " + days + " days."));
+    var left = (N.meta.truncated || {}).recently_filed;
+    main.appendChild(N.section({ id: "filed", title: "Recently filed", count: N.total("recently_filed", filed.length),
+      note: "What Atlas filed in the last " + days + " days, newest first. Tell Atlas in chat if one is wrong.",
+      body: [filedBody, h("p", { class: "more" }, (left ? left + " more in the last " + days + " days. " : "") + "For anything older, ask Atlas in chat.")] }));
+
+    /* 5. About you: the most useful few beliefs, the rest folded. */
+    var ab = d.about || {}, b = ab.basics || {}, files = L(ab.files);
+    function statement(s) {
+      var tag = STMT[s.status] || STMT[s.provenance === "stated" ? "confirmed" : "proposed"];
+      var ev = L(s.evidence).map(N.name).filter(function (x) { return x && x.indexOf("/") === -1; });
+      var where = (PROV[s.provenance] || N.label(s.provenance)) + (ev.length ? ": " + ev.join(", ") : "");
+      return h("li", { class: "stmt", "data-status": s.status || null },
+        h("p", { class: "stmt-text" }, N.rich(s.text)),
+        h("p", { class: "stmt-tag" }, N.chip(tag[0], tag[1]), where ? h("span", null, where) : null, s.date ? h("span", null, N.dateY(s.date)) : null,
+          s.status === "proposed" ? h("span", null, "Confirm or correct it in chat") : null));
+    }
+    var all = [], featured = [];
+    files.forEach(function (f) { L(f.groups).forEach(function (g) { L(g.statements).forEach(function (s) { all.push(s); if (s.featured) featured.push(s); }); }); });
+    if (!featured.length) featured = all.slice(0, 3);
+    var who = [b.role ? b.role + (b.company ? " at " + N.name(b.company) : "") : null, b.manager ? "reports to " + N.name(b.manager) : null].filter(Boolean).join("; ");
+    var restCount = all.length - featured.length;
+    var foldBody = [N.facts([["Name", b.name], ["Time zone", b.timezone], ["Key people", L(b.key_people).map(N.name).join(", ")], ["Current goals", L(b.goals).map(N.name).join(", ")]])];
+    files.forEach(function (f) {
+      var groups = L(f.groups).map(function (g) {
+        var rest = L(g.statements).filter(function (s) { return featured.indexOf(s) === -1; });
+        return rest.length ? h("div", null, g.heading ? h("h4", null, g.heading) : null, h("ul", { class: "stmts" }, rest.map(statement))) : null;
+      }).filter(Boolean);
+      foldBody.push(h("div", null, h("h3", null, f.title || N.label(f.part)),
+        f.description || f.updated ? h("p", { class: "small" }, [f.description, f.updated ? "Updated " + N.dateY(f.updated) + "." : null].filter(Boolean).join(" ")) : null,
+        groups.length ? groups : N.empty("Nothing more here yet."), N.more("about.files." + f.part)));
+    });
+    var ds = ab.design;
+    if (ds) {
+      foldBody.push(h("div", null, h("h3", null, "Design system"), h("p", { class: "small" }, "Used for your documents, decks, and these pages."),
+        ds.summary ? h("p", null, N.rich(ds.summary)) : null,
+        L(ds.colors).length ? h("ul", { class: "swatches", "aria-label": "Brand colors" }, L(ds.colors).map(function (c) {
+          var hex = /^#[0-9a-fA-F]{3,8}$/.test(c.hex || "") ? c.hex : "transparent";
+          return h("li", { class: "swatch" }, h("i", { style: "background:" + hex, "aria-hidden": "true" }), h("p", null, c.name), h("span", null, [c.hex, c.use].filter(Boolean).join(", ")));
+        })) : null,
+        L(ds.fonts).length ? N.facts(L(ds.fonts).map(function (f) { return [f.role, f.family]; })) : null));
+    }
+    main.appendChild(N.section({ id: "about", title: "About you", note: "What Atlas believes about you, and where each belief came from. Only confirmed ones are treated as fact.",
+      body: [who ? h("p", { class: "who" }, who + ".") : null,
+        featured.length ? h("ul", { class: "stmts" }, featured.map(statement)) : N.empty("Atlas hasn't learned anything about you yet."),
+        fold("Everything else Atlas knows about you", restCount > 0 ? restCount + " more" : null, foldBody)] }));
+
+    /* 6. Guide: What's new, things to say, fixing a problem; folded. */
+    var g = d.guide || {}, news = L(g.whats_new), secs = L(g.sections);
+    function paras(list) { return L(list).map(function (p) { return h("p", null, N.rich(p)); }); }
+    function entry(it) {
+      return h("article", { class: "entry" }, h("h3", null, it.title), paras(it.body),
+        L(it.bullets).length ? h("ul", null, L(it.bullets).map(function (x) { return h("li", null, N.rich(x)); })) : null,
+        L(it.steps).length ? h("ol", null, L(it.steps).map(function (x) { return h("li", null, N.rich(x)); })) : null,
+        L(it.examples).length ? h("ul", { class: "say", "aria-label": "Try saying" }, L(it.examples).map(function (x) { return h("li", null, "“" + x + "”"); })) : null);
+    }
+    var guideBody = [g.intro ? h("p", { class: "guide-intro" }, N.rich(g.intro)) : null];
+    if (news.length) {
+      guideBody.push(fold("What's new in Atlas " + news[0].version, null, [h("div", { class: "entries" }, news.map(function (r) {
+        return h("article", { class: "entry" }, h("h3", null, "Atlas " + r.version, r.date ? h("span", null, N.dateY(r.date)) : null),
+          h("ul", null, L(r.items).map(function (x) { return h("li", null, N.rich(x)); })));
+      })), N.more("guide.whats_new")]));
+    }
+    secs.forEach(function (s) {
+      guideBody.push(fold(s.title, null, [s.intro ? h("p", { class: "small" }, N.rich(s.intro)) : null,
+        L(s.items).length ? h("div", { class: "entries" }, L(s.items).map(entry)) : N.empty("Nothing here yet."), N.more("guide.sections." + s.id)]));
+    });
+    if (!news.length && !secs.length) guideBody.push(N.empty("Ask Atlas in chat what it can do."));
+    main.appendChild(N.section({ id: "guide", title: "Guide", note: "What Atlas can do, how to ask, and what changed lately.", body: guideBody }));
+
+    return { subtitle: "How Atlas is running, and what it knows about you.", lede: st.headline,
       stats: (acts.length ? [[acts.length, acts.length === 1 ? "action for you" : "actions for you"]] : []).concat([
-        [routines.filter(function (r) { return r.enabled !== false; }).length, "automations on"],
-        [N.total("approvals", asks.length), "waiting for your OK"], [N.total("questions", qs.length), ["question", "questions"]], [issues.length, ["known issue", "known issues"]]]) };
+        [N.total("approvals", asks.length), "waiting for your OK"], [N.total("questions", qs.length), ["question for you", "questions for you"]],
+        [issues.length, ["known issue", "known issues"]]], sys.installed_version ? [[sys.installed_version, "Atlas version"]] : []) };
   });
 })();
 </script>
