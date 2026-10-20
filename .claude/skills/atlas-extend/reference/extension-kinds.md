@@ -19,7 +19,7 @@ All paths are relative to `user/extensions/` (the registry `path`). Outlines: `s
 
 ## routine
 - **Path:** none (routines live in `user/settings/routines.yaml`); registry `path: null`, `description` says which jobs it runs.
-- **Wiring:** add `{ name, schedule, model, routine_id: null, jobs }` to `routines.yaml`; create the platform routine with the thin-pointer prompt in the "Atlas routine" environment (`ATLAS_CONTEXT=routine`; `.claude/skills/atlas-setup/reference/automations.md` §3–§5, including the test run that must report `atlas_context: routine`); store `routine_id`.
+- **Wiring:** add `{ name, schedule, model, routine_id: null, jobs }` to `routines.yaml` (schedule in local time); convert it for the platform as in `atlas-setup` `reference/automations.md` §4; create the platform routine with the thin-pointer prompt in the "Atlas routine" environment (`ATLAS_CONTEXT=routine`; `.claude/skills/atlas-setup/reference/automations.md` §3–§5, including the test run that must report `atlas_context: routine`); store `routine_id`.
 - **Rules:** schedule minutes off the hour; at least hourly spacing; mention plan usage impact.
 
 ## trigger

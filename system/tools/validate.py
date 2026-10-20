@@ -83,6 +83,12 @@ DATETIME_RE = re.compile(r"^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|
 SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+$")
 SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 CRON_FIELD_RE = re.compile(r"^[\d*,/\-A-Za-z]+$")
+UTC_OFFSET_RE = re.compile(r"^[+-]\d{4}$")
+
+
+def is_cron(v):
+    fields = v.split() if isinstance(v, str) else []
+    return len(fields) == 5 and all(CRON_FIELD_RE.match(f) for f in fields)
 
 
 class Report:
@@ -989,6 +995,9 @@ def check_routines(c, path, data, template):
         rep.warn(path, "no routines are set up yet (atlas-setup step 10 chooses a profile)")
     elif prof is None and not template or prof is not None and prof not in PROFILES:
         rep.error(path, "profile must be one of %s" % ", ".join(PROFILES))
+    off = data.get("utc_offset")
+    if off is not None and not (isinstance(off, str) and UTC_OFFSET_RE.match(off)):
+        rep.error(path, "utc_offset must be like -0700 or +0530 (as `date +%%z` prints it), or null (got %r)" % (off,))
     routines = data.get("routines")
     if not isinstance(routines, list):
         rep.error(path, "routines must be a list")
@@ -1010,9 +1019,24 @@ def check_routines(c, path, data, template):
         names.add(name)
         where = "routine %s" % name
         sched = r.get("schedule")
-        fields = sched.split() if isinstance(sched, str) else []
-        if len(fields) != 5 or not all(CRON_FIELD_RE.match(f) for f in fields):
+        if not is_cron(sched):
             rep.error(path, "%s: schedule must be a 5-field cron expression (got %r)" % (where, sched))
+        elif sched.split()[2:4] != ["*", "*"]:
+            rep.error(path, "%s: schedule uses day of week only (day of month and month must be *), "
+                      "so it can be converted to UTC (got %r)" % (where, sched))
+        utc = r.get("utc_schedule")
+        if utc is not None:
+            if not isinstance(utc, list) or not utc or not all(is_cron(u) for u in utc):
+                rep.error(path, "%s: utc_schedule must be a list of 5-field cron expressions (got %r)" % (where, utc))
+            elif isinstance(r.get("routine_id"), str) and len(utc) > 1:
+                rep.error(path, "%s: %d utc_schedule entries need a list of %d routine_ids (got one)"
+                          % (where, len(utc), len(utc)))
+            elif isinstance(r.get("routine_id"), list) and len(r["routine_id"]) != len(utc):
+                rep.error(path, "%s: routine_id lists one platform routine per utc_schedule entry (%d ids, %d schedules)"
+                          % (where, len(r["routine_id"]), len(utc)))
+        rid = r.get("routine_id")
+        if not (rid is None or isinstance(rid, str) or isinstance(rid, list) and rid and all(isinstance(x, str) for x in rid)):
+            rep.error(path, "%s: routine_id must be null, an ID, or a list of IDs (got %r)" % (where, rid))
         if r.get("model") not in roles:
             rep.error(path, "%s: model must be a role from system/manifest.yaml models (%s)"
                       % (where, ", ".join(sorted(roles))))

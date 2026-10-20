@@ -23,7 +23,7 @@ Formats: `system/schemas/settings.md`. Classes and locked levels: `system/rules/
 | "Stop suggesting ideas", "fewer people insights", "no more pattern insights" | `rhythms.yaml · insights.suppressed_kinds` (add the insight kind, e.g. `[idea]`; remove to bring it back) | `behavior_settings` | none; "fewer" (not none) → lower `brief_max` or keep adaptive, and say which |
 | "Pause/resume the weekly review", "I'm away" | `rhythms.yaml · away / paused` | `behavior_settings` | hand to `atlas-away` |
 | "Switch me to Standard" | `routines.yaml · profile` + rebuild `routines` | `behavior_settings` | reconcile platform routines; carry over user jobs |
-| "Run the nightly at 9 pm", "weekly review on Thursday afternoon" | `routines.yaml · routines[].schedule` | `behavior_settings` | update platform routine schedule |
+| "Run the nightly at 9 pm", "weekly review on Thursday afternoon" | `routines.yaml · routines[].schedule` | `behavior_settings` | update platform routine schedule, converted to UTC (`atlas-setup` `reference/automations.md` §6) |
 | "Add the pipeline summary to the nightly run", "skip email drafts on Mondays" | `routines.yaml · routines[].jobs` (job name or `{ job, when, target, mode }`) | `behavior_settings` | none (job list is read each run); `profile: custom` |
 | "Use the strongest model for upkeep" | `routines.yaml · routines[].model` | `behavior_settings` | update platform routine model |
 | "Stop ingesting Teams", "read only my inbox, not other folders", "also read my CRM" | `sources.yaml · ingest[]` (`scope`, add/remove) | `behavior_settings` | connector needed? → `atlas-connectors` |
@@ -31,8 +31,9 @@ Formats: `system/schemas/settings.md`. Classes and locked levels: `system/rules/
 | "Re-publish my dashboards", "I lost the Work page link" | `dashboards.yaml` | `behavior_settings` / `dashboards_refresh` | `atlas-dashboards` |
 | "Connect/disconnect a tool", "fix my connector map" | `connectors.yaml` | `governance_settings` 🔒 | `atlas-connectors` |
 | "Update my automation prompts", "update my routine instructions" | no repo file: the platform routines' instructions | `behavior_settings` | walk through them one automation at a time, count up front (`.claude/skills/atlas-setup/reference/automations.md` §7); close the release's `action` question at the end |
+| "Re-time my automations", "my automations run an hour late" | `routines.yaml · utc_offset`, `routines[].utc_schedule`, `routine_id` | `behavior_settings` | move each platform routine back to its local time, one at a time (`.claude/skills/atlas-setup/reference/automations.md` §8); close `routine-schedules-shifted` and the release's `action` question |
 | "Change where finished files go" | `atlas.yaml · deliverables_folder` | `behavior_settings` | find/create folder (`files.create_folder`) |
-| "My time zone is now Europe/Berlin" | `atlas.yaml · timezone` | `behavior_settings` | all schedules are local; update every platform routine's time zone |
+| "My time zone is now Europe/Berlin" | `atlas.yaml · timezone` | `behavior_settings` | schedules stay as they are (local); re-time every platform routine (`atlas-setup` `reference/automations.md` §8) |
 | "Updates: ask me before minor updates too" | `governance.yaml · autonomy.updates_minor: propose` | `governance_settings` 🔒 | none |
 
 ## Plain-language level names

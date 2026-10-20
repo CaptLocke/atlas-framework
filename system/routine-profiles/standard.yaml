@@ -6,6 +6,8 @@
 # ingest if the last ingest is over 3 hours old.
 # Schedules are cron in the user's time zone (user/settings/atlas.yaml: timezone),
 # minutes off the hour to avoid delayed starts. One schedule per routine.
+# The platform reads cron as UTC, so atlas-setup converts each schedule for it
+# (system/tools/cron_utc.py) and keeps this local one as the truth.
 # The daytime-ingest hours sit inside default work hours (08:00-18:00, Mon-Fri);
 # atlas-setup adjusts them if rhythms.yaml work_hours differ.
 # atlas-setup copies this file to user/settings/routines.yaml when the user picks it.

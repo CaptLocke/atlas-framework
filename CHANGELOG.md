@@ -7,6 +7,15 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
+## 2.0.1 (2026-10-20)
+
+### What's new
+- Your automations run at the times you chose. Claude keeps schedules in UTC, so some could run hours off, or on the wrong day, and every one moved by an hour when the clocks changed. Atlas now sets them in UTC for you, and when your clocks change it notices and offers to move them back.
+- During setup, Atlas asks you to turn on approval for sending, sharing and deleting as soon as you connect each app, before it reads anything through it, including your imported notes.
+
+### Action needed
+- Re-time your automations so they run at the times you chose: say "re-time my automations" in a chat.
+
 ## 2.0.0 (2026-10-19)
 
 ### What's new
