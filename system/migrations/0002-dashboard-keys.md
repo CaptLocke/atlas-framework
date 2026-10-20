@@ -37,6 +37,7 @@ The retired pages and where their content went:
    - **Overriding `daily-brief`, `commitments` or `control-center`:** "Your <name> page replaces Atlas's <Today, Work or Guide> page, which now also shows <what that page took over>. Keep yours, or switch back to Atlas's?" Its contract was written for the old page's data, so `atlas-health` checks it against the new contract.
    When no such extension exists, ask nothing.
 7. Set `atlas.yaml: data_version: 2`. Commit (`Atlas-Actor: update`, `Atlas-Reason: migration 0002`, `Atlas-Records:` listing the changed paths).
+8. **Republish Today and Work** with `atlas-dashboards`, if each has a `url`: the update has replaced their templates, and an update run by 1.1.x republishes only Guide, so until their next refresh they'd keep the old layout. In a routine, a failed republish is recorded as `atlas-dashboards` step 8 says, not treated as a failed migration. On a re-run, republishing again is harmless.
 
 ## Validation
 - `dashboards.yaml` parses, holds none of the eight retired keys, and still holds `daily-brief`, `commitments` and `control-center` with the `url` and `last_published` they had before (compare with the update lock's `base_commit`).
