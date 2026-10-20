@@ -1,6 +1,6 @@
 ---
 name: atlas-settings
-description: "Change how Atlas behaves, in plain language: autonomy levels and overrides, data rules and exclusions, moments and rhythms, work hours, triggers, insight volume, the automation profile, routines and schedules, and what sources Atlas reads; protected settings change only after explicit confirmation in chat. Use for \"update my automation prompts\", \"ask me before filing anything about Acme\", \"don't read #random\", \"turn off evening thoughts\", \"move the weekly review to Thursday\", \"switch me to the Standard profile\", \"fewer insights\", \"my hours are 9 to 5\", \"what are my settings?\"."
+description: "Change how Atlas behaves: autonomy, data rules, rhythms, work hours, triggers, profile, schedules, sources. Use for \"don't read #random\", \"move the weekly review to Thursday\", \"fewer insights\", \"my hours are 9 to 5\", \"update my automation prompts\", \"what are my settings?\"."
 ---
 # Settings
 
@@ -39,11 +39,11 @@ Let the user control Atlas by talking. Translate a plain-language request into t
    - **Work hours:** adjust schedules that depend on them (Full profile; Standard daytime refreshes) and update those platform routines.
 7. **Validate** with `python3 system/tools/validate.py --all`. If it fails, fix your edit (never the validator) or restore the previous content and tell the user.
 8. **Commit and log** (`system/rules/sync.md`, `Atlas-Actor: chat`, reason quoting the request briefly). Activity line, e.g. `chat · governance_settings (approved) · records_write: propose for organizations/acme · commit <sha>` or `chat · behavior_settings · weekly routine moved to Thu 14:07 · commit <sha>`.
-9. **Close the loop.** One or two lines: what changed, when it takes effect (now / next run at …), how to undo ("just say *put it back*"). If the change came from an approval or question entry, mark it `executed`/`answered`. Republish the Control Center (`atlas-dashboards`) when automations, schedules, or autonomy changed.
+9. **Close the loop.** One or two lines: what changed, when it takes effect (now / next run at …), how to undo ("just say *put it back*"). If the change came from an approval or question entry, mark it `executed`/`answered`. Republish Guide (`atlas-dashboards`) when automations, schedules, or autonomy changed.
 
 ## Outputs
 - Updated `user/settings/<file>.yaml`; platform routines updated (or copy-paste instructions shown).
-- Activity-log line and commit; inbox entries updated if the change came from them; Control Center republished.
+- Activity-log line and commit; inbox entries updated if the change came from them; Guide republished.
 
 ## Guardrails
 - Governance: `system/rules/governance.md`. Classes touched: `governance_settings` 🔒 (governance, data rules, connector map: chat only, explicit confirmation, approval record, N6), `behavior_settings` (rhythms, routines, sources, dashboards, profile choice), `destructive` 🔒 (deleting a platform routine), `dashboards_refresh`.

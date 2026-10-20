@@ -5,7 +5,22 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 - **Minor** (1.x.0): additive features, new optional fields, additive migrations. Applied automatically by default.
 - **Major** (x.0.0): a migration that needs user input, a non-additive data change, or a breaking change for extensions. Applied after the user says yes.
 
-Each release's "What's new" section is shown to users in the Atlas Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
+Each release's "What's new" section is shown to users in the Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
+
+## 2.0.0 (2026-10-19)
+
+### What's new
+- Your dashboards are now three pages, each answering one question:
+  - **Today**: what needs you today, and what's coming this week. It has a week-at-a-glance strip and your upcoming milestones.
+  - **Work**: where everything you're responsible for stands, with your commitments, projects, goals, decisions and risks, and the people you have something open with, on one page.
+  - **Guide**: how Atlas is running, what it filed for you in the last two weeks, what it knows about you, and what's new.
+- What you owe now comes before what you're waiting on, everywhere.
+- To look anything up, just ask: "what do I know about Sam?", "what did we decide about pricing?". The Records page is gone, because asking finds everything, however old.
+- Setup now asks you to turn on approval for sending, sharing and deleting just before Atlas reads your recent email for your first Daily Brief, and reminds you once you've seen the brief.
+- Atlas carries less of its own instructions into every chat, which leaves more room for your work.
+
+### Action needed
+- Delete your old Atlas dashboard pages. They no longer update, so they'll show out-of-date information: Projects, Goals, Decisions & Risks, Week Ahead, People, About You, Atlas Guide and Records. Your Today, Work and Guide pages keep their usual links. Ask Atlas "which old pages can I delete?" for the links.
 
 ## 1.1.4 (2026-10-19)
 

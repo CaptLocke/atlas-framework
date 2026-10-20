@@ -25,7 +25,7 @@ draft, active, retired
 Typically links to: projects, people (owners), topics.
 
 ## Runs
-A **run** is one use of the playbook: a project record (`scale: task_group`, `links.playbooks: ["[[playbooks/<slug>]]"]`, `target` = the anchor date) with one `i_owe` commitment per step (`origin: "[[playbooks/<slug>]]"`, due = anchor + `when`). Triage, the brief, the Commitments page, and email drafts then handle the checklist like any other work. How runs start, pre-draft, and flag missed steps: `.claude/skills/atlas-triage/reference/playbooks.md`.
+A **run** is one use of the playbook: a project record (`scale: task_group`, `links.playbooks: ["[[playbooks/<slug>]]"]`, `target` = the anchor date) with one `i_owe` commitment per step (`origin: "[[playbooks/<slug>]]"`, due = anchor + `when`). Triage, the brief, the Work page, and email drafts then handle the checklist like any other work. How runs start, pre-draft, and flag missed steps: `.claude/skills/atlas-triage/reference/playbooks.md`.
 
 Example:
 ```yaml

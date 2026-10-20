@@ -27,7 +27,7 @@ The user ranks their **active** goals so priorities across Atlas follow what mat
 - **Shape:** ranks are 1, 2, 3, … with no gaps or ties. When one goal moves, renumber the others to keep that order. When a goal leaves `active` (achieved, missed, dropped), clear its `rank` and close the gap.
 - **Partial ranking is fine.** The user may rank only their top one or two; the rest stay unranked.
 - **A new active goal** starts unranked. If other goals are ranked, add one question to `user/inbox/questions.md` (kind `other`): "Where does <goal> rank among your goals?"
-- **Effect:** triage scales the goal-link boost by rank (`.claude/skills/atlas-triage/reference/signals.md` §Priority rubric), and the Goals dashboard lists active goals in rank order. A rank change in chat is followed by a full priority pass (`atlas-triage`) so the brief and Commitments reflect it.
+- **Effect:** triage scales the goal-link boost by rank (`.claude/skills/atlas-triage/reference/signals.md` §Priority rubric), and Work lists active goals in rank order. A rank change in chat is followed by a full priority pass (`atlas-triage`) so the brief and Work reflect it.
 
 ## Status vocabulary
 draft, active, achieved, missed, dropped

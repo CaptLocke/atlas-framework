@@ -1,6 +1,6 @@
 ---
 name: atlas-prep
-description: "Prepare the user for a meeting, a person, a topic, or a deal\u2014who's involved, history, open items in both directions, related decisions, risks and questions, a suggested agenda, and the questions to ask\u2014and save it as a prep note linked from the event. Use when the meeting-prep job runs, when the key-meeting trigger fires, and for \"prep me for\u2026\", \"brief me on Dana before my call\", \"get me ready for the board meeting\", \"what should I raise in my 1:1 with Jordan\", \"what do I need to know about the Acme deal\"."
+description: "Prepare for a meeting, person, topic or deal: history, open items both ways, risks, agenda, questions to ask. Use for the meeting-prep job and \"prep me for…\", \"brief me on Dana before my call\", \"what should I raise in my 1:1?\"."
 ---
 # Prep
 

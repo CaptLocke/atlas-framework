@@ -15,9 +15,9 @@ Period: the ISO week (`YYYY-Www`) being reviewed; a Friday run covers Monday to 
 | **Commitments slipped** | `slipped` (or open and past due) at the time of review; `i_owe` first | All `i_owe`; `waiting_on` past due > 3 days |
 | **Stalled projects** | `active` projects with no update in 14+ days, or `health: at_risk|off_track` without a recent update | Each with its `next_step` or a suggested one |
 | **Aging waiting-on** | Open `waiting_on` older than 7 days or past due | With counterparty, age, and a suggested nudge (offer a draft via `atlas-write`) |
-| **People to reconnect with** | Key people (manager, reports, customers, stakeholders) whose contact has lapsed: days since `last_contact` > 1.5 × their `cadence` interval, or > 30 days with no `cadence` while there are open items either way (the same test as insights and the People page) | Max 5 |
+| **People to reconnect with** | Key people (manager, reports, customers, stakeholders) whose contact has lapsed: days since `last_contact` > 1.5 × their `cadence` interval, or > 30 days with no `cadence` while there are open items either way (the same test as insights and Work's People section) | Max 5 |
 | **Next week** | Meetings that matter (1:1s, external, linked to open items), deadlines, commitments due, events needing prep | From calendar (`calendar.list_range`) and records |
-| **Suggested priorities** | Max 5, ranked by active goals, then due dates and risk; each written as an outcome for the week ("Get Dana's MSA review unblocked"), since they become the Week Ahead's "This week's outcomes" | One-line reason each, citing the goal |
+| **Suggested priorities** | Max 5, ranked by active goals, then due dates and risk; each written as an outcome for the week ("Get Dana's MSA review unblocked"); they stay in this review document | One-line reason each, citing the goal |
 | **Accomplishments recorded** | The entries appended this week | Links to goals |
 
 ## File format

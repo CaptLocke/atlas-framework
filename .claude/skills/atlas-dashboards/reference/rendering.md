@@ -6,27 +6,23 @@ skill: atlas-dashboards
 > **Contracts govern.** `system/dashboards/README.md` and each `<name>.contract.md` define placeholders, theme tokens, truncation, and titles; where this file differs, they win.
 # Rendering and publishing detail
 
-## The eleven dashboards (and who refreshes them)
+## The three dashboards (and who refreshes them)
 Each contract's `republished_by` lists the jobs that republish it; any chat may also republish a dashboard after changing what it shows. This table copies those lists; when they differ, the contract wins.
 | Dashboard | Shows | `republished_by` |
 |---|---|---|
-| `daily-brief` | Today's brief (from `user/work/briefs/`) | daily-brief (and the chat catch-up) |
-| `commitments` | Open commitments in two sections, Waiting on and I owe | daily-brief, triage |
-| `projects` | Active, proposed, and paused projects with health and next step; a project with its own page opens it | daily-brief, triage, weekly-review |
-| `week-ahead` | The next 7 days as a plan: outcomes, day load and free time, prep, watch-outs, each day | daily-brief, weekly-review |
-| `goals` | Ranked goals with progress, evidence, linked projects, accomplishments | weekly-review, monthly, quarterly |
-| `people` | Key relationships, last contact, open items each way, gone quiet | weekly-review |
-| `decisions-risks` | Decision log with reasoning; risk and issue register | weekly-review |
-| `records` | Every record, searchable, each opening in the record panel | maintenance, weekly-review |
-| `about-you` | Profile, preferences, voice and design with provenance and confirmation status | monthly, quarterly |
-| `control-center` | Actions, automations, approvals, questions, connections, known issues, updates | daily-brief, monthly |
-| `atlas-guide` | What Atlas can do, how to ask, What's new (`system/guide/`) | update-check |
+| `daily-brief` (Today) | Today's brief (from `user/work/briefs/`), then this week: the day strip with meeting load and free hours, and upcoming milestones | daily-brief (and the chat catch-up) |
+| `commitments` (Work) | Commitments (I owe, then Waiting on), projects with health and next step, ranked goals, decisions and risks, and the people with something open | daily-brief, triage, weekly-review, monthly, quarterly |
+| `control-center` (Guide) | Health, what's waiting on the user, automations, what Atlas filed in the last 14 days, About you, and the guide content (`system/guide/`) | daily-brief, monthly, quarterly, update-check |
 | `project-page` | One project in depth, made on request | triage, weekly-review (while listed) |
 
 ## Building data
+- **Today's week data** comes from `atlas-brief` §D; this skill only embeds it.
+- **Work** carries no per-person lists: the page works out what each person owes and is owed from `commitments`. People are limited to current activity (something open, a meeting in the next 7 days, or gone quiet); decisions to the last 30 days plus any still proposed; risks to open ones. `commitments.contract.md` has the rest.
+- **Guide's Recently filed** comes from the activity log (`user/logs/activity/`) for the last 14 days, imports left out. For each line's commit, `git show --name-status --format= <sha> -- user/knowledge/` (leaving out `_index/` and `sources/`) gives the records: added files are `new`, modified ones `updated`. `from` is the title of the record's first source; `what` is the main field that changed. Beliefs for About you are marked `featured` (preferences first, then communication style, then proposed; at most 5), and the guide content goes in the same page's data (`control-center.contract.md`).
+
 - Read only the contract's listed sources, index-first (`_index/*.md`, `hot.md`), opening records only for fields the contract needs.
 - IDs: include `id` for each record item. Pages never show it (titles only); it is used for search, the record panel's linked records, and troubleshooting.
-- "Next run" times for the Control Center: compute from `routines.yaml` schedules in the user's time zone.
+- "Next run" times on Guide: compute from `routines.yaml` schedules in the user's time zone.
 - Away: when `rhythms.yaml: away` is active, add an `info` line to `meta.notices` ("You're away until Oct 20; Atlas is filing quietly.").
 - Exclude archived and superseded records unless the contract asks for history.
 

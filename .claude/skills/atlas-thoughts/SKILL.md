@@ -1,6 +1,6 @@
 ---
 name: atlas-thoughts
-description: "Take the user's Morning or Evening Thoughts\u2014a fast, messy brain dump typed or dictated\u2014save it verbatim in today's journal, confirm in a line or two, and sort out the commitments, ideas, questions, decisions, and risks inside it. Use for \"morning thoughts\", \"evening thoughts\", \"brain dump\", \"here's what's on my mind\", \"end of day dump\", or a long unstructured message at the start or end of the day."
+description: "Take a Morning or Evening Thoughts brain dump: save it to the journal and sort out what's inside. Use for \"morning thoughts\", \"evening thoughts\", \"brain dump\", \"here's what's on my mind\", or a long messy message at the start or end of the day."
 ---
 # Morning and Evening Thoughts
 

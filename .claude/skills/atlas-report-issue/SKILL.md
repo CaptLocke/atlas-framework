@@ -1,6 +1,6 @@
 ---
 name: atlas-report-issue
-description: "Draft a short, privacy-safe problem report to Atlas's maker: gather the version, what happened in the user's words, recent errors and health results, and the setup details that matter; strip out everything personal or work-related; show the user the full report; and leave it as an email draft (or copyable text) for them to review and send. Use for \"report an issue\", \"tell Atlas's maker my brief is missing meetings\", \"this is broken, report it\", or when a health check suggests a report for a problem Atlas can't fix."
+description: "Draft a privacy-safe problem report to Atlas's maker, for the user to review and send. Use for \"report an issue\", \"this is broken, report it\", \"tell Atlas's maker…\", or when a health check suggests a report."
 ---
 # Report an issue
 

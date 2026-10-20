@@ -12,7 +12,7 @@ You decide how much Atlas does on its own, what it keeps, and when it works. Cha
 ## How much Atlas does on its own
 For each kind of action, Atlas works at one of four levels:
 - **On its own:** Atlas does it and records what it did.
-- **Asks first:** Atlas prepares it and waits for your yes. In chat it simply asks; when it's running in the background, the item waits in your approval list (shown in your Daily Brief and the Control Center).
+- **Asks first:** Atlas prepares it and waits for your yes. In chat it simply asks; when it's running in the background, the item waits in your approval list (shown in your Daily Brief and on the Guide).
 - **Always asks (locked):** always needs your explicit yes, every single time. This can't be turned off.
 - **Never (locked):** Atlas won't do it, even if you ask.
 
@@ -103,7 +103,7 @@ Pause any automation or moment, for a while or until you say so.
 - "Resume everything."
 
 ## Which meetings Atlas shows
-Choose whether your brief, Week Ahead, and meeting prep include all-day events, meetings you've tentatively accepted, and invitations you haven't answered yet. All are included unless you say otherwise. Atlas still keeps track of skipped meetings, so one shows up as soon as you accept it, and deadlines and milestones on your calendar always show.
+Choose whether your brief, the week on your Today page, and meeting prep include all-day events, meetings you've tentatively accepted, and invitations you haven't answered yet. All are included unless you say otherwise. Atlas still keeps track of skipped meetings, so one shows up as soon as you accept it, and deadlines and milestones on your calendar always show.
 
 **Try:**
 - "Hide all-day events from my brief."
@@ -119,7 +119,7 @@ Lean, Standard, or Full (see **Automations**). Atlas suggests one for your Claud
 - "Stop drafting email replies."
 
 ## What Atlas knows about you
-Everything Atlas believes about you is on the **About You** dashboard, with where each belief came from and whether you've confirmed it. New observations are suggested to you before Atlas relies on them.
+Everything Atlas believes about you is in **About you** on the **Guide** dashboard, with where each belief came from and whether you've confirmed it. New observations are suggested to you before Atlas relies on them.
 
 **Try:**
 - "What do you know about me?"

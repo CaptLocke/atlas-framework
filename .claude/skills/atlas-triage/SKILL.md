@@ -1,6 +1,6 @@
 ---
 name: atlas-triage
-description: "Review every open commitment against recent evidence and the user's goals\u2014catch missed ones, close finished ones, mark slipped ones, rank priorities, flag aging waiting-on items, and write a one-line insight and next step for each commitment and active project. Use when the triage job runs and in chat for \"what do I owe\", \"what am I waiting on\", \"what's slipping\", \"prioritize my week\", \"mark the Acme deck done\"."
+description: "Review open commitments: catch missed ones, close finished ones, mark slipped ones, rank priorities, set next steps. Use for the triage job and \"what do I owe\", \"what am I waiting on\", \"what's slipping\", \"prioritize my week\", \"mark the Acme deck done\"."
 ---
 # Triage
 
@@ -37,7 +37,7 @@ Keep the user's commitments honest and their priorities clear: nothing promised 
    - Every `active` project: `insight` and `next_step` from its commitments, risks, decisions, questions, and target date; update `health` (`on_track | at_risk | off_track | unknown`) when evidence supports it, with an Updates line.
    - In `mode: light`: only for commitments created or changed in this run.
 9. **Triggers** (`system/triggers.md`; check and record in `user/.state/triggers.yaml`, key = due date):
-   - `deadline_approaching`: open `i_owe` commitments and deadline events due within `days` (default 3) → mark for the brief's "Due soon"; the day before, it leads Due soon in bold (`atlas-brief` §A step 4.2) and the Commitments page already lists it near the top by due date. Its `priority` is not changed: priority follows the rubric (`reference/signals.md`), never the due date alone.
+   - `deadline_approaching`: open `i_owe` commitments and deadline events due within `days` (default 3) → mark for the brief's "Due soon"; the day before, it leads Due soon in bold (`atlas-brief` §A step 4.2) and Work already lists it near the top by due date. Its `priority` is not changed: priority follows the rubric (`reference/signals.md`), never the due date alone.
    - `focus_time_needed`: `i_owe` work due soon with too little free time before it → propose a focus block, or say no slot fits (`reference/focus-time.md`).
    - `commitment_overdue`: slipped items → flag for the brief. If `waiting_on`, triage does **not** draft in routines:
      1. Mark the commitment for follow-up (`next_step` says a follow-up is due).
@@ -47,16 +47,16 @@ Keep the user's commitments honest and their priorities clear: nothing promised 
      Without a mail connector, `atlas-write` puts the follow-up text in the approvals entry for the user to send.
    - During away: evaluate, set statuses, but do not create drafts or approvals; record the trigger as held (`held: true`, not fired; `system/schemas/formats.md` §triggers.yaml). The catch-up brief lists the ones that still apply, and they fire normally after the return.
 10. **Write** all record changes with Updates lines; run `python3 -I system/tools/index.py` to refresh the indexes. Commit (`atlas(routine:<name>): triage …` with `Atlas-Records`) and log one activity line.
-11. **Republish** with `atlas-dashboards` every dashboard whose contract lists `triage` in `republished_by`, when this run changed its data and the routine does not run `daily-brief` later (the brief republishes it then; `system/jobs/triage.md` step 7): the Commitments page, the Projects dashboard (when a project's health, status, `insight`, or `next_step` changed), and, whether or not a brief follows, project pages listed in `dashboards.yaml: project_pages` whose project's records changed in this run (`system/dashboards/project-page.contract.md`).
+11. **Republish** with `atlas-dashboards` every dashboard whose contract lists `triage` in `republished_by`, when this run changed its data and the routine does not run `daily-brief` later (the brief republishes it then; `system/jobs/triage.md` step 7): Work (its commitments, and its projects when a project's health, status, `insight`, or `next_step` changed), and, whether or not a brief follows, project pages listed in `dashboards.yaml: project_pages` whose project's records changed in this run (`system/dashboards/project-page.contract.md`).
 11a. **Feedback.** In chat, when the user drops something Atlas created as never a promise, reopens something Atlas closed, or overrides a priority, log a `feedback` line (`reference/learning.md` §1) with the fix.
 12. **Report.** Run-report row: reviewed, created, closed, dropped, slipped, follow-up drafts, questions raised. In chat: answer the user's question (grouped lists, cited), then the one or two things that need them.
 
 ## Outputs
 - Commitment and project records (`status`, `priority`, `insight`, `next_step`, `health`, `completed_on`, Updates).
 - New commitments (via `atlas-capture`), questions in `user/inbox/questions.md`, follow-up approvals in `user/inbox/approvals.md` (drafts themselves come from `atlas-write`).
-- Republished the Commitments page, the Projects dashboard, and project pages (`atlas-dashboards`).
+- Republished Work and project pages (`atlas-dashboards`).
 - `user/.state/triggers.yaml` entries; index lines; activity-log line; run-report row.
-- Data the Commitments page and brief read directly from records (no separate file).
+- Data Work and the brief read directly from records (no separate file).
 
 ## Guardrails
 - Autonomy classes: `records_write`, `merge_supersede` (ambiguous → propose), `dashboards_refresh`, `external_read`; `drafts_create` only in chat via `atlas-write`; sending a follow-up is `send_communication` (locked, approve) and never happens here; `tasks_manage` (propose) if the user asks to mirror commitments into a task tool. See `system/rules/governance.md`.

@@ -7,7 +7,7 @@ version: 1.0.0
 ---
 # If something isn't working
 
-Most problems have a one-step fix. Atlas usually spots them first and tells you in chat, in your brief, or on the Control Center with what happened and how to fix it. If you're not sure, ask: "Is everything working?"
+Most problems have a one-step fix. Atlas usually spots them first and tells you in chat, in your brief, or on the Guide with what happened and how to fix it. If you're not sure, ask: "Is everything working?"
 
 ## Atlas doesn't seem to know my setup
 Claude answers like an ordinary chat, or says it can't open your Atlas.

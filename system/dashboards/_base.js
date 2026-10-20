@@ -315,7 +315,7 @@
 
   /* Links on a page only ever open another dashboard: the nav row, and names of other pages in text.
      NAV_ORDER fixes the order so every page lists them the same way. */
-  var NAV_ORDER = ["daily-brief", "commitments", "projects", "week-ahead", "goals", "people", "decisions-risks", "records", "about-you", "control-center", "atlas-guide"];
+  var NAV_ORDER = ["daily-brief", "commitments", "control-center"];   /* Today, Work, Guide */
   N.navLinks = function () {
     return N.list(N.meta.nav).filter(function (n) { return n && n.url && /^https:\/\//.test(n.url); })
       .sort(function (a, b) {

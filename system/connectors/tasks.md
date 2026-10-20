@@ -8,7 +8,7 @@ operations: [list_recent, read_item, create_item, update_item, delete]
 Covers task and work-tracking tools (Asana, Jira, Linear, Trello, Microsoft Planner/To Do, Notion databases used as trackers, and similar). Operation names and risk tags: `system/connectors/README.md`. Write path: `system/rules/knowledge.md`.
 
 ## What Atlas ingests and why
-- **Tasks assigned to the user or created by the user**, changed since the cursor: what the user owes, what they are waiting on, and what is done. Feeds triage (commitments, closure evidence), the Commitments page, priorities, and the Weekly Review.
+- **Tasks assigned to the user or created by the user**, changed since the cursor: what the user owes, what they are waiting on, and what is done. Feeds triage (commitments, closure evidence), the Work page, priorities, and the Weekly Review.
 - **Projects/epics the user owns or follows**, at summary level: status, due dates, blockers, owner. Feeds project records, health, and insights.
 - **Comments that mention the user**: requests and answers that create or close commitments.
 - Scope from `sources.yaml` (e.g. "tasks assigned to me or created by me; projects: Orion, Support Revamp").

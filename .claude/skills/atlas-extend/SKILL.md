@@ -1,6 +1,6 @@
 ---
 name: atlas-extend
-description: "Build the user's own additions to Atlas from a plain-language description: skills, automations (jobs), routines, event triggers, record types, dashboards, and playbooks; write them in Atlas's standard formats under user/extensions, register them, wire them in, and keep them working across updates. Use for \"create an automation that\u2026\", \"every Monday, pull\u2026\", \"when a deal moves to negotiation, \u2026\", \"add a Deals record type\", \"make me a dashboard of\u2026\", \"turn this into a playbook\", \"change/remove my extension\", \"what have I added to Atlas?\"."
+description: "Build the user's own additions: skills, automations, triggers, record types, dashboards, playbooks. Use for \"create an automation that…\", \"every Monday, pull…\", \"add a Deals record type\", \"make me a dashboard of…\", \"turn this into a playbook\", \"what have I added?\"."
 ---
 # Extensions
 
@@ -28,7 +28,7 @@ Let the user grow Atlas in plain language. Each extension follows the same outli
 7. **Register** in `user/extensions/registry.yaml`: `name`, `kind`, `path` (relative to `user/extensions/`), `overrides` (null unless explicit), `requires_atlas` (`">=<major.minor of installed>"`), `created`, `description`.
 8. **Wire it in** (per kind, see reference): add a job to a routine's job list or create a new routine (schedule and platform routine via `atlas-settings`/setup automations procedure, always in the "Atlas routine" environment; `behavior_settings`); add a trigger's on/off switch to `rhythms.yaml: triggers`; create a type's knowledge folder and index; render and publish a dashboard (`atlas-dashboards`); link a playbook record.
 9. **Validate** (`python3 system/tools/validate.py --all`), then **dry-run** where possible: run a job once in chat on current data (outputs clearly marked as a test, no external writes beyond drafts), evaluate a trigger against existing records without acting, create one sample record of a new type only if the user wants one.
-10. **Commit, log** (`chat · extensions_create · added job pipeline-summary (Monday nightly) · commit <sha>`), republish the Control Center and Atlas Guide if they list extensions. Tell the user how to change or remove it ("just ask").
+10. **Commit, log** (`chat · extensions_create · added job pipeline-summary (Monday nightly) · commit <sha>`), republish Guide if it lists extensions. Tell the user how to change or remove it ("just ask").
 
 ### Change or remove
 - Change: edit the files, keep the registry entry (update `description`; bump nothing else), re-validate, re-wire if schedules or switches changed.
@@ -38,7 +38,7 @@ Let the user grow Atlas in plain language. Each extension follows the same outli
 ## Outputs
 - Files under `user/extensions/{skills,jobs,triggers,types,dashboards,playbooks}/`; `user/extensions/registry.yaml` entry.
 - Wiring: `routines.yaml` / platform routine, `rhythms.yaml: triggers`, `user/knowledge/<folder>/` + `_index/<folder>.md`, `dashboards.yaml`, playbook record in `user/knowledge/playbooks/`.
-- Activity-log lines, commits, Control Center / Atlas Guide republished.
+- Activity-log lines, commits, Guide republished.
 
 ## Guardrails
 - Governance: `system/rules/governance.md`. Classes touched: `extensions_create` (default propose), `behavior_settings` (routines, schedules, trigger switches, dashboards entries), `records_write` (type folder/index, playbook records), `dashboards_refresh`, `destructive` 🔒 (deleting extension files or published pages: approval record), and whatever classes the extension's own actions will use (state them in its Guardrails section).

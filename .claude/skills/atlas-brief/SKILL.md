@@ -1,6 +1,6 @@
 ---
 name: atlas-brief
-description: "Assemble the Daily Brief (today's or tomorrow's) and the catch-up brief after away mode, add the \"Since last night\" section after the morning catch-up, and republish the Daily Brief dashboard. Use for \"what's my day look like\", \"brief me\", \"what's on today\", \"what do I need to know\", \"rebuild my brief\", and when the daily-brief job runs."
+description: "Build the Daily Brief or the catch-up brief and refresh the Today page. Use for \"brief me\", \"what does my day look like\", \"what's on today\", \"what do I need to know\", and the daily-brief job."
 ---
 # Daily Brief
 
@@ -31,9 +31,9 @@ Give the user a two-minute, trustworthy picture of where they stand: what's on, 
 2. **Readiness.** Check `jobs.yaml`: if `ingest` or `triage` hasn't succeeded since the last brief, either run them (job context, per the job spec) or proceed and add one line under Today: "Based on information up to <time>."
 3. **Set the window.** "What changed" covers from the previous brief's creation to now. For `target: tomorrow`, Today = tomorrow's calendar; Due soon is counted from tomorrow.
 4. **Build sections** in this order (template: `reference/template.md`). Omit a section that's empty, except Top priorities.
-   0. **Action needed** (only if any): every open `action` question in `user/inbox/questions.md` (things only the user can do, such as updating their Project instructions after an update), oldest first, never capped. One line each with what to do; when the entry has `Copy text`, say "the text to copy is on the Control Center, or ask me in chat". It stays in every brief until the entry is closed.
+   0. **Action needed** (only if any): every open `action` question in `user/inbox/questions.md` (things only the user can do, such as updating their Project instructions after an update), oldest first, never capped. One line each with what to do; when the entry has `Copy text`, say "the text to copy is on the Guide page, or ask me in chat". It stays in every brief until the entry is closed.
    1. **Today:** meaningful events shown by the meeting filter (`rhythms.yaml: meetings`; all-day, tentative, and unanswered events may be set to skip), in time order, each with a one-line why-it-matters and a link to its prep note (`prep` field) or "no prep needed". Flag conflicts and back-to-backs.
-   2. **Due soon / slipping:** `i_owe` items slipped or due within the `deadline_approaching` window (default 3 days), and deadline events. Items due tomorrow (the trigger's escalation) go first and in bold, then slipped items, then the rest by due date, then priority (the same order as the Daily Brief page). Each shows due date and `next_step`.
+   2. **Due soon / slipping:** `i_owe` items slipped or due within the `deadline_approaching` window (default 3 days), and deadline events. Items due tomorrow (the trigger's escalation) go first and in bold, then slipped items, then the rest by due date, then priority (the same order as the Today page). Each shows due date and `next_step`.
    3. **Waiting on:** open `waiting_on` items that are overdue or due within 7 days, soonest first, with who and when (overdue ones show days late), plus any waiting 7+ days without a due date; note if a follow-up draft is ready.
    4. **What changed:** never imported history (`.claude/skills/atlas-capture/reference/import.md` §10). At most 5 bullets: decisions made, projects whose health changed, new risks, new commitments to the user, notable replies. Include a "From your Evening Thoughts" line group if last night's journal produced items. Add "What's new in Atlas" (one line) if `atlas.yaml: installed_version` changed since the last brief.
    5. **Top priorities:** 3–5 items ranked against active goals first, then urgency (triage `priority`, due dates, who's waiting). Each with a one-line reason tied to a goal or person.
@@ -42,10 +42,10 @@ Give the user a two-minute, trustworthy picture of where they stand: what's on, 
    8. **Awaiting your approval:** pending approvals with ID, action, and why; note any expiring within 3 days.
    9. **Questions from Atlas:** up to 3 open questions other than `action` ones (vague commitments to confirm, relationships, profile proposals): first those raised since the last brief, then the oldest. Each links the record or source it's about. "+N more in Questions" if needed.
    10. **Needs attention** (only if any): high-severity known issues from `health.yaml` with their one-step fix.
-   Also compute the **Week Ahead planning data** for the 7 days from the target date (§D).
-5. **Two-minute check.** Target ≤ ~350 words. Caps: Due soon 5, Waiting on 5, What changed 5, priorities 5, Questions 3; overflow becomes "+N more on the Commitments page". Every item links to its record (`system/rules/writing.md`). Lead with what needs the user.
+   Also compute **Today's week data** for the 7 days from the target date (§D).
+5. **Two-minute check.** Target ≤ ~350 words. Caps: Due soon 5, Waiting on 5, What changed 5, priorities 5, Questions 3; overflow becomes "+N more on the Work page". Every item links to its record (`system/rules/writing.md`). Lead with what needs the user.
 6. **Write** `user/work/briefs/YYYY-MM-DD.md` (target date) with frontmatter `type: brief`, `date`, `generated` (timestamp), `window_start`, `sources` (records cited). If the file exists (re-run), regenerate it but keep any "Since last night" section.
-7. **Republish** with `atlas-dashboards` every dashboard whose contract lists `daily-brief` in `republished_by` (always the Daily Brief; Week Ahead with the planning data from §D).
+7. **Republish** with `atlas-dashboards` every dashboard whose contract lists `daily-brief` in `republished_by`: always Today, with the week data from §D.
 8. **Commit and log** (`atlas(routine:<name>): daily brief for <date>` or `atlas(chat): …`).
 9. **In chat**, present the brief itself (not a summary of it) in the user's preferred format, then offer the obvious next action ("Want me to send the follow-up to Dana?").
 
@@ -64,22 +64,20 @@ Give the user a two-minute, trustworthy picture of where they stand: what's on, 
 ### C. "Since last night" (after the morning quick catch-up)
 1. Input: the items `atlas-capture` filed in the quick catch-up ingest.
 2. Append `## Since last night` to today's brief file (create a minimal brief with Today and this section if none exists) with ≤5 bullets: new replies, new commitments, changed or new events today, anything urgent. Link each item.
-3. Republish the Daily Brief dashboard. The page has no "Since last night" section: the new items appear in its own sections (Today, Due and slipping, Waiting on others, Needs you). Tell the user in one line only if something is urgent.
+3. Republish Today. The page has no "Since last night" section: the new items appear in its own sections (Schedule, Due and slipping, Needs you). Tell the user in one line only if something is urgent.
 
-### D. Week Ahead planning data
-Used by A and by `atlas-review`'s weekly review. The range is set by `system/dashboards/week-ahead.contract.md` (Purpose, "Which seven days"): next Monday to Sunday once this week's weekly review has run, otherwise the 7 days from the target date. Field definitions: `system/dashboards/week-ahead.contract.md`. From event records (events hidden by the meeting filter still count as busy), `rhythms.yaml: work_hours`, open commitments with `effort`, `working-style.md`, and `preferences.md`:
-1. **Focus suggestions** (`focus[]`): free gaps of at least 60 minutes (the same gaps `free_hours` counts) inside work hours on work days, each matched to the highest-priority `i_owe` work due within the week that isn't already scheduled; at most 1 per day and 4 per week; respect working style and preferences (e.g. no Friday afternoons). Each has `start`, `end`, `label`, and a one-line `reason`. A focus block awaiting approval (`focus_time_needed`) is shown as the suggestion for its slot. Suggestions only: putting a hold on the calendar is `own_calendar_manage` (propose, in chat).
-2. **Time:** each day's `free_hours`; the week's `summary.focus_hours`, `work_due_hours`, and `unsized`.
-3. **Watch-outs** (`watchouts[]`): overloaded days, no-break stretches, double bookings, unprotected deadlines.
-4. **Meetings:** `note` (one line on why it matters or what to raise; from the event's `insight` or the prep note), `project` (the event's first linked project), `prep.summary` (first line of the prep note's suggested agenda) and `prep.todo` (what to prepare, or when `meeting-prep` will write the note).
-5. **Outcomes:** from the weekly review whose "next week" contains the range's first day, with `status` refreshed from the linked records; before the first weekly review, propose up to 3 (contract, Sources).
-6. **Headline** (`meta.headline`): one line on the shape of the week.
-Pass all of it to `atlas-dashboards` with the Week Ahead republish.
+### D. Today's week data
+Used by A for the Today page's This week and Coming up sections. Field definitions: `system/dashboards/daily-brief.contract.md`. The range is always the 7 days from the target date. From event records (events hidden by the meeting filter still count as busy), `rhythms.yaml: work_hours` and open commitments:
+1. **Days** (`week.days[]`): for each day, whether it's a work day, the number of meetings, meeting hours, free hours inside work hours, and what's due: commitments due that day in either direction (I owe first), and deadline and milestone events, at most 5 per day.
+2. **Totals:** `week.work_hours_per_day` and the week's `free_hours`. With no calendar connected, `week` is `null` and the section is hidden.
+3. **Coming up** (`milestones[]`): deadline and milestone events from tomorrow to 60 days out, soonest first, at most 8, each with its project (the event's first linked project) and a one-line note.
+4. **Schedule extras** for today's events: `project` (the event's first linked project), and `prep.todo` (what to prepare, or when `meeting-prep` will write the note) where there's no prep summary.
+Pass it all to `atlas-dashboards` with the Today republish.
 
 ## Outputs
 - `user/work/briefs/YYYY-MM-DD.md`, `user/work/briefs/YYYY-MM-DD-catch-up.md`.
 - Insight status updates in `user/inbox/insights.md` (`seen`).
-- Daily Brief (and other `daily-brief`-listed) dashboards republished, including the Week Ahead planning data (§D); activity-log line; run-report row (brief date, sections, dashboards republished).
+- Today (and any other `daily-brief`-listed dashboard) republished, with its week data (§D); activity-log line; run-report row (brief date, sections, dashboards republished).
 - In chat: the brief, readable in two minutes.
 
 ## Guardrails
@@ -93,4 +91,4 @@ Pass all of it to `atlas-dashboards` with the Week Ahead republish.
 - The brief file exists for the target date with all non-empty sections, every item linked, and fits the caps.
 - Top priorities each cite a goal, a person, or a deadline as the reason.
 - Insights shown are marked `seen`; pending approvals and drafts are all listed.
-- The Daily Brief dashboard shows the new brief; the change is committed and logged.
+- The Today page shows the new brief; the change is committed and logged.

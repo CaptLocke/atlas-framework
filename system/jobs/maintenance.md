@@ -35,13 +35,13 @@ None beyond sync. Maintenance does not read connectors.
 6. **Expiry:** approvals `pending` for more than 14 days → `expired`; insights `new` for more than 30 days → `expired`. Add a dated status-history line; never delete entries. Away pauses the clock: while away is active (`system/jobs/README.md`), expire nothing; afterwards, extend each item's limit by the number of away days that fell after it was created (count from `away.start` to `away.end`, or to today for an open-ended away). If away has already been cleared, use the away period recorded in the catch-up brief (`user/work/briefs/*-catch-up.md`).
 6a. **Inbox archive:** move entries resolved more than 14 days ago to `user/inbox/archive/YYYY-MM-<name>.md` and recompute `counts` in every inbox file, adding the block where it's missing (`system/schemas/formats.md` §3). Runs during away too (it only moves resolved entries).
 7. Commit (one commit for indexes, one for record fixes, one for inbox).
-8. **Republish** (`atlas-dashboards`, `dashboards_refresh`) every dashboard whose contract lists `maintenance` in `republished_by` (the Records page), from the freshly rebuilt indexes. Skip it in `mode: light`.
+8. **Republish** (`atlas-dashboards`, `dashboards_refresh`) every dashboard whose contract lists `maintenance` in `republished_by`, from the freshly rebuilt indexes. Skip it in `mode: light`.
 
 ## Outputs
 - Regenerated `user/knowledge/_index/*.md`; repaired and merged records with Updates lines.
 - `user/inbox/approvals.md` and `insights.md` status changes; questions for ambiguous cases.
 - Resolved inbox entries moved to `user/inbox/archive/`; `counts` blocks current.
-- The republished Records dashboard.
+- Republished dashboards whose contracts list `maintenance`.
 
 ## Early exit
 Never fully skipped on its scheduled run (the index rebuild is the safety net). In `light` mode, nothing to expire or sweep → `early_exit`.

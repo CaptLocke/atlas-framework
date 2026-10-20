@@ -1,6 +1,6 @@
 ---
 name: atlas-away
-description: "Turn away mode on, off, or schedule it in advance, and pause or resume individual automations or moments, so Atlas keeps filing everything quietly while the user is out and has a catch-up brief ready when they return. Use for \"I'm out from the 12th to the 20th\", \"I'm on vacation next week\", \"I'm back\", \"cancel my away\", \"pause the weekly review until November\", \"resume status updates\", \"what's paused?\"."
+description: "Away mode and pausing: turn away on or off or schedule it, pause or resume automations or moments, and give the catch-up brief on return. Use for \"I'm out from the 12th to the 20th\", \"I'm back, what did I miss?\", \"pause the weekly review until November\", \"what's paused?\"."
 ---
 # Away mode and pausing
 
@@ -24,7 +24,7 @@ Make being away effortless: one sentence turns it on (now or scheduled), it ends
 2. Confirm in one line with what changes: "You're away Nov 12–20. I'll keep filing everything; I'll pause briefs, email drafts, status updates, meeting prep, and nudges, and hold approvals. Your catch-up brief will be the first brief for a day after Nov 20 (Friday Nov 21). Sound right?" (The request is the confirmation for `behavior_settings`; confirm only if dates were inferred.)
 3. Write `rhythms.yaml: away` = `{ start, end, set_on: <today> }`. A future `start` schedules it; jobs treat away as active when `start ≤ today` and (`end` is null or `today ≤ end`).
 4. If an away block already exists and overlaps, replace it after saying so; if it's in the past, overwrite.
-5. Commit and log (`chat · behavior_settings · away 2026-11-12 → 2026-11-20 · commit <sha>`); republish the Control Center and Daily Brief so they show the away banner (`atlas-dashboards`).
+5. Commit and log (`chat · behavior_settings · away 2026-11-12 → 2026-11-20 · commit <sha>`); republish Guide and Today so they show the away banner (`atlas-dashboards`).
 6. Mention once: Atlas doesn't write out-of-office replies; set one in their email tool if they want one. Pending approvals and new insights don't expire while away (maintenance pauses expiry); the catch-up brief lists whatever is still pending. Offer to handle urgent approvals now.
 
 ### End away (early return or "I'm back")
@@ -37,7 +37,7 @@ Make being away effortless: one sentence turns it on (now or scheduled), it ends
 2. Pause: add `{ job: <name>, until: <date or null> }` or `{ moment: <name>, until: <date or null> }` to `rhythms.yaml: paused` (`until` = the day it resumes; `null` = until they say). Don't duplicate an existing entry; update its `until`.
 3. Resume: remove the entry.
 4. Explain the difference once if relevant: pausing is temporary; turning a moment off for good is a settings change (`atlas-settings`, `moments.<moment>: off`).
-5. Commit, log, republish the Control Center.
+5. Commit, log, republish Guide.
 
 ### Status ("what's paused?", "am I away?")
 List the away window (or scheduled one) and every paused item with its resume date. Change nothing.
@@ -45,7 +45,7 @@ List the away window (or scheduled one) and every paused item with its resume da
 ## Outputs
 - `user/settings/rhythms.yaml` `away` and `paused` updated.
 - Catch-up brief on early return (via `atlas-brief`).
-- Activity-log line and commit; Control Center (and Daily Brief when away changes) republished.
+- Activity-log line and commit; Guide (and Today when away changes) republished.
 
 ## Guardrails
 - Governance: `system/rules/governance.md`. Classes touched: `behavior_settings` (rhythms.yaml; the user's request is the confirmation), `dashboards_refresh`.

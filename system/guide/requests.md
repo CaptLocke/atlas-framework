@@ -31,7 +31,7 @@ Ask about anything in your work. Atlas shows where each answer came from.
 - "Where was I on the vendor evaluation?"
 - "Catch me up on Globex."
 - "What happened while I was away?"
-- To browse everything Atlas has filed, open the **Records** page and search by name, type, or status.
+- "Find everything you have on the Acme renewal."
 
 ## Prepare
 Get ready for what's next.

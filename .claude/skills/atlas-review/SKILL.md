@@ -1,6 +1,6 @@
 ---
 name: atlas-review
-description: "Produce Atlas's periodic reviews: the Weekly Review (wins, decisions, commitments kept and slipped, stalled projects, aging waiting-on items, people to reconnect with, next week and suggested priorities, plus accomplishments), the monthly report (goal progress, user and system health, automation review with private success indicators), and the quarterly moments (goal reset, role refresh with permission re-confirmation, performance review pack). Use for the `weekly-review`, `monthly`, and `quarterly` jobs, and for \"review my week\", \"how did this month go?\", \"how are my goals tracking?\", \"prep my self-review\", \"what did I accomplish this quarter?\", \"reset my goals\", \"my role changed\"."
+description: "Weekly review, monthly report, and the quarterly goal reset, role refresh and performance pack. Use for those jobs and \"review my week\", \"how did this month go?\", \"how are my goals tracking?\", \"prep my self-review\", \"my role changed\"."
 ---
 # Reviews
 
@@ -29,7 +29,7 @@ The jobs own scheduling, period bookkeeping in `user/.state/jobs.yaml`, away/pau
 2. Write the sections in `reference/weekly.md`: **Wins · Decisions made · Commitments kept · Commitments slipped · Stalled projects · Aging waiting-on · People to reconnect with · Next week · Suggested priorities**. Every item cites its record. Lead with a 2–3 line summary.
 3. **Accomplishments:** pick the week's real accomplishments (delivered work, decisions driven, milestones, problems solved; not activity). For each, append a short dated entry to the relevant goal's `accomplishments` field (record update with an `## Updates` line) and a line to `user/work/accomplishments.md` (format in `reference/weekly.md`). Don't duplicate an entry already recorded.
 4. Suggested priorities (max 5) are ranked against active goals, then due dates; each with a one-line reason.
-5. Republish the dashboards whose contracts list this job in `republished_by` (`system/dashboards/*.contract.md`) with `atlas-dashboards`; the next brief links the review. For Week Ahead, first compute its planning data for next week (Monday to Sunday) with `atlas-brief` §D, using this review's suggested priorities as the week's outcomes, and render it with `meta.as_of` = next Monday.
+5. Republish the dashboards whose contracts list this job in `republished_by` (`system/dashboards/*.contract.md`) with `atlas-dashboards`; the next brief links the review. The suggested priorities for next week stay in the review document; Today shows the coming week from the next brief on.
 
 ### Monthly report (previous calendar month)
 1. **Goal progress:** for each active goal: progress vs target (`current`), evidence for and against (accomplishments, linked projects' health, decisions), what needs attention; propose `current` updates the evidence supports (records_write) and status changes (`achieved`/`missed`) as questions.

@@ -1,6 +1,6 @@
 ---
 name: atlas-memory
-description: "Give the user control over what Atlas remembers\u2014correct or update a fact, archive or unarchive, forget a record (and stop capturing it), permanently erase it from history, undo an import, export everything, or minimize stored content to pointers and summaries. Use for \"that's wrong, it's\u2026\", \"forget that\", \"forget everything about\u2026\", \"permanently erase\u2026\", \"archive the vendor project\", \"bring back\u2026\", \"undo the import\", \"export my Atlas\", \"store less\", \"minimize what you keep\"."
+description: "Control what Atlas remembers: correct, archive, forget, permanently erase, undo an import, export, or store less. Use for \"that's wrong, it's…\", \"forget that\", \"forget everything about…\", \"permanently erase…\", \"undo the import\", \"export my Atlas\"."
 ---
 # Memory controls
 

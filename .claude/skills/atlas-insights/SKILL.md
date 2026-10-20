@@ -1,6 +1,6 @@
 ---
 name: atlas-insights
-description: "Notice what deserves attention\u2014risks, gaps (decisions without owners, unanswered questions), quiet people, cross-project patterns, contradictions, and opportunities\u2014score them against the user's goals, write them with reasoning and sources, and manage their lifecycle. Use when the intelligence job runs and in chat for \"what am I missing\", \"any risks I should know about\", \"what patterns do you see in\u2026\", \"connect the dots on\u2026\", \"dismiss that insight\", \"turn that into a risk\"."
+description: "Spot risks, gaps, quiet people, patterns and contradictions, score them against goals, and manage insights. Use for the intelligence job and \"what am I missing?\", \"any risks I should know about?\", \"connect the dots on…\", \"dismiss that insight\"."
 ---
 # Insights
 

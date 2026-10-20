@@ -72,7 +72,7 @@ Record in `sources.yaml: fallbacks` with one of:
 - **forward** (another mail account is connected): "Forward important work emails to your connected address with **[atlas]** in the subject. Atlas files them on the next run."
 - **drop**: "In Outlook or Gmail, choose *Print → Save as PDF* (or *Save as*) for an important thread and put the file in your **Atlas Drop** folder, or attach it in an Atlas chat."
 - **manual**: "Paste the email into an Atlas chat and say *file this*."
-Remind the user in the Control Center that email capture is partial until a mail connector is added.
+Remind the user on the Guide that email capture is partial until a mail connector is added.
 
 ## Checks
 - No Source created for excluded senders or obvious noise.

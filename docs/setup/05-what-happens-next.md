@@ -65,7 +65,7 @@ This is the part where you may need to follow a few clicks. If Claude can't crea
 
 ## Step 11. Your dashboards
 
-Atlas creates your dashboards: always-up-to-date pages such as your Daily Brief, Commitments, and the Atlas Guide (a handy reference for everything Atlas can do).
+Atlas creates your dashboards, three always-up-to-date pages: **Today** (your day and your week), **Work** (everything you're responsible for), and the **Guide** (how Atlas is running, and a handy reference for everything it can do).
 
 ## Step 12. Your first brief
 
@@ -77,7 +77,7 @@ Atlas looks through your last couple of weeks of work, builds its first picture 
 
 - **Just ask.** "What did we decide about pricing?", "Prep me for my 2pm", "Draft a reply to Priya." Atlas uses what it knows without you having to say "check my notes."
 - **Brain-dump.** Say "Morning thoughts" or "Evening thoughts" and type or dictate whatever's on your mind. Atlas sorts it.
-- **Learn what Atlas can do.** Open the **Atlas Guide** dashboard, or ask "What can you do?"
+- **Learn what Atlas can do.** Open the **Guide** dashboard, or ask "What can you do?"
 - **Stay in control.** Ask "What did you do overnight?", "Pause the weekly review", or "I'm away from the 12th to the 20th."
 
 Everything happens in chat. You'll never need to open GitHub, manage files, or save anything.
