@@ -27,7 +27,7 @@ If `ingest` has not succeeded in the last 24 hours and is not earlier in this ro
 
 ## Steps
 1. Gather the change set. If it is empty, exit early.
-2. Invoke `atlas-insights` (routine mode) over the change set and its L3 neighborhood: look for risks, gaps (missing owners, dates, decisions without rationale), patterns (repeated themes across sources), connections (same issue in two projects), and opportunities.
+2. Invoke `atlas-insights` (routine mode) over the change set and its L3 neighborhood: look for risks, gaps (missing owners, dates, decisions without rationale), patterns (repeated themes across sources), connections (same issue in two projects), and opportunities. Create a topic for any theme that has reached `system/schemas/topic.md`'s bar without one (`atlas-insights` §A step 3).
 3. Score each candidate 0–1 (relevance to goals × urgency × novelty). Drop candidates of a kind listed in `suppressed_kinds` and candidates that repeat an existing `new`, `seen`, or recently `dismissed` insight. Adapt volume to engagement when `engagement: adaptive`.
 4. Append surviving insights to `user/inbox/insights.md` (newest first, format `system/schemas/formats.md` §3) with Why, Sources, Links, and a Suggested action.
 5. Where an insight is a concrete risk, open question, or idea, create or update the record (`records_write`) and link it from the insight.
@@ -35,7 +35,7 @@ If `ingest` has not succeeded in the last 24 hours and is not earlier in this ro
 
 ## Outputs
 - New entries in `user/inbox/insights.md` (status `new`).
-- New or updated records in `user/knowledge/risks/`, `questions/`, `ideas/`, with links and index lines.
+- New or updated records in `user/knowledge/risks/`, `questions/`, `ideas/`, `topics/`, with links and index lines.
 
 ## Early exit
 No records or sources changed since the last successful run → `early_exit`. No candidate scores high enough → `ok` with "0 new insights" (not an error).
