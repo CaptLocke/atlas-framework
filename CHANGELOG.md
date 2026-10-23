@@ -11,6 +11,8 @@ Each release's "What's new" section is shown to users in the Guide and their nex
 
 ### What's new
 - When you agree a new date for something that had slipped, Atlas stops showing it as overdue.
+- Something you promised without a date no longer sits forgotten: after two quiet weeks, Atlas asks when you'll do it or whether to drop it.
+- What someone owes you now ranks higher when they're a customer, your manager or another key person.
 
 ## 2.1.0 (2026-10-22)
 

@@ -21,16 +21,24 @@ Score each open commitment, then map: high (top ~20%), medium, low.
    - A commitment linked to several goals takes the highest weight, not the sum.
    - Example, four ranked goals: rank 1 = 1.0, rank 2 = 0.8, rank 3 = 0.6, rank 4 = 0.4.
    - In the `insight` or the brief's reason, name the goal when its rank drove the priority ("Supports your #1 goal, Q4 retention").
-2. **Who's waiting** (counterparty `relationship`, `system/schemas/person.md` §Relationships): `manager`, `board`, `customer`, or a senior `stakeholder` → boost; `prospect` in an active deal → boost; `peer`, `report`, `vendor`, `partner`, `external` → neutral.
+2. **Who's on the other side** (`relationship`, `system/schemas/person.md` §Relationships): for `i_owe`, the counterparty's; for `waiting_on`, the owner's, since the counterparty is the user. `manager`, `board`, `customer`, or a senior `stakeholder` → boost; `prospect` in an active deal → boost; `peer`, `report`, `vendor`, `partner`, `external` → neutral.
 3. **Time:** due within 3 days or already slipped → boost; no date → neutral.
 4. **Consequence:** blocks others (others' commitments or a decision depend on it), or affects revenue, legal, or launch dates → boost.
 5. **Effort hint:** quick wins (<30 min) due soon can be raised to clear them.
 Never rank purely by due date. Top priorities in the brief are the top 3–5 by this rubric, each with its reason.
 
-## Aging waiting-on
+- **Between full passes.** Light mode bands a new commitment against the current set and moves nothing else, so `high` can run past ~20% until the next full pass rebalances it (within a day in every profile).
+- **Learned rules sit outside the band.** A `## Triage rules` priority line (`reference/learning.md` §3) applies after the rubric and stands even when it takes `high` past ~20%.
+
+## Aging
+**Waiting on:**
 - Days waiting = business days since `created`, or since the last follow-up line in Updates.
 - Aging if: past due; or >5 business days with no movement; or due within 2 days with no sign of progress.
 - Use person cadence and history for the channel: "Dana usually replies within a day to calls; email has gone unanswered twice".
+
+**I owe, with no date:** it never slips and never reaches Due soon, so it needs its own check.
+- Aging if: no `due` and no movement (no Updates line) for more than 10 business days since `created`.
+- Ask once: a `questions.md` entry (kind `commitment`) linking it, only if no open one already does: "You told Jordan you'd do the survey analysis on 10/02 and there's no date. When will you do it, or should I drop it?" A date in the answer sets `due` (the user's word); "drop it" drops it.
 
 ## Insight and next-step examples
 | Record | insight | next_step |

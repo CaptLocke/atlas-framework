@@ -33,6 +33,7 @@ Keep the user's commitments honest and their priorities clear: nothing promised 
 8. **Insight and next step.**
    - Every open or slipped commitment: `insight` (one line: why it matters or may slip, grounded in evidence) and `next_step` (one concrete action with a time). Refresh only when stale or circumstances changed.
    - **Aging waiting-on:** compute days waiting (since created, or since the last follow-up recorded in Updates). Aging = past due, or no movement for more than 5 business days, or due within 2 days with no sign of progress. Say so in `insight` and suggest the follow-up channel in `next_step` (person's `cadence`/habits if known).
+   - **Aging I-owe without a date:** no `due` and no movement for more than 10 business days → one question asking for a date or whether to drop it, unless an open one already links it (`reference/signals.md` §Aging). Say so in `insight`.
    - **Playbook runs:** check steps out of order or skipped in practice, and finish runs whose steps are all closed (`reference/playbooks.md` §4–5).
    - Every `active` project: `insight` and `next_step` from its commitments, risks, decisions, questions, and target date; update `health` (`on_track | at_risk | off_track | unknown`) when evidence supports it, with an Updates line.
    - In `mode: light`: only for commitments created or changed in this run.
