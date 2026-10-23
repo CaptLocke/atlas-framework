@@ -36,7 +36,7 @@ Give the user a two-minute, trustworthy picture of where they stand: what's on, 
    2. **Due soon / slipping:** `i_owe` items slipped or due within the `deadline_approaching` window (default 3 days), and deadline events. Items due tomorrow (the trigger's escalation) go first and in bold, then slipped items, then the rest by due date, then priority (the same order as the Today page). Each shows due date and `next_step`. Tomorrow leads, ahead of slipped, because it can still be met; Work leads with overdue because it shows where everything stands, not what to do next.
    3. **Waiting on:** open `waiting_on` items that are overdue or due within 7 days, soonest first, with who and when (overdue ones show days late), plus any waiting 7+ days without a due date; note if a follow-up draft is ready.
    4. **What changed:** never imported history (`.claude/skills/atlas-capture/reference/import.md` §10). At most 5 bullets: decisions made, projects whose health changed, new risks, new commitments to the user, notable replies. Include a "From your Evening Thoughts" line group if last night's journal produced items. Add "What's new in Atlas" (one line) if `atlas.yaml: installed_version` changed since the last brief.
-   5. **Top priorities:** 3–5 items chosen and ordered by `atlas-triage/reference/signals.md` §Top priorities: triage's `high` commitments and at-risk projects, by goal weight, then date. Each with a one-line reason tied to a goal or person.
+   5. **Top priorities:** up to 5 items, chosen and ordered by `atlas-triage/reference/signals.md` §Top priorities (candidates, order and how many are there, not here). Each with a one-line reason tied to a goal or person.
    6. **Insights:** up to `brief_max` of the highest-scoring `new` insights not shown before; each with its one-line why and link, and "Draft ready in <where>" when its entry has a `Draft:` line. Then mark them `seen` (via `atlas-insights` lifecycle).
    7. **Drafts ready to review:** each draft with recipient, subject, why, and where it is (e.g. "in your Outlook drafts").
    8. **Awaiting your approval:** pending approvals with ID, action, and why; note any expiring within 3 days.
@@ -89,6 +89,6 @@ Pass it all to `atlas-dashboards` with the Today republish.
 
 ## Done when
 - The brief file exists for the target date with all non-empty sections, every item linked, and fits the caps.
-- Top priorities each cite a goal, a person, or a deadline as the reason.
+- Top priorities follow `atlas-triage/reference/signals.md` §Top priorities, each citing a goal or a person as the reason.
 - Insights shown are marked `seen`; pending approvals and drafts are all listed.
 - The Today page shows the new brief; the change is committed and logged.

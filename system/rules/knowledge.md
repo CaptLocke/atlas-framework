@@ -29,7 +29,7 @@ For every input (chat statement, journal entry, connector item, file):
 ## Commitments
 - Record **explicit** promises only: a clear actor, a clear deliverable or action, and either a date or clear expectation. Direction: `i_owe` when the user promised; `waiting_on` when someone promised the user.
 - Vague intentions become `questions` or a "confirm?" line in the next brief.
-- Close (`done`) only on evidence: a sent message, delivered file, the user's word, or a source showing completion. `slipped` is set by triage when past due and open.
+- Close (`done`) only on evidence: a sent message, delivered file, the user's word, or a source showing completion. `slipped` is set by triage when past due and open. Whoever moves a slipped commitment's `due` to today or later sets it back to `open` in the same write (`atlas-triage` step 6 handles its follow-up approval).
 
 ## Decisions
 Capture who decided, when, and why. If the why is missing, set `rationale: unknown`.
