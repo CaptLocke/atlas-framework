@@ -31,8 +31,8 @@ Never rank purely by due date.
 - **Learned rules sit outside the band.** A `## Triage rules` priority line (`reference/learning.md` §3) applies after the rubric and stands even when it takes `high` past ~20%.
 
 ## Top priorities
-The brief's 3–5 Top priorities come from this rule, so the same records give the same list; only the wording is the brief's.
-1. **Candidates:** open or slipped `high` commitments, and `active` projects whose `health` is `at_risk` or `off_track`. Fewer than 3 → add `medium` commitments, after the `high` ones.
+The brief's Top priorities (3, up to 5) come from this rule, so the same records give the same list; only the wording is the brief's.
+1. **Candidates:** open or slipped `high` commitments, and `active` projects whose `health` is `at_risk` or `off_track`. Count lines after folding (step 3): fewer than 3 → add `medium` commitments, after the `high` ones, until there are 3.
 2. **Order:** goal weight first (item 1 of the rubric; a project takes its `goal`'s weight, anything unlinked 0), then `due` ascending (a project's `target`; none last), then title.
 3. **Take** the top 3, then each of the 4th and 5th that ties the 3rd on goal weight, so up to 5; fewer when fewer qualify. A commitment whose project is also a candidate folds into that project's line and takes no slot of its own.
 4. **Reason:** one line naming the goal or the person that put it there; a project is phrased as the outcome ("Unblock the Acme MSA").
