@@ -37,7 +37,7 @@ sources: ["[[events/2026-10-13-acme-msa-call]]", "[[commitments/maya-pricing-fee
 
 ## Top priorities
 1. Pricing feedback to Jordan: due tomorrow and tied to your Q4 revenue goal. [[goals/2026-q4-enterprise-revenue]]
-2. Unblock the Acme MSA: the deal is 30% of the quarter's pipeline. [[projects/acme-expansion]]
+2. Unblock the Acme MSA: Dana's review gates your Q4 revenue goal. [[projects/acme-expansion]]
 3. Hiring plan: Finance locks budgets Friday. [[goals/2026-q4-team-growth]]
 
 ## Insights

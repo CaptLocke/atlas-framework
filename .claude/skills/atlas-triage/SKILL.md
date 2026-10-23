@@ -28,12 +28,12 @@ Keep the user's commitments honest and their priorities clear: nothing promised 
 4. **Close with evidence.** For each open commitment, look for completion evidence (`reference/signals.md` § Completion): a sent message delivering it, a delivered file, a completed task, a source showing it done, the user's word. Found → `status: done`, `completed_on`, Updates line citing the evidence. Likely but uncertain → `questions.md` (kind `commitment`): "Did you send Acme the SOC report? I saw an email with an attachment on 10/12."
 4a. **Apply triage rules** from `preferences.md ## Triage rules` to closing, dropping, and priority; name the rule where it changes an outcome.
 5. **Drop or move.** If evidence shows it's no longer wanted (cancelled meeting, decision reversed) → `status: dropped` with reason; if a new date was agreed → update `due`, keep "was X, now Y" in Updates.
-6. **Slipped.** Open items past `due` → `status: slipped` (this is the `commitment_overdue` condition; see step 9). A slipped item that gets done → `done`. A slipped item whose `due` is now today or later (a new date agreed, in step 5 or anywhere else) → back to `open`, with an Updates line; it slips again only if the new date passes.
+6. **Slipped.** Open items past `due` → `status: slipped` (this is the `commitment_overdue` condition; see step 9). A slipped item that gets done → `done`. A slipped item whose `due` is now today or later (a new date agreed, in step 5 or anywhere else) → back to `open`, with an Updates line; it slips again only if the new date passes. For a `waiting_on`, its `pending` follow-up approval, if any, goes to `expired` (status history `expired <date>: re-dated`), and the Updates line says the follow-up draft is stale.
 7. **Priority** (skip in `mode: light` except for new commitments). Set `priority` high/medium/low against goals first (weighted by each goal's `rank`), then urgency and people (`reference/signals.md` § Priority). Due-less items get a suggested date in `next_step`, not in `due`. Estimate `effort` for open `i_owe` items that lack one (`reference/focus-time.md` §1).
 8. **Insight and next step.**
    - Every open or slipped commitment: `insight` (one line: why it matters or may slip, grounded in evidence) and `next_step` (one concrete action with a time). Refresh only when stale or circumstances changed.
    - **Aging waiting-on:** compute days waiting (since created, or since the last follow-up recorded in Updates). Aging = past due, or no movement for more than 5 business days, or due within 2 days with no sign of progress. Say so in `insight` and suggest the follow-up channel in `next_step` (person's `cadence`/habits if known).
-   - **Aging I-owe without a date:** no `due` and no movement for more than 10 business days → one question asking for a date or whether to drop it, unless an open one already links it (`reference/signals.md` §Aging). Say so in `insight`.
+   - **Aging I-owe without a date:** no `due` and no movement for more than 10 business days → one question asking for a date or whether to drop it (`reference/signals.md` §Aging, which defines movement and when not to ask again). Say so in `insight`. Not during away.
    - **Playbook runs:** check steps out of order or skipped in practice, and finish runs whose steps are all closed (`reference/playbooks.md` §4–5).
    - Every `active` project: `insight` and `next_step` from its commitments, risks, decisions, questions, and target date; update `health` (`on_track | at_risk | off_track | unknown`) when evidence supports it, with an Updates line.
    - In `mode: light`: only for commitments created or changed in this run.
@@ -67,7 +67,7 @@ Keep the user's commitments honest and their priorities clear: nothing promised 
 - Respect `rhythms.yaml` trigger switches and away/paused (step 1, step 9).
 
 ## Done when
-- No open commitment is past due without `status: slipped`, and no slipped one has a `due` of today or later.
+- No open commitment is past due without `status: slipped`, and no slipped one has a `due` of today or later; a reopened `waiting_on` has no `pending` follow-up approval.
 - Every open/slipped commitment and every active project has a current `insight` and `next_step` (full mode).
 - Every closed commitment cites its evidence in Updates.
 - Every overdue `waiting_on` (not away) has exactly one pending approvals entry and is handed to the email-drafts procedure for its single follow-up draft (marker `follow-up draft created <date>`); the firing is recorded once in `triggers.yaml`.

@@ -14,7 +14,7 @@ Something someone has promised to do. Direction says who owes it.
 | `direction` | enum | yes | `i_owe` (the user promised) or `waiting_on` (someone promised the user). |
 | `owner` | ID | yes | Person who must act (`[[people/<self>]]` when `i_owe`). |
 | `counterparty` | ID | yes | Person it is owed to (or from). |
-| `due` | date or null | yes | `null` if no date was given; triage may propose one. |
+| `due` | date or null | yes | `null` if no date was given. Only the user's word or evidence sets it; triage proposes one in `next_step` or a question. |
 | `origin` | ID | no | Source or event where it was made. |
 | `priority` | enum | no | high, medium, low, set by triage against goals. |
 | `effort` | enum | no | Rough size of the work, for `i_owe`: `quick` (under 30 min), `hour` (about an hour), `half_day`, `day`. Set by triage (inferred) or the user; used to protect focus time (`focus_time_needed`). |

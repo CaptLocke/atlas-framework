@@ -28,15 +28,15 @@ If `ingest` has not succeeded in the last 24 hours and is not earlier in this ro
 1. Invoke `atlas-triage` in the requested mode with the window "since last triage success".
 2. Catch: scan new sources for explicit promises not yet recorded; create commitments per `system/rules/knowledge.md` (direction `i_owe` or `waiting_on` only). Vague intentions become questions.
 3. Close: mark `done` only on evidence (sent message, delivered file, user's word, source showing completion), with `completed_on` and an Updates line citing the evidence.
-4. Prioritize (full mode only): set `priority` against active goals, deadlines, and who is waiting; set a one-line `insight` and `next_step`.
+4. Prioritize (full mode only): set `priority` by the rubric (`.claude/skills/atlas-triage/reference/signals.md` §Priority rubric: goals, who's on the other side, time, consequence); set a one-line `insight` and `next_step`. Ask once for a date on an `i_owe` undated and quiet for 10 business days (same file, §Aging).
 5. Dedupe obvious duplicate commitments (`merge_supersede`); ambiguous ones become questions.
-6. Evaluate triggers: `playbook_start` (start or propose runs for active playbooks, `.claude/skills/atlas-triage/reference/playbooks.md` §2), `commitment_overdue` (set `status: slipped`; flag for the brief; for `waiting_on`, queue a pending approval to follow up; in routines triage doesn't draft: the `email-drafts` job creates the draft, or the follow-up text goes in the approval without a mail connector, `.claude/skills/atlas-triage/SKILL.md` step 9) and `deadline_approaching` (due within `days`, default 3: mark for the next brief's "Due soon"; the day before, mark for the top). Fire once per key.
+6. Evaluate triggers: `playbook_start` (start or propose runs for active playbooks, `.claude/skills/atlas-triage/reference/playbooks.md` §2), `commitment_overdue` (set `status: slipped`, and back to `open` when the `due` moves to today or later; flag for the brief; for `waiting_on`, queue a pending approval to follow up; in routines triage doesn't draft: the `email-drafts` job creates the draft, or the follow-up text goes in the approval without a mail connector, `.claude/skills/atlas-triage/SKILL.md` step 9) and `deadline_approaching` (due within `days`, default 3: mark for the next brief's "Due soon"; the day before, mark for the top). Fire once per key.
 7. If commitments or projects changed and this routine does not run `daily-brief` later, republish (`atlas-dashboards`, `dashboards_refresh`) every dashboard whose contract (`system/dashboards/*.contract.md`) lists `triage` in `republished_by`, in full and `light` mode alike. Project pages are the exception: the brief doesn't republish them, so triage republishes a listed project's page whenever that project's records changed (`system/dashboards/project-page.contract.md`).
 
 ## Outputs
 - Updated commitment records (and new ones), index lines, `user/.state/triggers.yaml`.
 - Follow-up drafts in the user's mail tool and entries in `user/inbox/approvals.md` for sending them.
-- Questions in `user/inbox/questions.md` (vague commitments, ambiguous duplicates).
+- Questions in `user/inbox/questions.md` (vague commitments, ambiguous duplicates, dates for quiet undated `i_owe` items).
 - Dashboards listing `triage` in `republished_by`, republished when no brief follows.
 
 ## Early exit

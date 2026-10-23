@@ -124,7 +124,8 @@
       if (oa !== ob) return oa - ob;
       var pa = a.priority in PRIORITY ? PRIORITY[a.priority] : 3, pb = b.priority in PRIORITY ? PRIORITY[b.priority] : 3;
       if (pa !== pb) return pa - pb;
-      if (a.due !== b.due) { if (!a.due) return 1; if (!b.due) return -1; return cmp(a.due, b.due); }
+      var da = a.due || "", db = b.due || "";
+      if (da !== db) { if (!da) return 1; if (!db) return -1; return cmp(da, db); }
       return cmp(title(a), title(b));
     });
     function cView(c) {
@@ -337,9 +338,10 @@
       var t = N.time(m.start);
       return (m.title ? m.title + ", " : "") + day + (t ? ", " + t : "");
     }
+    function byDue(a, b) { var da = a.due || "", db = b.due || ""; return da === db ? 0 : !da ? 1 : !db ? -1 : cmp(da, db); }
     function owedList(list) {
       if (!list.length) return h("p", { class: "none" }, "Nothing");
-      return h("ul", null, list.map(function (c) {
+      return h("ul", null, list.slice().sort(byDue).map(function (c) {
         return h("li", null, c.title, " ", h("span", { class: overdue(c) ? "late" : "d" }, c.status === "slipped" && !c.due ? "Slipped" : N.due(c.due)));
       }));
     }

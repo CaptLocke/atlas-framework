@@ -34,7 +34,7 @@ Never rank purely by due date.
 The brief's 3–5 Top priorities come from this rule, so the same records give the same list; only the wording is the brief's.
 1. **Candidates:** open or slipped `high` commitments, and `active` projects whose `health` is `at_risk` or `off_track`. Fewer than 3 → add `medium` commitments, after the `high` ones.
 2. **Order:** goal weight first (item 1 of the rubric; a project takes its `goal`'s weight, anything unlinked 0), then `due` ascending (a project's `target`; none last), then title.
-3. **Take** the top 3, up to 5 when the 4th and 5th carry the same goal weight as the 3rd. A commitment whose project is also a candidate folds into that project's line and takes no slot of its own.
+3. **Take** the top 3, then each of the 4th and 5th that ties the 3rd on goal weight, so up to 5; fewer when fewer qualify. A commitment whose project is also a candidate folds into that project's line and takes no slot of its own.
 4. **Reason:** one line naming the goal or the person that put it there; a project is phrased as the outcome ("Unblock the Acme MSA").
 
 ## Aging
@@ -44,8 +44,11 @@ The brief's 3–5 Top priorities come from this rule, so the same records give t
 - Use person cadence and history for the channel: "Dana usually replies within a day to calls; email has gone unanswered twice".
 
 **I owe, with no date:** it never slips and never reaches Due soon, so it needs its own check.
-- Aging if: no `due` and no movement (no Updates line) for more than 10 business days since `created`.
-- Ask once: a `questions.md` entry (kind `commitment`) linking it, only if no open one already does: "You told Jordan you'd do the survey analysis on 10/02 and there's no date. When will you do it, or should I drop it?" A date in the answer sets `due` (the user's word); "drop it" drops it.
+- **Movement** is an Updates line recording progress or contact, from a source or the user (a draft started, a message about it, the user's word), or the user keeping it undated (below). Triage's own changes to `priority`, `effort`, `insight` or `next_step` are not movement.
+- Aging if: no `due`, and more than 10 business days since the latest movement, else since `created`. Days while away mode is on don't count.
+- Ask once: a `questions.md` entry (kind `commitment`) with `- **Links:** [[commitments/<slug>]]`, only if no open entry links it and none was answered or dismissed since the latest movement: "You told Jordan you'd do the survey analysis on 10/02 and there's no date. When will you do it, or should I drop it?"
+- The answer: a date sets `due` (the user's word); "drop it" drops it; "keep it undated", or a dismissal, adds the Updates line `kept undated <date> (user)`, which is movement, so the clock restarts.
+- During away, nothing is asked; the check runs again after the return.
 
 ## Insight and next-step examples
 | Record | insight | next_step |

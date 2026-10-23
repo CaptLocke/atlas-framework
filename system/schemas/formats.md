@@ -161,7 +161,7 @@ counts: { open: 1, answered: 0, dismissed: 0 }
 - **Proposed change:** voice-personal.md: "Keep emails under ~120 words" [observed · proposed]
 - **Asked:** 2026-10-12
 ```
-Kinds: `profile | migration | relationship | commitment | setup | action | other`. Statuses: `open | answered | dismissed`.
+Kinds: `profile | migration | relationship | commitment | setup | action | other`. Statuses: `open | answered | dismissed`. An entry about particular records carries `- **Links:** [[…]]` naming them.
 
 **Action entries** (`kind: action`) are things only the user can do, queued by `atlas-update` from a release's `### Action needed` list or a higher `bootstrap_version`, and by the chat boot check (kernel §2 step 0):
 ```markdown

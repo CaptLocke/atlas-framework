@@ -14,7 +14,7 @@ Each release's "What's new" section is shown to users in the Guide and their nex
 - Something you promised without a date no longer sits forgotten: after two quiet weeks, Atlas asks when you'll do it or whether to drop it.
 - What someone owes you now ranks higher when they're a customer, your manager or another key person.
 - The Work page lists what matters most first: after anything overdue, high priority comes before low, whatever the date.
-- Your Daily Brief's top priorities follow a fixed rule, so they only change when something about your work does.
+- Your Daily Brief's top priorities follow a fixed rule, so they change only when something about your work does.
 
 ## 2.1.0 (2026-10-22)
 
