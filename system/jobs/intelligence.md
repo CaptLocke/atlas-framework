@@ -11,7 +11,7 @@ Look across what changed and what matters (goals, open risks, questions) for ris
 
 ## Runs when
 - Lean: `nightly-cycle`. Standard: `morning-cycle`. Full: `intelligence` routine (every 3 hours in work hours).
-- Modifiers: `when`. `mode: light` limits the look to records changed since the last run (no wider sweep).
+- Modifiers: `when`. `mode: light` limits the look to records changed since the last run (no wider sweep, except the topic search in `atlas-insights` §A step 3).
 
 ## Away and paused
 Runs during away; new insights stay `new` in `user/inbox/insights.md` and are summarized in the catch-up brief, not nudged. Paused per `system/jobs/README.md`.
@@ -46,4 +46,4 @@ No records or sources changed since the last successful run → `early_exit`. No
 - Quality over volume: noise erodes trust. The brief shows at most `brief_max`; the rest stay in the inbox.
 
 ## Run report
-Row: `intelligence | <status> | <N> new insights, <r> records | <top score>`.
+Row: `intelligence | <status> | <N> new insights, <r> records, <t> topics | <top score>`.

@@ -11,6 +11,7 @@ Each release's "What's new" section is shown to users in the Guide and their nex
 
 ### What's new
 - Atlas notices themes that keep coming up across your email, meetings and notes, even when they arrive a day at a time, and gathers them so "what do we know about pricing?" has a fuller answer. Themes that go quiet for three months step aside, and come back when they come up again.
+- Insights about patterns now come from these themes: when one suddenly picks up, Atlas tells you.
 
 ## 2.0.1 (2026-10-20)
 
