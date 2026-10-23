@@ -127,7 +127,7 @@ The page computes this from the data, so the builder sets no flag. Under "Needs 
 - **Record panel** (`system/dashboards/README.md` §Record panel): commitments, projects without a project page, decisions, risks and people open in it; goals do not. Every item that opens may carry the panel data fields (`details`, `body`, `body_truncated`, `links`, `created`, `updated`; same section). Linked items on this page open in the panel with Back.
 - **Project pages:** a project with `page_url` is a link: clicking anywhere on its card opens its project page in a new tab, and the card shows a "Project page ↗" chip.
 - **Sort** (the page applies these, so data order doesn't matter):
-  - Commitments: I owe, then Waiting on; within each, overdue first, then `due` ascending (`null` last), then priority (high → low), then title.
+  - Commitments: I owe, then Waiting on; within each, overdue first, then priority (high → low, none last), then `due` ascending (`null` last), then title. Priority leads because triage's rubric already counts urgency (`atlas-triage/reference/signals.md` §Priority rubric); Today's Due soon is the date-ordered view.
   - Projects: active by health (off track, at risk, not assessed, on track), then proposed, then paused; then `target` ascending (`null` last).
   - Goals: active before draft; ranked by `rank`, then unranked by assessment (off track, at risk, not assessed, on track); then title.
   - Decisions: `proposed` first, then `decided_on` newest first. Risks: issues first, then exposure descending, then `updated` newest first.

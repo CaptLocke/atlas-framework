@@ -38,7 +38,7 @@ Keep the user's commitments honest and their priorities clear: nothing promised 
    - Every `active` project: `insight` and `next_step` from its commitments, risks, decisions, questions, and target date; update `health` (`on_track | at_risk | off_track | unknown`) when evidence supports it, with an Updates line.
    - In `mode: light`: only for commitments created or changed in this run.
 9. **Triggers** (`system/triggers.md`; check and record in `user/.state/triggers.yaml`, key = due date):
-   - `deadline_approaching`: open `i_owe` commitments and deadline events due within `days` (default 3) → mark for the brief's "Due soon"; the day before, it leads Due soon in bold (`atlas-brief` §A step 4.2) and Work already lists it near the top by due date. Its `priority` is not changed: priority follows the rubric (`reference/signals.md`), never the due date alone.
+   - `deadline_approaching`: open `i_owe` commitments and deadline events due within `days` (default 3) → mark for the brief's "Due soon"; the day before, it leads Due soon in bold (`atlas-brief` §A step 4.2) and Work marks it due soon. Its `priority` is not changed: priority follows the rubric (`reference/signals.md`), never the due date alone.
    - `focus_time_needed`: `i_owe` work due soon with too little free time before it → propose a focus block, or say no slot fits (`reference/focus-time.md`).
    - `commitment_overdue`: slipped items → flag for the brief. If `waiting_on`, triage does **not** draft in routines:
      1. Mark the commitment for follow-up (`next_step` says a follow-up is due).

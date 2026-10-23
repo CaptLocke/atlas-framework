@@ -122,9 +122,10 @@
     var cs = L(d.commitments).slice().sort(function (a, b) {
       var oa = overdue(a) ? 0 : 1, ob = overdue(b) ? 0 : 1;
       if (oa !== ob) return oa - ob;
-      if (a.due !== b.due) { if (!a.due) return 1; if (!b.due) return -1; return cmp(a.due, b.due); }
       var pa = a.priority in PRIORITY ? PRIORITY[a.priority] : 3, pb = b.priority in PRIORITY ? PRIORITY[b.priority] : 3;
-      return pa - pb || cmp(title(a), title(b));
+      if (pa !== pb) return pa - pb;
+      if (a.due !== b.due) { if (!a.due) return 1; if (!b.due) return -1; return cmp(a.due, b.due); }
+      return cmp(title(a), title(b));
     });
     function cView(c) {
       var owe = c.direction === "i_owe";
@@ -160,7 +161,7 @@
     var waitG = group(h("ul", { class: "items" }, waitRows.map(function (r) { return r.el; })), waitRows, "You're not waiting on anyone.");
     var oweCount = countSpan(N.total("i_owe", oweList.length)), waitCount = countSpan(N.total("waiting_on", waitList.length));
     var commitSec = N.section({ id: "w-commitments", title: "Commitments", count: N.total("i_owe", oweList.length) + N.total("waiting_on", waitList.length),
-      note: "Every open promise, either way. Overdue first, then by due date.",
+      note: "Every open promise, either way. Overdue first, then by priority and due date.",
       body: [h("div", { class: "grp" }, h("h3", { class: "sub" }, "I owe", oweCount), oweG.node, N.more("i_owe")),
         h("div", { class: "grp" }, h("h3", { class: "sub" }, "Waiting on", waitCount), waitG.node, N.more("waiting_on"))] });
 
