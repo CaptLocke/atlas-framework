@@ -26,7 +26,7 @@ Surface the few things the user would want to know but hasn't noticed, each with
 1. **Paused/away.** If `intelligence` is paused, stop. During away, generate normally (they wait for the catch-up brief) but don't nudge.
 2. **Early exit.** Nothing changed since the last run and no date-driven checks are due (quiet people, approaching targets) → exit (`early_exit`).
 3. **Look** across the changed records and their neighborhoods (imported history is context, never a change: `.claude/skills/atlas-capture/reference/import.md` §10) (`system/rules/retrieval.md` L3) for each kind in `reference/insight-kinds.md`, skipping every kind listed in `rhythms.yaml: insights.suppressed_kinds`: risks, gaps, quiet people, patterns, connections, contradictions, opportunities, goal drift.
-   **Topics** (every run, `mode: light` included): for each theme the change set touches that no topic covers, search for it and its variants as `atlas-recall` §D does. If it meets `system/schemas/topic.md` §Capture guidance, create the topic through `atlas-capture` (`provenance: inferred`, a `scope` line) and link its records both ways. No insight for this: topics are Atlas's own structure.
+   **Topics** (every run, `mode: light` included): for each theme the change set touches, look for a topic that covers it, active or dormant. If one does, link the change set's records to it both ways (a dormant one becomes `active`). If none does, search for the theme and its variants as `atlas-recall` §D does; if it meets `system/schemas/topic.md` §Capture guidance (including its sensitivity rules), create the topic through `atlas-capture` (`provenance: inferred`, a `scope` line) and link its records both ways. No insight for this: topics are Atlas's own structure, and links made when a topic is created never count toward a `pattern`.
 4. **Ground** every candidate in at least one record or source; write the reasoning in one line. Drop candidates you can't cite.
 5. **Score** each: `score = goal_relevance × urgency × novelty` (each 0–1; rubric in the reference). Novelty is low when `insights.md` already holds the same insight (same links and gist) in the last 30 days in any status; a dismissed insight returns only if something material changed (say what).
 6. **Apply insight rules** from `user/profile/preferences.md ## Insight rules` (drop or raise matching candidates), then **adapt volume** (if `engagement: adaptive`): compute engagement per kind from status histories over the last 60 days (acted, dismissed, expired-unseen). Lower the kind's effective score by its dismiss/expire rate and raise it by its act rate; never suppress `risk` kinds with high impact entirely. With `fixed`, skip this step.
@@ -59,7 +59,7 @@ Append to Status history with the date (and "(brief)" / "(chat)" where useful). 
 
 ## Outputs
 - `user/inbox/insights.md` entries and status updates.
-- New `risk`, `question`, `idea` records (via `atlas-capture`); project `insight`/`next_step` updates.
+- New `risk`, `question`, `idea` and `topic` records and topic links (via `atlas-capture`); project `insight`/`next_step` updates.
 - Activity-log line; run-report row. In chat: findings with reasoning and citations.
 
 ## Guardrails

@@ -51,7 +51,7 @@ Apply `system/rules/retrieval.md` (levels L0–L4 and the search steps). Do not 
 1. Start from the topic record if one exists (`_index/topics.md`); otherwise search for the theme and its variants (churn → attrition, cancellations, non-renewal, downgrade).
 2. Collect linked and matching records and group them: decisions, risks, questions, ideas, projects, people/organizations, key sources; add a short timeline of how the theme developed.
 3. Summarize what is known, what is uncertain, and what is missing (e.g. "no decision recorded on…"). For patterns and recommendations, hand off to `atlas-insights` (exploration mode).
-4. If the theme meets the bar in `system/schemas/topic.md` § Capture guidance and no topic exists, create one (`atlas-capture`) without asking: topics are Atlas's own structure.
+4. In chat only: if the theme meets the bar in `system/schemas/topic.md` § Capture guidance and no topic exists, create one (`atlas-capture`) without asking: topics are Atlas's own structure. Skills and jobs that follow this procedure leave it to `intelligence`.
 
 ### E. List questions ("what have I committed to this quarter?")
 Filter the type index by status, direction, dates, and links; open records only when needed for detail. Group sensibly (by due date, project, or counterparty) and give counts.
@@ -60,13 +60,13 @@ Filter the type index by status, direction, dates, and links; open records only 
 - **Answer format:** lead with the answer in one or two sentences, then supporting detail; inline citations in wiki-link form after each claim (`system/rules/writing.md`); group citations at a paragraph's end if inline would clutter. Mark inferences ("I think…"). Follow `user/profile/communication-style.md`.
 - **"I don't know":** if nothing is recorded, say so plainly ("I don't have anything recorded about the Q3 budget ceiling."), give whatever adjacent knowledge exists (cited), suggest where it might live (a connected source you can search, a person who would know), and offer to capture the answer when the user has it. Never guess a fact to fill the gap.
 - **Partial knowledge:** say what is known, what is missing, and how confident you are.
-- No files are written by recall itself. If the user tells you something new while asking, capture it with `atlas-capture` and mention it in one line.
+- Recall writes nothing itself except, through `atlas-capture`, a due topic (§D step 4) and anything new the user tells you while asking; mention the latter in one line.
 - Mark any insight you presented from `insights.md` as `seen` (`atlas-insights` lifecycle).
 
 Examples of each output: `reference/answer-patterns.md`.
 
 ## Guardrails
-- Autonomy classes: `read` (knowledge) and `external_read` (connectors at L4), both normally `auto`; obey any `propose` override for a scope (`system/rules/governance.md`).
+- Autonomy classes: `read` (knowledge) and `external_read` (connectors at L4), both normally `auto`, and `records_write` for those captures; obey any `propose` override for a scope (`system/rules/governance.md`).
 - Never present archived or superseded records as current; flag them as historical when relevant.
 - Never read excluded sources (`data-rules.yaml: exclusions`), and never reveal content that data rules stored as `pointer` only: say the item exists and offer to open the original with the user.
 - `notes_private` on people records is never repeated outside the chat it is relevant to and never put in drafts.
