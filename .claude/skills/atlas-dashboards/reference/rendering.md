@@ -21,7 +21,7 @@ Each contract's `republished_by` lists the jobs that republish it; any chat may 
 - **Guide's Recently filed** comes from the activity log (`user/logs/activity/`) for the last 14 days, imports left out. For each line's commit, `git show --name-status --format= <sha> -- user/knowledge/` (leaving out `_index/` and `sources/`) gives the records: added files are `new`, modified ones `updated`. `from` is the title of the record's first source; `what` is the main field that changed. Beliefs for About you are marked `featured` (preferences first, then communication style, then proposed; at most 5), and the guide content goes in the same page's data (`control-center.contract.md`).
 
 - Read only the contract's listed sources, index-first (`_index/*.md`, `hot.md`), opening records only for fields the contract needs.
-- IDs: include `id` for each record item. Pages never show it (titles only); it is used for search, the record panel's linked records, and troubleshooting.
+- IDs: include `id` for each record item. Pages never show it (titles only); it is used for search, the requests the page's buttons copy for chat, and troubleshooting.
 - "Next run" times on Guide: compute from `routines.yaml` schedules in the user's time zone.
 - Away: when `rhythms.yaml: away` is active, add an `info` line to `meta.notices` ("You're away until Oct 20; Atlas is filing quietly.").
 - Exclude archived and superseded records unless the contract asks for history.

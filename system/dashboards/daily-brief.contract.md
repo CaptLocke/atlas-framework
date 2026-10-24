@@ -3,13 +3,13 @@ type: dashboard-contract
 name: daily-brief
 template: daily-brief.html
 republished_by: [daily-brief]
-size_budget_kb: 120
+size_budget_kb: 280
 stale_after_hours: 36
 ---
 # Dashboard: daily-brief (the Today page)
 
 ## Purpose
-**Today** answers one question: what needs me today, and what's coming this week? Readable in two minutes, in this order: anything only the user can do, the top three priorities with why, today's schedule (meetings with prep status, plus today's deadlines and milestones), what is due or slipping (what the user owes first, then what they're waiting on), what needs their answer (approvals, questions), up to three insights, drafts ready to review, then **This week** (a seven-day strip of meeting load against work hours, free hours, and what's due each day, milestones marked) and **Coming up** (milestones and deadlines in the next 60 days).
+**Today** answers one question: what needs me today, and what's coming this week? Readable in two minutes, in this order: what needs the user (anything only they can do, approvals, questions, drafts ready to review), the top three priorities with why, today's schedule (meetings with prep status, plus today's deadlines and milestones), what is due or slipping (what the user owes beside what they're waiting on), up to three insights, then **This week** (a seven-day strip of meeting load against work hours, free hours, and what's due each day, milestones marked) and **Coming up** (milestones and deadlines in the next 60 days).
 
 The page keeps the slug `daily-brief`, so its `url` and `last_published` carry over; its title is **Today**. It is the page view of the written **Daily Brief**, `user/work/briefs/YYYY-MM-DD.md`; the brief file and this page are built in the same step and must agree on everything they both show. The week strip and Coming up come from the same run's planning data (`atlas-brief` §D) and have no counterpart in the brief file.
 
@@ -103,8 +103,9 @@ Envelope: `meta` as in `system/dashboards/README.md`; `meta.title` = `"Today"`; 
 | `meta.notices` | `user/.state/health.yaml` open high-severity issues affecting ingestion; staleness found by the job's readiness check (`user/.state/jobs.yaml`) |
 
 ## Rendering notes
-- Order on the page: action needed (if any), while you were away (catch-up only), top priorities (numbered: they are ranked), schedule, due and slipping (**I owe, then Waiting on**, as two groups in one section), needs you (if any), worth knowing (if any), drafts ready (if any), this week (when `week` is set), coming up. Every section has a one-line description under its title and no count. The brief file's "What changed" and "Since last night" sections are not shown on the page.
-- Stat cards: things only the user can do (when any), meetings today (with how many have prep ready), due today, and overdue (both directions).
+- Order on the page: **needs you** (only-you actions, approvals, questions and drafts ready, as action cards with one primary action each; "Nothing needs you right now" when empty), while you were away (catch-up only), top priorities (numbered: they are ranked), schedule, due and slipping (**I owe beside Waiting on**, stacked on a phone), worth knowing (if any), this week (when `week` is set), coming up. The brief file's "What changed" and "Since last night" sections are not shown on the page.
+- Stat tiles: needs you and meetings today (with how many have prep ready) open their sections; due today and overdue filter Due and slipping (chosen again, they clear). Overdue is labelled with the split, "1 you owe, 2 waiting", so neither direction is missed.
+- Actions copy a request for chat (`system/dashboards/README.md` §Actions copy a request for chat): "Approve" and "Decline" on approvals, "Answer in chat" on questions, "Send it" and "Change it" on drafts, "Mark done" and "Nudge <name>" on due items, "Do this" and "Not useful" on insights.
 - **This week:** one tile per day: day and date (today outlined), a meeting bar against `work_hours_per_day` (amber over 60%), meeting and free hours, and what's due as short pins: due from the user (deadlines and `i_owe`) tinted red, milestones marked with a diamond, waiting-on items plain. Non-work days are dashed, "Day off". On phones the strip scrolls sideways inside its own box. Under it, a legend and one line with `week.free_hours`.
 - **Coming up:** date with "in N days", title, deadline or project, and the note.
 - Sorting: `priorities` in rank order (3 items, up to 5, fewer when fewer qualify; `atlas-triage/reference/signals.md` §Top priorities); `today` by `start`, all-day items last; `due` as in the brief (`atlas-brief` §A step 4.2): items due tomorrow first, then slipped, then by `due`, then priority; `waiting_on` slipped first, then by `due` (nulls last); `week.days[].due` deadlines and milestones first, then `i_owe`, then `waiting_on`; `milestones` by `date`.
@@ -112,4 +113,4 @@ Envelope: `meta` as in `system/dashboards/README.md`; `meta.title` = `"Today"`; 
 - Text limits: `headline` 200 characters, `why`/`next_step`/`summary`/`todo` 240, `milestones[].note` 200.
 
 ## Size budget and truncation
-The page is about 62 KB before data (17 KB of template plus the base files) and typically 10 to 20 KB of data, so 120 KB leaves room for a long catch-up. If a render would exceed it, cut in this order until it fits, recording each in `meta.truncated`: `while_away` (to 4), `drafts` (to 3), `milestones` (to 4), `week.days[].due` (to 3 per day), then shorten `why`, `next_step` and `note` text to 120 characters. Never drop `actions`, `priorities`, `today`, `due` or `waiting_on` below their caps.
+The page is about 210 KB before data (the template, the base and the embedded fonts) and typically 10 to 20 KB of data, so 280 KB leaves room for a long catch-up. If a render would exceed it, cut in this order until it fits, recording each in `meta.truncated`: `while_away` (to 4), `drafts` (to 3), `milestones` (to 4), `week.days[].due` (to 3 per day), then shorten `why`, `next_step` and `note` text to 120 characters. Never drop `actions`, `priorities`, `today`, `due` or `waiting_on` below their caps.

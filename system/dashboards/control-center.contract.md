@@ -3,21 +3,21 @@ type: dashboard-contract
 name: control-center
 template: control-center.html
 republished_by: [daily-brief, monthly, quarterly, update-check]
-size_budget_kb: 300
+size_budget_kb: 450
 stale_after_hours: 36
 ---
 # Dashboard: control-center (shown as **Guide**)
 
 ## Purpose
 Answers "Is Atlas working, and what does it know about me?". The slug stays `control-center`, so the page keeps its `url` and `last_published`; its title is **Guide**. In order:
-1. **Health** in one line, with any known issues and how to fix them, the version and update status, the notes import, and suspicious content Atlas ignored (folded).
-2. **Waiting on you:** open `action` questions with their text to copy, approvals, and other questions.
+1. **Needs you:** open `action` questions with their text to copy, approvals, and other questions.
+2. **Health** in one line, with any known issues and how to fix them, the version and update status, the notes import, and suspicious content Atlas ignored (folded).
 3. **Automations:** each one's schedule in the user's time, last run and result, next run; connection health as one compact list; each job's last result and recent runs, folded.
 4. **Recently filed:** records Atlas created or updated in the last 14 days, newest first, each with its kind and where it came from, with an All / New / Updated filter. Anything older is a chat question.
 5. **About you:** the few beliefs Atlas relies on most, each with its source and whether it's confirmed; everything else (profile, voice guides, design system) folded.
 6. **Guide:** What's new and the guide sections (things to say, fixing a problem, and the rest), each folded. Built mechanically from `system/guide/` and `CHANGELOG.md`, so it is the same for every user of a version.
 
-Changing anything (pausing, rescheduling, approving, correcting a belief or a filed record) happens in chat.
+Changing anything (pausing, rescheduling, approving, correcting a belief or a filed record) happens in chat; the page's buttons copy the request to paste there.
 
 Republished by `daily-brief` (each cycle), `monthly` (after health checks and the automation review), `quarterly` (after the role refresh) and `update-check` (after applying an update). A chat that approves or answers items, changes the profile, or confirms or rejects a profile proposal republishes it too.
 
@@ -139,13 +139,15 @@ Republished by `daily-brief` (each cycle), `monthly` (after health checks and th
 Where guide text says "by default", `atlas-dashboards` may personalize it from `routines.yaml` and `governance.yaml` as `system/guide/README.md` allows.
 
 ## Rendering notes
-- Section order: Health, Waiting on you, Automations, Recently filed, About you, Guide. Empty sections say so plainly ("Nothing is waiting on you").
-- **Health** is one line (state and `status.headline`), then each open known issue with its fix, then one line of version, update and import status, then suspicious content (only if any) folded.
-- **Waiting on you:** "Action needed" (open `action` questions, each with its `how` and `copy_text` ready to copy) first, then approvals, then the other questions. The approvals carry one static line — requests expire after 14 days that the user is not away — and no expiry date on any entry: it is the general rule, not a promise about the entry in front of the user.
+- Order, in three parts: **Needs you** (action needed, approvals, questions, as action cards); **How Atlas runs** (Health, Automations); **What Atlas knows** (Recently filed, About you, Guide). Empty sections say so plainly ("Nothing is waiting for you").
+- Stat tiles open their section: needs you, known issues, automations, Atlas version.
+- Actions copy a request for chat (`system/dashboards/README.md` §Actions copy a request for chat): "I've done this" and "Copy the text" on action-needed entries; "Approve" and "Decline" on approvals; "Yes" and "No" on a question with a proposed change, "Answer in chat" on any other; "Help me fix this" on a known issue; "Confirm" and "Correct it" on a statement not yet confirmed; "Wrong?" on a recently filed item.
+- **Health** is one line (state and `status.headline`), then each open known issue as a row that expands to its fix, then one line of version, update and import status, then suspicious content (only if any) folded.
+- **Needs you:** "Action needed" (open `action` questions, each with its `how` and `copy_text` ready to copy) first, then approvals, then the other questions. The approvals carry one static line — requests expire after 14 days that the user is not away — and no expiry date on any entry: it is the general rule, not a promise about the entry in front of the user.
 - **Automations** is a table (automation, when, last run, next run) with a note that times are in the user's time zone; then connections as one compact list (a note only for those not `ok`); then jobs and recent runs inside one fold.
-- **Recently filed** shows the kind, New or Updated, `what`, `from` and the day; the filter is All / New / Updated. Its last line always says older items are a chat question.
+- **Recently filed** shows the kind, New or Updated, `what`, `from` and the day; the filter is All / New / Updated, with find beside it. Its last line always says older items are a chat question.
 - **About you** shows a one-line who-you-are (role, company, manager), the featured statements, then a fold with basics, every other statement by file and group, and the design system. Proposed statements are visually distinct and labeled "Not yet confirmed".
-- **Guide**: the intro, then What's new (one fold: every listed release), then one fold per section.
+- **Guide**: the intro, then What's new (one fold: every listed release), then one fold per section. "How do I…" finds across every section's entries and opens the folds that match.
 - Sorting: issues by severity (high, medium, low) then `since`; approvals and questions newest first, except open `action` questions, which come first, oldest first; routines in `routines.yaml` order; jobs in pipeline order (ingest, triage, intelligence, email-drafts, meeting-prep, daily-brief, weekly-review, status-updates, monthly, quarterly, maintenance, update-check, then user jobs); runs and recently filed newest first; statements in file order.
 - Caps: `known_issues` 20, `approvals` 20, `questions` 20 (`action` entries never cut), `runs` 10, `suspicious` 10, `recently_filed.items` 40, statements 40 per file (300 characters each), colors 12, `whats_new` 5 releases, 40 items per guide section, 10 examples per item.
 - **Truncation**, when the page is over budget, in this order until it fits: `runs` to 3; older releases from `whats_new` (keep the installed one); `recently_filed.items` from the oldest, down to 15; guide `body` paragraphs cut to 600 characters; the oldest non-featured statements in the longest profile file. Never cut `action` questions, open `high` issues, featured statements, or `recently_filed`'s totals. `meta.truncated` keys: `known_issues`, `approvals`, `questions`, `runs`, `recently_filed`, `about.files.<part>`, `guide.whats_new`, `guide.sections.<id>`.

@@ -3,20 +3,20 @@ type: dashboard-contract
 name: commitments
 template: commitments.html
 republished_by: [daily-brief, triage, weekly-review, monthly, quarterly]
-size_budget_kb: 400
+size_budget_kb: 550
 stale_after_hours: 36
 ---
 # Dashboard: Work (`commitments`)
 
 ## Purpose
-**Where does my work stand?** One page, titled **Work**, that replaces the Commitments, Projects, Goals, Decisions & Risks and People pages. It keeps the `commitments` slug, so its URL and `last_published` survive. Jump links at the top lead to five sections, in this order:
-1. **Commitments:** I owe, then Waiting on.
+**Where does my work stand?** One page, titled **Work**, that replaces the Commitments, Projects, Goals, Decisions & Risks and People pages. It keeps the `commitments` slug, so its URL and `last_published` survive. Five tabs, in this order, each with a live count (a plain `#token` opens one: `#commitments`, `#projects`, `#goals`, `#decisions`, `#people`):
+1. **Commitments:** I owe beside Waiting on (stacked on a phone).
 2. **Projects:** cards, each with owner, target, insight and its one next step.
 3. **Goals:** by rank, with a progress bar, the assessment, and evidence for and against.
 4. **Decisions & risks:** recent decisions with their reasons, beside open risks and issues.
 5. **People:** only people with something open either way, a meeting in the next 7 days, or who've gone quiet. A line below says anyone else is a chat question.
 
-One filter applies to the whole page: **Everything / Needs attention** (below). Finished items aren't shown (done commitments, resolved risks, achieved or missed goals); history and anyone not listed are chat questions. Sizes stay bounded by current activity, not history.
+One filter applies to every tab: **Everything / Needs attention** (below), with find on the page beside it. Finished items aren't shown (done commitments, resolved risks, achieved or missed goals); history and anyone not listed are chat questions. Sizes stay bounded by current activity, not history.
 
 Republished by `daily-brief` every run; by `triage` when this run changed its data and the routine does not run `daily-brief` later (the brief republishes it then; `system/jobs/triage.md` step 7); by `weekly-review` (project health, risks, decisions, people gone quiet); by `monthly` (goal progress); and by `quarterly` (goal reset). That is the union of the five pages it replaces.
 
@@ -122,10 +122,11 @@ The page computes this from the data, so the builder sets no flag. Under "Needs 
 - **People:** gone quiet, or with a commitment either way that needs attention.
 
 ## Rendering notes
-- **Header:** title "Work"; subtitle "Where everything you're responsible for stands."; headline (`meta.headline`): what's slipping or blocked most, in either direction, and the project or goal it threatens. Stat cards: you owe, waiting on others, overdue, projects need attention, goals at risk.
-- **Jump links** under the header, one per section with its count; the Projects link shows "N need attention" as a warning when any do. The counts follow the filter. The filter sits in the same row; default "Everything", and the viewer's last choice is remembered in browser storage when available.
-- **Record panel** (`system/dashboards/README.md` §Record panel): commitments, projects without a project page, decisions, risks and people open in it; goals do not. Every item that opens may carry the panel data fields (`details`, `body`, `body_truncated`, `links`, `created`, `updated`; same section). Linked items on this page open in the panel with Back.
-- **Project pages:** a project with `page_url` is a link: clicking anywhere on its card opens its project page in a new tab, and the card shows a "Project page ↗" chip.
+- **Head:** title "Work"; date line "Where everything you're responsible for stands."; lead (`meta.headline`): what's slipping or blocked most, in either direction, and the project or goal it threatens.
+- **Stat tiles, all filters** (chosen again, they clear; choosing a tab clears them): you owe, waiting on others, overdue (labelled with the split, "2 you owe, 1 waiting", so neither direction is missed), and projects need attention. Each switches to its tab.
+- **Tabs** under the head, sticky while scrolling, each with its count; the counts follow the filter, the tiles and find. The Commitments count is marked when anything is overdue, the Projects count when a project needs attention. The filter remembers the viewer's last choice in browser storage when available.
+- **Rows expand in place** (`system/dashboards/README.md` §Rows expand in place): commitments, decisions, risks and people; projects and goals are cards. Each commitment's row is grouped under an overline (Overdue, High priority, Medium priority, Low priority, No priority set) and carries one action: "Mark done" for I owe, "Nudge <name>" for Waiting on. Every item that expands may carry the row details data (`details`, `body`, `body_truncated`, `links`, `created`, `updated`; same section).
+- **Project pages:** a project with `page_url` has its title and an "Open project page" button linked to it, opening in a new tab.
 - **Sort** (the page applies these, so data order doesn't matter):
   - Commitments: I owe, then Waiting on; within each, overdue first, then priority (high → low, none last), then `due` ascending (`null` last), then title. Priority leads because triage's rubric already counts urgency (`atlas-triage/reference/signals.md` §Priority rubric); Today's Due soon is the date-ordered view. A person's card lists what's owed either way by `due` (none last).
   - Projects: active by health (off track, at risk, not assessed, on track), then proposed, then paused; then `target` ascending (`null` last).
@@ -137,10 +138,10 @@ The page computes this from the data, so the builder sets no flag. Under "Needs 
 ## Caps and truncation
 Caps: 200 commitments, 60 projects, 20 goals, 30 decisions, 60 risks, 60 people. Text limits: `insight`, `next_step`, `quiet_reason`, `summary` (project, goal) and evidence `text` 240 characters; decision and risk `summary` 200; `rationale` 400; `mitigation` 300; at most 5 `alternatives` and 8 evidence lines per goal.
 
-**Budget: 400 KB**, one for the page. The five pages it replaces had 1,300 KB between them, but most of that paid for history (365 days of decisions, resolved risks, accomplishments, people by last contact); Work shows only what's open now. The template is about 75 KB with the base; a heavy month (80 open commitments, 20 projects, 30 risks, 40 people, all with 800-character bodies) comes to about 300 KB, so 400 leaves headroom without inviting a slow page on a phone.
+**Budget: 550 KB**, one for the page. The five pages it replaces had 1,300 KB between them, but most of that paid for history (365 days of decisions, resolved risks, accomplishments, people by last contact); Work shows only what's open now. The page is about 205 KB before data (the template, the base and the embedded fonts); a heavy month (80 open commitments, 20 projects, 30 risks, 40 people, all with 800-character bodies) comes to about 430 KB, so 550 leaves headroom without inviting a slow page on a phone.
 
 When over budget or a cap, apply in order until it fits, recording each list's dropped count in `meta.truncated` (keys `i_owe`, `waiting_on`, `projects`, `goals`, `decisions`, `risks`, `people`; each list shows its own "N more not shown here"):
-1. Cut each `body` to 800 characters, then drop `body` from the oldest items first (README §Record panel).
+1. Cut each `body` to 800 characters, then drop `body` from the oldest items first (README §Row details data).
 2. Drop `details` and `links` from every item.
 3. Commitments: low-priority with no due date, then those due more than 30 days out.
 4. Decisions older than 14 days, oldest first.

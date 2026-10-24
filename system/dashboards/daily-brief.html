@@ -2,68 +2,48 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
 <title>Today</title>
 <style id="atlas-base">{{ATLAS_BASE_CSS}}</style>
 <style id="atlas-page">
-.prio { list-style: none; margin: 0; padding: 0; counter-reset: prio; display: grid; gap: 1.1rem; }
-.prio li { counter-increment: prio; display: grid; grid-template-columns: 2.4rem minmax(0, 1fr); gap: .25rem .75rem; }
-.prio li::before { content: counter(prio); grid-row: span 3; font-family: var(--font-heading); font-size: 2.1rem; line-height: 1; color: var(--star); font-weight: 600; }
-.prio-title { font-weight: 600; font-size: 1.08rem; }
-.prio-why { color: var(--ink-2); font-size: .95rem; max-width: var(--measure); }
-/* Schedule */
-.when { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ink); }
-.when small { display: block; font-weight: 400; color: var(--ink-2); font-size: .8rem; }
-.sched .item-main { grid-template-columns: 5.5rem minmax(0, 1fr); column-gap: 1rem; }
-.sched .item-main > :not(.when) { grid-column: 2; }
-.sched .when { grid-row: span 6; }
-@media (max-width: 34rem) {
-  .sched .item-main { grid-template-columns: minmax(0, 1fr); }
-  .sched .item-main > :not(.when) { grid-column: 1; }
-  .sched .when { grid-row: auto; }
-  .sched .when small { display: inline; margin-left: .35rem; }
-}
-/* Due and slipping: I owe, then Waiting on */
-.sub { font-family: var(--font-body); font-size: .8rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 .45rem; }
-.sub-group + .sub-group { margin-top: 1.25rem; }
-.notes { margin: 0; padding-left: 1.1rem; display: grid; gap: .45rem; max-width: var(--measure); }
+/* Top priorities: rank numerals in the brand color */
+.prio { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); }
+.prio li { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 4px var(--space-4); padding: var(--space-5); border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
+.prio-n { grid-row: span 3; font-family: var(--font-display); font-size: 40px; line-height: 40px; font-weight: 500; color: var(--accent); }
+.prio-title { font-family: var(--font-display); font-size: 22px; line-height: 27px; font-weight: 500; }
+.prio-why { color: var(--muted); font-size: 14px; line-height: 20px; }
+.prio .chips { margin-top: 4px; }
+/* I owe beside Waiting on */
+.cols { display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); align-items: start; }
+.col { display: flex; flex-direction: column; gap: var(--space-3); min-width: 0; }
+.notes { margin: 0; padding-left: 18px; display: grid; gap: 6px; max-width: var(--measure); }
 /* This week: the seven-day strip */
-.week-wrap { overflow-x: auto; margin: 0 -2px; padding: 2px 2px .35rem; }
-.week { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, minmax(5.75rem, 1fr)); gap: .45rem; min-width: 42rem; }
-.day { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: .55rem .5rem .6rem; display: grid; gap: .35rem; align-content: start; min-width: 0; }
-.day[data-today="1"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
-.day[data-off="1"] { background: transparent; border-style: dashed; color: var(--ink-2); }
-.day-name { font-size: .76rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); }
-.day[data-today="1"] .day-name { color: var(--accent); }
-.day-num { font-family: var(--font-heading); font-size: 1.3rem; font-weight: 600; line-height: 1; color: var(--ink); }
-.load { height: 3.2rem; background: var(--surface-2); border-radius: 4px; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; }
-.load i { display: block; background: var(--accent); }
-.day[data-heavy="1"] .load i { background: var(--warn); }
-.day-hrs { font-size: .76rem; color: var(--ink-2); font-variant-numeric: tabular-nums; line-height: 1.35; }
+.week-wrap { overflow-x: auto; padding: 2px; }
+.week { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, minmax(96px, 1fr)); gap: var(--space-2); min-width: 700px; }
+.day { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 12px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.day[data-today="1"] { border: 2px solid var(--ink); padding: 11px; }
+.day[data-off="1"] { background: transparent; border-style: dashed; color: var(--muted); }
+.day-name { font-size: 13px; line-height: 18px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.day-num { font-family: var(--font-display); font-size: 28px; line-height: 28px; font-weight: 500; color: var(--ink); }
+.load { height: 48px; background: var(--sunken); border-radius: var(--radius-sm); display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; }
+.load i { display: block; background: var(--neutral-dot); }
+.day[data-heavy="1"] .load i { background: var(--warn-dot); }
+.day-hrs { font-size: 13px; line-height: 18px; color: var(--muted); }
 .day-hrs b { color: var(--ink); font-weight: 600; }
-.pins { list-style: none; margin: 0; padding: 0; display: grid; gap: .2rem; }
-.pin { font-size: .72rem; line-height: 1.3; padding: .15rem .3rem .15rem .35rem; border-radius: 3px; border-left: 3px solid var(--line); background: var(--surface-2); color: var(--ink); overflow-wrap: break-word; hyphens: auto; }
-.pin[data-tone="owe"] { border-left-color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, var(--surface)); }
-.pin[data-tone="star"] { border-left-color: var(--star); background: color-mix(in srgb, var(--star) 20%, var(--surface)); }
-.pin[data-tone="star"]::before, .legend .lg-star::before { content: "\25C6"; color: var(--star); margin-right: .25rem; }
-.pin-more { font-size: .72rem; color: var(--ink-2); }
-.legend { display: flex; flex-wrap: wrap; gap: .3rem 1rem; margin-top: .6rem; font-size: .8rem; color: var(--ink-2); }
-.legend i { display: inline-block; width: .7rem; height: .7rem; border-radius: 2px; vertical-align: -.05rem; margin-right: .3rem; }
-.legend .lg-meet { background: var(--accent); }
-.legend .lg-owe { background: var(--danger); }
-.legend .lg-star { width: auto; height: auto; background: none; font-style: normal; margin-right: 0; }
-.week-free { margin-top: .5rem; font-size: .9rem; color: var(--ink-2); }
-.week-free b { color: var(--ink); }
-/* Coming up */
-.mstones { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr)); gap: .75rem 1rem; }
-.ms { border-left: 3px solid var(--star); padding: .1rem 0 .1rem .75rem; display: grid; gap: .1rem; align-content: start; min-width: 0; }
-.ms[data-kind="deadline"] { border-left-color: var(--danger); }
-.ms time { font-size: .8rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
-.ms-title { font-weight: 600; overflow-wrap: anywhere; }
-.ms-meta { font-size: .85rem; color: var(--ink-2); }
-@media print { .week-wrap { overflow: visible; } }
+.pins { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.pin { font-size: 12px; line-height: 16px; padding: 3px 8px; border-radius: var(--radius-sm); background: var(--neutral-bg); color: var(--ink-2); overflow-wrap: break-word; hyphens: auto; }
+.pin[data-tone="owe"] { background: var(--bad-bg); color: var(--bad); }
+.pin[data-tone="star"] { background: var(--accent-soft); color: var(--accent); }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; }
+.legend .lg-meet { background: var(--neutral-dot); }
+.legend .lg-owe { background: var(--bad-bg); border: 1px solid var(--bad); }
+.legend .lg-star { background: var(--accent-soft); border: 1px solid var(--accent); }
+.week-free { font-size: 14px; color: var(--ink-2); }
+.week-free b { color: var(--ink); font-weight: 600; }
 </style>
 <style id="atlas-theme">{{ATLAS_THEME_CSS}}</style>
 </head>
@@ -75,9 +55,6 @@
 (function () {
   var N = window.Atlas, h = N.h, L = N.list;
 
-  function notes(list) {
-    return h("ul", { class: "notes" }, L(list).map(function (n) { return h("li", null, N.rich(n.text)); }));
-  }
   function hrs(x) { return (Math.round((x || 0) * 10) / 10) + " h"; }
   function mins(start, end) {
     var a = Date.parse(start), b = Date.parse(end);
@@ -85,112 +62,152 @@
     var m = Math.round((b - a) / 60000);
     return m < 60 ? m + " min" : (m % 60 ? hrs(m / 60) : (m / 60) + " h");
   }
-  function overdue(c) { return c.status === "slipped" || (c.due && N.daysFromToday(c.due) < 0); }
+  function overdue(c) { return c.status === "slipped" || (!!c.due && N.daysFromToday(c.due) < 0); }
+  function first(r) { return String(N.name(r) || "").split(" ")[0]; }
 
   N.page({ title: "Today" }, function (d, main) {
     var b = d.brief || {};
     var catchUp = b.kind === "catch-up";
     var today = L(d.today), due = L(d.due), waiting = L(d.waiting_on);
+    var acts = L(d.actions), asks = L(d.approvals), qs = L(d.questions), drafts = L(d.drafts);
+    var dueFilter = null;   /* "today" | "overdue" | null, from the stat tiles */
+    var dueRows = [];
 
-    /* Order: action needed, (catch-up only: while you were away), top priorities, schedule, due and slipping
-       (I owe, then Waiting on), needs you, worth knowing, drafts ready, this week, coming up.
-       Section heads carry a description, no count. */
-    var acts = L(d.actions);
-    if (acts.length) {
-      main.appendChild(N.section({ id: "actions", title: "Action needed",
-        note: "Only you can do these. They stay here until they're done; tell Atlas in chat when you've done one.",
-        body: N.items(acts.map(function (a) {
-          return N.item({ tone: "warn", title: a.text, text: a.how || null,
-            insight: a.copy_text ? ["The text to copy is on the ", N.pageLink("control-center", "Guide"), " page, or ask Atlas in chat."] : null,
-            aside: [null] });
-        })) }));
-    }
+    /* Order: needs you (only-you actions, approvals, questions, drafts), while you were away (catch-up),
+       top priorities, schedule, due and slipping (I owe beside Waiting on), worth knowing, this week, coming up. */
+
+    /* ================= Needs you ================= */
+    var cards = [];
+    acts.forEach(function (a) {
+      cards.push(N.card({ eyebrow: ["Only you can do this", "warn"], title: a.text, detail: a.how || null,
+        body: a.copy_text ? h("p", null, "The text to copy is on the ", N.pageLink("control-center", "Guide"), " page, or ask Atlas in chat.") : null,
+        actions: [N.request("I've done this", N.withId("I've done this: " + a.text, a.id), "primary", true)] }));
+    });
+    asks.forEach(function (a) {
+      cards.push(N.card({ eyebrow: ["Waiting for your OK", "warn"], title: a.action, detail: a.why || null,
+        actions: [N.request("Approve", N.withId("Approve: " + a.action, a.id), "primary", true),
+          N.request("Decline", N.withId("Decline: " + a.action, a.id), "secondary")] }));
+    });
+    qs.forEach(function (q) {
+      cards.push(N.card({ eyebrow: ["Question from Atlas", "info"], title: q.text,
+        actions: [N.request("Answer in chat", N.withId("About your question " + N.quote(q.text) + ":", q.id), "secondary")] }));
+    });
+    drafts.forEach(function (x) {
+      cards.push(N.card({ eyebrow: ["Draft ready", "good"], title: x.title,
+        detail: [x.to ? "To " + x.to : null, x.where ? "In your " + x.where : null].filter(Boolean).join(" · "),
+        body: x.why ? h("p", null, N.rich(x.why)) : null,
+        actions: [N.request("Send it", N.withId("Send the draft " + N.quote(x.title), x.ref && x.ref.id), "primary"),
+          N.request("Change it", N.withId("Change the draft " + N.quote(x.title), x.ref && x.ref.id), "secondary")] }));
+    });
+    var needsN = cards.length;
+    main.appendChild(N.section({ id: "needs", title: "Needs you", count: needsN || null,
+      note: needsN ? "Atlas won't do these until you say so. Each button copies a request for your Atlas chat." : null,
+      body: [needsN ? h("div", { class: "atl-grid" }, cards) : N.empty("Nothing needs you right now."),
+        N.more("approvals"), N.more("questions"), N.more("drafts")] }));
 
     if (catchUp && L(d.while_away).length) {
       main.appendChild(N.section({ id: "away", title: "While you were away", note: "What happened while you were out, most important first.",
-        body: notes(d.while_away), key: "while_away" }));
+        body: h("ul", { class: "notes" }, L(d.while_away).map(function (n) { return h("li", null, N.rich(n.text)); })), key: "while_away" }));
     }
 
+    /* ================= Top priorities ================= */
     main.appendChild(N.section({ id: "priorities", title: "Top priorities", note: "Ranked against your goals, not just due dates.",
-      body: L(d.priorities).length ? h("ol", { class: "prio" }, L(d.priorities).map(function (p) {
-        return h("li", null, h("p", { class: "prio-title" }, p.text), p.why ? h("p", { class: "prio-why" }, N.rich(p.why)) : null);
+      body: L(d.priorities).length ? h("ol", { class: "prio" }, L(d.priorities).map(function (p, i) {
+        return h("li", null, h("span", { class: "prio-n", "aria-hidden": "true" }, String(i + 1)),
+          h("p", { class: "prio-title" }, p.text), p.why ? h("p", { class: "prio-why" }, N.rich(p.why)) : null);
       })) : N.empty("No priorities set for today.") }));
 
-    main.appendChild(N.section({ id: "schedule", title: "Schedule", key: "today",
+    /* ================= Schedule ================= */
+    var PREP_TONE = { ready: "good", planned: "info", none: "warn", not_needed: "neutral" };
+    var schedRows = today.map(function (e) {
+      var prep = e.prep || {}, dated = e.kind === "deadline" || e.kind === "milestone";
+      var len = !e.all_day && e.end ? mins(e.start, e.end) : null;
+      var when = e.all_day ? "All day" : N.time(e.start) + (len ? " · " + len : "");
+      return N.row({
+        title: e.title, tone: e.kind === "deadline" ? "bad" : prep.status === "none" ? "warn" : prep.status === "ready" ? "good" : null,
+        meta: [when, e.location, L(e.attendees).length ? "With " + L(e.attendees).map(N.name).join(", ") : null],
+        badge: dated ? N.badge(N.label(e.kind), e.kind === "deadline" ? "bad" : "accent") : prep.status ? N.badge(N.label(prep.status), PREP_TONE[prep.status]) : null,
+        detail: prep.summary || prep.todo || e.project ? function () {
+          return N.detail({
+            blocks: [prep.summary ? { heading: "Prep", nodes: N.para(prep.summary) } : null,
+              prep.todo ? { heading: "To prepare", nodes: N.para(prep.todo) } : null],
+            facts: [["Project", N.name(e.project)], ["Where", e.location]],
+            actions: [prep.status === "ready" ? N.request("Open the prep note", N.withId("Show me the prep note for " + N.quote(e.title), e.id), "secondary") : null,
+              N.request("Ask Atlas", N.withId("What do I need to know for " + N.quote(e.title) + "?", e.id), "ghost")]
+          });
+        } : null
+      });
+    });
+    main.appendChild(N.section({ id: "schedule", title: "Schedule", count: today.length || null, key: "today",
       note: "Today's meetings with whether prep is ready, and what's due today.",
-      body: today.length ? h("ul", { class: "items sched" }, today.map(function (e) {
-        var prep = e.prep || {}, dated = e.kind === "deadline" || e.kind === "milestone";
-        var li = N.item({ tone: e.kind === "deadline" ? "danger" : e.kind === "milestone" ? "accent" : prep.status === "ready" ? "ok" : prep.status === "none" ? "warn" : null,
-          title: e.title, id: e.id,
-          meta: [e.location, L(e.attendees).length ? "With " + L(e.attendees).map(N.name).join(", ") : null, e.project ? N.name(e.project) : null],
-          insight: prep.summary || prep.todo || null,
-          aside: [prep.status && !dated ? N.status(prep.status) : null, dated ? N.chip(N.label(e.kind), e.kind === "deadline" ? "danger" : null) : null]
-        });
-        var len = !e.all_day && e.end ? mins(e.start, e.end) : null;
-        var when = h("p", { class: "when" }, e.all_day ? "All day" : N.time(e.start),
-          len ? h("small", null, len) : null,
-          e.end && !e.all_day ? h("span", { class: "visually-hidden" }, " to " + N.time(e.end)) : null);
-        li.firstChild.insertBefore(when, li.firstChild.firstChild);
-        return li;
-      })) : N.empty("No meetings or deadlines today.") }));
+      body: N.listBox(schedRows, "No meetings or deadlines today.") }));
 
-    function owed(c) {
-      var n = N.daysFromToday(c.due);
-      return N.item({ tone: overdue(c) ? "danger" : (n === 0 ? "warn" : "accent"), title: c.title, id: c.id,
-        meta: [c.counterparty ? "For " + N.name(c.counterparty) : null, c.priority ? N.label(c.priority) + " priority" : null],
-        nextStep: c.next_step,
-        aside: [h("span", null, N.due(c.due)), c.status === "slipped" ? N.status("slipped") : null] });
+    /* ================= Due and slipping: I owe beside Waiting on ================= */
+    function badgeFor(c) {
+      if (c.status === "slipped" && !(c.due && N.daysFromToday(c.due) < 0)) return N.badge("Slipped", "bad");
+      if (overdue(c)) return N.badge(N.due(c.due), "bad");
+      if (c.due && N.daysFromToday(c.due) <= 1) return N.badge(N.due(c.due), "warn");
+      return N.badge(c.due ? N.due(c.due) : "No date");
     }
-    function awaited(c) {
-      return N.item({ tone: overdue(c) ? "warn" : "muted", title: c.title, id: c.id,
-        meta: [c.counterparty ? "From " + N.name(c.counterparty) : null, c.since ? "Asked " + N.date(c.since) : null],
-        nextStep: c.next_step, aside: [h("span", null, N.due(c.due)), c.status === "slipped" ? N.status("slipped") : null] });
+    function cRow(c, owe) {
+      var other = c.counterparty;   /* on this page, the other person either way (daily-brief.contract.md) */
+      var row = N.row({
+        title: c.title, tone: overdue(c) ? "bad" : c.due && N.daysFromToday(c.due) <= 1 ? "warn" : null,
+        meta: [other ? (owe ? "For " : "From ") + N.name(other) : null, !owe && c.since ? "Asked " + N.date(c.since) : null, owe && c.priority ? N.label(c.priority) + " priority" : null],
+        badge: badgeFor(c),
+        action: owe ? N.request("Mark done", N.withId("Mark " + N.quote(c.title) + " as done", c.id), "secondary", true)
+          : N.request("Nudge " + first(other), N.withId("Draft a follow-up to " + N.name(other) + " about " + N.quote(c.title), c.id), "secondary"),
+        detail: c.next_step ? function () {
+          return N.detail({ blocks: [{ heading: "Next step", nodes: N.para(c.next_step) }],
+            actions: [N.request("Ask Atlas", N.withId("Show me " + N.quote(c.title), c.id), "ghost")] });
+        } : null
+      });
+      dueRows.push({ el: row, late: overdue(c), today: !overdue(c) && N.daysFromToday(c.due) === 0, owe: owe });
+      return row;
     }
-    function group(label, list, fn, key, emptyText) {
-      return h("div", { class: "sub-group" }, h("h3", { class: "sub" }, label),
-        N.items(list.map(fn), emptyText), N.more(key));
+    var oweBox = N.listBox(due.map(function (c) { return cRow(c, true); }), "Nothing you owe is due in the next few days.");
+    var waitBox = N.listBox(waiting.map(function (c) { return cRow(c, false); }), "You're not waiting on anyone.");
+    var oweCount = h("span", { class: "count" }, String(N.total("due", due.length)));
+    var waitCount = h("span", { class: "count" }, String(N.total("waiting_on", waiting.length)));
+    var dueNote = h("p", { class: "sec-note", role: "status" }, "Due soon or overdue, either way.");
+    var dueSec = N.section({ id: "due", title: "Due and slipping",
+      body: [dueNote, h("div", { class: "cols" },
+        h("div", { class: "col" }, h("h3", { class: "sub" }, "I owe", oweCount), oweBox, N.more("due")),
+        h("div", { class: "col" }, h("h3", { class: "sub" }, "Waiting on", waitCount), waitBox, N.more("waiting_on")))] });
+    main.appendChild(dueSec);
+    function applyDue() {
+      var o = 0, w = 0;
+      dueRows.forEach(function (r) {
+        var ok = !dueFilter || (dueFilter === "overdue" ? r.late : r.today);
+        r.el.hidden = !ok; if (ok) { if (r.owe) o++; else w++; }
+      });
+      oweCount.textContent = String(dueFilter ? o : N.total("due", due.length));
+      waitCount.textContent = String(dueFilter ? w : N.total("waiting_on", waiting.length));
+      dueNote.textContent = dueFilter === "overdue" ? "Showing only what's overdue. Choose the tile again to show everything."
+        : dueFilter === "today" ? "Showing only what's due today. Choose the tile again to show everything." : "Due soon or overdue, either way.";
     }
-    main.appendChild(N.section({ id: "due", title: "Due and slipping",
-      note: "Due soon or overdue: what you owe first, then what others owe you.",
-      body: [group("I owe", due, owed, "due", "Nothing you owe is due in the next few days."),
-        group("Waiting on", waiting, awaited, "waiting_on", "You're not waiting on anyone.")] }));
 
-    var asks = L(d.approvals), qs = L(d.questions);
-    if (asks.length || qs.length) {
-      main.appendChild(N.section({ id: "asks", title: "Needs you", note: "Reply in chat to approve, decline, or answer.",
-        body: [N.items(asks.map(function (a) {
-            return N.item({ tone: "warn", title: a.action, text: a.why, aside: [N.status("pending")] });
-          }).concat(qs.map(function (q) {
-            return N.item({ tone: "accent", title: q.text, aside: [N.chip("Question")] });
-          }))), N.more("approvals"), N.more("questions")] }));
-    }
-
+    /* ================= Worth knowing ================= */
     if (L(d.insights).length) {
       main.appendChild(N.section({ id: "insights", title: "Worth knowing", note: "Patterns Atlas noticed, with the reasoning.",
-        body: N.items(L(d.insights).map(function (i) {
-          return N.item({ tone: "accent", title: i.text, text: i.why,
-            nextStep: i.suggested_action,
-            extra: [i.draft && i.draft.where ? h("p", { class: "item-insight" }, h("b", null, "Draft ready: "),
-                (i.draft.to ? "to " + i.draft.to + ", " : "") + "in " + i.draft.where + ". Review and send it yourself, or say \"send it\" in chat.") : null,
-              L(i.refs).length ? h("p", { class: "item-meta" }, h("span", null, "Based on ", N.refs(i.refs))) : null],
-            aside: [i.draft && i.draft.where ? N.chip("Draft ready", "ok") : null] });
+        body: h("div", { class: "atl-grid" }, L(d.insights).map(function (i) {
+          var draft = i.draft && i.draft.where;
+          return N.card({ eyebrow: draft ? ["Draft ready", "good"] : ["Atlas noticed", "accent"], title: i.text, detail: i.why || null,
+            body: [i.suggested_action ? h("p", null, h("b", null, "Suggested: "), N.rich(i.suggested_action)) : null,
+              draft ? h("p", null, "Draft " + (i.draft.to ? "to " + i.draft.to + " " : "") + "in your " + i.draft.where + ". Review and send it yourself, or say “send it” in chat.") : null,
+              L(i.refs).length ? h("p", { class: "atl-card__detail" }, "Based on ", N.refs(i.refs)) : null],
+            actions: [i.suggested_action ? N.request("Do this", N.withId("Let's do this: " + i.suggested_action, i.id), "primary") : null,
+              N.request("Not useful", N.withId("That insight wasn't useful: " + N.quote(i.text), i.id), "secondary")] });
         })) }));
     }
 
-    if (L(d.drafts).length) {
-      main.appendChild(N.section({ id: "drafts", title: "Drafts ready", note: "Waiting in your email drafts. Nothing has been sent.", key: "drafts",
-        body: N.items(L(d.drafts).map(function (x) {
-          return N.item({ title: x.title, meta: [x.to ? "To " + x.to : null, x.where], text: x.why, id: x.ref && x.ref.id });
-        })) }));
-    }
-
-    /* This week: one tile per day, meeting load against work hours, free hours, what's due (milestones marked). */
+    /* ================= This week ================= */
     var wk = d.week || {}, days = L(wk.days), cap = wk.work_hours_per_day || 10;
     if (days.length) {
       var strip = h("ul", { class: "week", "aria-label": "The next seven days" }, days.map(function (day) {
         var off = day.work_day === false, mh = day.meeting_hours || 0, n = N.daysFromToday(day.date);
-        var items = L(day.due), more = (N.meta.truncated || {})["week." + day.date] || 0;
-        var dueWords = items.map(function (x) {
+        var its = L(day.due), more = (N.meta.truncated || {})["week." + day.date] || 0;
+        var dueWords = its.map(function (x) {
           return (x.kind === "milestone" ? "milestone: " : x.kind === "deadline" ? "deadline: " : x.direction === "waiting_on" ? "from " + N.name(x.counterparty) + ": " : "you owe: ") + x.title;
         });
         var label = (n === 0 ? "Today, " : "") + N.longDate(day.date) + ". " +
@@ -201,17 +218,15 @@
           h("span", { class: "day-name", "aria-hidden": "true" }, n === 0 ? "Today" : N.dayName(day.date).slice(0, 3)),
           h("span", { class: "day-num", "aria-hidden": "true" }, N.date(day.date).replace(/^\D+/, "")),
           off ? h("span", { class: "day-hrs", "aria-hidden": "true" }, "Day off")
-            : [h("span", { class: "load", "aria-hidden": "true", title: hrs(mh) + " of meetings" }, h("i", { style: "height:" + Math.min(100, Math.round(mh / cap * 100)) + "%" })),
+            : [h("span", { class: "load", "aria-hidden": "true" }, h("i", { style: "height:" + Math.min(100, Math.round(mh / cap * 100)) + "%" })),
               h("span", { class: "day-hrs", "aria-hidden": "true" }, h("b", null, hrs(mh)), " meetings", h("br"), h("b", null, hrs(day.free_hours)), " free")],
-          items.length || more ? h("ul", { class: "pins", "aria-hidden": "true" }, items.map(function (x) {
+          its.length || more ? h("ul", { class: "pins", "aria-hidden": "true" }, its.map(function (x) {
               var tone = x.kind === "milestone" ? "star" : (x.kind === "deadline" || x.direction === "i_owe") ? "owe" : null;
               return h("li", { class: "pin", "data-tone": tone }, x.title);
-            }), more ? h("li", { class: "pin-more" }, "+" + more + " more") : null) : null);
+            }), more ? h("li", { class: "pin" }, "+" + more + " more") : null) : null);
       }));
-      var free = typeof wk.free_hours === "number" ? wk.free_hours
-        : days.reduce(function (s, x) { return s + (x.free_hours || 0); }, 0);
-      main.appendChild(N.section({ id: "week", title: "This week",
-        note: "Meeting load, free time and what's due each day.",
+      var free = typeof wk.free_hours === "number" ? wk.free_hours : days.reduce(function (s, x) { return s + (x.free_hours || 0); }, 0);
+      main.appendChild(N.section({ id: "week", title: "This week", note: "Meeting load, free time and what's due each day.",
         body: [h("div", { class: "week-wrap" }, strip),
           h("p", { class: "legend", "aria-hidden": "true" },
             h("span", null, h("i", { class: "lg-meet" }), "meetings, against a " + cap + "-hour day"),
@@ -220,38 +235,41 @@
           h("p", { class: "week-free" }, "About ", h("b", null, hrs(free)), " free for focused work across the week, in gaps of an hour or more.")] }));
     }
 
-    /* Coming up: milestones and deadlines in the next 60 days. */
+    /* ================= Coming up ================= */
     var ms = L(d.milestones);
     if (d.week || ms.length) {
-      main.appendChild(N.section({ id: "coming", title: "Coming up", key: "milestones",
-        note: "Milestones and deadlines in the next two months.",
-        body: ms.length ? h("ul", { class: "mstones" }, ms.map(function (m) {
-          return h("li", { class: "ms", "data-kind": m.kind || "milestone" },
-            h("time", { datetime: m.date }, N.weekday(m.date) + " · " + N.rel(m.date)),
-            h("p", { class: "ms-title" }, m.title),
-            (m.kind === "deadline" || m.project) ? h("p", { class: "ms-meta" },
-              [m.kind === "deadline" ? "Deadline" : null, m.project ? N.name(m.project) : null].filter(Boolean).join(" · ")) : null,
-            m.note ? h("p", { class: "ms-meta" }, N.rich(m.note)) : null);
-        })) : N.empty("No milestones or deadlines in the next two months.") }));
+      main.appendChild(N.section({ id: "coming", title: "Coming up", key: "milestones", note: "Milestones and deadlines in the next two months.",
+        body: N.listBox(ms.map(function (m) {
+          var dl = m.kind === "deadline";
+          return N.row({ title: m.title, tone: dl ? "bad" : null,
+            meta: [N.weekday(m.date) + ", " + N.rel(m.date), m.project ? N.name(m.project) : null, m.note ? N.rich(m.note) : null],
+            badge: N.badge(dl ? "Deadline" : "Milestone", dl ? "bad" : "accent") });
+        }), "No milestones or deadlines in the next two months.") }));
     }
 
+    /* ================= Stat tiles: each one goes somewhere ================= */
     var meetings = today.filter(function (e) { return e.kind !== "deadline" && e.kind !== "milestone"; });
     var prepped = meetings.filter(function (e) { return (e.prep || {}).status === "ready"; }).length;
-    /* counts covers items cut to fit the budget; without it, count what's shown */
-    var counts = d.counts || {};
+    var counts = d.counts || {};   /* covers items cut to fit the budget; without it, count what's shown */
     var dueToday = typeof counts.due_today === "number" ? counts.due_today
       : due.concat(waiting).filter(function (c) { return c.status !== "slipped" && N.daysFromToday(c.due) === 0; }).length;
-    var late = typeof counts.overdue === "number" ? counts.overdue : due.concat(waiting).filter(overdue).length;
-    var stats = [];
-    if (acts.length) stats.push([acts.length, ["needs only you", "need only you"]]);
-    stats.push([meetings.length, meetings.length === 1 ? "meeting" + (prepped ? ", prepped" : "") : "meetings" + (prepped ? ", " + prepped + " prepped" : "")]);
-    stats.push([dueToday, "due today"]);
-    stats.push([late, "overdue"]);
+    var lateOwe = due.filter(overdue).length, lateWait = waiting.filter(overdue).length;
+    var late = typeof counts.overdue === "number" ? counts.overdue : lateOwe + lateWait;
+    function go(id) { var el = document.getElementById(id); if (el && el.scrollIntoView) el.scrollIntoView({ block: "start" }); }
     return {
       title: catchUp ? "Catch-up Brief" : "Today",
-      subtitle: catchUp && b.away ? "Away " + N.date(b.away.start) + " to " + N.date(b.away.end) : N.longDate(b.date || N.meta.as_of),
-      lede: b.headline,
-      stats: stats
+      dateLine: catchUp && b.away ? "Away " + N.date(b.away.start) + " to " + N.date(b.away.end) : N.longDate(b.date || N.meta.as_of),
+      lead: b.headline,
+      stats: [
+        { key: "needs", jump: "needs", value: needsN, label: ["needs you", "need you"] },
+        { key: "meetings", jump: "schedule", value: meetings.length, label: (meetings.length === 1 ? "meeting" : "meetings") + (prepped ? ", " + prepped + " prepped" : "") },
+        { key: "today", filter: true, value: dueToday, label: "due today" },
+        { key: "overdue", filter: true, tone: "bad", value: late, label: late ? "overdue: " + lateOwe + " you owe, " + lateWait + " waiting" : "overdue" }],
+      onStat: function (key) {
+        dueFilter = key === "today" || key === "overdue" ? key : null;
+        applyDue();
+        if (key) go("due");
+      }
     };
   });
 })();
