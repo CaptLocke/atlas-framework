@@ -88,7 +88,7 @@
       var owe = c.direction === "i_owe", late = overdue(c);
       var other = owe ? c.counterparty : c.owner;
       var action = owe ? N.request("Mark done", N.withId("Mark " + N.quote(c.title) + " as done", c.id), "secondary", true)
-        : N.request("Nudge " + first(other), N.withId("Draft a follow-up to " + N.name(other) + " about " + N.quote(c.title), c.id), "secondary");
+        : N.request("Nudge " + first(other), N.withId("Draft a follow-up to " + N.quote(N.name(other)) + " about " + N.quote(c.title), c.id), "secondary");
       var row = N.row({
         title: c.title, tone: late ? "bad" : cAtt(c) ? "warn" : null,
         meta: [owe ? (other ? "For " + who(other) : null) : (other ? "From " + who(other) : null), N.name(c.project) || null],
@@ -304,7 +304,7 @@
         meta: [[p.role, p.org ? N.name(p.org) : null].filter(Boolean).join(", ") || null,
           p.last_contact ? "Last contact " + N.rel(p.last_contact) : "No contact recorded", meet ? "Next: " + meet : null],
         badge: p.quiet ? N.badge("Gone quiet", "warn") : p.relationship ? N.badge(N.label(p.relationship)) : null,
-        action: o.theirs.length ? N.request("Nudge " + first(p), N.withId("Draft a follow-up to " + p.title + " about what they owe me", p.id), "secondary") : null,
+        action: o.theirs.length ? N.request("Nudge " + first(p), N.withId("Draft a follow-up to " + N.quote(p.title) + " about what they owe me", p.id), "secondary") : null,
         search: [p.role, N.name(p.org), p.quiet_reason, p.insight].join(" "),
         detail: function () {
           return N.detail({
@@ -316,7 +316,7 @@
             facts: N.mergeDetails([["Relationship", p.relationship ? N.label(p.relationship) : null], ["Usually", p.cadence],
               ["Last contact", p.last_contact ? N.dateY(p.last_contact) : "No contact recorded"], ["Next meeting", meet]], p.details),
             body: p.body, body_truncated: p.body_truncated, links: p.links, dates: N.datesLine(p.created, p.updated),
-            actions: [N.request("Ask Atlas", N.withId("What do I know about " + p.title + "?", p.id), "ghost")]
+            actions: [N.request("Ask Atlas", N.withId("What do I know about " + N.quote(p.title) + "?", p.id), "ghost")]
           });
         }
       });
@@ -341,8 +341,10 @@
     var filterSeg = N.segmented("Show", [{ value: "all", label: "Everything" }, { value: "attention", label: "Needs attention" }], "all",
       function (v) { state.filter = v; apply(); });
     var find = N.search("Find on this page", function (q) { state.q = q; apply(); });
+    var EMPTY = {}, TAB_KEYS = { commitments: ["i_owe", "waiting_on"], projects: ["projects"], goals: ["goals"], decisions: ["decisions", "risks"], people: ["people"] };
     var panelWrap = h("div", null, TABS.map(function (t) {
-      return h("div", { id: "panel-" + t.id, role: "tabpanel", "aria-labelledby": "tab-" + t.id }, PANELS[t.id]);
+      EMPTY[t.id] = h("p", { class: "empty", hidden: true }, "Nothing on this tab matches. Choose Everything, or clear the tile above.");
+      return h("div", { id: "panel-" + t.id, role: "tabpanel", "aria-labelledby": "tab-" + t.id }, EMPTY[t.id], PANELS[t.id]);
     }));
     main.appendChild(h("section", { class: "sec", "aria-label": "Your work" },
       h("div", { class: "toolbar atl-tabs-sticky" }, tabs.el, h("div", { class: "toolbar-row" }, filterSeg, find)),
@@ -372,10 +374,16 @@
       oweNone.textContent = oweList.length ? "Nothing here matches." : "You don't owe anyone anything right now.";
       waitNone.textContent = waitList.length ? "Nothing here matches." : "You're not waiting on anyone.";
       decCount.textContent = String(shown(dRows)); riskCount.textContent = String(shown(rRows));
+      var unfiltered = state.filter === "all" && !state.q && !state.tile;
       TABS.forEach(function (t) {
-        var n = per[t.id] || 0;
+        var n = per[t.id] || 0, any = items.some(function (i) { return i.tab === t.id; });
+        if (unfiltered) n += TAB_KEYS[t.id].reduce(function (s, k) { return s + ((N.meta.truncated || {})[k] || 0); }, 0);
         tabs.count(t.id, n, (t.id === "projects" && projAtt > 0) || (t.id === "commitments" && cs.some(overdue)));
         PANELS[t.id].parentNode.hidden = t.id !== state.tab;
+        /* filtered to nothing: say so, and hide the empty lists and grids */
+        var blank = any && !(per[t.id] || 0) && !state.q;
+        EMPTY[t.id].hidden = !blank;
+        PANELS[t.id].hidden = blank;
       });
       nomatch.textContent = state.q && !(per[state.tab] || 0) ? "Nothing on this tab matches “" + state.q + "”." + (Object.keys(per).length ? " Try the other tabs." : "") : "";
       nomatch.hidden = !nomatch.textContent;
@@ -391,7 +399,7 @@
         { key: "i_owe", filter: true, value: s.i_owe != null ? s.i_owe : N.total("i_owe", oweList.length), label: "you owe" },
         { key: "waiting_on", filter: true, value: s.waiting_on != null ? s.waiting_on : N.total("waiting_on", waitList.length), label: "waiting on others" },
         { key: "overdue", filter: true, tone: "bad", value: overdueN,
-          label: overdueN ? "overdue: " + lateOwe + " you owe, " + lateWait + " waiting" : "overdue" },
+          label: overdueN && lateOwe + lateWait === overdueN ? "overdue: " + lateOwe + " you owe, " + lateWait + " waiting" : "overdue" },
         { key: "projects", filter: true, tone: "bad", value: s.projects_attention != null ? s.projects_attention : projAtt, label: ["project needs attention", "projects need attention"] }],
       onStat: function (key) {
         state.tile = key;

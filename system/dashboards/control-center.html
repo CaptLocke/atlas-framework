@@ -12,7 +12,8 @@
 .part-head { display: flex; flex-direction: column; gap: 4px; padding-top: var(--space-2); border-top: 1px solid var(--line); }
 .part-head h2 { font-size: 30px; line-height: 34px; letter-spacing: -0.01em; padding-top: var(--space-4); }
 .part-head p { color: var(--muted); font-size: 14px; }
-.block { display: flex; flex-direction: column; gap: var(--space-3); min-width: 0; scroll-margin-top: 96px; }
+.block { display: flex; flex-direction: column; gap: var(--space-3); min-width: 0; scroll-margin-top: calc(var(--header-h, 66px) + 16px); }
+@media (max-width: 40rem) { .block { scroll-margin-top: 16px; } }
 .block-tools { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; justify-content: space-between; }
 .small { font-size: 14px; color: var(--muted); }
 /* Status in one line */
@@ -131,13 +132,13 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
       cards.push(N.card({ eyebrow: ["Only you can do this", "warn"], title: q.text, detail: q.how || null,
         body: q.copy_text ? h("pre", { class: "copy-text" }, q.copy_text) : null,
         actions: [q.copy_text ? h("button", { type: "button", class: "atl-btn atl-btn--secondary", onclick: function (e) { N.copyText(q.copy_text, e.currentTarget); } }, N.icon("copy"), h("span", null, "Copy the text")) : null,
-          N.request("I've done this", N.withId("I've done this: " + q.text, q.id), "primary", true)] }));
+          N.request("I've done this", N.withId("I've done this: " + N.quote(q.text), q.id), "primary", true)] }));
     });
     asks.forEach(function (a) {
       cards.push(N.card({ eyebrow: ["Waiting for your OK", "warn"], title: a.action,
         detail: [a.prepared ? "Prepared: " + a.prepared : null, byWhom(a.requested_by), a.requested_on ? "Asked " + N.date(a.requested_on) : null].filter(Boolean).join(" · "),
         body: a.why ? h("p", null, N.rich(a.why)) : null,
-        actions: [N.request("Approve", N.withId("Approve: " + a.action, a.id), "primary", true), N.request("Decline", N.withId("Decline: " + a.action, a.id), "secondary")] }));
+        actions: [N.request("Approve", N.withId("Approve " + N.quote(a.action), a.id), "primary", true), N.request("Decline", N.withId("Decline " + N.quote(a.action), a.id), "secondary")] }));
     });
     qs.forEach(function (q) {
       var proposal = !!q.proposed_change;
@@ -176,7 +177,7 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
       return N.row({ title: i.summary, tone: SEV_TONE[i.severity] || null, meta: [i.since ? "Since " + N.date(i.since) : null],
         badge: N.badge(i.severity === "high" ? "Problem" : i.severity === "medium" ? "Needs attention" : "Minor", SEV_TONE[i.severity] || "neutral"),
         detail: i.fix ? function () { return N.detail({ blocks: [{ heading: "To fix", nodes: N.para(i.fix) }],
-          actions: [N.request("Help me fix this", N.withId("Help me fix: " + i.summary, i.id), "secondary")] }); } : null });
+          actions: [N.request("Help me fix this", N.withId("Help me fix " + N.quote(i.summary), i.id), "secondary")] }); } : null });
     });
     var healthBlock = block("health", "Health", null, null, [
       h("div", { class: "status" }, N.dot(hs[1]), h("span", { class: "status-word" }, hs[0]),
@@ -259,8 +260,8 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
       var proposed = s.status === "proposed";
       return N.row({ title: N.rich(s.text), tone: proposed ? "warn" : "good",
         meta: [where, s.date ? N.dateY(s.date) : null], badge: N.badge(tag[0], tag[1]),
-        action: proposed ? N.request("Confirm", "That's right: " + N.quote(N.rich(s.text)), "secondary", true) : null,
-        detail: proposed ? function () { return N.detail({ actions: [N.request("Correct it", "That's not right: " + N.quote(N.rich(s.text)) + ". Actually,", "secondary")] }); } : null });
+        action: proposed ? N.request("Confirm", "Your belief about me is right: " + N.quote(N.rich(s.text)), "secondary", true) : null,
+        detail: proposed ? function () { return N.detail({ actions: [N.request("Correct it", "Your belief about me is wrong: " + N.quote(N.rich(s.text)) + ". Actually,", "secondary")] }); } : null });
     }
     var all = [], featured = [];
     files.forEach(function (f) { L(f.groups).forEach(function (g) { L(g.statements).forEach(function (s) { all.push(s); if (s.featured) featured.push(s); }); }); });
@@ -335,7 +336,7 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
       dateLine: "How Atlas is running, and what it knows about you.", lead: st.headline,
       stats: [
         { key: "needs", jump: "needs", value: nWaiting, label: ["needs you", "need you"] },
-        { key: "issues", jump: "health", tone: "bad", value: issues.length, label: ["known issue", "known issues"] },
+        { key: "issues", jump: "health", tone: "bad", value: N.total("known_issues", issues.length), label: ["known issue", "known issues"] },
         { key: "automations", jump: "automations", value: routines.length, label: ["automation", "automations"] },
         sys.installed_version ? { key: "version", jump: "health", value: sys.installed_version, label: up.available ? "Atlas version, update available" : "Atlas version" } : null]
     };

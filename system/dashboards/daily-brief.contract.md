@@ -70,7 +70,7 @@ Envelope: `meta` as in `system/dashboards/README.md`; `meta.title` = `"Today"`; 
 | `today[].project` | The event's first linked project as a ref, or `null`. |
 | `prep.status` | `ready` (prep note exists), `planned` (meeting-prep will create one before the meeting), `none` (meaningful meeting without prep), `not_needed`. `prep.todo` is one line on what to prepare, for `planned` or `none`; shown when there is no `summary`. |
 | `due[].status`, `waiting_on[].status` | `open` or `slipped`. |
-| `counts` | Optional `{ overdue, due_today }`: totals over every open commitment in both directions, before caps, for the stat cards. Without it the page counts only the items it shows. |
+| `counts` | Optional `{ overdue, due_today }`: totals over every open commitment in both directions, before caps, for the stat tiles. Without it the page counts only the items it shows. |
 | `drafts[].where` | Plain words for where the draft is ("Outlook drafts"). Never the draft body. |
 | `actions[]` | Things only the user can do. `how` is optional; `copy_text` is `true` when the entry has text to copy (shown on the Guide page, never on this one). |
 | `insights[].draft` | `{ to, where }` when the insight's suggested action already has a draft (its `Draft:` line in `insights.md`), else `null`. Never the draft body. |
@@ -113,4 +113,4 @@ Envelope: `meta` as in `system/dashboards/README.md`; `meta.title` = `"Today"`; 
 - Text limits: `headline` 200 characters, `why`/`next_step`/`summary`/`todo` 240, `milestones[].note` 200.
 
 ## Size budget and truncation
-The page is about 210 KB before data (the template, the base and the embedded fonts) and typically 10 to 20 KB of data, so 280 KB leaves room for a long catch-up. If a render would exceed it, cut in this order until it fits, recording each in `meta.truncated`: `while_away` (to 4), `drafts` (to 3), `milestones` (to 4), `week.days[].due` (to 3 per day), then shorten `why`, `next_step` and `note` text to 120 characters. Never drop `actions`, `priorities`, `today`, `due` or `waiting_on` below their caps.
+The page is about 225 KB before data (the template, the base and the embedded fonts) and typically 10 to 20 KB of data, so 280 KB leaves room for a long catch-up. If a render would exceed it, cut in this order until it fits, recording each in `meta.truncated`: `while_away` (to 4), `drafts` (to 3), `milestones` (to 4), `week.days[].due` (to 3 per day), then shorten `why`, `next_step` and `note` text to 120 characters. Never drop `actions`, `priorities`, `today`, `due` or `waiting_on` below their caps.

@@ -57,6 +57,7 @@
   /* Names older templates and user dashboards may still use */
   --bg: var(--ground); --surface-2: var(--sunken); --ok: var(--good); --danger: var(--bad); --star: var(--accent);
   --accent-ink: var(--on-ink); --font-heading: var(--font-display); --font-body: var(--font-sans); --radius: var(--radius-lg);
+  --gutter: 16px; --font-id: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -177,6 +178,7 @@ a.atl-nav__item:hover { background: var(--sunken-hover); }
 .atl-icon-btn:focus-visible { outline: 2px solid var(--info); outline-offset: 2px; }
 .atl-icon { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 @media (max-width: 40rem) {
+  .atl-header { position: static; }   /* on a phone the header wraps to two rows; pinned, it would cover a fifth of the screen */
   .atl-header__inner { gap: 6px 12px; }
   .atl-header__trailing { margin-left: 0; width: 100%; justify-content: space-between; order: 3; }
   .atl-wordmark { font-size: 24px; }
@@ -212,7 +214,8 @@ a.atl-nav__item:hover { background: var(--sunken-hover); }
 
 /* ---- Sections ---- */
 main { display: flex; flex-direction: column; gap: var(--space-9); }
-.sec { display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; scroll-margin-top: 96px; }
+.sec { display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; scroll-margin-top: calc(var(--header-h, 66px) + 16px); }
+@media (max-width: 40rem) { .sec { scroll-margin-top: 16px; } }
 .sec-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-2) var(--space-4); }
 .sec-head h2 { font-size: 30px; line-height: 34px; letter-spacing: -0.01em; }
 .sec-head h2 .count, .sec-count { font-family: var(--font-sans); font-size: 18px; font-weight: 400; color: var(--muted); margin-left: var(--space-2); }
@@ -363,6 +366,6 @@ button.atl-row__main { cursor: pointer; }
 
 @media print {
   .atl-header, .atl-tabs, .atl-search, .atl-btn, .atl-actions, .skip, .atl-toast { display: none !important; }
-  .atl-row__detail[hidden] { display: flex !important; }
+  [role="tabpanel"][hidden] { display: block !important; }   /* print every Work tab, not just the open one */
   body { font-size: 11pt; }
 }

@@ -192,7 +192,8 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
             action: N.request("Answer", N.withId("About " + N.quote(q.title) + ":", q.id), "secondary") });
         }).concat(ideas.map(function (i) {
           return N.row({ title: i.title, badge: N.badge("Idea: " + N.label(i.status).toLowerCase(), "accent") });
-        }))) }));
+        }))), key: "questions" }));
+      if (N.more("ideas")) main.lastChild.querySelector(".sec-body").appendChild(N.more("ideas"));
     }
 
     if (evs.length) {

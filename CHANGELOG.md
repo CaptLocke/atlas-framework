@@ -12,10 +12,12 @@ Each release's "What's new" section is shown to users in the Guide and their nex
 ### What's new
 - Your pages have a new look: easier to read in light and dark, with the same header on every page to move between Today, Work and Guide.
 - Work is split into tabs (Commitments, Projects, Goals, Decisions & risks, People), and what you owe sits beside what others owe you.
-- The numbers at the top of each page do something: choose one to see the items behind it, and choose it again to show everything.
+- The numbers at the top of each page do something: choose one to jump to the items behind it. On Work and Today, some narrow the list to those items; choose them again to show everything.
 - Today opens with what needs you: approvals, questions, drafts and anything only you can do, each with a button.
 - Buttons like Mark done, Approve and Nudge copy a ready request for your Atlas chat, so you don't have to write it yourself.
-- Choose any item to see its details right where it is.
+- Choose an item in a list to see its details right where it is, instead of in a panel at the side.
+- Pages are about twice the size they were, because they now carry their own fonts, so they may take a moment longer to open on a slow connection.
+- If you have dashboards of your own, they keep working; ask Atlas to rebuild one to give it the new look.
 
 ## 2.2.0 (2026-10-23)
 

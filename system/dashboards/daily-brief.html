@@ -81,12 +81,12 @@
     acts.forEach(function (a) {
       cards.push(N.card({ eyebrow: ["Only you can do this", "warn"], title: a.text, detail: a.how || null,
         body: a.copy_text ? h("p", null, "The text to copy is on the ", N.pageLink("control-center", "Guide"), " page, or ask Atlas in chat.") : null,
-        actions: [N.request("I've done this", N.withId("I've done this: " + a.text, a.id), "primary", true)] }));
+        actions: [N.request("I've done this", N.withId("I've done this: " + N.quote(a.text), a.id), "primary", true)] }));
     });
     asks.forEach(function (a) {
       cards.push(N.card({ eyebrow: ["Waiting for your OK", "warn"], title: a.action, detail: a.why || null,
-        actions: [N.request("Approve", N.withId("Approve: " + a.action, a.id), "primary", true),
-          N.request("Decline", N.withId("Decline: " + a.action, a.id), "secondary")] }));
+        actions: [N.request("Approve", N.withId("Approve " + N.quote(a.action), a.id), "primary", true),
+          N.request("Decline", N.withId("Decline " + N.quote(a.action), a.id), "secondary")] }));
     });
     qs.forEach(function (q) {
       cards.push(N.card({ eyebrow: ["Question from Atlas", "info"], title: q.text,
@@ -99,7 +99,7 @@
         actions: [N.request("Send it", N.withId("Send the draft " + N.quote(x.title), x.ref && x.ref.id), "primary"),
           N.request("Change it", N.withId("Change the draft " + N.quote(x.title), x.ref && x.ref.id), "secondary")] }));
     });
-    var needsN = cards.length;
+    var needsN = cards.length + ((N.meta.truncated || {}).approvals || 0) + ((N.meta.truncated || {}).questions || 0) + ((N.meta.truncated || {}).drafts || 0);
     main.appendChild(N.section({ id: "needs", title: "Needs you", count: needsN || null,
       note: needsN ? "Atlas won't do these until you say so. Each button copies a request for your Atlas chat." : null,
       body: [needsN ? h("div", { class: "atl-grid" }, cards) : N.empty("Nothing needs you right now."),
@@ -167,13 +167,14 @@
     }
     var oweBox = N.listBox(due.map(function (c) { return cRow(c, true); }), "Nothing you owe is due in the next few days.");
     var waitBox = N.listBox(waiting.map(function (c) { return cRow(c, false); }), "You're not waiting on anyone.");
+    var oweNone = h("p", { class: "empty", hidden: true }, "Nothing here matches."), waitNone = h("p", { class: "empty", hidden: true }, "Nothing here matches.");
     var oweCount = h("span", { class: "count" }, String(N.total("due", due.length)));
     var waitCount = h("span", { class: "count" }, String(N.total("waiting_on", waiting.length)));
     var dueNote = h("p", { class: "sec-note", role: "status" }, "Due soon or overdue, either way.");
     var dueSec = N.section({ id: "due", title: "Due and slipping",
       body: [dueNote, h("div", { class: "cols" },
-        h("div", { class: "col" }, h("h3", { class: "sub" }, "I owe", oweCount), oweBox, N.more("due")),
-        h("div", { class: "col" }, h("h3", { class: "sub" }, "Waiting on", waitCount), waitBox, N.more("waiting_on")))] });
+        h("div", { class: "col" }, h("h3", { class: "sub" }, "I owe", oweCount), oweBox, oweNone, N.more("due")),
+        h("div", { class: "col" }, h("h3", { class: "sub" }, "Waiting on", waitCount), waitBox, waitNone, N.more("waiting_on")))] });
     main.appendChild(dueSec);
     function applyDue() {
       var o = 0, w = 0;
@@ -181,6 +182,8 @@
         var ok = !dueFilter || (dueFilter === "overdue" ? r.late : r.today);
         r.el.hidden = !ok; if (ok) { if (r.owe) o++; else w++; }
       });
+      if (due.length) { oweBox.hidden = !!dueFilter && !o; oweNone.hidden = !(dueFilter && !o); }
+      if (waiting.length) { waitBox.hidden = !!dueFilter && !w; waitNone.hidden = !(dueFilter && !w); }
       oweCount.textContent = String(dueFilter ? o : N.total("due", due.length));
       waitCount.textContent = String(dueFilter ? w : N.total("waiting_on", waiting.length));
       dueNote.textContent = dueFilter === "overdue" ? "Showing only what's overdue. Choose the tile again to show everything."
@@ -196,7 +199,7 @@
             body: [i.suggested_action ? h("p", null, h("b", null, "Suggested: "), N.rich(i.suggested_action)) : null,
               draft ? h("p", null, "Draft " + (i.draft.to ? "to " + i.draft.to + " " : "") + "in your " + i.draft.where + ". Review and send it yourself, or say “send it” in chat.") : null,
               L(i.refs).length ? h("p", { class: "atl-card__detail" }, "Based on ", N.refs(i.refs)) : null],
-            actions: [i.suggested_action ? N.request("Do this", N.withId("Let's do this: " + i.suggested_action, i.id), "primary") : null,
+            actions: [i.suggested_action ? N.request("Do this", N.withId("Let's do the suggested action " + N.quote(i.suggested_action), i.id), "primary") : null,
               N.request("Not useful", N.withId("That insight wasn't useful: " + N.quote(i.text), i.id), "secondary")] });
         })) }));
     }
@@ -227,7 +230,7 @@
       }));
       var free = typeof wk.free_hours === "number" ? wk.free_hours : days.reduce(function (s, x) { return s + (x.free_hours || 0); }, 0);
       main.appendChild(N.section({ id: "week", title: "This week", note: "Meeting load, free time and what's due each day.",
-        body: [h("div", { class: "week-wrap" }, strip),
+        body: [h("div", { class: "week-wrap", tabindex: "0", role: "region", "aria-label": "This week, scrolls sideways" }, strip),
           h("p", { class: "legend", "aria-hidden": "true" },
             h("span", null, h("i", { class: "lg-meet" }), "meetings, against a " + cap + "-hour day"),
             h("span", null, h("i", { class: "lg-owe" }), "due from you"),
@@ -264,7 +267,7 @@
         { key: "needs", jump: "needs", value: needsN, label: ["needs you", "need you"] },
         { key: "meetings", jump: "schedule", value: meetings.length, label: (meetings.length === 1 ? "meeting" : "meetings") + (prepped ? ", " + prepped + " prepped" : "") },
         { key: "today", filter: true, value: dueToday, label: "due today" },
-        { key: "overdue", filter: true, tone: "bad", value: late, label: late ? "overdue: " + lateOwe + " you owe, " + lateWait + " waiting" : "overdue" }],
+        { key: "overdue", filter: true, tone: "bad", value: late, label: late && lateOwe + lateWait === late ? "overdue: " + lateOwe + " you owe, " + lateWait + " waiting" : "overdue" }],
       onStat: function (key) {
         dueFilter = key === "today" || key === "overdue" ? key : null;
         applyDue();

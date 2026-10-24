@@ -80,7 +80,7 @@ Republished by `daily-brief` every run; by `triage` when this run changed its da
 ```
 `summary` counts cover **all** matching records, including any truncated from the lists. `schema_version` is 2: the shape changed when the five pages merged.
 
-**Derived on the page, not carried in the data** (so nothing is listed twice): what each person owes you and what you owe them (from `commitments`: `waiting_on` items whose `owner` is the person, and `i_owe` items whose `counterparty` is the person); each project's open commitments and risks, shown in its record panel (commitments whose `project` is it, risks whose `projects` include it); and each goal's projects (projects whose `goal` is it).
+**Derived on the page, not carried in the data** (so nothing is listed twice): what each person owes you and what you owe them (from `commitments`: `waiting_on` items whose `owner` is the person, and `i_owe` items whose `counterparty` is the person); each project's open commitments and risks, shown in its expanded row (commitments whose `project` is it, risks whose `projects` include it); and each goal's projects (projects whose `goal` is it).
 
 | Field | Notes |
 |---|---|
@@ -138,7 +138,7 @@ The page computes this from the data, so the builder sets no flag. Under "Needs 
 ## Caps and truncation
 Caps: 200 commitments, 60 projects, 20 goals, 30 decisions, 60 risks, 60 people. Text limits: `insight`, `next_step`, `quiet_reason`, `summary` (project, goal) and evidence `text` 240 characters; decision and risk `summary` 200; `rationale` 400; `mitigation` 300; at most 5 `alternatives` and 8 evidence lines per goal.
 
-**Budget: 550 KB**, one for the page. The five pages it replaces had 1,300 KB between them, but most of that paid for history (365 days of decisions, resolved risks, accomplishments, people by last contact); Work shows only what's open now. The page is about 205 KB before data (the template, the base and the embedded fonts); a heavy month (80 open commitments, 20 projects, 30 risks, 40 people, all with 800-character bodies) comes to about 430 KB, so 550 leaves headroom without inviting a slow page on a phone.
+**Budget: 550 KB**, one for the page. The five pages it replaces had 1,300 KB between them, but most of that paid for history (365 days of decisions, resolved risks, accomplishments, people by last contact); Work shows only what's open now. The page is about 225 KB before data (the template, the base and the embedded fonts); a heavy month (80 open commitments, 20 projects, 30 risks, 40 people, all with 800-character bodies) comes to about 450 KB, so 550 leaves headroom without inviting a slow page on a phone.
 
 When over budget or a cap, apply in order until it fits, recording each list's dropped count in `meta.truncated` (keys `i_owe`, `waiting_on`, `projects`, `goals`, `decisions`, `risks`, `people`; each list shows its own "N more not shown here"):
 1. Cut each `body` to 800 characters, then drop `body` from the oldest items first (README §Row details data).

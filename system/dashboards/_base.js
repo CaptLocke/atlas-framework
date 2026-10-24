@@ -233,10 +233,12 @@
   N.toast = function (message, onUndo) {
     if (toastEl && toastEl.parentNode) toastEl.parentNode.removeChild(toastEl);
     clearTimeout(toastTimer);
-    toastEl = h("div", { class: "atl-toast", role: "status", "aria-live": "polite" }, h("span", null, message),
+    var msg = h("span", null, "");
+    toastEl = h("div", { class: "atl-toast", role: "status", "aria-live": "polite" }, msg,
       onUndo ? h("button", { type: "button", class: "atl-toast__undo", onclick: function () { hide(); onUndo(); } }, "Undo") : null);
     function hide() { if (toastEl && toastEl.parentNode) toastEl.parentNode.removeChild(toastEl); }
     document.body.appendChild(toastEl);
+    setTimeout(function () { msg.textContent = message; }, 50);   /* text after the live region exists, so it's announced */
     toastTimer = setTimeout(hide, 5000);
   };
 
@@ -244,7 +246,8 @@
      to paste into the Atlas chat, and says so. The list changes when Atlas refreshes the page. ---- */
   N.copyText = function (text, anchor) {
     function fallback() {
-      var box = h("input", { class: "atl-copybox", type: "text", readonly: true, value: text, "aria-label": "Request to paste in your Atlas chat" });
+      var box = h("textarea", { class: "atl-copybox", readonly: true, rows: String(Math.min(8, String(text).split("\n").length + 1)), "aria-label": "Text to paste in your Atlas chat" });
+      box.value = text;
       var holder = anchor && anchor.parentNode;
       if (holder) {
         var old = holder.querySelector(".atl-copybox");
@@ -258,14 +261,23 @@
       navigator.clipboard.writeText(text).then(function () { N.toast("Copied. Paste it in your Atlas chat."); }, fallback);
     } catch (e) { fallback(); }
   };
-  /* A request button. text is what lands in chat; id, when given, lets Atlas find the right record. */
+  /* Page data comes from emails and documents, so it is cleaned before it lands in chat: control characters
+     and line breaks become spaces, and each piece is capped. Quote every data piece with N.quote, and add the
+     record or inbox ID with N.withId: Atlas acts on the record the ID names, and the quoted text is only a
+     reminder of which one (system/rules/governance.md, N7). */
+  function clean(s, max) {
+    s = String(s == null ? "" : s).replace(/[\u0000-\u001f\u007f-\u009f\u2028\u2029]+/g, " ").replace(/\s+/g, " ").trim();
+    return s.length > max ? s.slice(0, max - 1).trim() + "…" : s;
+  }
+  N.clean = function (s) { return clean(s, 200); };
+  N.quote = function (title) { return "“" + clean(title, 200).replace(/[“”"]/g, "'") + "”"; };
+  N.withId = function (text, id) { return text + (id ? " (" + clean(id, 120) + ")" : ""); };
+  /* A request button: label on the button; text, built with N.quote and N.withId, is what lands in chat. */
   N.request = function (label, text, variant, check) {
     var btn = N.button({ label: label, variant: variant, check: check });
-    btn.addEventListener("click", function (e) { e.stopPropagation(); N.copyText(text, btn); });
+    btn.addEventListener("click", function (e) { e.stopPropagation(); N.copyText(clean(text, 600), btn); });
     return btn;
   };
-  N.quote = function (title) { return "“" + String(title || "").replace(/[“”]/g, "") + "”"; };
-  N.withId = function (text, id) { return text + (id ? " (" + id + ")" : ""); };
 
   /* ---- Sections: a display heading with its count, a note, optional tools on the right ---- */
   /* opts: {id, title, note, count, key, body, tools} */
@@ -322,7 +334,8 @@
   /* What goes inside an expanded row or a card. opts: {facts:[[label, value]], text, blocks:[{heading, nodes}],
      body:[{heading,text}], body_truncated, links:[ref], dates, actions:[nodes]} */
   N.detail = function (o) {
-    var facts = N.list(o.facts).filter(function (p) { return p && p[1] != null && p[1] !== "" && !(Array.isArray(p[1]) && !p[1].length); });
+    var facts = N.list(o.facts).map(function (p) { return p && !Array.isArray(p) && p.label ? [p.label, p.value] : p; })
+      .filter(function (p) { return p && p[1] != null && p[1] !== "" && !(Array.isArray(p[1]) && !p[1].length); });
     var body = N.list(o.body).filter(function (s) { return s && s.text; });
     var links = N.list(o.links).filter(Boolean);
     return [
@@ -346,8 +359,8 @@
   /* Extra facts from a record's panel data (details: [{label, value}]) not already shown. */
   N.mergeDetails = function (pairs, extra) {
     var out = [], seen = {};
-    N.list(pairs).forEach(function (p) { if (p && p[1] != null && p[1] !== "") { out.push([p[0], p[1]]); seen[p[0]] = 1; } });
-    N.list(extra).forEach(function (x) { if (x && x.label && !seen[x.label] && x.value != null && x.value !== "") out.push([x.label, x.value]); });
+    N.list(pairs).forEach(function (p) { if (p && p[1] != null && p[1] !== "") { out.push({ label: p[0], value: p[1] }); seen[p[0]] = 1; } });
+    N.list(extra).forEach(function (x) { if (x && x.label && !seen[x.label] && x.value != null && x.value !== "") out.push({ label: x.label, value: x.value }); });
     return out.slice(0, 16);
   };
 
@@ -383,9 +396,12 @@
       return btns[t.id];
     }));
     el.addEventListener("keydown", function (e) {
-      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
-      var ids = items.map(function (t) { return t.id; }), i = ids.indexOf(current);
-      var next = ids[(i + (e.key === "ArrowRight" ? 1 : ids.length - 1)) % ids.length];
+      var ids = items.map(function (t) { return t.id; }), i = ids.indexOf(current), next;
+      if (e.key === "ArrowRight") next = ids[(i + 1) % ids.length];
+      else if (e.key === "ArrowLeft") next = ids[(i + ids.length - 1) % ids.length];
+      else if (e.key === "Home") next = ids[0];
+      else if (e.key === "End") next = ids[ids.length - 1];
+      else return;
       set(next, true); btns[next].focus(); e.preventDefault();
     });
     function set(id, user) {
@@ -430,8 +446,9 @@
   };
 
   /* ---- Find on this page ---- */
+  var searchSeq = 0;
   N.search = function (label, onInput) {
-    var id = "q-" + (N.meta.dashboard || "page");
+    var id = "q-" + (N.meta.dashboard || "page") + "-" + (++searchSeq);
     return h("div", { class: "atl-search" },
       h("label", { class: "visually-hidden", for: id }, label),
       N.icon("search"),
@@ -470,10 +487,38 @@
     nodes = N.list(nodes);
     return nodes.length ? h("ul", { class: "items" }, nodes) : N.empty(emptyText || "Nothing here right now.");
   };
-  /* The record drawer is gone: rows expand in place. These keep older templates working. */
+  /* The record drawer is gone: rows expand in place. These keep older user dashboards working:
+     N.clickable adds a "Details" toggle that shows a view's content under the card instead of in a drawer. */
   N.recordPanel = function () { return { el: h("span", { hidden: true }), open: function () {}, add: function (v) { return v; }, get: function () { return null; } }; };
-  N.clickable = function (card) { return card; };
+  N.clickable = function (card, panel, view) {
+    if (!card || !view) return card;
+    var box = h("div", { class: "atl-row__detail", hidden: true }), built = false;
+    var btn = h("button", { type: "button", class: "atl-btn atl-btn--ghost", "aria-expanded": "false" }, "Details");
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      var open = btn.getAttribute("aria-expanded") !== "true";
+      if (open && !built) {
+        add(box, N.detail({ text: view.summary, facts: view.details,
+          blocks: N.list(view.sections).filter(Boolean).map(function (s) { return { heading: s.heading, nodes: s.nodes }; }),
+          body: view.body, body_truncated: view.body_truncated, links: view.links, dates: view.dates }));
+        built = true;
+      }
+      btn.setAttribute("aria-expanded", String(open)); box.hidden = !open;
+    });
+    var host = card.querySelector && card.querySelector(".item-main") || card;
+    host.appendChild(h("div", { class: "atl-actions" }, btn)); host.appendChild(box);
+    return card;
+  };
   N.openTitle = function (text) { return text; };
+  /* The old page header, for user dashboards that build their own: title, subtitle, lead, stat tiles. */
+  N.masthead = function (o) {
+    o = o || {};
+    var stats = o.stats && o.stats.length ? N.statTiles(o.stats.map(function (s, i) { return Array.isArray(s) ? { key: "s" + i, value: s[0], label: s[1] } : s; })) : null;
+    return h("div", { class: "page-head" }, h("h1", { class: "page-title" }, o.title),
+      o.subtitle ? h("p", { class: "date-line" }, o.subtitle) : null,
+      (N.meta.headline || o.lede || o.lead) ? h("p", { class: "lead" }, N.rich(N.meta.headline || o.lede || o.lead)) : null,
+      stats ? stats.el : null);
+  };
 
   /* ---- Theme: follows the system until the viewer picks; the toggle switches light and dark ---- */
   function applyTheme(t) {
@@ -637,7 +682,7 @@
         if (window.console) console.error(e);
       }
     }
-    var lead = N.meta.headline || head.lead;
+    var lead = N.meta.headline || head.lead || head.lede;   /* "lede": older templates */
     var stats = head.stats && head.stats.length ? N.statTiles(head.stats.map(function (s, i) {
       return Array.isArray(s) ? { key: "s" + i, value: s[0], label: s[1] } : s;   /* older [value, label] pairs */
     }), head.onStat) : null;
