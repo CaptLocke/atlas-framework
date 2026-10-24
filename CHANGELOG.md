@@ -7,6 +7,16 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
+## Unreleased
+
+### What's new
+- Your pages have a new look: easier to read in light and dark, with the same header on every page to move between Today, Work and Guide.
+- Work is split into tabs (Commitments, Projects, Goals, Decisions & risks, People), and what you owe sits beside what others owe you.
+- The numbers at the top of each page do something: choose one to see the items behind it, and choose it again to show everything.
+- Today opens with what needs you: approvals, questions, drafts and anything only you can do, each with a button.
+- Buttons like Mark done, Approve and Nudge copy a ready request for your Atlas chat, so you don't have to write it yourself.
+- Choose any item to see its details right where it is.
+
 ## 2.2.0 (2026-10-23)
 
 ### What's new
