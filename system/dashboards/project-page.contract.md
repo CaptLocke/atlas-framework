@@ -3,7 +3,7 @@ type: dashboard-contract
 name: project-page
 template: project-page.html
 republished_by: [triage, weekly-review]
-size_budget_kb: 250
+size_budget_kb: 400
 stale_after_hours: 192
 ---
 # Dashboard: project-page
@@ -59,6 +59,9 @@ Created only in chat. Once listed in `project_pages`, it is republished by `tria
 
 ## Rendering notes
 - Only records linked to the project (directly or via its commitments, decisions, and risks) appear; the page never pulls in unrelated work.
+- Order: overview (a card with health, owner, goal, dates, insight and next step), **timeline** (start to target with today marked, then the dated items grouped Overdue, This week, Later, Done or past; built from the dates already in the data, nothing extra), people, open commitments **grouped by who's holding each one**, risks beside decisions, questions and ideas, meetings and milestones, then history and sources folded.
+- Stat tiles open their section: open commitments, overdue, open risks, days to target.
+- Rows expand in place and actions copy a request for chat (`system/dashboards/README.md`): "Mark done" or "Nudge <name>" on commitments, "Decide" on a proposed decision, "Answer" on a question.
 - Caps: 40 commitments, 30 risks, 40 decisions, 20 questions, 20 ideas, 20 events, 30 updates, 30 sources, 30 people. Older items go first; `meta.truncated` keys match the list names (`updates`, `sources`, …).
 - Text limits: description paragraphs 800, `rationale` 400, update text 300 characters.
 - Publishing a project page is `dashboards_refresh` (auto) in chat; sharing it with anyone is `share_expose` (locked).

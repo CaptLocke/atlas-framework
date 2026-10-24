@@ -35,6 +35,7 @@ All paths are relative to `user/extensions/` (the registry `path`). Outlines: `s
 ## dashboard
 - **Path:** `dashboards/<name>.html` (self-contained template, light/dark, phone width; start from the closest system template's structure) and `dashboards/<name>.contract.md` (dashboard contract outline: `name`, `template`, `republished_by`, `size_budget_kb`; Data, Sources, Rendering notes).
 - **Wiring:** `atlas-dashboards` publishes it privately in chat and adds `<name>` to `dashboards.yaml`; add the jobs that should republish it to `republished_by`.
+- **Build it on the shared base,** so it matches the other pages: keep the `{{ATLAS_BASE_CSS}}` and `{{ATLAS_BASE_JS}}` placeholders, render through `N.page`, and use the design system's components (`N.row`, `N.card`, `N.tabs`, `N.statTiles`, `N.request` for actions that copy a request for chat; `system/dashboards/README.md`). A template without the base still renders, but without the header, the fonts or the shared components.
 
 ## playbook
 - **Path:** `playbooks/<slug>.md`, the runnable procedure (frontmatter `type: playbook-extension`, `name`, `record: "[[playbooks/<slug>]]"`, `automatable: true|false`; sections Purpose, When, Steps, Outputs, Guardrails).

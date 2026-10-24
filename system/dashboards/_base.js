@@ -178,9 +178,41 @@
       .trim();
   };
 
-  /* ---- Building blocks ---- */
-  N.chip = function (text, tone) { return text ? h("span", { class: "chip", "data-tone": tone || null }, text) : null; };
-  N.status = function (v) { return N.chip(N.label(v), N.tone(v)); };
+  /* ---- Icons: inline strokes on a 24px grid, decorative (aria-hidden) ---- */
+  var SVGNS = "http://www.w3.org/2000/svg";
+  var ICONS = {
+    check: ["M5 12.5l4.5 4.5L19 7.5"],
+    chevron: ["M6 9l6 6 6-6"],
+    search: ["M10.5 4a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13z", "M20 20l-4.8-4.8"],
+    sun: ["M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z", "M12 2v2", "M12 20v2", "M4.9 4.9l1.4 1.4", "M17.7 17.7l1.4 1.4", "M2 12h2", "M20 12h2", "M4.9 19.1l1.4-1.4", "M17.7 6.3l1.4-1.4"],
+    moon: ["M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"],
+    copy: ["M9 9h10v10H9z", "M5 15V5h10"]
+  };
+  N.icon = function (name, cls) {
+    var svg = document.createElementNS(SVGNS, "svg");
+    svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("aria-hidden", "true");
+    svg.setAttribute("class", "atl-icon" + (cls ? " " + cls : ""));
+    if (name === "check") svg.setAttribute("style", "stroke-width:2.2");
+    (ICONS[name] || []).forEach(function (d) { var p = document.createElementNS(SVGNS, "path"); p.setAttribute("d", d); svg.appendChild(p); });
+    return svg;
+  };
+
+  /* ---- Status: always a word plus a color. Tones: bad, warn, good, info, accent, neutral. ---- */
+  var OLD_TONE = { danger: "bad", warn: "warn", ok: "good", accent: "info", muted: "neutral" };
+  N.toneOf = function (v) { var t = N.tone(v); return t ? OLD_TONE[t] : "neutral"; };
+  N.badge = function (text, tone) {
+    if (!text) return null;
+    tone = OLD_TONE[tone] || tone || "neutral";
+    return h("span", { class: "atl-badge" + (tone !== "neutral" ? " atl-badge--" + tone : "") }, text);
+  };
+  N.dot = function (tone) {
+    tone = OLD_TONE[tone] || tone;
+    return h("span", { class: "atl-dot" + (tone && tone !== "neutral" ? " atl-dot--" + tone : ""), "aria-hidden": "true" });
+  };
+  /* Kept for user dashboards: a chip is a badge. */
+  N.chip = function (text, tone) { return N.badge(text, tone); };
+  N.status = function (v) { return N.badge(N.label(v), N.toneOf(v)); };
+
   N.empty = function (text) { return h("p", { class: "empty" }, text); };
   N.more = function (key) {
     var n = (N.meta.truncated || {})[key];
@@ -189,20 +221,256 @@
   };
   N.total = function (key, shown) { return shown + ((N.meta.truncated || {})[key] || 0); };
 
-  /* opts: {id, title, note, count, key, body} */
+  /* ---- Buttons ---- */
+  /* opts: {label, variant: primary|secondary|ghost, check, onClick, ariaLabel} */
+  N.button = function (o) {
+    return h("button", { type: "button", class: "atl-btn atl-btn--" + (o.variant || "secondary"), onclick: o.onClick || null, "aria-label": o.ariaLabel || null },
+      o.check ? N.icon("check") : null, h("span", null, o.label));
+  };
+
+  /* ---- Toast: one at a time, five seconds, optional Undo ---- */
+  var toastEl = null, toastTimer = null;
+  N.toast = function (message, onUndo) {
+    if (toastEl && toastEl.parentNode) toastEl.parentNode.removeChild(toastEl);
+    clearTimeout(toastTimer);
+    var msg = h("span", null, "");
+    toastEl = h("div", { class: "atl-toast", role: "status", "aria-live": "polite" }, msg,
+      onUndo ? h("button", { type: "button", class: "atl-toast__undo", onclick: function () { hide(); onUndo(); } }, "Undo") : null);
+    function hide() { if (toastEl && toastEl.parentNode) toastEl.parentNode.removeChild(toastEl); }
+    document.body.appendChild(toastEl);
+    setTimeout(function () { msg.textContent = message; }, 50);   /* text after the live region exists, so it's announced */
+    toastTimer = setTimeout(hide, 5000);
+  };
+
+  /* ---- Requests for Atlas. A page can't change a record: a button copies a ready request
+     to paste into the Atlas chat, and says so. The list changes when Atlas refreshes the page. ---- */
+  N.copyText = function (text, anchor) {
+    function fallback() {
+      var box = h("textarea", { class: "atl-copybox", readonly: true, rows: String(Math.min(8, String(text).split("\n").length + 1)), "aria-label": "Text to paste in your Atlas chat" });
+      box.value = text;
+      var holder = anchor && anchor.parentNode;
+      if (holder) {
+        var old = holder.querySelector(".atl-copybox");
+        if (old) old.parentNode.removeChild(old);
+        holder.appendChild(box);
+      }
+      box.focus(); box.select();
+      N.toast("Copy the selected text and paste it in your Atlas chat.");
+    }
+    try {
+      navigator.clipboard.writeText(text).then(function () { N.toast("Copied. Paste it in your Atlas chat."); }, fallback);
+    } catch (e) { fallback(); }
+  };
+  /* Page data comes from emails and documents, so it is cleaned before it lands in chat: control characters
+     and line breaks become spaces, and each piece is capped. Quote every data piece with N.quote, and add the
+     record or inbox ID with N.withId: Atlas acts on the record the ID names, and the quoted text is only a
+     reminder of which one (system/rules/governance.md, N7). */
+  function clean(s, max) {
+    s = String(s == null ? "" : s).replace(/[\u0000-\u001f\u007f-\u009f\u2028\u2029]+/g, " ").replace(/\s+/g, " ").trim();
+    return s.length > max ? s.slice(0, max - 1).trim() + "…" : s;
+  }
+  N.clean = function (s) { return clean(s, 200); };
+  N.quote = function (title) { return "“" + clean(title, 200).replace(/[“”"]/g, "'") + "”"; };
+  N.withId = function (text, id) { return text + (id ? " (" + clean(id, 120) + ")" : ""); };
+  /* A request button: label on the button; text, built with N.quote and N.withId, is what lands in chat. */
+  N.request = function (label, text, variant, check) {
+    var btn = N.button({ label: label, variant: variant, check: check });
+    btn.addEventListener("click", function (e) { e.stopPropagation(); N.copyText(clean(text, 600), btn); });
+    return btn;
+  };
+
+  /* ---- Sections: a display heading with its count, a note, optional tools on the right ---- */
+  /* opts: {id, title, note, count, key, body, tools} */
   N.section = function (o) {
     var hid = o.id + "-h";
     return h("section", { class: "sec", id: o.id, "aria-labelledby": hid },
-      h("div", { class: "sec-head" }, h("div", null,
-        h("h2", { id: hid }, o.title, o.count != null ? h("span", { class: "count", "aria-label": o.count + " items" }, String(o.count)) : null),
-        o.note ? h("p", { class: "sec-note" }, o.note) : null)),
+      h("div", { class: "sec-head" },
+        h("h2", { id: hid }, o.title, o.count != null ? h("span", { class: "count sec-count", "aria-label": o.count + " items" }, String(o.count)) : null),
+        o.tools ? h("div", { class: "sec-tools" }, o.tools) : null,
+        o.note ? h("p", { class: "sec-note" }, o.note) : null),
       h("div", { class: "sec-body" }, o.body, o.key ? N.more(o.key) : null));
   };
 
-  /* opts: {tone, title, id, meta:[...], text, insight, nextStep, aside:[...], attrs} */
+  /* ---- Lists ---- */
+  /* A bordered list; children are rows and group headers. */
+  N.listBox = function (children, emptyText) {
+    children = N.list(children).filter(Boolean);
+    return children.length ? h("ul", { class: "atl-list" }, children) : N.empty(emptyText || "Nothing here right now.");
+  };
+  N.group = function (text) { return h("li", { class: "atl-group overline", role: "presentation" }, text); };
+
+  /* One item in a list: status dot, title, meta line, a badge, an action that stays visible, and
+     details that expand in place. opts: {title, meta:[...], tone, badge:[text, tone] | node,
+     action: node | [nodes], detail: () => nodes (built on first open), search: extra text} */
+  var rowSeq = 0;
+  N.row = function (o) {
+    var id = "row-" + (++rowSeq);
+    var metas = N.list(o.meta).filter(function (x) { return x != null && x !== ""; });
+    var metaNode = metas.length ? h("span", { class: "atl-row__meta" }, metas.map(function (m, i) { return [i ? " · " : "", m]; })) : null;
+    var text = h("span", { class: "atl-row__text" }, h("span", { class: "atl-row__title" }, o.title), metaNode);
+    var badge = Array.isArray(o.badge) ? N.badge(o.badge[0], o.badge[1]) : o.badge || null;
+    var expandable = typeof o.detail === "function";
+    var main = expandable
+      ? h("button", { type: "button", class: "atl-row__main", "aria-expanded": "false", "aria-controls": id }, N.dot(o.tone), text, N.icon("chevron", "atl-row__chev"))
+      : h("div", { class: "atl-row__main" }, N.dot(o.tone), text);
+    var detail = expandable ? h("div", { class: "atl-row__detail", id: id, hidden: true }) : null;
+    var li = h("li", { class: "atl-row" },
+      h("div", { class: "atl-row__line" }, main,
+        badge || o.action ? h("div", { class: "atl-row__end" }, badge, o.action || null) : null),
+      detail);
+    if (expandable) {
+      var built = false;
+      main.addEventListener("click", function () {
+        var open = main.getAttribute("aria-expanded") !== "true";
+        if (open && !built) { add(detail, o.detail()); built = true; }
+        main.setAttribute("aria-expanded", String(open));
+        detail.hidden = !open;
+      });
+    }
+    li._search = [typeof o.title === "string" ? o.title : li.textContent, metas.join(" "), o.search || ""].join(" ").toLowerCase();
+    return li;
+  };
+
+  /* What goes inside an expanded row or a card. opts: {facts:[[label, value]], text, blocks:[{heading, nodes}],
+     body:[{heading,text}], body_truncated, links:[ref], dates, actions:[nodes]} */
+  N.detail = function (o) {
+    var facts = N.list(o.facts).map(function (p) { return p && !Array.isArray(p) && p.label ? [p.label, p.value] : p; })
+      .filter(function (p) { return p && p[1] != null && p[1] !== "" && !(Array.isArray(p[1]) && !p[1].length); });
+    var body = N.list(o.body).filter(function (s) { return s && s.text; });
+    var links = N.list(o.links).filter(Boolean);
+    return [
+      o.text ? h("p", null, N.rich(o.text)) : null,
+      N.list(o.blocks).filter(function (b) { return b && b.nodes; }).map(function (b) {
+        return h("div", { class: "detail-block" }, b.heading ? h("h4", null, b.heading) : null, b.nodes);
+      }),
+      facts.length ? h("dl", { class: "facts" }, facts.map(function (p) { return h("div", null, h("dt", null, p[0]), h("dd", null, typeof p[1] === "object" ? p[1] : N.rich(String(p[1])))); })) : null,
+      body.map(function (s) { return h("div", { class: "detail-block" }, s.heading ? h("h4", null, s.heading) : null, h("p", { class: "detail-text" }, N.rich(s.text))); }),
+      o.body_truncated ? h("p", { class: "detail-note" }, "There's more in this record than fits here. Ask Atlas in chat to see all of it.") : null,
+      links.length ? h("div", { class: "detail-block" }, h("h4", null, "Linked"), h("p", null, links.map(function (x, i) { return [i ? ", " : "", N.name(x)]; }))) : null,
+      o.dates ? h("p", { class: "detail-note" }, o.dates) : null,
+      N.list(o.actions).filter(Boolean).length ? h("div", { class: "atl-actions" }, o.actions) : null
+    ];
+  };
+  N.para = function (text) { return text ? h("p", null, N.rich(text)) : null; };
+  N.lines = function (items) { items = N.list(items).filter(Boolean); return items.length ? h("ul", { class: "detail-list" }, items.map(function (x) { return h("li", null, x); })) : null; };
+  N.datesLine = function (created, updated) {
+    return [created ? "Created " + N.dateY(created) : null, updated ? "Updated " + N.dateY(updated) : null].filter(Boolean).join(" · ");
+  };
+  /* Extra facts from a record's panel data (details: [{label, value}]) not already shown. */
+  N.mergeDetails = function (pairs, extra) {
+    var out = [], seen = {};
+    N.list(pairs).forEach(function (p) { if (p && p[1] != null && p[1] !== "") { out.push({ label: p[0], value: p[1] }); seen[p[0]] = 1; } });
+    N.list(extra).forEach(function (x) { if (x && x.label && !seen[x.label] && x.value != null && x.value !== "") out.push({ label: x.label, value: x.value }); });
+    return out.slice(0, 16);
+  };
+
+  /* ---- Cards ---- */
+  /* opts: {eyebrow:[text, tone] | node, title, detail, body, actions:[nodes], attrs} */
+  N.card = function (o) {
+    var props = { class: "atl-card" };
+    if (o.attrs) for (var k in o.attrs) props[k] = o.attrs[k];
+    var eyebrow = Array.isArray(o.eyebrow) ? N.badge(o.eyebrow[0], o.eyebrow[1]) : o.eyebrow || null;
+    var acts = N.list(o.actions).filter(Boolean);
+    var el = h("article", props,
+      eyebrow ? h("div", { class: "atl-card__eyebrow chips" }, eyebrow) : null,
+      h("h3", { class: "atl-card__title" }, o.title),
+      o.detail ? h("p", { class: "atl-card__detail" }, o.detail) : null,
+      o.body ? h("div", { class: "atl-card__body" }, o.body) : null,
+      acts.length ? h("div", { class: "atl-card__actions" }, acts) : null);
+    el._search = [typeof o.title === "string" ? o.title : "", el.textContent].join(" ").toLowerCase();
+    return el;
+  };
+
+  /* ---- Tabs: underlined, live counts. Plain #token links open a tab (#commitments). ---- */
+  /* items: [{id, label, count, warn}] ; onChange(id). Returns {el, set(id), count(id, n, warn)} */
+  N.tabs = function (items, initial, onChange) {
+    var current = initial;
+    var hashId = (location.hash || "").replace(/^#/, "");
+    if (items.some(function (t) { return t.id === hashId; })) current = hashId;
+    var btns = {}, counts = {};
+    var el = h("div", { class: "atl-tabs", role: "tablist" }, items.map(function (t) {
+      counts[t.id] = h("span", { class: "atl-tab__count" + (t.warn ? " atl-tab__count--warn" : "") }, String(t.count != null ? t.count : ""));
+      if (t.count == null) counts[t.id].hidden = true;
+      btns[t.id] = h("button", { type: "button", role: "tab", id: "tab-" + t.id, "aria-controls": "panel-" + t.id, class: "atl-tab",
+        onclick: function () { set(t.id, true); } }, t.label, counts[t.id]);
+      return btns[t.id];
+    }));
+    el.addEventListener("keydown", function (e) {
+      var ids = items.map(function (t) { return t.id; }), i = ids.indexOf(current), next;
+      if (e.key === "ArrowRight") next = ids[(i + 1) % ids.length];
+      else if (e.key === "ArrowLeft") next = ids[(i + ids.length - 1) % ids.length];
+      else if (e.key === "Home") next = ids[0];
+      else if (e.key === "End") next = ids[ids.length - 1];
+      else return;
+      set(next, true); btns[next].focus(); e.preventDefault();
+    });
+    function set(id, user) {
+      current = id;
+      items.forEach(function (t) {
+        var on = t.id === id;
+        btns[t.id].className = "atl-tab" + (on ? " atl-tab--current" : "");
+        btns[t.id].setAttribute("aria-selected", String(on));
+        btns[t.id].tabIndex = on ? 0 : -1;
+      });
+      if (user) { try { history.replaceState(null, "", "#" + id); } catch (e) { /* ignore */ } }
+      onChange(id, user);
+    }
+    return { el: el, current: function () { return current; }, set: set, start: function () { set(current, false); },
+      count: function (id, n, warn) {
+        var c = counts[id]; if (!c) return;
+        c.textContent = String(n); c.hidden = n == null;
+        c.className = "atl-tab__count" + (warn ? " atl-tab__count--warn" : "");
+      } };
+  };
+
+  /* ---- Segmented control: two to four options; remembers the choice per page. ---- */
+  N.segmented = function (name, options, initial, onChange) {
+    var key = (N.meta.dashboard || "page") + ":" + name;
+    var saved = N.store.get(key);
+    var current = options.some(function (o) { return o.value === saved; }) ? saved : initial;
+    var buttons = options.map(function (o) {
+      return h("button", { type: "button", "data-value": o.value, "aria-pressed": String(o.value === current),
+        class: "atl-seg__btn" + (o.value === current ? " atl-seg__btn--on" : ""),
+        onclick: function () {
+          current = o.value; N.store.set(key, current);
+          buttons.forEach(function (b) {
+            var on = b.getAttribute("data-value") === current;
+            b.setAttribute("aria-pressed", String(on)); b.className = "atl-seg__btn" + (on ? " atl-seg__btn--on" : "");
+          });
+          onChange(current);
+        } }, o.label);
+    });
+    var group = h("div", { class: "atl-seg", role: "group", "aria-label": name }, buttons);
+    setTimeout(function () { onChange(current); }, 0);
+    return group;
+  };
+
+  /* ---- Find on this page ---- */
+  var searchSeq = 0;
+  N.search = function (label, onInput) {
+    var id = "q-" + (N.meta.dashboard || "page") + "-" + (++searchSeq);
+    return h("div", { class: "atl-search" },
+      h("label", { class: "visually-hidden", for: id }, label),
+      N.icon("search"),
+      h("input", { id: id, type: "search", placeholder: label, autocomplete: "off",
+        oninput: function (e) { onInput(e.target.value.trim().toLowerCase()); } }));
+  };
+  N.matches = function (el, q) { return !q || String(el._search || el.textContent || "").toLowerCase().indexOf(q) !== -1; };
+
+  N.bar = function (fraction, label, tone) {
+    if (typeof fraction !== "number" || isNaN(fraction)) return null;
+    var pct = Math.max(0, Math.min(1, fraction)) * 100;
+    return h("div", { class: "bar", role: "img", "data-tone": tone || null, "aria-label": label || Math.round(pct) + "% complete" },
+      h("span", { style: "width:" + pct.toFixed(1) + "%" }));
+  };
+  N.facts = function (pairs) {
+    var rows = pairs.filter(function (p) { return p && p[1] != null && p[1] !== "" && !(Array.isArray(p[1]) && !p[1].length); });
+    return rows.length ? h("dl", { class: "facts" }, rows.map(function (p) { return h("div", null, h("dt", null, p[0]), h("dd", null, p[1])); })) : null;
+  };
+
+  /* ---- Older building blocks, kept for user dashboards ---- */
   N.item = function (o) {
-    var metas = N.list(o.meta).filter(function (x) { return x != null && x !== ""; })
-      .map(function (x) { return h("span", null, x); });
+    var metas = N.list(o.meta).filter(function (x) { return x != null && x !== ""; }).map(function (x) { return h("span", null, x); });
     var props = { class: "item", "data-tone": o.tone || null };
     if (o.attrs) for (var k in o.attrs) props[k] = o.attrs[k];
     return h("li", props,
@@ -212,72 +480,72 @@
         metas.length ? h("p", { class: "item-meta" }, metas) : null,
         o.insight ? h("p", { class: "item-insight" }, N.rich(o.insight)) : null,
         o.nextStep ? h("p", { class: "item-insight" }, h("b", null, "Next step: "), N.rich(o.nextStep)) : null,
-        o.extra || null,
-        o.id ? N.rid(o.id) : null),
+        o.extra || null),
       o.aside && N.list(o.aside).some(Boolean) ? h("div", { class: "item-aside" }, o.aside) : null);
   };
   N.items = function (nodes, emptyText) {
     nodes = N.list(nodes);
     return nodes.length ? h("ul", { class: "items" }, nodes) : N.empty(emptyText || "Nothing here right now.");
   };
-
-  /* Segmented filter. options: [{value, label}] ; remembers the choice per page. */
-  N.segmented = function (name, options, initial, onChange) {
-    var key = (N.meta.dashboard || "page") + ":" + name;
-    var saved = N.store.get(key);
-    var current = options.some(function (o) { return o.value === saved; }) ? saved : initial;
-    var buttons = options.map(function (o) {
-      return h("button", { type: "button", "data-value": o.value, "aria-pressed": String(o.value === current),
-        onclick: function () {
-          current = o.value; N.store.set(key, current);
-          buttons.forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-value") === current)); });
-          onChange(current);
-        } }, o.label);
+  /* The record drawer is gone: rows expand in place. These keep older user dashboards working:
+     N.clickable adds a "Details" toggle that shows a view's content under the card instead of in a drawer. */
+  N.recordPanel = function () { return { el: h("span", { hidden: true }), open: function () {}, add: function (v) { return v; }, get: function () { return null; } }; };
+  N.clickable = function (card, panel, view) {
+    if (!card || !view) return card;
+    var box = h("div", { class: "atl-row__detail", hidden: true }), built = false;
+    var btn = h("button", { type: "button", class: "atl-btn atl-btn--ghost", "aria-expanded": "false" }, "Details");
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      var open = btn.getAttribute("aria-expanded") !== "true";
+      if (open && !built) {
+        add(box, N.detail({ text: view.summary, facts: view.details,
+          blocks: N.list(view.sections).filter(Boolean).map(function (s) { return { heading: s.heading, nodes: s.nodes }; }),
+          body: view.body, body_truncated: view.body_truncated, links: view.links, dates: view.dates }));
+        built = true;
+      }
+      btn.setAttribute("aria-expanded", String(open)); box.hidden = !open;
     });
-    var group = h("div", { class: "seg", role: "group", "aria-label": name }, buttons);
-    setTimeout(function () { onChange(current); }, 0);
-    return group;
+    var host = card.querySelector && card.querySelector(".item-main") || card;
+    host.appendChild(h("div", { class: "atl-actions" }, btn)); host.appendChild(box);
+    return card;
   };
-  N.search = function (label, onInput) {
-    var id = "q-" + Math.random().toString(36).slice(2, 8);
-    return h("div", { class: "search" },
-      h("label", { class: "visually-hidden", for: id }, label),
-      h("input", { id: id, type: "search", placeholder: label, autocomplete: "off",
-        oninput: function (e) { onInput(e.target.value.trim().toLowerCase()); } }));
-  };
-  N.bar = function (fraction, label) {
-    if (typeof fraction !== "number" || isNaN(fraction)) return null;
-    var pct = Math.max(0, Math.min(1, fraction)) * 100;
-    return h("div", { class: "bar", role: "img", "aria-label": label || Math.round(pct) + "% complete" },
-      h("span", { style: "width:" + pct.toFixed(1) + "%" }));
-  };
-  N.facts = function (pairs) {
-    var rows = pairs.filter(function (p) { return p && p[1] != null && p[1] !== "" && !(Array.isArray(p[1]) && !p[1].length); });
-    return rows.length ? h("dl", { class: "facts" }, rows.map(function (p) { return h("div", null, h("dt", null, p[0]), h("dd", null, p[1])); })) : null;
+  N.openTitle = function (text) { return text; };
+  /* The old page header, for user dashboards that build their own: title, subtitle, lead, stat tiles. */
+  N.masthead = function (o) {
+    o = o || {};
+    var stats = o.stats && o.stats.length ? N.statTiles(o.stats.map(function (s, i) { return Array.isArray(s) ? { key: "s" + i, value: s[0], label: s[1] } : s; })) : null;
+    return h("div", { class: "page-head" }, h("h1", { class: "page-title" }, o.title),
+      o.subtitle ? h("p", { class: "date-line" }, o.subtitle) : null,
+      (N.meta.headline || o.lede || o.lead) ? h("p", { class: "lead" }, N.rich(N.meta.headline || o.lede || o.lead)) : null,
+      stats ? stats.el : null);
   };
 
-  /* ---- Theme preference (auto / light / dark) ---- */
-  var THEMES = ["auto", "light", "dark"];
+  /* ---- Theme: follows the system until the viewer picks; the toggle switches light and dark ---- */
   function applyTheme(t) {
     if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
     else document.documentElement.removeAttribute("data-theme");
   }
+  function isDark() {
+    var t = document.documentElement.getAttribute("data-theme");
+    if (t) return t === "dark";
+    return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  }
   N.themeButton = function () {
-    var t = N.store.get("theme") || "auto";
-    if (THEMES.indexOf(t) === -1) t = "auto";
-    applyTheme(t);
-    var btn = h("button", { type: "button", class: "theme-btn" });
-    function label() { btn.textContent = "Theme: " + t; btn.setAttribute("aria-label", "Color theme: " + t + ". Activate to change."); }
-    btn.addEventListener("click", function () {
-      t = THEMES[(THEMES.indexOf(t) + 1) % THEMES.length];
-      N.store.set("theme", t); applyTheme(t); label();
-    });
-    label();
+    var btn = h("button", { type: "button", class: "atl-icon-btn" });
+    function paint() {
+      var dark = isDark();
+      while (btn.firstChild) btn.removeChild(btn.firstChild);
+      btn.appendChild(N.icon(dark ? "sun" : "moon"));
+      btn.setAttribute("aria-pressed", String(dark));
+      btn.setAttribute("aria-label", "Dark theme");
+    }
+    btn.addEventListener("click", function () { var t = isDark() ? "light" : "dark"; N.store.set("theme", t); applyTheme(t); paint(); });
+    paint();
     return btn;
   };
   applyTheme(N.store.get("theme") || "auto");
 
-  /* The Atlas mark: two long blades and two short ones around a disc, drawn in --star. */
+  /* The Atlas mark, inline so it takes --accent. */
   var LOGO = [
     "M20.25 352.566L140.031 193.844C141.398 192.035 143.48 190.906 145.738 190.75C148 190.594 150.215 191.422 151.816 193.023L181.555 222.762C183.156 224.363 183.988 226.582 183.828 228.84C183.672 231.102 182.543 233.184 180.734 234.547L22.016 354.328C21.512 354.707 20.809 354.656 20.367 354.211C19.922 353.77 19.875 353.066 20.25 352.566Z",
     "M355.539 21.555L234.996 179.496C233.617 181.301 231.527 182.426 229.262 182.574C226.996 182.727 224.777 181.895 223.172 180.289L195.113 152.23C193.508 150.625 192.672 148.402 192.824 146.137C192.977 143.871 194.098 141.781 195.902 140.406L353.844 19.863C354.324 19.496 355.004 19.539 355.43 19.969C355.859 20.395 355.906 21.074 355.539 21.555Z",
@@ -285,17 +553,15 @@
     "M118.082 112.582L179.781 141.996C181.645 142.887 182.961 144.625 183.313 146.66C183.664 148.695 183.004 150.773 181.543 152.234L153.484 180.293C152.023 181.754 149.945 182.414 147.91 182.063C145.875 181.711 144.137 180.395 143.246 178.531L113.832 116.832C113.25 115.613 113.5 114.16 114.453 113.203C115.41 112.25 116.863 112 118.082 112.582Z",
     "M135.297 187.918a52.625 52.625 0 1 0 105.25 0a52.625 52.625 0 1 0-105.25 0Z"
   ];
-  function logo() {
-    var ns = "http://www.w3.org/2000/svg";
-    var svg = document.createElementNS(ns, "svg");
-    svg.setAttribute("viewBox", "0 0 375 375"); svg.setAttribute("aria-hidden", "true");
-    LOGO.forEach(function (d) { var p = document.createElementNS(ns, "path"); p.setAttribute("d", d); svg.appendChild(p); });
+  N.logo = function () {
+    var svg = document.createElementNS(SVGNS, "svg");
+    svg.setAttribute("viewBox", "0 0 375 375"); svg.setAttribute("aria-hidden", "true"); svg.setAttribute("class", "atl-logo");
+    LOGO.forEach(function (d) { var p = document.createElementNS(SVGNS, "path"); p.setAttribute("d", d); svg.appendChild(p); });
     return svg;
-  }
+  };
 
-  /* The standard refresh marker: when this page was last refreshed, flagged when older
-     than meta.stale_after_hours (from the contract). Staleness is the one thing measured against the
-     viewer's clock: it is about how old the page is when someone opens it. */
+  /* ---- Sync status: when the page was refreshed. Staleness is the one thing measured
+     against the viewer's clock (meta.stale_after_hours, from the contract). ---- */
   N.refreshedText = function () {
     var at = N.meta.generated_at;
     if (!at) return "Not refreshed yet";
@@ -306,152 +572,71 @@
     return !isNaN(at) && typeof limit === "number" && limit > 0 && (Date.now() - at) / 36e5 > limit;
   };
   N.refreshed = function () {
-    var stale = N.isStale(), state = !N.meta.generated_at ? "none" : stale ? "stale" : "fresh";
-    return h("p", { class: "mast-fresh", "data-stale": stale ? "1" : null },
-      h("span", { class: "signal", "data-state": state, "aria-hidden": "true" }),
+    var stale = N.isStale();
+    return h("p", { class: "atl-sync", "data-stale": stale ? "1" : null },
+      N.dot(!N.meta.generated_at ? "neutral" : stale ? "warn" : "good"),
       h("time", { datetime: N.meta.generated_at || null }, N.refreshedText()),
-      stale ? N.chip("May be out of date", "warn") : null);
+      stale ? N.badge("May be out of date", "warn") : null);
   };
 
-  /* Links on a page only ever open another dashboard: the nav row, and names of other pages in text.
-     NAV_ORDER fixes the order so every page lists them the same way. */
-  var NAV_ORDER = ["daily-brief", "commitments", "control-center"];   /* Today, Work, Guide */
+  /* ---- Navigation: the same three pages everywhere. Links only ever open another dashboard. ---- */
+  var NAV = [["daily-brief", "Today"], ["commitments", "Work"], ["control-center", "Guide"]];
   N.navLinks = function () {
+    var order = NAV.map(function (x) { return x[0]; });
     return N.list(N.meta.nav).filter(function (n) { return n && n.url && /^https:\/\//.test(n.url); })
       .sort(function (a, b) {
-        var ia = NAV_ORDER.indexOf(a.name), ib = NAV_ORDER.indexOf(b.name);
+        var ia = order.indexOf(a.name), ib = order.indexOf(b.name);
         return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
       });
   };
-  /* The name of another dashboard, linked when its URL is known (plain text otherwise). */
-  N.pageLink = function (name, text) {
+  N.pageUrl = function (name, token) {
+    var n = N.navLinks().filter(function (x) { return x.name === name; })[0];
+    return n ? n.url + (token ? "#" + token : "") : null;
+  };
+  /* The name of another dashboard, linked when its URL is known; token opens a tab or section there. */
+  N.pageLink = function (name, text, token) {
+    var url = name !== N.meta.dashboard ? N.pageUrl(name, token) : null;
     var n = N.navLinks().filter(function (x) { return x.name === name; })[0];
     text = text || (n && n.title) || name;
-    return n && n.name !== N.meta.dashboard ? h("a", { href: n.url, target: "_blank", rel: "noopener noreferrer" }, text) : text;
+    return url ? h("a", { href: url, target: "_blank", rel: "noopener noreferrer" }, text) : text;
+  };
+  N.header = function () {
+    var links = {};
+    N.navLinks().forEach(function (n) { links[n.name] = n; });
+    var items = NAV.map(function (x) {
+      var cur = x[0] === N.meta.dashboard, n = links[x[0]];
+      var label = (n && n.title) || x[1];
+      if (cur) return h("span", { class: "atl-nav__item atl-nav__item--current", "aria-current": "page" }, label);
+      return n ? h("a", { class: "atl-nav__item", href: n.url, target: "_blank", rel: "noopener noreferrer" }, label) : null;
+    }).filter(Boolean);
+    return h("header", { class: "atl-header" },
+      h("div", { class: "atl-header__inner" },
+        h("div", { class: "atl-header__brand" }, N.logo(), h("span", { class: "atl-wordmark" }, "Atlas")),
+        items.length ? h("nav", { class: "atl-nav", "aria-label": "Atlas pages" }, items) : null,
+        h("div", { class: "atl-header__trailing" }, N.refreshed(), N.themeButton())));
   };
 
-  /* Every page's header: title, subtitle, headline (meta.headline, else the page's own lede), stat cards.
-     opts: {title, subtitle, lede, stats:[[value, label or [singular, plural]]]} */
-  N.masthead = function (o) {
-    var nav = N.navLinks();
-    return h("header", { class: "mast" },
-      h("div", { class: "mast-top" },
-        h("p", { class: "mast-who" }, logo(), "Atlas"),
-        N.refreshed()),
-      h("h1", null, o.title),
-      o.subtitle ? h("p", { class: "mast-sub" }, o.subtitle) : null,
-      (N.meta.headline || o.lede) ? h("p", { class: "mast-lede" }, N.rich(N.meta.headline || o.lede)) : null,
-      o.stats && o.stats.length ? h("ul", { class: "mast-stats" }, o.stats.map(function (s) {
-        var label = Array.isArray(s[1]) ? (Number(s[0]) === 1 ? s[1][0] : s[1][1]) : s[1];  /* [singular, plural] */
-        return h("li", { class: "stat" }, h("b", null, String(s[0])), h("span", null, label));
-      })) : null,
-      nav.length ? h("nav", { class: "mast-nav", "aria-label": "Other Atlas pages" }, nav.map(function (n) {
-        return h("a", { href: n.url, target: "_blank", rel: "noopener noreferrer", "aria-current": n.name === N.meta.dashboard ? "page" : null }, n.title || n.name);
-      })) : null);
-  };
-
-  /* Footer: the Atlas version on the left, the theme button on the right. */
-  N.footer = function () {
-    return h("footer", { class: "foot" },
-      h("p", null, N.meta.atlas_version ? "Atlas " + N.meta.atlas_version : "Atlas"),
-      h("p", { class: "chips" }, N.themeButton()));
-  };
-
-  /* ---- Record panel ----
-     A drawer (full screen on phones) that shows one item in full. Pages build a "view" per item:
-       { id, title, kind, chips:[nodes], summary, details:[{label,value}], sections:[{heading, nodes}],
-         body:[{heading,text}], body_truncated, links:[{id,title}], dates }
-     and register every view, so linked items on the same page open in the panel too (with Back).
-     N.clickable(card, view) makes a card open it (click, or Enter/Space on its title button). */
-  N.recordPanel = function () {
-    var panel = h("dialog", { class: "rec-panel", "aria-labelledby": "rp-title" });
-    var views = {}, trail = [], lastFocus = null;
-    function close() { if (panel.open && panel.close) panel.close(); else panel.removeAttribute("open"); onClose(); }
-    function onClose() { document.documentElement.classList.remove("rp-lock"); trail = []; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
-    panel.addEventListener("close", onClose);
-    panel.addEventListener("click", function (e) { if (e.target === panel) close(); });
-    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && panel.hasAttribute("open") && !panel.showModal) close(); });
-    function copyRequest(v, where) {
-      var text = "Show me the “" + v.title + "” record" + (v.id ? " (" + v.id + ")" : "") + ".";
-      function fallback() {
-        var box = h("input", { class: "rp-copy", type: "text", readonly: true, value: text, "aria-label": "Request to paste in chat" });
-        while (where.firstChild) where.removeChild(where.firstChild);
-        where.appendChild(h("p", null, "Copy this and paste it in your Atlas chat:")); where.appendChild(box);
-        box.focus(); box.select();
-      }
-      try { navigator.clipboard.writeText(text).then(function () { where.textContent = "Copied. Paste it in your Atlas chat to see or change this record."; }, fallback); }
-      catch (e) { fallback(); }
-    }
-    function render(v) {
-      var details = N.list(v.details).filter(function (x) { return x && x.label && x.value != null && x.value !== ""; });
-      var body = N.list(v.body).filter(function (s) { return s && s.text; });
-      var links = N.list(v.links).filter(Boolean);
-      var askNote = h("p", { role: "status", "aria-live": "polite" }, "To change this, ask Atlas in chat.");
-      var inner = h("div", { class: "rp" },
-        h("div", { class: "rp-bar" },
-          h("p", { class: "chips" }, v.kind ? N.chip(v.kind) : null, v.chips || null),
-          trail.length > 1 ? h("button", { type: "button", class: "rp-btn", onclick: function () { trail.pop(); render(trail[trail.length - 1]); } }, "Back") : null,
-          h("button", { type: "button", class: "rp-btn", onclick: close }, "Close")),
-        h("div", { class: "rp-body" },
-          h("div", null, h("h2", { id: "rp-title" }, v.title), v.summary ? h("p", { class: "rp-sum" }, N.rich(v.summary)) : null),
-          details.length ? h("section", null, h("h3", { class: "rp-h" }, "Details"),
-            h("dl", { class: "rp-details" }, details.map(function (x) { return h("div", null, h("dt", null, x.label), h("dd", null, typeof x.value === "object" ? x.value : N.rich(String(x.value)))); }))) : null,
-          N.list(v.sections).filter(function (s) { return s && s.nodes; }).map(function (s) { return h("section", null, s.heading ? h("h3", { class: "rp-h" }, s.heading) : null, s.nodes); }),
-          body.map(function (s) { return h("section", null, s.heading ? h("h3", { class: "rp-h" }, s.heading) : null, h("p", { class: "rp-text" }, N.rich(s.text))); }),
-          v.body_truncated ? h("p", { class: "rp-cut" }, "There's more in this record than fits here. Ask Atlas in chat to see all of it.") : null,
-          links.length ? h("section", null, h("h3", { class: "rp-h" }, "Linked records"),
-            h("ul", { class: "rp-links" }, links.map(function (x) {
-              var t = x.id && views[x.id];
-              if (!t) return h("li", null, h("div", { class: "rp-link-off" }, N.name(x)));
-              return h("li", null, h("button", { type: "button", class: "rp-link", onclick: function () { trail.push(t); render(t); } },
-                h("span", null, t.title), h("span", { class: "chips" }, t.kind ? N.chip(t.kind) : null, t.chips || null)));
-            }))) : null,
-          v.dates ? h("p", { class: "rp-dates" }, v.dates) : null,
-          h("div", { class: "rp-ask" },
-            h("button", { type: "button", class: "rp-btn", onclick: function () { copyRequest(v, askNote); } }, "Copy a request for Atlas"),
-            askNote)));
-      while (panel.firstChild) panel.removeChild(panel.firstChild);
-      panel.appendChild(inner);
-      var first = inner.querySelector(".rp-bar button:last-child");
-      if (first) first.focus();
-    }
-    function open(v) {
-      lastFocus = document.activeElement; trail = [v]; render(v);
-      document.documentElement.classList.add("rp-lock");
-      if (!panel.open) { if (panel.showModal) panel.showModal(); else panel.setAttribute("open", ""); }
-    }
-    return {
-      el: panel, open: open,
-      add: function (v) { if (v && v.id) views[v.id] = v; return v; },
-      get: function (id) { return views[id]; }
-    };
-  };
-  /* Panel section content: a paragraph, or a list of plain lines. */
-  N.para = function (text) { return text ? h("p", { class: "rp-text" }, N.rich(text)) : null; };
-  N.lines = function (items) { items = N.list(items).filter(Boolean); return items.length ? h("ul", { class: "rp-list" }, items.map(function (x) { return h("li", null, x); })) : null; };
-  /* Dates line for a panel: "Created Oct 1, 2026 · Updated Oct 9, 2026". */
-  N.datesLine = function (created, updated) {
-    return [created ? "Created " + N.dateY(created) : null, updated ? "Updated " + N.dateY(updated) : null].filter(Boolean).join(" · ");
-  };
-  /* A title rendered as a button, so keyboard users can open the card's panel. */
-  N.openTitle = function (text) { return h("button", { type: "button", class: "rec-open", "aria-haspopup": "dialog" }, text); };
-  /* Make a card open the panel: anywhere on the card, except while the reader is selecting text. */
-  N.clickable = function (card, panel, view) {
-    card.classList.add("rec");
-    card.addEventListener("click", function (e) {
-      if (e.target.closest && e.target.closest("a, input, select")) return;
-      var sel = window.getSelection && String(window.getSelection());
-      if (sel && sel.length > 2 && !(e.target.closest && e.target.closest(".rec-open"))) return;
-      panel.open(view);
-    });
-    return card;
-  };
-  /* Panel details: [label, value] pairs, empty ones dropped, then extra data details whose label isn't already shown. */
-  N.mergeDetails = function (pairs, extra) {
-    var out = [], seen = {};
-    N.list(pairs).forEach(function (p) { if (p && p[1] != null && p[1] !== "") { out.push({ label: p[0], value: p[1] }); seen[p[0]] = 1; } });
-    N.list(extra).forEach(function (x) { if (x && x.label && !seen[x.label]) out.push(x); });
-    return out.slice(0, 16);
+  /* ---- Stat tiles. Each is a readout, a filter (onSelect: chosen again clears it), or a link (href). ----
+     stats: [{key, value, label | [singular, plural], tone, href (another page), jump (a section id here), hint, filter: true}] ; onSelect(key | null) */
+  N.statTiles = function (stats, onSelect) {
+    var selected = null, tiles = {};
+    function label(s) { return Array.isArray(s.label) ? (Number(s.value) === 1 ? s.label[0] : s.label[1]) : s.label; }
+    function paint() { for (var k in tiles) { tiles[k].classList.toggle("atl-stat--selected", k === selected); tiles[k].setAttribute("aria-pressed", String(k === selected)); } }
+    var el = h("ul", { class: "atl-stats" }, N.list(stats).filter(Boolean).map(function (s) {
+      var num = h("span", { class: "atl-stat__num" + (s.tone === "bad" && Number(s.value) > 0 ? " atl-stat__num--bad" : "") }, String(s.value));
+      var lab = h("span", { class: "atl-stat__label" }, label(s));
+      var node;
+      if (s.href) node = h("a", { class: "atl-stat atl-stat--action", href: s.href, target: "_blank", rel: "noopener noreferrer" }, num, lab, h("span", { class: "atl-stat__hint" }, s.hint || "View"));
+      else if (s.jump) node = h("a", { class: "atl-stat atl-stat--action", href: "#" + s.jump }, num, lab, h("span", { class: "atl-stat__hint" }, s.hint || "View"));
+      else if (s.filter && onSelect) {
+        node = h("button", { type: "button", class: "atl-stat atl-stat--action", "aria-pressed": "false",
+          onclick: function () { selected = selected === s.key ? null : s.key; paint(); onSelect(selected, s); } }, num, lab);
+        tiles[s.key] = node;
+      } else node = h("div", { class: "atl-stat" }, num, lab);
+      return h("li", null, node);
+    }));
+    return { el: el, clear: function () { selected = null; paint(); }, selected: function () { return selected; },
+      select: function (k) { selected = k; paint(); } };
   };
 
   /* Notices: a label and an icon per level, so a warning reads as one at a glance. */
@@ -462,14 +647,21 @@
     info: ["M12 2.75a9.25 9.25 0 1 0 0 18.5 9.25 9.25 0 0 0 0-18.5z", "M12 11v5.5", "M12 7.6v.1"]
   };
   function noticeIcon(level) {
-    var ns = "http://www.w3.org/2000/svg";
-    var svg = document.createElementNS(ns, "svg");
+    var svg = document.createElementNS(SVGNS, "svg");
     svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("aria-hidden", "true"); svg.setAttribute("class", "notice-icon");
-    NOTICE_ICON[level].forEach(function (d) { var p = document.createElementNS(ns, "path"); p.setAttribute("d", d); svg.appendChild(p); });
+    NOTICE_ICON[level].forEach(function (d) { var p = document.createElementNS(SVGNS, "path"); p.setAttribute("d", d); svg.appendChild(p); });
     return svg;
   }
 
-  /* Render a page. build(data, main) appends sections to main and may return masthead options. */
+  N.footer = function () {
+    return h("footer", { class: "foot" },
+      h("p", null, N.meta.atlas_version ? "Atlas " + N.meta.atlas_version : "Atlas"),
+      h("p", null, "To change anything here, ask Atlas in chat."));
+  };
+
+  /* ---- Render a page ----
+     build(data, main) appends sections to main and returns the page head:
+       {title, dateLine (or subtitle), lead, stats:[...], onStat(key, stat)} */
   N.page = function (defaults, build) {
     var data = N.load();
     var app = document.getElementById("app");
@@ -477,32 +669,49 @@
     if (N.meta.locale) document.documentElement.setAttribute("lang", N.meta.locale);
     if (N.meta.title) document.title = N.meta.title;
     var main = h("main", { id: "main" });
-    var mastOpts = { title: N.meta.title || defaults.title };
+    var head = { title: N.meta.title || defaults.title };
     if (!data) {
-      mastOpts.subtitle = "Waiting for data";
+      head.dateLine = "Waiting for data";
       main.appendChild(N.empty("This page has no data yet. Ask Atlas in chat to refresh it."));
     } else {
       try {
         var extra = build(data, main) || {};
-        for (var k in extra) mastOpts[k] = extra[k];
+        for (var k in extra) head[k] = extra[k];
       } catch (e) {
         main.appendChild(h("div", { class: "error-box", role: "alert" }, "Part of this page couldn't be displayed. Ask Atlas in chat to refresh it."));
         if (window.console) console.error(e);
       }
     }
+    var lead = N.meta.headline || head.lead || head.lede;   /* "lede": older templates */
+    var stats = head.stats && head.stats.length ? N.statTiles(head.stats.map(function (s, i) {
+      return Array.isArray(s) ? { key: "s" + i, value: s[0], label: s[1] } : s;   /* older [value, label] pairs */
+    }), head.onStat) : null;
+    if (stats && head.onStatsReady) head.onStatsReady(stats);
     var notices = N.list(N.meta.notices);
+    var headerEl = N.header();
     add(app, [
       h("a", { class: "skip", href: "#main" }, "Skip to content"),
+      headerEl,
       h("div", { class: "wrap" },
-        N.masthead(mastOpts),
+        h("div", { class: "page-head" },
+          h("h1", { class: "page-title" }, head.title),
+          head.dateLine || head.subtitle ? h("p", { class: "date-line" }, head.dateLine || head.subtitle) : null,
+          lead ? h("p", { class: "lead" }, N.rich(lead)) : null,
+          stats ? stats.el : null),
         notices.length ? h("ul", { class: "notices", "aria-label": "Notices" }, notices.map(function (n) {
           var level = NOTICE[n.level] ? n.level : "warn";
           return h("li", { class: "notice", "data-level": level, role: level === "error" ? "alert" : null },
-            noticeIcon(level),
-            h("p", null, h("b", null, NOTICE[level] + " "), N.rich(n.text)));
+            noticeIcon(level), h("p", null, h("b", null, NOTICE[level] + " "), N.rich(n.text)));
         })) : null,
         main,
         N.footer())
     ]);
+    /* Sticky bars sit under the header, whatever height it wraps to. */
+    function setHeaderH() { document.documentElement.style.setProperty("--header-h", headerEl.offsetHeight + "px"); }
+    setHeaderH();
+    window.addEventListener("resize", setHeaderH);
+    /* A plain #token opens that section (tabs handle their own). */
+    var t = (location.hash || "").replace(/^#/, "");
+    if (t && /^[\w.~-]+$/.test(t)) { var target = document.getElementById(t); if (target && target.scrollIntoView) setTimeout(function () { target.scrollIntoView(); }, 0); }
   };
 })();

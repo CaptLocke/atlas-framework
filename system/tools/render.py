@@ -10,10 +10,13 @@ close its <style> element. The template must contain exactly one
 {{ATLAS_DATA}} and one {{ATLAS_THEME_CSS}}, and at most one each of
 {{ATLAS_BASE_CSS}} and {{ATLAS_BASE_JS}}, which are filled with the shared
 system/dashboards/_base.css and _base.js (always Atlas's own copies, whatever
-template is rendered); nothing else changes. Prints the page size in KB; exit
+template is rendered); the base CSS also carries the Atlas fonts from
+system/dashboards/fonts/, embedded as data: URIs, since a page loads nothing
+from outside. Nothing else changes. Prints the page size in KB; exit
 1 with a message on any problem (system/dashboards/README.md, "How a page is
 rendered").
 """
+import base64
 import json
 import os
 import re
@@ -40,9 +43,30 @@ def safe_css(css):
     return (css or "").replace("<", "")
 
 
+FONTS = (  # (family, file, weight range): the Atlas design system's two faces, Latin subset (OFL; licences beside them)
+    ("Newsreader", "newsreader-latin.woff2", "400 600"),
+    ("Inter", "inter-latin.woff2", "400 600"),
+)
+
+
+def fonts_css():
+    """@font-face rules with the fonts inlined, so a page loads nothing from outside."""
+    out = []
+    for family, name, weight in FONTS:
+        path = os.path.join(BASE_DIR, "fonts", name)
+        if not os.path.exists(path):
+            continue  # the fallback stacks in _base.css still apply
+        with open(path, "rb") as f:
+            b64 = base64.b64encode(f.read()).decode("ascii")
+        out.append('@font-face{font-family:"%s";font-style:normal;font-weight:%s;font-display:swap;'
+                   'src:url(data:font/woff2;base64,%s) format("woff2")}' % (family, weight, b64))
+    return "\n".join(out) + ("\n" if out else "")
+
+
 def base_file(name):
     with open(os.path.join(BASE_DIR, name), encoding="utf-8") as f:
-        return f.read().rstrip() + "\n"
+        text = f.read().rstrip() + "\n"
+    return fonts_css() + text if name == "_base.css" else text
 
 
 def inject(template, data, theme_css=""):
