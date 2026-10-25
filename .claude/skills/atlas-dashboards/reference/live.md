@@ -24,7 +24,9 @@ If any step fails, leave `live` unset: the page keeps working as an embedded pag
 ## 3. Refreshing a live page (chats and routines)
 Wherever `SKILL.md` says to render and republish a page that is live, do this instead. There is no publish:
 1. Build the data (`SKILL.md` steps 1–4) and cut it with `sections.py` as in §2 step 1.
-2. Write the sections in one batch: `set` every section the data has, and `delete` any section document the page's database holds that the data no longer has (list `sections` first). Update `last_published`.
+2. List the page's `sections` (with `out_dir` under `/tmp` when they're large), then write in one batch only what changed: `set` each section whose `data` differs from the database's copy, `delete` each section the data no longer has, each pinned with the `if_version` you listed. Nothing changed: write nothing. A pinned write that fails means another run wrote first: list again and redo the batch once. Update `last_published`.
+
+The whole page's data is still built every time (step 1); only the writes are trimmed. Building just the sections whose sources changed is the next step once the pilot's timings show it's worth it.
 
 ## 4. Republishing a live page
 Only when its template changed (an update) or the user asks for it: render from `live.json` as in §2 step 2 and republish to the stored URL **without** a `capabilities` field, so the page keeps its database. No data build is needed; refresh the sections only if the update changed the contract.
