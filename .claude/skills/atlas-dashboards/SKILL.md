@@ -12,13 +12,14 @@ Keep three always-current, browsable pages, Today, Work and Guide, plus project 
 - Jobs (per each contract's `republished_by`, e.g. `daily-brief`, `triage`, `weekly-review`, `monthly`): republish the dashboards whose data changed.
 - Skills after relevant changes: `atlas-settings`/`atlas-away` (Guide, Today), `atlas-update` (Guide), `atlas-review` (Work; Guide after the monthly and quarterly reviews), `atlas-health` (Guide).
 - User: "refresh my dashboards", "I lost the link to …", "make a project page for Orion", "add the deals dashboard I built".
-- Dashboards are views only. Requests to change things *from* a dashboard ("mark that done") are handled in chat by the owning skill, then the page is republished.
+- Dashboards are views. A request to change something *from* a page ("mark that done") is handled by the owning skill: pasted into chat from an embedded page, or queued by a live page's button and applied at the next routine run or chat (`reference/live.md` §5). Then the page is refreshed.
 
 ## Inputs
 - `system/dashboards/<name>.html` (template) and `system/dashboards/<name>.contract.md` (data shape, sources, `republished_by`, `size_budget_kb`, rendering notes) for the three dashboards and `project-page`.
 - User dashboards: `user/extensions/dashboards/<name>.html` + `<name>.contract.md`, registered in `user/extensions/registry.yaml` (kind `dashboard`). A user dashboard with `overrides: <system dashboard>` replaces it (`system/rules/extensions.md`).
 - The files named in each contract's "Sources" section; `user/profile/design-system.md` for theme; `user/settings/dashboards.yaml` for URLs.
 - Rendering detail, theming, size trimming, and publishing rules: `reference/rendering.md`.
+- Live pages (Work): their database, the switch-over, refreshes and the request queue: `reference/live.md`.
 
 ## Procedure
 ### Render (every publish or republish)
@@ -29,10 +30,10 @@ Keep three always-current, browsable pages, Today, Work and Guide, plus project 
 5. **Embed** with the render script, never by hand: write the JSON to `.atlas-tmp/dashboards/<name>.json` and the theme to `.atlas-tmp/dashboards/theme.css` (or pass `-` for none), then run `python3 -I system/tools/render.py <template> .atlas-tmp/dashboards/<name>.json <theme or -> .atlas-tmp/dashboards/<name>.html`. It escapes the data so text from emails or documents can't run as code, and prints the page size (never committed). Check: under budget, no secrets. Templates carry a content security policy, so a page can't load or send anything from the network.
 
 ### Publish (first time, chat only)
-6. Publish the page as a **private** artifact: page only (no extra files), no connector or data grants, no runtime capabilities, nothing public or shared. Save the URL and `last_published` in `user/settings/dashboards.yaml` (project pages under `project_pages: { <project ID>: url }`; user dashboards as an additional key named after the extension). Commit.
+6. Publish the page as a **private** artifact: page only (no extra files), no connector or data grants, no runtime capabilities (a live page's own database is the one exception, added in a chat: `reference/live.md` §2), nothing public or shared. Save the URL and `last_published` in `user/settings/dashboards.yaml` (project pages under `project_pages: { <project ID>: url }`; user dashboards as an additional key named after the extension). Commit.
 
 ### Republish (chats and routines)
-7. Republish to the stored URL with the new page (same title). Keep it private, page-only, without grants, so routines can update it unattended. Update `last_published`. Batch: render and republish only dashboards whose sources changed since `last_published`, plus any the caller names.
+7. **A live page** (`live: true` in `dashboards.yaml`) is refreshed by writing its sections, not republished (`reference/live.md` §3–4). Every other page: republish to the stored URL with the new page (same title). Keep it private, page-only, without grants, so routines can update it unattended. Update `last_published`. Batch: render and republish only dashboards whose sources changed since `last_published`, plus any the caller names.
 8. **If republish fails:** in a routine, record it in the run report and as a known issue in `user/.state/health.yaml` ("Dashboards couldn't update; I'll refresh them when you next chat"), don't retry endlessly; in a chat, retry once, then publish a new private page, update the URL, tell the user the new link, and close the known issue. If a URL is missing (never published, or lost), publish fresh in a chat; a routine records a known issue instead. A built-in dashboard with no entry in `dashboards.yaml` at all (new in an update) is added there with `url: null` and published at the next chat, with one line telling the user what it is ("New: a page that shows …", in a sentence); routines skip it without a known issue.
 
 ### Project pages and user dashboards
@@ -52,7 +53,7 @@ Keep three always-current, browsable pages, Today, Work and Guide, plus project 
 - Pages stay private, page-only, and without connector grants; anything else breaks unattended republish and may expose data.
 - Data rules apply to dashboards exactly as to answers: excluded and pointer-only content never appears; `notes_private` never appears.
 - Never put secrets, tokens, or the repo's credentials into a page.
-- Dashboards never take actions; no forms that change data.
+- Dashboards never take actions themselves. A live page's buttons only queue a request; Atlas checks and applies it like anything the user says (`reference/live.md` §5).
 
 ## Done when
 - Each requested dashboard is rendered from the right template, matches its contract's shape, is under budget, and is published privately at the URL recorded in `dashboards.yaml` with today's `last_published`.

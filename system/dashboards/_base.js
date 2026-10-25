@@ -5,12 +5,15 @@
 
    Safety: dashboard data comes from emails, documents, and meetings, so it is
    untrusted text. Everything is rendered with textContent / createElement,
-   never parsed as HTML markup. No network calls, no connectors. Browser storage is used
-   only for UI conveniences (theme, remembered filter) and is optional. */
+   never parsed as HTML markup. No network calls, no connectors. A live page reads its
+   data from its own artifact database, through the viewer's runtime (N.page), and its
+   buttons write requests there (N.request). Browser storage is used only for UI
+   conveniences (theme, remembered filter) and is optional. */
 (function () {
   "use strict";
   var N = (window.Atlas = {});
   N.meta = {};
+  N.live = null;   /* {db, requests} while a live page is connected to its database */
 
   var LABELS = {
     i_owe: "I owe", waiting_on: "Waiting on",
@@ -273,11 +276,55 @@
   N.quote = function (title) { return "“" + clean(title, 200).replace(/[“”"]/g, "'") + "”"; };
   N.withId = function (text, id) { return text + (id ? " (" + clean(id, 120) + ")" : ""); };
   /* A request button: label on the button; text, built with N.quote and N.withId, is what lands in chat. */
-  N.request = function (label, text, variant, check) {
+  N.request = function (label, text, variant, check, live) {
+    if (live && N.live && LIVE_KINDS[live.kind] && live.target) return liveRequest(label, text, variant, check, live);
     var btn = N.button({ label: label, variant: variant, check: check });
     btn.addEventListener("click", function (e) { e.stopPropagation(); N.copyText(clean(text, 600), btn); });
     return btn;
   };
+
+  /* On a live page, a button for one of these kinds writes a request row instead of copying text;
+     Atlas applies it at its next routine run or chat and sets its state (plans: live pages).
+     live: {kind, target (record ID), quoted (the title, a reminder only), due (move_date)} */
+  var LIVE_KINDS = { mark_done: 1, mark_received: 1, move_date: 1 };
+  var REQUEST_STATE = {
+    queued: "Saved. Atlas does this at its next run or chat",
+    applied: "Done",
+    waiting_chat: "Waiting for your next chat",
+    needs_chat: "Atlas will ask you about this in chat"
+  };
+  function liveRequest(label, text, variant, check, spec) {
+    var holder = h("span", { class: "atl-request", onclick: function (e) { e.stopPropagation(); } });
+    var row = N.live.requests[spec.target];
+    if (row && REQUEST_STATE[row.state]) {
+      holder.appendChild(N.badge(REQUEST_STATE[row.state], row.state === "applied" ? "good" : "neutral"));
+      return holder;
+    }
+    function save(args) {
+      var id = spec.kind + "-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
+      N.live.db.collection("requests").doc(id).set({
+        kind: spec.kind, target: clean(spec.target, 120), quoted: clean(spec.quoted, 200), args: args || {},
+        created: new Date().toISOString(), state: "queued"
+      }).then(function () {
+        N.toast("Saved. Atlas will do this at its next run or chat.");
+      }, function () {
+        N.copyText(clean(text, 600), holder);   /* couldn't save: fall back to the chat request */
+      });
+    }
+    var btn = N.button({ label: label, variant: variant, check: check });
+    holder.appendChild(btn);
+    if (row && row.state === "refused") holder.appendChild(h("span", { class: "atl-request__note" }, row.note ? "Atlas couldn't do this: " + clean(row.note, 160) : "Atlas couldn't do this."));
+    btn.addEventListener("click", function () {
+      if (spec.kind !== "move_date") { btn.disabled = true; save(); return; }
+      var input = h("input", { type: "date", class: "atl-input", "aria-label": "New due date for " + clean(spec.quoted, 80), value: spec.due || "" });
+      var ok = N.button({ label: "Save date", variant: "primary", onClick: function () { if (input.value) { ok.disabled = true; save({ due: input.value }); } } });
+      var cancel = N.button({ label: "Cancel", variant: "ghost", onClick: function () { holder.textContent = ""; holder.appendChild(btn); btn.focus(); } });
+      holder.textContent = "";
+      add(holder, [input, ok, cancel]);
+      input.focus();
+    });
+    return holder;
+  }
 
   /* ---- Sections: a display heading with its count, a note, optional tools on the right ---- */
   /* opts: {id, title, note, count, key, body, tools} */
@@ -662,17 +709,19 @@
   /* ---- Render a page ----
      build(data, main) appends sections to main and returns the page head:
        {title, dateLine (or subtitle), lead, stats:[...], onStat(key, stat)} */
-  N.page = function (defaults, build) {
-    var data = N.load();
+  var resizeBound = false;
+  function paint(defaults, build, data, waiting) {
     var app = document.getElementById("app");
-    N.meta = (data && data.meta) || {};
+    app.textContent = "";
+    N.meta = (data && data.meta) || N.liveMeta || {};
     if (N.meta.locale) document.documentElement.setAttribute("lang", N.meta.locale);
     if (N.meta.title) document.title = N.meta.title;
     var main = h("main", { id: "main" });
     var head = { title: N.meta.title || defaults.title };
     if (!data) {
-      head.dateLine = "Waiting for data";
-      main.appendChild(N.empty("This page has no data yet. Ask Atlas in chat to refresh it."));
+      waiting = waiting || WAITING.none;
+      head.dateLine = waiting[0];
+      main.appendChild(waiting[2] ? h("div", { class: "error-box", role: "status" }, waiting[1]) : N.empty(waiting[1]));
     } else {
       try {
         var extra = build(data, main) || {};
@@ -707,11 +756,69 @@
         N.footer())
     ]);
     /* Sticky bars sit under the header, whatever height it wraps to. */
-    function setHeaderH() { document.documentElement.style.setProperty("--header-h", headerEl.offsetHeight + "px"); }
+    function setHeaderH() { var hd = document.querySelector(".atl-header"); if (hd) document.documentElement.style.setProperty("--header-h", hd.offsetHeight + "px"); }
     setHeaderH();
-    window.addEventListener("resize", setHeaderH);
+    if (!resizeBound) { window.addEventListener("resize", setHeaderH); resizeBound = true; }
     /* A plain #token opens that section (tabs handle their own). */
     var t = (location.hash || "").replace(/^#/, "");
-    if (t && /^[\w.~-]+$/.test(t)) { var target = document.getElementById(t); if (target && target.scrollIntoView) setTimeout(function () { target.scrollIntoView(); }, 0); }
+    if (!N.live && t && /^[\w.~-]+$/.test(t)) { var target = document.getElementById(t); if (target && target.scrollIntoView) setTimeout(function () { target.scrollIntoView(); }, 0); }
+  }
+
+  /* [date line, message, shown as a problem] for a page with nothing to show yet. */
+  var WAITING = {
+    none: ["Waiting for data", "This page has no data yet. Ask Atlas in chat to refresh it."],
+    loading: ["Loading", "Loading your latest information…"],
+    empty: ["Waiting for data", "Atlas fills this page at its next run. To fill it now, ask Atlas in chat to refresh it."],
+    unavailable: ["Can't load right now", "This page couldn't load its information. Open it in Claude while signed in to see your latest work. If it keeps happening, ask Atlas in chat to refresh it.", true]
+  };
+
+  /* A page renders once from its embedded data. A live page (embedded meta.live) renders from its
+     database instead: one document per contract section in "sections" ({data}), plus the open
+     requests, and renders again whenever either changes. Nothing is fetched over the network:
+     the viewer's runtime holds the database. */
+  N.page = function (defaults, build) {
+    var data = N.load();
+    if (!(data && data.meta && data.meta.live)) { paint(defaults, build, data); return; }
+    N.liveMeta = data.meta;
+    paint(defaults, build, null, WAITING.loading);
+    function unavailable() { N.live = null; paint(defaults, build, null, WAITING.unavailable); }
+    var runtime = window.claude;
+    if (!runtime || typeof runtime.use !== "function") { unavailable(); return; }
+    runtime.use("db").then(function (db) {
+      if (!db) { unavailable(); return; }
+      var sections = null, requests = {}, timer = null;
+      function render() {
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+          if (!sections) return;
+          var keys = Object.keys(sections);
+          if (!keys.length) { N.live = null; paint(defaults, build, null, WAITING.empty); return; }
+          var d = {};
+          keys.forEach(function (k) { d[k] = sections[k]; });
+          var m = {}, k;
+          for (k in N.liveMeta) m[k] = N.liveMeta[k];
+          for (k in (d.meta || {})) m[k] = d.meta[k];
+          d.meta = m;
+          N.live = { db: db, requests: requests };
+          var y = window.scrollY;
+          paint(defaults, build, d);
+          window.scrollTo(0, y);
+        }, 120);
+      }
+      db.collection("sections").onSnapshot(function (snap) {
+        sections = {};
+        snap.docs.forEach(function (doc) { var v = doc.data(); if (v && Object.prototype.hasOwnProperty.call(v, "data")) sections[doc.id] = v.data; });
+        render();
+      }, unavailable);
+      db.collection("requests").onSnapshot(function (snap) {
+        for (var key in requests) delete requests[key];
+        snap.docs.forEach(function (doc) {   /* the newest request per record decides what its button shows */
+          var v = doc.data() || {};
+          if (typeof v.target !== "string") return;
+          if (!requests[v.target] || String(v.created) > String(requests[v.target].created)) requests[v.target] = v;
+        });
+        render();
+      }, function () { /* without requests the page still shows its sections */ });
+    }, unavailable);
   };
 })();
