@@ -506,6 +506,18 @@ def handle_mcp(payload, proj, ctx):
 ARTIFACT_PUBLISH_KEYS = {"action", "url", "file_path", "description", "label", "title", "icon"}
 
 
+def _temp_only(path, payload, proj, allow_scratch):
+    """Is this local path one a routine may hand an artifact tool? Temp folders outside the
+    repo, plus .atlas-tmp/ (where pages are rendered) when allow_scratch. Neither tool goes
+    through paths.py, so a folder in the repo would skip its rules."""
+    rel = atlas.rel_to_project(path, atlas.session_cwd(payload, proj), proj)
+    if rel is not None:
+        return allow_scratch and rel.startswith(atlas.TMP_DIR + "/") and not rel.startswith(
+            atlas.ROUTINE_SESSIONS + "/")
+    base = os.path.join(atlas.session_cwd(payload, proj), os.path.expanduser(path))
+    return atlas.outside_write_ok(base)
+
+
 def handle_artifact(payload, proj, ctx):
     """Routines use artifacts only on Atlas's own pages (system/dashboards/README.md)."""
     if ctx == "chat":
@@ -522,26 +534,33 @@ def handle_artifact(payload, proj, ctx):
                     "needs a chat (system/dashboards/README.md)." % action)
     if tool_name == "Artifact" and action == "publish":
         extra = sorted(k for k in ti if k not in ARTIFACT_PUBLISH_KEYS)
-        if extra or ti.get("asset"):
+        if extra:
             atlas.block("A routine republishes a page's content only; %s change%s more than that, so it "
-                        "waits for a chat." % (", ".join(extra) or "asset",
-                                               "s" if len(extra) == 1 or not extra else ""))
+                        "waits for a chat." % (", ".join(extra), "s" if len(extra) == 1 else ""))
         if not ti.get("url"):
             atlas.block("A routine never creates a new page: publishing without 'url' does. Republish to the "
                         "page's link in user/settings/dashboards.yaml, or leave a new page for a chat.")
-    out_dir = str(ti.get("out_dir") or "") if tool_name == "ArtifactData" else ""
-    # saving rows into the repo would skip paths.py, which doesn't see this tool
-    if out_dir and (atlas.rel_to_project(out_dir, atlas.session_cwd(payload, proj), proj) is not None
-                    or not atlas.outside_write_ok(os.path.join(out_dir.rstrip("/"), ""))):
-        atlas.block("In a routine, ArtifactData saves rows only under a temp folder (/tmp), outside the "
-                    "repo, not %s." % out_dir)
-    pid = atlas.artifact_id(ti.get("url"))
+    out_dir = str(ti.get("out_dir") or "")
+    if out_dir and not _temp_only(os.path.join(out_dir, "x"), payload, proj, allow_scratch=False):
+        atlas.block("In a routine, %s saves files only under a temp folder (/tmp) outside the repo, not %s."
+                    % (tool_name, out_dir))
+    source = str(ti.get("file_path") or "")
+    if source and not _temp_only(source, payload, proj, allow_scratch=True):
+        atlas.block("In a routine, %s sends only files rendered for it, from .atlas-tmp/ or a temp folder "
+                    "(/tmp), not %s: anything else could put records or other files on a page."
+                    % (tool_name, source))
+    url = ti.get("url")
+    pid = atlas.artifact_id(url)
     if pid and pid in atlas.dashboard_pages(proj):
         atlas.allow()
+    if url and not pid:
+        atlas.block("Atlas doesn't recognise %s as a page link (it reads claude.ai/artifact/<id> and "
+                    "claude.ai/code/artifact/<id>), so a routine can't use it. Note it in the run report; "
+                    "a chat can check the link in user/settings/dashboards.yaml." % url)
     atlas.block("%s is not one of Atlas's pages (the links in user/settings/dashboards.yaml), and a routine "
                 "only reads or writes those: anything else could carry the user's data to someone else's "
                 "page (N9). If a page's link changed, that is fixed in a chat."
-                % (ti.get("url") or "This call names no page, so it"))
+                % (url or "This call names no page, so it"))
 
 
 EXEMPT_DELETE = ("user/inbox/drop/", "user/knowledge/_index/")

@@ -259,8 +259,9 @@ def check(rels, tool_name, proj, ctx, payload):
         if kind != "delete" and rel in (atlas.APPROVAL, atlas.PURGE_LOCK):
             tmp_hits.append(rel)
         if ctx != "chat" and rel in FIXED_IN_ROUTINES and kind != "delete":
-            why = fixed_part_change(payload, proj, rel) if tool_name in FILE_TOOLS else (
-                "Change %s with the Edit tool in a routine, not the shell." % rel)
+            # fixed_part_change can replay Write, Edit and MultiEdit only
+            why = fixed_part_change(payload, proj, rel) if tool_name in ("Write", "Edit", "MultiEdit") else (
+                "Change %s with the Edit tool in a routine." % rel)
             if why:
                 atlas.STATE.locked = True
                 atlas.block(why)
