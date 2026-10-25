@@ -291,7 +291,6 @@
   var REQUEST_STATE = {
     queued: "Saved. Atlas does this at its next run or chat",
     applied: "Done",
-    waiting_chat: "Waiting for your next chat",
     needs_chat: "Atlas will ask you about this in chat"
   };
   /* What a button shows for the newest request of its own kind on its record: {badge, tone} in place
@@ -326,8 +325,17 @@
         kind: spec.kind, target: clean(spec.target, 120), quoted: clean(spec.quoted, 1000), args: args || {},
         created: new Date().toISOString(), state: "queued"
       }).then(function () {
+        /* the picker must go: an open one holds every live re-render */
+        var hadFocus = holder.contains(document.activeElement);
+        var badge = N.badge(REQUEST_STATE.queued, "neutral");
+        holder.textContent = "";
+        holder.appendChild(badge);
+        if (hadFocus) { badge.setAttribute("tabindex", "-1"); badge.focus({ preventScroll: true }); }
         N.toast("Saved. Atlas will do this at its next run or chat.");
       }, function () {
+        holder.textContent = "";
+        holder.appendChild(btn);
+        btn.disabled = false;
         N.copyText(clean(text, 600), holder);   /* couldn't save: fall back to the chat request */
       });
     }
@@ -818,7 +826,27 @@
     var open = [], q = document.querySelector(".atl-search input"), tile = -1;
     document.querySelectorAll('.atl-row__main[aria-expanded="true"] .atl-row__title').forEach(function (t) { open.push(t.textContent); });
     document.querySelectorAll(".atl-stat").forEach(function (el, i) { if (el.getAttribute("aria-pressed") === "true") tile = i; });
-    return { open: open, q: q ? q.value : "", tile: tile, y: window.scrollY };
+    var a = document.activeElement, focus = null;
+    if (a && a !== document.body) {
+      var row = a.closest && a.closest(".atl-row"), rt = row && row.querySelector(".atl-row__title");
+      focus = { row: rt ? rt.textContent : null, tag: a.tagName, label: a.getAttribute("aria-label") || a.textContent, search: q === a };
+    }
+    return { open: open, q: q ? q.value : "", tile: tile, y: window.scrollY, focus: focus };
+  }
+  /* The same control after a repaint: the find box, or the control with the same label in the same row. */
+  function refocus(f) {
+    if (!f) return;
+    if (f.search) { var q = document.querySelector(".atl-search input"); if (q) q.focus(); return; }
+    var scope = document;
+    if (f.row) {
+      scope = null;
+      document.querySelectorAll(".atl-row").forEach(function (r) { var t = r.querySelector(".atl-row__title"); if (!scope && t && t.textContent === f.row) scope = r; });
+      if (!scope) return;
+    }
+    var hit = null;
+    scope.querySelectorAll(f.tag.toLowerCase()).forEach(function (el) { if (!hit && (el.getAttribute("aria-label") || el.textContent) === f.label) hit = el; });
+    if (!hit && f.row) hit = scope.querySelector(".atl-row__main, .atl-request button, .atl-request .atl-badge");
+    if (hit) { if (!hit.hasAttribute("tabindex") && !/^(BUTTON|INPUT|A|SELECT|TEXTAREA)$/.test(hit.tagName)) hit.setAttribute("tabindex", "-1"); hit.focus({ preventScroll: true }); }
   }
   function restoreUi(st) {
     if (st.tile >= 0) { var tiles = document.querySelectorAll(".atl-stat"); if (tiles[st.tile] && tiles[st.tile].click) tiles[st.tile].click(); }
@@ -829,6 +857,7 @@
       if (t && st.open.indexOf(t.textContent) !== -1 && b.getAttribute("aria-expanded") !== "true") b.click();
     });
     window.scrollTo(0, st.y);
+    refocus(st.focus);
   }
 
   N.page = function (defaults, build) {

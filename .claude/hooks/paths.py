@@ -180,8 +180,11 @@ def company(text, proj):
 
 
 def page_links(text, proj):
-    """The page URLs in a dashboards.yaml text; raises on bad YAML."""
-    return atlas.page_urls(atlas.load_yaml_text(text, proj) or {})
+    """The page URLs in a dashboards.yaml text, and which pages are live; raises on bad YAML."""
+    data = atlas.load_yaml_text(text, proj) or {}
+    pages = data.get("dashboards") if isinstance(data, dict) else None
+    live = sorted(k for k, v in (pages or {}).items() if isinstance(v, dict) and v.get("live")) if isinstance(pages, dict) else []
+    return atlas.page_urls(data), live
 
 
 # Settings a routine may edit except for one part, which decides what routines may reach:
@@ -189,8 +192,8 @@ def page_links(text, proj):
 FIXED_IN_ROUTINES = {
     ATLAS_YAML: (company, "'company' in user/settings/atlas.yaml decides which sites routines may reach, "
                           "so only a chat with the user changes it."),
-    atlas.DASHBOARDS_YAML: (page_links, "The page links in user/settings/dashboards.yaml decide which pages "
-                                        "routines may write to, so only a chat with the user changes them."),
+    atlas.DASHBOARDS_YAML: (page_links, "The page links and live flags in user/settings/dashboards.yaml decide "
+                                        "which pages routines may write to and how, so only a chat changes them."),
 }
 
 
