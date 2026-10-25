@@ -11,6 +11,7 @@ Each release's "What's new" section is shown to users in the Guide and their nex
 
 ### What's new
 - Atlas's scheduled runs can only update your own Atlas pages, never another page you can edit.
+- Your Work page updates as Atlas works, without reloading. Mark done, Mark received and Move the date save straight to Atlas, which makes the change at its next run or chat and shows you when it's done. Your next chat with Atlas switches the page over.
 
 ## 2.3.0 (2026-10-24)
 

@@ -139,16 +139,21 @@ Rules: only `--brand-*` declarations; colors as hex; font names as CSS family li
 Pages support light and dark (`prefers-color-scheme`), a viewer-chosen theme (`<html data-theme="light|dark">`, set by the header's toggle), phone widths down to 320 px with 16 px gutters and no horizontal scroll, keyboard focus states, and printing (filters hidden, black on white).
 
 ## Republish constraints (why templates look the way they do)
-Routines republish unattended only when an artifact is **private, page-only, and has no connector grants**: anything else can change what the page reads or who can see it, so it needs the user in a chat. So every template:
+Routines republish unattended only when an artifact is **private, page-only, and has no connector grants** (a live page's own database is the one capability, added in a chat): anything else can change what the page reads or who can see it, so it needs the user in a chat. So every template:
 - is a single self-contained file: inline CSS and JS, no external scripts, stylesheets, fonts, or images;
 - makes no network or connector calls and asks Claude nothing at view time;
-- reads all data from the embedded JSON; nothing is fetched live;
+- reads all data from the embedded JSON, or, on a live page, from its own database through the viewer's runtime; nothing is fetched over the network, and the security policy stays as strict (a page's `db` works under it, `connect-src 'none'` included);
 - uses browser storage only for conveniences (remembered filter, theme), wrapped in `try/catch`, and works without it;
 - is never shared or made public by a routine (`share_expose` is locked; publishing publicly needs approval in chat).
 
 Atlas's guard holds routines to this: they reach only the pages linked in `user/settings/dashboards.yaml`, can't change those links, and republish a page's content only, never its capabilities (`system/rules/governance.md` §Routines).
 
 If a republish fails (artifact deleted, permission lost), the job records a known issue (`health.yaml`) and the next chat offers to publish a fresh page and update `dashboards.yaml`.
+
+## Live pages
+A **live page** (Work, for now) keeps its data in its own artifact database, not in its HTML: one document per top-level key of its contract data in `sections`, written by Atlas, and the page re-renders when one changes. Its Mark done, Mark received and Move the date buttons write a row to `requests` instead of copying text, and the page shows that row's state on the item; any other button still copies a request for chat. Atlas works the queue at the start of every routine run and every chat. Only the owner can write either collection. The data is built exactly as for an embedded page, in the contract's shape, so the contract, the data rules and the size trimming are unchanged; `system/tools/sections.py` cuts it into sections, and a section must fit one database write (900 KB).
+
+A page becomes live in a chat, once, because adding the database is a capability change routines can't make; until then it stays an embedded page, and `_base.js` renders whichever it is. A live page embeds only `{"meta": {"live": true, ...}}`, the fields that don't change between refreshes, so a refresh writes sections and publishes nothing. When its database can't be reached, the page says so in plain words and hides its buttons; there is no embedded fallback, since an embedded copy would bring back the cost of building the data at every refresh. Procedure: `atlas-dashboards`, `reference/live.md`.
 
 ## User dashboards
 User dashboards live in `user/extensions/dashboards/` (registered in `registry.yaml`, kind `dashboard`) and follow the same pattern: a contract using the outline in `system/guide/authoring.md` and a template with the same placeholders. They may use `{{ATLAS_BASE_CSS}}`/`{{ATLAS_BASE_JS}}` to match. A user dashboard with `overrides: <name>` replaces the built-in one.

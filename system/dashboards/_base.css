@@ -317,6 +317,11 @@ button.atl-row__main { cursor: pointer; }
 .atl-toast { position: fixed; left: 50%; bottom: calc(28px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 40; display: inline-flex; align-items: center; gap: 16px; max-width: calc(100% - 32px); padding: 10px 20px; border-radius: var(--radius-pill); background: var(--ink); color: var(--on-ink); box-shadow: var(--shadow-toast); font-family: var(--font-sans); font-size: 15px; }
 .atl-toast__undo { min-height: 44px; padding: 0 16px; border: 0; border-radius: var(--radius-pill); background: var(--surface); color: var(--ink); font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; }
 .atl-copybox { width: 100%; max-width: 40rem; font: inherit; font-size: 14px; padding: 8px 12px; border: 1px solid var(--line-strong); border-radius: var(--radius-md); background: var(--surface); color: var(--ink); }
+/* Live pages: a request button, its saved state, and the date picker for Move the date */
+.atl-request { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.atl-request__note { font-size: 14px; color: var(--muted); }
+.atl-input { min-height: 44px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: var(--radius-md); background: var(--surface); color: var(--ink); font: inherit; font-size: 15px; }
+.atl-input:focus-visible { outline: 2px solid var(--info); outline-offset: 2px; }
 
 /* ---- Find on this page ---- */
 .atl-search { position: relative; flex: 1 1 16rem; max-width: 22rem; }

@@ -87,7 +87,8 @@
     function cRow(c) {
       var owe = c.direction === "i_owe", late = overdue(c);
       var other = owe ? c.counterparty : c.owner;
-      var action = owe ? N.request("Mark done", N.withId("Mark " + N.quote(c.title) + " as done", c.id), "secondary", true)
+      var action = owe ? N.request("Mark done", N.withId("Mark " + N.quote(c.title) + " as done", c.id), "secondary", true,
+          { kind: "mark_done", target: c.id, quoted: c.title })
         : N.request("Nudge " + first(other), N.withId("Draft a follow-up to " + N.quote(N.name(other)) + " about " + N.quote(c.title), c.id), "secondary");
       var row = N.row({
         title: c.title, tone: late ? "bad" : cAtt(c) ? "warn" : null,
@@ -101,8 +102,10 @@
             facts: N.mergeDetails([[owe ? "For" : "From", who(other)], ["Due", c.due ? N.dateY(c.due) + " (" + N.due(c.due).toLowerCase() + ")" : "No date"],
               ["Priority", c.priority ? N.label(c.priority) : null], ["Project", N.name(c.project)], ["Status", c.status ? N.label(c.status) : null]], c.details),
             body: c.body, body_truncated: c.body_truncated, links: c.links, dates: N.datesLine(c.created, c.updated),
-            actions: [owe ? N.request("Move the date", N.withId("Change the due date for " + N.quote(c.title), c.id))
-                : N.request("Mark received", N.withId(N.quote(c.title) + " has arrived. Mark it done", c.id), "secondary", true),
+            actions: [owe ? N.request("Move the date", N.withId("Change the due date for " + N.quote(c.title), c.id), "secondary", false,
+                { kind: "move_date", target: c.id, quoted: c.title, due: c.due })
+                : N.request("Mark received", N.withId(N.quote(c.title) + " has arrived. Mark it done", c.id), "secondary", true,
+                  { kind: "mark_received", target: c.id, quoted: c.title }),
               N.request("Ask Atlas", N.withId("Show me " + N.quote(c.title), c.id), "ghost")]
           });
         }

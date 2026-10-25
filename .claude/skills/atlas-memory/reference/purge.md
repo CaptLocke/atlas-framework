@@ -80,6 +80,8 @@ git push origin HEAD:main
 ```
 Delete `.atlas-tmp/purge-keep/` and `.atlas-tmp/purge.lock`.
 
+Then refresh every page that showed the erased content (`atlas-dashboards`), so it leaves the pages too. On a live page, also delete the request rows that name it (`reference/live.md` §6).
+
 ## 10. Log and tell
 - Activity log: `- <date> <time> · chat · purge (approved) · erased history for 2 paths: user/knowledge/people/jane-doe.md, … · commit <sha>`. Paths only, never content. If even a path reveals sensitive content, log "2 paths (named in conversation)".
 - Tell the user: done; any rollback tags left from earlier versions were rewritten; GitHub may hold cached copies for a period; copies outside Atlas are unaffected.
