@@ -57,6 +57,7 @@ AUTOLOAD_NAMES = {"claude.md", "claude.local.md", "agents.md", ".mcp.json", ".gi
 AUTOLOAD_DIRS = {".claude", ".githooks", ".husky"}
 # Places outside the repo a routine may write (M4): temp files and the null device.
 OUTSIDE_WRITE_OK = ("/tmp/", "/var/tmp/", "/dev/null", "/dev/stdout", "/dev/stderr", "/dev/fd/")
+DASHBOARDS_YAML = "user/settings/dashboards.yaml"
 GOVERNANCE_FILES = (
     "user/settings/governance.yaml",
     "user/settings/data-rules.yaml",
@@ -231,6 +232,41 @@ def owned_paths(proj):
             raise ValueError("system/manifest.yaml has no owned_paths list")
         _CACHE[key] = [str(p) for p in paths]
     return _CACHE[key]
+
+
+# --------------------------------------------------------------- dashboards
+def artifact_id(url):
+    """The id in a claude.ai artifact link (claude.ai/artifact/<id> or claude.ai/code/artifact/<id>),
+    or None. Two links name the same page only when their ids match."""
+    m = re.match(r"^(?:https?://)?(?:www\.)?claude\.ai/(?:code/)?artifact/([A-Za-z0-9_-]+)/?(?:[?#].*)?$",
+                 str(url or "").strip())
+    return m.group(1) if m else None
+
+
+def page_urls(data):
+    """Every page URL in a parsed dashboards.yaml: any 'url' value, and project_pages entries
+    given as a plain link (system/schemas/settings.md)."""
+    found = set()
+
+    def walk(node, key=None):
+        if isinstance(node, dict):
+            for k, v in node.items():
+                walk(v, k)
+        elif isinstance(node, list):
+            for v in node:
+                walk(v, key)
+        elif isinstance(node, str) and (key == "url" or artifact_id(node)):
+            found.add(node.strip())
+    walk(data)
+    return found
+
+
+def dashboard_pages(proj):
+    """Artifact ids of Atlas's own pages, from user/settings/dashboards.yaml (empty when absent)."""
+    path = os.path.join(proj, DASHBOARDS_YAML)
+    if not os.path.exists(path):
+        return set()
+    return {i for i in (artifact_id(u) for u in page_urls(load_yaml(path, proj) or {})) if i}
 
 
 def _git(proj, args, timeout=10):

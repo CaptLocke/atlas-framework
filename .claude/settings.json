@@ -24,6 +24,17 @@
         ]
       },
       {
+        "matcher": "Artifact|ArtifactData|ArtifactComments",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/actions.py\"",
+            "timeout": 20,
+            "onFailure": "block"
+          }
+        ]
+      },
+      {
         "matcher": "Write|Edit|MultiEdit|NotebookEdit",
         "hooks": [
           {

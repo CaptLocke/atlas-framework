@@ -39,6 +39,11 @@ What it enforces (system/rules/governance.md):
 - Routines (1.0.2): shell commands must pass the routine allowlist
   (commands.py), and curl/wget may use only a few known options with every
   address a written-out URL on an allowed host.
+- Artifacts in routines (matcher "Artifact|ArtifactData|ArtifactComments"):
+  only Atlas's own pages, the links in user/settings/dashboards.yaml, so
+  content can't steer a routine into writing to someone else's page (N9).
+  Artifact may read and republish those pages, nothing else; ArtifactData may
+  read and write their rows; ArtifactComments is a visible post, blocked.
 """
 import os
 import re
@@ -495,6 +500,69 @@ def handle_mcp(payload, proj, ctx):
     atlas.allow(warning)
 
 
+# What a routine may pass when republishing one of Atlas's pages: a new page, a
+# capability or runtime change, files, assets, forcing over a newer version or
+# pinning all change more than the page's content, so they need a chat.
+ARTIFACT_PUBLISH_KEYS = {"action", "url", "file_path", "description", "label", "title", "icon"}
+
+
+def _temp_only(path, payload, proj, allow_scratch):
+    """Is this local path one a routine may hand an artifact tool? Temp folders outside the
+    repo, plus .atlas-tmp/ (where pages are rendered) when allow_scratch. Neither tool goes
+    through paths.py, so a folder in the repo would skip its rules."""
+    rel = atlas.rel_to_project(path, atlas.session_cwd(payload, proj), proj)
+    if rel is not None:
+        return allow_scratch and rel.startswith(atlas.TMP_DIR + "/") and not rel.startswith(
+            atlas.ROUTINE_SESSIONS + "/")
+    base = os.path.join(atlas.session_cwd(payload, proj), os.path.expanduser(path))
+    return atlas.outside_write_ok(base)
+
+
+def handle_artifact(payload, proj, ctx):
+    """Routines use artifacts only on Atlas's own pages (system/dashboards/README.md)."""
+    if ctx == "chat":
+        atlas.allow()
+    tool_name = payload.get("tool_name") or ""
+    ti = payload.get("tool_input") if isinstance(payload.get("tool_input"), dict) else {}
+    atlas.STATE.locked = True
+    if tool_name == "ArtifactComments":
+        atlas.block("A comment on a page is visible to everyone who can open it (send_communication), and "
+                    "routines never post. Note it in the run report for the next chat instead.")
+    action = ti.get("action") or "publish"
+    if tool_name == "Artifact" and action not in ("read", "publish"):
+        atlas.block("In a routine, the Artifact tool only reads and republishes Atlas's own pages; '%s' "
+                    "needs a chat (system/dashboards/README.md)." % action)
+    if tool_name == "Artifact" and action == "publish":
+        extra = sorted(k for k in ti if k not in ARTIFACT_PUBLISH_KEYS)
+        if extra:
+            atlas.block("A routine republishes a page's content only; %s change%s more than that, so it "
+                        "waits for a chat." % (", ".join(extra), "s" if len(extra) == 1 else ""))
+        if not ti.get("url"):
+            atlas.block("A routine never creates a new page: publishing without 'url' does. Republish to the "
+                        "page's link in user/settings/dashboards.yaml, or leave a new page for a chat.")
+    out_dir = str(ti.get("out_dir") or "")
+    if out_dir and not _temp_only(os.path.join(out_dir, "x"), payload, proj, allow_scratch=False):
+        atlas.block("In a routine, %s saves files only under a temp folder (/tmp) outside the repo, not %s."
+                    % (tool_name, out_dir))
+    source = str(ti.get("file_path") or "")
+    if source and not _temp_only(source, payload, proj, allow_scratch=True):
+        atlas.block("In a routine, %s sends only files rendered for it, from .atlas-tmp/ or a temp folder "
+                    "(/tmp), not %s: anything else could put records or other files on a page."
+                    % (tool_name, source))
+    url = ti.get("url")
+    pid = atlas.artifact_id(url)
+    if pid and pid in atlas.dashboard_pages(proj):
+        atlas.allow()
+    if url and not pid:
+        atlas.block("Atlas doesn't recognise %s as a page link (it reads claude.ai/artifact/<id> and "
+                    "claude.ai/code/artifact/<id>), so a routine can't use it. Note it in the run report; "
+                    "a chat can check the link in user/settings/dashboards.yaml." % url)
+    atlas.block("%s is not one of Atlas's pages (the links in user/settings/dashboards.yaml), and a routine "
+                "only reads or writes those: anything else could carry the user's data to someone else's "
+                "page (N9). If a page's link changed, that is fixed in a chat."
+                % (url or "This call names no page, so it"))
+
+
 EXEMPT_DELETE = ("user/inbox/drop/", "user/knowledge/_index/")
 
 
@@ -651,6 +719,8 @@ def main(payload, proj, ctx):
         handle_bash(payload, proj, ctx)
     elif tool_name == "WebFetch":
         handle_webfetch(payload, proj, ctx)
+    elif tool_name in ("Artifact", "ArtifactData", "ArtifactComments"):
+        handle_artifact(payload, proj, ctx)
     atlas.allow()
 
 

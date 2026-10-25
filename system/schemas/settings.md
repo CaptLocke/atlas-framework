@@ -239,4 +239,4 @@ dashboards:
 project_pages: {}                       # project ID → url, created on request
 # User dashboards from extensions are additional keys named after the extension.
 ```
-`dashboards.yaml` URLs and `last_published` dates are bookkeeping written under `dashboards_refresh` (auto), so routines can update them; choosing which dashboards exist is `behavior_settings`.
+`last_published` dates are bookkeeping written under `dashboards_refresh` (auto), so routines update them. The URLs change only in a chat: they decide which pages a routine may write to, so the guard refuses a routine edit that changes one, and a page that needs a new link waits for the next chat (`system/dashboards/README.md`). Choosing which dashboards exist is `behavior_settings`.
