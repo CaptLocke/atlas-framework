@@ -24,7 +24,7 @@
         ]
       },
       {
-        "matcher": "Artifact|ArtifactData|ArtifactComments",
+        "matcher": "Artifact|ArtifactData|ArtifactComments|ArtifactCheck",
         "hooks": [
           {
             "type": "command",

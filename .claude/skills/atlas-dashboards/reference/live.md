@@ -9,17 +9,17 @@ Two collections, both writable only by the owner (the page declares the rules):
 - **`sections`**: one document per top-level key of the page's contract data, doc id = the key (`meta` included), body `{ "data": <that key's value> }`. Atlas writes them; the page renders from them and re-renders when one changes.
 - **`requests`**: one document per button press, created by the page: `{ kind, target, quoted, args, created, state }`, `state: queued`. Atlas sets `state` (and `note`, `applied_at`, `applied_by`).
 
-The tool is `ArtifactData` with the page's URL from `dashboards.yaml`. In routines Atlas's guard allows it only on those URLs, and only with files from `.atlas-tmp/` or a temp folder.
+The tool is `ArtifactData` with the page's URL from `dashboards.yaml`. In routines Atlas's guard allows it only on those URLs, only with files from `.atlas-tmp/` or a temp folder, and on `requests` only to update a row's `state`, `note`, `applied_at` and `applied_by` or delete it: a routine never creates or rewrites a request.
 
 ## 2. Switching a page to live (chat only)
 Adding a database is a capability change, which routines can't make. In a chat, when `dashboards.yaml` has the page without `live: true` and its template supports it (Work, since the release that added this file), switch it over once, without asking (`dashboards_refresh`), and tell the user in one line ("Your Work page now updates as Atlas works, and its Mark done buttons save straight to Atlas"):
 1. Build the data as in `SKILL.md` steps 1–4, then cut it: `python3 -I system/tools/sections.py .atlas-tmp/dashboards/<name>.json .atlas-tmp/dashboards/sections/<name>`. It writes one file per section plus `live.json`, and stops if a section is too large for one write (trim by the contract's rules, then run it again).
 2. Render the page from `live.json`: `python3 -I system/tools/render.py <template> .atlas-tmp/dashboards/sections/<name>/live.json <theme or -> .atlas-tmp/dashboards/<name>.html`.
 3. Republish it to its stored URL with the capabilities `{ "db": { "rules": [ { "path": "sections", "read": "view", "write": "owner" }, { "path": "requests", "read": "view", "write": "owner" } ] } }`. Keep it private, as always.
-4. Write every section in one `ArtifactData` batch (`set`, one entry per file, `file_path` each).
+4. Write the sections as in §3 step 2: list `sections` first, so a retry after a half-finished switch-over pins the documents already there.
 5. Set `live: true` on the page's entry in `dashboards.yaml` and `last_published`; commit.
 
-If any step fails, leave `live` unset: the page keeps working as an embedded page, and the next chat tries again.
+If any step fails, leave `live` unset and add or update the low-severity known issue `dashboards-live-switch` naming the step and the error: the page keeps working as an embedded page, and the next chat tries again, once per day at most. A switch-over that works closes the issue.
 
 ## 3. Refreshing a live page (chats and routines)
 Wherever `SKILL.md` says to render and republish a page that is live, do this instead. There is no publish:

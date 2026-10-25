@@ -12,7 +12,8 @@ shape (atlas-dashboards, Render step 2). Writes into <out-dir>:
 Prints each section's size in KB and fails (exit 1) when one is over the limit
 a single database write takes, naming it, so a refresh never half-writes a page
 (system/dashboards/README.md, "Live pages"). <out-dir> must be inside .atlas-tmp/
-or a temp folder, because the tool clears the .json files it finds there.
+(not its routine-sessions/) or a temp folder, because the tool clears the
+.json files it finds there. The sections together must also fit one write.
 """
 import json
 import os
@@ -20,7 +21,7 @@ import re
 import sys
 import tempfile
 
-SECTION_MAX_KB = 900          # a database batch carries at most 1 MiB
+SECTION_MAX_KB = 900          # a database batch carries at most 1 MiB, and a refresh is one batch
 STATIC_META = ("dashboard", "title", "locale", "atlas_version", "stale_after_hours")
 KEY = re.compile(r"^[A-Za-z0-9_-]{1,100}$")
 
@@ -43,6 +44,9 @@ def scratch_dir(path):
     """Is this a folder the tool may clear: inside .atlas-tmp/ (of the working directory) or a temp folder?"""
     real = os.path.realpath(path)
     roots = [os.path.join(os.getcwd(), ".atlas-tmp"), "/tmp", "/var/tmp", tempfile.gettempdir()]
+    markers = os.path.realpath(os.path.join(os.getcwd(), ".atlas-tmp", "routine-sessions"))
+    if real == markers or real.startswith(markers + os.sep):
+        return False   # the routine session markers (system/rules/governance.md)
     return any(real.startswith(os.path.realpath(r) + os.sep) for r in roots)
 
 
@@ -65,6 +69,10 @@ def main(argv):
         if too_big:
             raise ValueError("section(s) over %d KB: %s; trim them by the contract's rules"
                              % (SECTION_MAX_KB, ", ".join(sorted(too_big))))
+        total = sum(size_kb(d) for d in docs.values())
+        if total > SECTION_MAX_KB:
+            raise ValueError("the sections come to %.0f KB, over the %d KB one write takes; trim by the contract's "
+                             "rules" % (total, SECTION_MAX_KB))
         os.makedirs(out_dir, exist_ok=True)
         for name in os.listdir(out_dir):   # a section dropped from the data mustn't linger
             if name.endswith(".json"):

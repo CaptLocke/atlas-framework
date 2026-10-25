@@ -43,7 +43,9 @@ What it enforces (system/rules/governance.md):
   only Atlas's own pages, the links in user/settings/dashboards.yaml, so
   content can't steer a routine into writing to someone else's page (N9).
   Artifact may read and republish those pages, nothing else; ArtifactData may
-  read and write their rows; ArtifactComments is a visible post, blocked.
+  read and write their rows, but only update or delete requests (the user's
+  words); ArtifactComments is a visible post and ArtifactCheck a preview, both
+  blocked.
 """
 import os
 import re
@@ -518,6 +520,24 @@ def _temp_only(path, payload, proj, allow_scratch):
     return atlas.outside_write_ok(base)
 
 
+# A page's requests are the user's own words (system/rules/governance.md, N7), so a routine never
+# creates or rewrites one: it only records what happened to it, and clears finished ones.
+REQUEST_FIELDS = {"state", "note", "applied_at", "applied_by"}
+
+
+def _request_write_problem(w, single):
+    """Why this ArtifactData write (one call, or one batch entry) can't touch a page's requests, or None."""
+    op = (w.get("action") if single else w.get("op")) or ""
+    coll = str(w.get("collection") or "").strip("/")
+    if coll.split("/")[0] != "requests" or op in ("get", "list", "query", "profiles", "delete"):
+        return None
+    data = w.get("data") if isinstance(w.get("data"), dict) else None
+    if op == "update" and data is not None and set(data) <= REQUEST_FIELDS and not w.get("file_path"):
+        return None
+    return ("A page's requests are what the user pressed, so a routine only updates a request's state, note, "
+            "applied_at and applied_by, or deletes a finished one; it never creates or rewrites a request.")
+
+
 def handle_artifact(payload, proj, ctx):
     """Routines use artifacts only on Atlas's own pages (system/dashboards/README.md)."""
     if ctx == "chat":
@@ -528,6 +548,8 @@ def handle_artifact(payload, proj, ctx):
     if tool_name == "ArtifactComments":
         atlas.block("A comment on a page is visible to everyone who can open it (send_communication), and "
                     "routines never post. Note it in the run report for the next chat instead.")
+    if tool_name == "ArtifactCheck":
+        atlas.block("Previewing pages is for a chat; a routine only reads and republishes Atlas's own pages.")
     action = ti.get("action") or "publish"
     if tool_name == "Artifact" and action not in ("read", "publish"):
         atlas.block("In a routine, the Artifact tool only reads and republishes Atlas's own pages; '%s' "
@@ -544,11 +566,19 @@ def handle_artifact(payload, proj, ctx):
     if out_dir and not _temp_only(os.path.join(out_dir, "x"), payload, proj, allow_scratch=False):
         atlas.block("In a routine, %s saves files only under a temp folder (/tmp) outside the repo, not %s."
                     % (tool_name, out_dir))
-    source = str(ti.get("file_path") or "")
-    if source and not _temp_only(source, payload, proj, allow_scratch=True):
-        atlas.block("In a routine, %s sends only files rendered for it, from .atlas-tmp/ or a temp folder "
-                    "(/tmp), not %s: anything else could put records or other files on a page."
-                    % (tool_name, source))
+    writes = [ti] if tool_name == "ArtifactData" and ti.get("action") != "batch" else []
+    if tool_name == "ArtifactData" and ti.get("action") == "batch":
+        writes = [w if isinstance(w, dict) else {} for w in (ti.get("writes") if isinstance(ti.get("writes"), list) else [])]
+    for w in ([ti] if tool_name == "Artifact" else writes):
+        source = str(w.get("file_path") or "")
+        if source and not _temp_only(source, payload, proj, allow_scratch=True):
+            atlas.block("In a routine, %s sends only files rendered for it, from .atlas-tmp/ or a temp folder "
+                        "(/tmp), not %s: anything else could put records or other files on a page."
+                        % (tool_name, source))
+    for w in writes:
+        why = _request_write_problem(w, ti.get("action") != "batch")
+        if why:
+            atlas.block(why)
     url = ti.get("url")
     pid = atlas.artifact_id(url)
     if pid and pid in atlas.dashboard_pages(proj):
@@ -719,7 +749,7 @@ def main(payload, proj, ctx):
         handle_bash(payload, proj, ctx)
     elif tool_name == "WebFetch":
         handle_webfetch(payload, proj, ctx)
-    elif tool_name in ("Artifact", "ArtifactData", "ArtifactComments"):
+    elif tool_name in ("Artifact", "ArtifactData", "ArtifactComments", "ArtifactCheck"):
         handle_artifact(payload, proj, ctx)
     atlas.allow()
 
