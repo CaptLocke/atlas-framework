@@ -32,7 +32,9 @@ What it enforces (system/rules/governance.md, system/schemas/formats.md s2):
   from that release's ref, and `git rm` removes only owned files that release
   doesn't have. Writes outside the repo go only to temp folders (M4); paths
   with variables are refused; `company` in user/settings/atlas.yaml (it
-  decides which sites routines may reach) can't change (M1); and shell
+  decides which sites routines may reach) can't change (M1), nor can the
+  page links in user/settings/dashboards.yaml (they decide which pages
+  routines may write to, N9; actions.py handle_artifact); and shell
   redirects can't overwrite existing files under user/ (L2: use Write/Edit).
 - In any context: files Claude Code or git load as instructions, servers or
   hooks (CLAUDE.md, CLAUDE.local.md, AGENTS.md, .mcp.json, .gitattributes,
@@ -177,9 +179,25 @@ def company(text, proj):
     return data.get("company") if isinstance(data, dict) else None
 
 
-def atlas_yaml_change(payload, proj):
-    """Why this file-tool edit of user/settings/atlas.yaml isn't allowed in a routine, or None (M1)."""
-    path = os.path.join(proj, ATLAS_YAML)
+def page_links(text, proj):
+    """The page URLs in a dashboards.yaml text; raises on bad YAML."""
+    return atlas.page_urls(atlas.load_yaml_text(text, proj) or {})
+
+
+# Settings a routine may edit except for one part, which decides what routines may reach:
+# 'company' sets the sites they open (M1); the page links set the artifacts they write (N9).
+FIXED_IN_ROUTINES = {
+    ATLAS_YAML: (company, "'company' in user/settings/atlas.yaml decides which sites routines may reach, "
+                          "so only a chat with the user changes it."),
+    atlas.DASHBOARDS_YAML: (page_links, "The page links in user/settings/dashboards.yaml decide which pages "
+                                        "routines may write to, so only a chat with the user changes them."),
+}
+
+
+def fixed_part_change(payload, proj, rel):
+    """Why this file-tool edit of a FIXED_IN_ROUTINES file isn't allowed in a routine, or None."""
+    part, what = FIXED_IN_ROUTINES[rel]
+    path = os.path.join(proj, rel)
     try:
         with open(path, encoding="utf-8") as f:
             before = f.read()
@@ -197,12 +215,11 @@ def atlas_yaml_change(payload, proj):
             if old and old in after:
                 after = after.replace(old, new) if e.get("replace_all") else after.replace(old, new, 1)
     try:
-        same = company(before, proj) == company(after, proj)
+        same = part(before, proj) == part(after, proj)
     except Exception:
-        return "the new user/settings/atlas.yaml isn't valid YAML"
+        return "the new %s isn't valid YAML" % rel
     if not same:
-        return ("'company' in user/settings/atlas.yaml decides which sites routines may reach, so only a chat "
-                "with the user changes it. Queue the change in user/inbox/approvals.md instead.")
+        return "%s Queue the change in user/inbox/approvals.md instead." % what
     return None
 
 
@@ -241,9 +258,9 @@ def check(rels, tool_name, proj, ctx, payload):
             gov_hits.append(rel or ".")
         if kind != "delete" and rel in (atlas.APPROVAL, atlas.PURGE_LOCK):
             tmp_hits.append(rel)
-        if ctx != "chat" and rel == ATLAS_YAML and kind != "delete":
-            why = atlas_yaml_change(payload, proj) if tool_name in FILE_TOOLS else (
-                "Change user/settings/atlas.yaml with the Edit tool in a routine, not the shell.")
+        if ctx != "chat" and rel in FIXED_IN_ROUTINES and kind != "delete":
+            why = fixed_part_change(payload, proj, rel) if tool_name in FILE_TOOLS else (
+                "Change %s with the Edit tool in a routine, not the shell." % rel)
             if why:
                 atlas.STATE.locked = True
                 atlas.block(why)

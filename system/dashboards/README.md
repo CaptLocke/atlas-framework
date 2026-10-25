@@ -146,6 +146,8 @@ Routines republish unattended only when an artifact is **private, page-only, and
 - uses browser storage only for conveniences (remembered filter, theme), wrapped in `try/catch`, and works without it;
 - is never shared or made public by a routine (`share_expose` is locked; publishing publicly needs approval in chat).
 
+Atlas's guard holds routines to this: they reach only the pages linked in `user/settings/dashboards.yaml`, can't change those links, and republish a page's content only, never its capabilities (`system/rules/governance.md` §Routines).
+
 If a republish fails (artifact deleted, permission lost), the job records a known issue (`health.yaml`) and the next chat offers to publish a fresh page and update `dashboards.yaml`.
 
 ## User dashboards
