@@ -11,12 +11,14 @@ shape (atlas-dashboards, Render step 2). Writes into <out-dir>:
   the fields that don't change between refreshes (render.py takes it as data).
 Prints each section's size in KB and fails (exit 1) when one is over the limit
 a single database write takes, naming it, so a refresh never half-writes a page
-(system/dashboards/README.md, "Live pages").
+(system/dashboards/README.md, "Live pages"). <out-dir> must be inside .atlas-tmp/
+or a temp folder, because the tool clears the .json files it finds there.
 """
 import json
 import os
 import re
 import sys
+import tempfile
 
 SECTION_MAX_KB = 900          # a database batch carries at most 1 MiB
 STATIC_META = ("dashboard", "title", "locale", "atlas_version", "stale_after_hours")
@@ -37,6 +39,13 @@ def cut(data):
     return docs, live
 
 
+def scratch_dir(path):
+    """Is this a folder the tool may clear: inside .atlas-tmp/ (of the working directory) or a temp folder?"""
+    real = os.path.realpath(path)
+    roots = [os.path.join(os.getcwd(), ".atlas-tmp"), "/tmp", "/var/tmp", tempfile.gettempdir()]
+    return any(real.startswith(os.path.realpath(r) + os.sep) for r in roots)
+
+
 def size_kb(obj):
     return len(json.dumps(obj, ensure_ascii=False, separators=(",", ":")).encode("utf-8")) / 1024
 
@@ -46,6 +55,9 @@ def main(argv):
         print(__doc__, file=sys.stderr)
         return 2
     data_path, out_dir = argv[1:]
+    if not scratch_dir(out_dir):
+        print("sections failed: write sections under .atlas-tmp/ or a temp folder, not %s" % out_dir, file=sys.stderr)
+        return 1
     try:
         with open(data_path, encoding="utf-8") as f:
             docs, live = cut(json.load(f))
