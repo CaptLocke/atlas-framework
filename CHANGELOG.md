@@ -10,7 +10,7 @@ Each release's "What's new" section is shown to users in the Guide and their nex
 ## 2.4.1 (2026-10-26)
 
 ### What's new
-- A request from your Work page counts only as you made it: if it was changed after you pressed the button, Atlas asks you about it in a chat instead of applying it.
+- A request from your Work page counts only as you made it: if it was changed after you pressed the button, Atlas checks it with you in a chat instead of applying it. A button you press while Atlas is working waits for its next run or chat.
 
 ## 2.4.0 (2026-10-25)
 
