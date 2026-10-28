@@ -7,7 +7,7 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
-## 2.4.1 (2026-10-26)
+## 2.4.1 (2026-10-27)
 
 ### What's new
 - A request from your Work page counts only as you made it: if it was changed after you pressed the button, Atlas checks it with you in a chat instead of applying it. A button you press while Atlas is working waits for its next run or chat.
