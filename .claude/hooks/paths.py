@@ -184,6 +184,9 @@ def page_links(text, proj):
     data = atlas.load_yaml_text(text, proj) or {}
     pages = data.get("dashboards") if isinstance(data, dict) else None
     live = sorted(k for k, v in (pages or {}).items() if isinstance(v, dict) and v.get("live")) if isinstance(pages, dict) else []
+    projects = data.get("project_pages") if isinstance(data, dict) else None
+    if isinstance(projects, dict):   # a live project page is { url, live: true } instead of a plain link
+        live += sorted("project_pages/%s" % k for k, v in projects.items() if isinstance(v, dict) and v.get("live"))
     return atlas.page_urls(data), live
 
 

@@ -89,7 +89,8 @@
       var other = owe ? c.counterparty : c.owner;
       var action = owe ? N.request("Mark done", N.withId("Mark " + N.quote(c.title) + " as done", c.id), "secondary", true,
           { kind: "mark_done", target: c.id, quoted: c.title })
-        : N.request("Nudge " + first(other), N.withId("Draft a follow-up to " + N.quote(N.name(other)) + " about " + N.quote(c.title), c.id), "secondary");
+        : N.request("Nudge " + first(other), N.withId("Draft a follow-up to " + N.quote(N.name(other)) + " about " + N.quote(c.title), c.id), "secondary", false,
+          { kind: "nudge", target: c.id, quoted: c.title });
       var row = N.row({
         title: c.title, tone: late ? "bad" : cAtt(c) ? "warn" : null,
         meta: [owe ? (other ? "For " + who(other) : null) : (other ? "From " + who(other) : null), N.name(c.project) || null],
@@ -307,7 +308,8 @@
         meta: [[p.role, p.org ? N.name(p.org) : null].filter(Boolean).join(", ") || null,
           p.last_contact ? "Last contact " + N.rel(p.last_contact) : "No contact recorded", meet ? "Next: " + meet : null],
         badge: p.quiet ? N.badge("Gone quiet", "warn") : p.relationship ? N.badge(N.label(p.relationship)) : null,
-        action: o.theirs.length ? N.request("Nudge " + first(p), N.withId("Draft a follow-up to " + N.quote(p.title) + " about what they owe me", p.id), "secondary") : null,
+        action: o.theirs.length ? N.request("Nudge " + first(p), N.withId("Draft a follow-up to " + N.quote(p.title) + " about what they owe me", p.id), "secondary", false,
+          { kind: "nudge", target: p.id, quoted: p.title }) : null,
         search: [p.role, N.name(p.org), p.quiet_reason, p.insight].join(" "),
         detail: function () {
           return N.detail({

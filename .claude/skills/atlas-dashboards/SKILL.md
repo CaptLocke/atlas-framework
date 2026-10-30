@@ -19,7 +19,7 @@ Keep three always-current, browsable pages, Today, Work and Guide, plus project 
 - User dashboards: `user/extensions/dashboards/<name>.html` + `<name>.contract.md`, registered in `user/extensions/registry.yaml` (kind `dashboard`). A user dashboard with `overrides: <system dashboard>` replaces it (`system/rules/extensions.md`).
 - The files named in each contract's "Sources" section; `user/profile/design-system.md` for theme; `user/settings/dashboards.yaml` for URLs.
 - Rendering detail, theming, size trimming, and publishing rules: `reference/rendering.md`.
-- Live pages (Work): their database, the switch-over, refreshes and the request queue: `reference/live.md`.
+- Live pages (Today, Work, Guide and project pages): their database, the switch-over, refreshes and the request queue: `reference/live.md`.
 
 ## Procedure
 ### Render (every publish or republish)

@@ -51,5 +51,6 @@ dashboards:
   deals-board: { url: "https://…", last_published: 2026-10-20 }   # user dashboard (extension name)
 project_pages:
   projects/orion-migration: "https://…"
+  projects/enterprise-launch: { url: "https://…", live: true }   # a live project page (reference/live.md)
 ```
 Update `last_published` on every successful (re)publish. Commit with the job or chat change set.

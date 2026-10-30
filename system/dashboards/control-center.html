@@ -132,20 +132,22 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
       cards.push(N.card({ eyebrow: ["Only you can do this", "warn"], title: q.text, detail: q.how || null,
         body: q.copy_text ? h("pre", { class: "copy-text" }, q.copy_text) : null,
         actions: [q.copy_text ? h("button", { type: "button", class: "atl-btn atl-btn--secondary", onclick: function (e) { N.copyText(q.copy_text, e.currentTarget); } }, N.icon("copy"), h("span", null, "Copy the text")) : null,
-          N.request("I've done this", N.withId("I've done this: " + N.quote(q.text), q.id), "primary", true)] }));
+          N.request("I've done this", N.withId("I've done this: " + N.quote(q.text), q.id), "primary", true, { kind: "mark_done", target: q.id, quoted: q.text })] }));
     });
     asks.forEach(function (a) {
       cards.push(N.card({ eyebrow: ["Waiting for your OK", "warn"], title: a.action,
         detail: [a.prepared ? "Prepared: " + a.prepared : null, byWhom(a.requested_by), a.requested_on ? "Asked " + N.date(a.requested_on) : null].filter(Boolean).join(" · "),
         body: a.why ? h("p", null, N.rich(a.why)) : null,
-        actions: [N.request("Approve", N.withId("Approve " + N.quote(a.action), a.id), "primary", true), N.request("Decline", N.withId("Decline " + N.quote(a.action), a.id), "secondary")] }));
+        actions: [N.request("Approve", N.withId("Approve " + N.quote(a.action), a.id), "primary", true, { kind: "approve", target: a.id, quoted: a.action }),
+          N.request("Decline", N.withId("Decline " + N.quote(a.action), a.id), "secondary", false, { kind: "decline", target: a.id, quoted: a.action })] }));
     });
     qs.forEach(function (q) {
       var proposal = !!q.proposed_change;
       cards.push(N.card({ eyebrow: ["Question from Atlas", "info"], title: q.text,
         detail: q.asked ? "Asked " + N.date(q.asked) : null,
         body: proposal ? h("p", null, h("b", null, "Proposed: "), N.rich(q.proposed_change)) : null,
-        actions: proposal ? [N.request("Yes", N.withId("Yes to your question " + N.quote(q.text), q.id), "primary", true), N.request("No", N.withId("No to your question " + N.quote(q.text), q.id), "secondary")]
+        actions: proposal ? [N.request("Yes", N.withId("Yes to your question " + N.quote(q.text), q.id), "primary", true, { kind: "answer", target: q.id, quoted: q.text, args: { choice: "yes" } }),
+          N.request("No", N.withId("No to your question " + N.quote(q.text), q.id), "secondary", false, { kind: "answer", target: q.id, quoted: q.text, args: { choice: "no" } })]
           : [N.request("Answer in chat", N.withId("About your question " + N.quote(q.text) + ":", q.id), "secondary")] }));
     });
     var nWaiting = acts.length + N.total("approvals", asks.length) + N.total("questions", qs.length);
@@ -253,6 +255,7 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
         N.search("Find in recently filed", function (q) { filedQ = q; applyFiled(); })] : null);
 
     var ab = d.about || {}, b = ab.basics || {}, files = L(ab.files);
+    /* A belief is named by its profile file; its text (quoted) says which statement (plans: live pages). */
     function statement(s) {
       var tag = STMT[s.status] || STMT[s.provenance === "stated" ? "confirmed" : "proposed"];
       var ev = L(s.evidence).map(N.name).filter(function (x) { return x && x.indexOf("/") === -1; });
@@ -260,11 +263,13 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
       var proposed = s.status === "proposed";
       return N.row({ title: N.rich(s.text), tone: proposed ? "warn" : "good",
         meta: [where, s.date ? N.dateY(s.date) : null], badge: N.badge(tag[0], tag[1]),
-        action: proposed ? N.request("Confirm", "Your belief about me is right: " + N.quote(N.rich(s.text)), "secondary", true) : null,
-        detail: proposed ? function () { return N.detail({ actions: [N.request("Correct it", "Your belief about me is wrong: " + N.quote(N.rich(s.text)) + ". Actually,", "secondary")] }); } : null });
+        action: proposed ? N.request("Confirm", "Your belief about me is right: " + N.quote(N.rich(s.text)), "secondary", true,
+          s.part && { kind: "confirm", target: "profile/" + s.part, quoted: s.text }) : null,
+        detail: proposed ? function () { return N.detail({ actions: [N.request("Correct it", "Your belief about me is wrong: " + N.quote(N.rich(s.text)) + ". Actually,", "secondary", false,
+          s.part && { kind: "correct", target: "profile/" + s.part, quoted: s.text, input: "text" })] }); } : null });
     }
     var all = [], featured = [];
-    files.forEach(function (f) { L(f.groups).forEach(function (g) { L(g.statements).forEach(function (s) { all.push(s); if (s.featured) featured.push(s); }); }); });
+    files.forEach(function (f) { L(f.groups).forEach(function (g) { L(g.statements).forEach(function (s) { if (s && !s.part) s.part = f.part; all.push(s); if (s.featured) featured.push(s); }); }); });
     if (!featured.length) featured = all.slice(0, 3);
     var who = [b.role ? b.role + (b.company ? " at " + N.name(b.company) : "") : null, b.manager ? "reports to " + N.name(b.manager) : null].filter(Boolean).join("; ");
     var restCount = all.length - featured.length;

@@ -9,7 +9,7 @@ stale_after_hours: 192
 # Dashboard: project-page
 
 ## Purpose
-A one-page view of a single project, generated on request in chat ("make a page for the enterprise launch"): current state, health, owner, goal, people, open commitments, risks, decisions, open questions and ideas, meetings, history, and sources. One artifact per project; the URL is stored in `user/settings/dashboards.yaml: project_pages` (project ID → url).
+A one-page view of a single project, generated on request in chat ("make a page for the enterprise launch"): current state, health, owner, goal, people, open commitments, risks, decisions, open questions and ideas, meetings, history, and sources. One artifact per project; the URL is stored in `user/settings/dashboards.yaml: project_pages` (project ID → url, or `{ url, live: true }` once the page is live).
 
 Created only in chat. Once listed in `project_pages`, it is republished by `triage` and `weekly-review` when that project's records changed, and by any chat that changes them. Removing the entry stops refreshes (deleting the page itself is `destructive`).
 

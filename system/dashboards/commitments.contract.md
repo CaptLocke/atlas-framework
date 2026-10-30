@@ -98,7 +98,7 @@ Republished by `daily-brief` every run; by `triage` when this run changed its da
 |---|---|
 | `commitments[]` | `user/knowledge/commitments/*.md` with `status: open|slipped`, not archived/superseded: `id, title, direction, status, due, priority, owner, counterparty, insight, next_step`; `project` = first `links.projects` entry (or `null`) |
 | `projects[]` | `user/knowledge/projects/*.md` with `status: active|proposed|paused`: `id, title, status, health, scale, owner, goal, target, insight, next_step`; optional `summary` |
-| `projects[].page_url` | `user/settings/dashboards.yaml: project_pages[<project ID>]` when the project has its own project page (`https://` only), else `null` |
+| `projects[].page_url` | `user/settings/dashboards.yaml: project_pages[<project ID>]` (the entry, or its `url` once the page is live) when the project has its own project page (`https://` only), else `null` |
 | `period` | The current quarter (or the period most active goals share), from the goals' `period` |
 | `goals[]` | `user/knowledge/goals/*.md` with `status: active|draft`: `id, title, status, period, rank, summary, metric, target, current, owner` |
 | `goals[].current_as_of` | The date in the goal's `current` text or its latest `## Updates` line that changed `current` |

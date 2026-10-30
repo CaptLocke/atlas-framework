@@ -81,12 +81,13 @@
     acts.forEach(function (a) {
       cards.push(N.card({ eyebrow: ["Only you can do this", "warn"], title: a.text, detail: a.how || null,
         body: a.copy_text ? h("p", null, "The text to copy is on the ", N.pageLink("control-center", "Guide"), " page, or ask Atlas in chat.") : null,
-        actions: [N.request("I've done this", N.withId("I've done this: " + N.quote(a.text), a.id), "primary", true)] }));
+        actions: [N.request("I've done this", N.withId("I've done this: " + N.quote(a.text), a.id), "primary", true,
+          { kind: "mark_done", target: a.id, quoted: a.text })] }));
     });
     asks.forEach(function (a) {
       cards.push(N.card({ eyebrow: ["Waiting for your OK", "warn"], title: a.action, detail: a.why || null,
-        actions: [N.request("Approve", N.withId("Approve " + N.quote(a.action), a.id), "primary", true),
-          N.request("Decline", N.withId("Decline " + N.quote(a.action), a.id), "secondary")] }));
+        actions: [N.request("Approve", N.withId("Approve " + N.quote(a.action), a.id), "primary", true, { kind: "approve", target: a.id, quoted: a.action }),
+          N.request("Decline", N.withId("Decline " + N.quote(a.action), a.id), "secondary", false, { kind: "decline", target: a.id, quoted: a.action })] }));
     });
     qs.forEach(function (q) {
       cards.push(N.card({ eyebrow: ["Question from Atlas", "info"], title: q.text,
@@ -96,7 +97,8 @@
       cards.push(N.card({ eyebrow: ["Draft ready", "good"], title: x.title,
         detail: [x.to ? "To " + x.to : null, x.where ? "In your " + x.where : null].filter(Boolean).join(" · "),
         body: x.why ? h("p", null, N.rich(x.why)) : null,
-        actions: [N.request("Send it", N.withId("Send the draft " + N.quote(x.title), x.ref && x.ref.id), "primary"),
+        actions: [N.request("Send it", N.withId("Send the draft " + N.quote(x.title), x.ref && x.ref.id), "primary", false,
+          { kind: "approve", target: x.ref && x.ref.id, quoted: x.title }),
           N.request("Change it", N.withId("Change the draft " + N.quote(x.title), x.ref && x.ref.id), "secondary")] }));
     });
     var needsN = cards.length + ((N.meta.truncated || {}).approvals || 0) + ((N.meta.truncated || {}).questions || 0) + ((N.meta.truncated || {}).drafts || 0);
@@ -155,8 +157,8 @@
         title: c.title, tone: overdue(c) ? "bad" : c.due && N.daysFromToday(c.due) <= 1 ? "warn" : null,
         meta: [other ? (owe ? "For " : "From ") + N.name(other) : null, !owe && c.since ? "Asked " + N.date(c.since) : null, owe && c.priority ? N.label(c.priority) + " priority" : null],
         badge: badgeFor(c),
-        action: owe ? N.request("Mark done", N.withId("Mark " + N.quote(c.title) + " as done", c.id), "secondary", true)
-          : N.request("Nudge " + first(other), N.withId("Draft a follow-up to " + N.name(other) + " about " + N.quote(c.title), c.id), "secondary"),
+        action: owe ? N.request("Mark done", N.withId("Mark " + N.quote(c.title) + " as done", c.id), "secondary", true, { kind: "mark_done", target: c.id, quoted: c.title })
+          : N.request("Nudge " + first(other), N.withId("Draft a follow-up to " + N.name(other) + " about " + N.quote(c.title), c.id), "secondary", false, { kind: "nudge", target: c.id, quoted: c.title }),
         detail: c.next_step ? function () {
           return N.detail({ blocks: [{ heading: "Next step", nodes: N.para(c.next_step) }],
             actions: [N.request("Ask Atlas", N.withId("Show me " + N.quote(c.title), c.id), "ghost")] });
@@ -200,7 +202,8 @@
               draft ? h("p", null, "Draft " + (i.draft.to ? "to " + i.draft.to + " " : "") + "in your " + i.draft.where + ". Review and send it yourself, or say “send it” in chat.") : null,
               L(i.refs).length ? h("p", { class: "atl-card__detail" }, "Based on ", N.refs(i.refs)) : null],
             actions: [i.suggested_action ? N.request("Do this", N.withId("Let's do the suggested action " + N.quote(i.suggested_action), i.id), "primary") : null,
-              N.request("Not useful", N.withId("That insight wasn't useful: " + N.quote(i.text), i.id), "secondary")] });
+              N.request("Not useful", N.withId("That insight wasn't useful: " + N.quote(i.text), i.id), "secondary", false,
+                { kind: "not_useful", target: i.id, quoted: i.text })] });
         })) }));
     }
 

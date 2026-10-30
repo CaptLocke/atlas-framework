@@ -10,6 +10,9 @@ Each release's "What's new" section is shown to users in the Guide and their nex
 ## Unreleased
 
 ### What's new
+- Today, Guide and your project pages now update as Atlas works, like Work: Atlas switches each one over in your next chat. Their buttons save straight to Atlas instead of copying a request: approve or decline, answer a question, confirm or correct what Atlas believes about you, mark something done, ask for a follow-up draft, or say an insight wasn't useful. Atlas does it at its next run or chat.
+- An Approve or Send it pressed on a page is done in your next chat, never by an automation, and your approval card still asks before anything is sent. Buttons that start a conversation (Ask Atlas, Decide, Change it) still copy the request for you to paste.
+- Guide's health is updated at the end of every automation run, so it's never a day behind.
 - When you ask Atlas to update in a chat, it says up front that it takes a few minutes and that your pages refresh last, so a long wait doesn't look like it has stalled.
 
 ## 2.4.1 (2026-10-27)
