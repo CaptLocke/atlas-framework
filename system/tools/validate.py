@@ -1082,6 +1082,12 @@ def check_dashboards_settings(c, path, data, template):
     pp = (data or {}).get("project_pages")
     if pp is not None and not isinstance(pp, dict):
         rep.error(path, "project_pages must be a mapping of project ID to url")
+    elif pp:
+        for k, v in pp.items():   # a plain link, or { url, live: true } once the page is live
+            if isinstance(v, dict) and ("url" not in v or not isinstance(v.get("live", False), bool)):
+                rep.error(path, "project_pages.%s must be a url, or { url, live } for a live page" % k)
+            elif not isinstance(v, (dict, str)) and v is not None:
+                rep.error(path, "project_pages.%s must be a url, or { url, live } for a live page" % k)
 
 
 def check_atlas(c, path, data, template):

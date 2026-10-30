@@ -285,12 +285,17 @@
 
   /* On a live page, a button for one of these kinds writes a request row instead of copying text;
      Atlas applies it at its next routine run or chat and sets its state (plans: live pages).
-     live: {kind, target (record ID), quoted (the title, a reminder only), due (move_date)} */
-  var LIVE_KINDS = { mark_done: 1, mark_received: 1, move_date: 1 };
-  var CLOSES = { mark_done: 1, mark_received: 1 };   /* kinds whose item leaves the page once applied */
+     live: {kind, target (record or inbox ID, or profile/<part>), quoted (the title, a reminder only),
+     due (move_date), args (fixed, e.g. {choice: "yes"}), input: "text" (asks for a few words first)} */
+  var LIVE_KINDS = { mark_done: 1, mark_received: 1, move_date: 1, answer: 1, decline: 1, not_useful: 1,
+    confirm: 1, correct: 1, nudge: 1, approve: 1 };
+  /* kinds whose item leaves the page once applied; the others give their button back */
+  var CLOSES = { mark_done: 1, mark_received: 1, answer: 1, decline: 1, not_useful: 1, confirm: 1, correct: 1, approve: 1 };
+  var APPLIED = { nudge: "Draft ready" };   /* kinds that keep a badge once applied, and its text */
   var REQUEST_STATE = {
     queued: "Saved. Atlas does this at its next run or chat",
     applied: "Done",
+    waiting_chat: "Waiting for your next chat",
     needs_chat: "Atlas will ask you about this in chat"
   };
   /* What a button shows for the newest request of its own kind on its record: {badge, tone} in place
@@ -298,6 +303,7 @@
   N.requestView = function (row, kind) {
     if (!row || !REQUEST_STATE[row.state] && row.state !== "refused") return {};
     if (row.state === "refused") return { note: row.note ? "Atlas couldn't do this: " + clean(row.note, 160) : "Atlas couldn't do this." };
+    if (row.state === "applied" && APPLIED[kind]) return { badge: APPLIED[kind], tone: "good" };
     if (row.state === "applied" && !CLOSES[kind]) return {};
     return { badge: REQUEST_STATE[row.state], tone: row.state === "applied" ? "good" : "neutral" };
   };
@@ -322,7 +328,7 @@
     function save(args) {
       var id = spec.kind + "-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
       N.live.db.collection("requests").doc(id).set({
-        kind: spec.kind, target: clean(spec.target, 120), quoted: clean(spec.quoted, 1000), args: args || {},
+        kind: spec.kind, target: clean(spec.target, 120), quoted: clean(spec.quoted, 1000), args: args || spec.args || {},
         created: new Date().toISOString(), state: "queued"
       }).then(function () {
         /* the picker must go: an open one holds every live re-render */
@@ -343,9 +349,17 @@
     holder.appendChild(btn);
     if (view.note) holder.appendChild(h("span", { class: "atl-request__note" }, view.note));
     btn.addEventListener("click", function () {
-      if (spec.kind !== "move_date") { btn.disabled = true; save(); return; }
-      var input = h("input", { type: "date", class: "atl-input", min: today(), "aria-label": "New due date for " + clean(spec.quoted, 80), value: spec.due || "" });
-      var ok = N.button({ label: "Save date", variant: "primary", onClick: function () { if (input.value) { ok.disabled = true; save({ due: input.value }); } } });
+      var input, ok;
+      if (spec.kind === "move_date") {
+        input = h("input", { type: "date", class: "atl-input", min: today(), "aria-label": "New due date for " + clean(spec.quoted, 80), value: spec.due || "" });
+        ok = N.button({ label: "Save date", variant: "primary", onClick: function () { if (input.value) { ok.disabled = true; save({ due: input.value }); } } });
+      } else if (spec.input === "text") {
+        input = h("textarea", { class: "atl-input", rows: "3", maxlength: "1000", "aria-label": label + ": " + clean(spec.quoted, 80) });
+        ok = N.button({ label: "Save", variant: "primary", onClick: function () {
+          var t = clean(input.value, 1000);
+          if (t) { ok.disabled = true; var a = {}; for (var k in (spec.args || {})) a[k] = spec.args[k]; a.text = t; save(a); }
+        } });
+      } else { btn.disabled = true; save(); return; }
       var cancel = N.button({ label: "Cancel", variant: "ghost", onClick: function () { holder.textContent = ""; holder.appendChild(btn); btn.focus(); } });
       holder.textContent = "";
       add(holder, [input, ok, cancel]);
@@ -876,8 +890,8 @@
         clearTimeout(timer);
         timer = setTimeout(function () {
           if (failed || !sections) return;
-          /* a date being picked would be lost: wait until it's saved or cancelled */
-          if (document.querySelector(".atl-request input")) { timer = setTimeout(render, 1000); return; }
+          /* a date or answer being entered would be lost: wait until it's saved or cancelled */
+          if (document.querySelector(".atl-request input, .atl-request textarea")) { timer = setTimeout(render, 1000); return; }
           var d = N.assemble(sections, N.liveMeta);
           if (!d) { N.live = null; paint(defaults, build, null, WAITING.empty); return; }
           N.live = { db: db, requests: requests };

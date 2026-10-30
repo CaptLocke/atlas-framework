@@ -233,10 +233,10 @@ Job entries are a job name or `{ job, when, target, mode }`. Modifiers: `when` (
 ## dashboards.yaml
 ```yaml
 dashboards:
-  daily-brief: { url: null, last_published: null }      # Today
-  commitments: { url: null, last_published: null }      # Work; live: true once switched over (atlas-dashboards reference/live.md)
-  control-center: { url: null, last_published: null }   # Guide
-project_pages: {}                       # project ID → url, created on request
+  daily-brief: { url: null, last_published: null }      # Today; live: true once switched over (atlas-dashboards reference/live.md)
+  commitments: { url: null, last_published: null }      # Work; the same
+  control-center: { url: null, last_published: null }   # Guide; the same
+project_pages: {}                       # project ID → url, created on request; { url, live: true } once switched over
 # User dashboards from extensions are additional keys named after the extension.
 ```
 `last_published` dates are bookkeeping written under `dashboards_refresh` (auto), so routines update them. `live: true` marks a page that reads its data from its own database; it's set in the chat that switches the page over, and the guard refuses a routine edit that changes it. The URLs change only in a chat: they decide which pages a routine may write to, so the guard refuses a routine edit that changes one, and a page that needs a new link waits for the next chat (`system/dashboards/README.md`). Choosing which dashboards exist is `behavior_settings`.

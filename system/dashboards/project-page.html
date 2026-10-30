@@ -156,8 +156,8 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
         cKids.push(N.row({ title: c.title, tone: overdue(c) ? "bad" : null,
           meta: [owe ? (c.counterparty ? "For " + who(c.counterparty) : null) : (c.counterparty ? "Owed to " + (who(c.counterparty) === "You" ? "you" : who(c.counterparty)) : null)],
           badge: dueBadge(c),
-          action: owe ? N.request("Mark done", N.withId("Mark " + N.quote(c.title) + " as done", c.id), "secondary", true)
-            : N.request("Nudge " + first(c.owner), N.withId("Draft a follow-up to " + N.name(c.owner) + " about " + N.quote(c.title), c.id), "secondary"),
+          action: owe ? N.request("Mark done", N.withId("Mark " + N.quote(c.title) + " as done", c.id), "secondary", true, { kind: "mark_done", target: c.id, quoted: c.title })
+            : N.request("Nudge " + first(c.owner), N.withId("Draft a follow-up to " + N.name(c.owner) + " about " + N.quote(c.title), c.id), "secondary", false, { kind: "nudge", target: c.id, quoted: c.title }),
           detail: c.next_step ? function () { return N.detail({ blocks: [{ heading: "Next step", nodes: N.para(c.next_step) }] }); } : null }));
       });
     });
@@ -189,7 +189,7 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
       main.appendChild(N.section({ id: "open", title: "Questions and ideas", count: qs.length + ideas.length,
         body: N.listBox(qs.map(function (q) {
           return N.row({ title: q.title, tone: "info", meta: [q.asked_on ? "Asked " + N.date(q.asked_on) : null], badge: N.badge("Question", "info"),
-            action: N.request("Answer", N.withId("About " + N.quote(q.title) + ":", q.id), "secondary") });
+            action: N.request("Answer", N.withId("About " + N.quote(q.title) + ":", q.id), "secondary", false, { kind: "answer", target: q.id, quoted: q.title, input: "text" }) });
         }).concat(ideas.map(function (i) {
           return N.row({ title: i.title, badge: N.badge("Idea: " + N.label(i.status).toLowerCase(), "accent") });
         }))), key: "questions" }));
