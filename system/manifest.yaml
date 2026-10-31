@@ -1,6 +1,6 @@
 # Atlas system manifest. System-owned; replaced on every update.
 name: Atlas
-version: 2.4.1            # must match system/VERSION
+version: 2.5.0            # must match system/VERSION
 data_version: 2           # user data format version this release expects (see system/migrations/)
 min_plan: pro             # minimum Claude plan
 support_email: atlas.framework.support@gmail.com # issue reports (atlas-report-issue)
