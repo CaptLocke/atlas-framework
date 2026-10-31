@@ -98,7 +98,7 @@
         detail: [x.to ? "To " + x.to : null, x.where ? "In your " + x.where : null].filter(Boolean).join(" · "),
         body: x.why ? h("p", null, N.rich(x.why)) : null,
         actions: [N.request("Send it", N.withId("Send the draft " + N.quote(x.title), x.ref && x.ref.id), "primary", false,
-          { kind: "approve", target: x.ref && x.ref.id, quoted: x.title }),
+          x.approval ? { kind: "approve", target: x.approval.id, quoted: x.approval.action } : null),
           N.request("Change it", N.withId("Change the draft " + N.quote(x.title), x.ref && x.ref.id), "secondary")] }));
     });
     var needsN = cards.length + ((N.meta.truncated || {}).approvals || 0) + ((N.meta.truncated || {}).questions || 0) + ((N.meta.truncated || {}).drafts || 0);

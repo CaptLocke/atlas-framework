@@ -42,7 +42,8 @@ Envelope: `meta` as in `system/dashboards/README.md`; `meta.title` = `"Today"`; 
                   "draft": { "to": "Sam Okafor", "where": "Outlook drafts" },
                   "refs": [ { "id": "risks/onboarding-import-failures", "title": "Onboarding import failures" } ] } ],
   "drafts": [ { "title": "Contract review: quick check-in", "to": "Dana Ruiz", "where": "Outlook drafts", "why": "…",
-                "ref": { "id": "commitments/dana-msa-review", "title": "…" } } ],
+                "ref": { "id": "commitments/dana-msa-review", "title": "…" },
+                "approval": { "id": "A-2026-10-12-01", "action": "Send follow-up to Dana Ruiz" } } ],
   "approvals": [ { "id": "A-2026-10-12-01", "action": "Send follow-up to Dana Ruiz", "why": "…", "requested_on": "2026-10-12" } ],
   "questions": [ { "id": "Q-2026-10-12-02", "kind": "profile", "text": "…" } ],
   "week": {
@@ -72,6 +73,7 @@ Envelope: `meta` as in `system/dashboards/README.md`; `meta.title` = `"Today"`; 
 | `due[].status`, `waiting_on[].status` | `open` or `slipped`. |
 | `counts` | Optional `{ overdue, due_today }`: totals over every open commitment in both directions, before caps, for the stat tiles. Without it the page counts only the items it shows. |
 | `drafts[].where` | Plain words for where the draft is ("Outlook drafts"). Never the draft body. |
+| `drafts[].approval` | `{ id, action }` of the `pending` approval that sends this draft, else `null`. On a live page, Send it approves that entry; without one it copies a request for chat. |
 | `actions[]` | Things only the user can do. `how` is optional; `copy_text` is `true` when the entry has text to copy (shown on the Guide page, never on this one). |
 | `insights[].draft` | `{ to, where }` when the insight's suggested action already has a draft (its `Draft:` line in `insights.md`), else `null`. Never the draft body. |
 | `week` | The seven days from `meta.as_of` (`range.start` = `as_of`), always 7 entries in `days`. `null` when there is no calendar data; the page then leaves out This week. |
@@ -91,7 +93,7 @@ Envelope: `meta` as in `system/dashboards/README.md`; `meta.title` = `"Today"`; 
 | `waiting_on[]` | The brief's Waiting on items (`atlas-brief` §A step 4.3): commitments, `direction: waiting_on`, `status: open|slipped`, that are overdue or due within 7 days, plus any waiting 7+ days with no `due`; `since` = `created`. Here `counterparty` is the person who owes it (the record's `owner`), so the page can say "From Dana" |
 | `counts` | Open commitments in both directions (`commitments/`): `overdue` = slipped or past `due`; `due_today` = `due` on the target date, not slipped |
 | `insights[]` | `user/inbox/insights.md`, status `new`, highest `score` first, max `rhythms.yaml: insights.brief_max` (default 3): heading ID, Insight, Why it matters, Suggested action, Links |
-| `drafts[]` | Drafts created since the previous brief, from run reports and the activity log (`email-drafts`, `status-updates`, triage follow-ups), the same list the brief file shows: titles, recipients, reasons, where each draft is |
+| `drafts[]` | Drafts created since the previous brief, from run reports and the activity log (`email-drafts`, `status-updates`, triage follow-ups), the same list the brief file shows: titles, recipients, reasons, where each draft is; `approval` from `user/inbox/approvals.md`, the `pending` entry whose action sends it |
 | `approvals[]` | `user/inbox/approvals.md`, status `pending` |
 | `actions[]` | `user/inbox/questions.md`, kind `action`, status `open`, oldest first: heading ID, Question, How, whether Copy text exists |
 | `questions[]` | `user/inbox/questions.md`, status `open`, kind not `action`, in the brief's order (`atlas-brief` §A step 4.9): those raised since the previous brief first, then the oldest |
@@ -105,7 +107,7 @@ Envelope: `meta` as in `system/dashboards/README.md`; `meta.title` = `"Today"`; 
 ## Rendering notes
 - Order on the page: **needs you** (only-you actions, approvals, questions and drafts ready, as action cards with one primary action each; "Nothing needs you right now" when empty), while you were away (catch-up only), top priorities (numbered: they are ranked), schedule, due and slipping (**I owe beside Waiting on**, stacked on a phone), worth knowing (if any), this week (when `week` is set), coming up. The brief file's "What changed" and "Since last night" sections are not shown on the page.
 - Stat tiles: needs you and meetings today (with how many have prep ready) open their sections; due today and overdue filter Due and slipping (chosen again, they clear). Overdue is labelled with the split, "1 you owe, 2 waiting", so neither direction is missed.
-- Actions copy a request for chat (`system/dashboards/README.md` §Actions copy a request for chat): "Approve" and "Decline" on approvals, "Answer in chat" on questions, "Send it" and "Change it" on drafts, "Mark done" and "Nudge <name>" on due items, "Do this" and "Not useful" on insights.
+- Actions copy a request for chat (`system/dashboards/README.md` §Actions copy a request for chat): "Approve" and "Decline" on approvals, "Answer in chat" on questions, "Send it" and "Change it" on drafts, "Mark done" and "Nudge <name>" on due items, "Do this" and "Not useful" on insights. On a live page, those that change something queue a request instead (README §Live pages): Approve, Decline, I've done this, Send it (when the draft has an approval), Mark done, Nudge and Not useful.
 - **This week:** one tile per day: day and date (today outlined), a meeting bar against `work_hours_per_day` (amber over 60%), meeting and free hours, and what's due as short pins: due from the user (deadlines and `i_owe`) tinted red, milestones marked with a diamond, waiting-on items plain. Non-work days are dashed, "Day off". On phones the strip scrolls sideways inside its own box. Under it, a legend and one line with `week.free_hours`.
 - **Coming up:** date with "in N days", title, deadline or project, and the note.
 - Sorting: `priorities` in rank order (3 items, up to 5, fewer when fewer qualify; `atlas-triage/reference/signals.md` §Top priorities); `today` by `start`, all-day items last; `due` as in the brief (`atlas-brief` §A step 4.2): items due tomorrow first, then slipped, then by `due`, then priority; `waiting_on` slipped first, then by `due` (nulls last); `week.days[].due` deadlines and milestones first, then `i_owe`, then `waiting_on`; `milestones` by `date`.

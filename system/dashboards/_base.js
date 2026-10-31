@@ -307,12 +307,18 @@
     if (row.state === "applied" && !CLOSES[kind]) return {};
     return { badge: REQUEST_STATE[row.state], tone: row.state === "applied" ? "good" : "neutral" };
   };
-  /* The newest request per record and kind, from a snapshot's rows ([{target, kind, created, state}]). */
+  /* Which item a request belongs to: its record and kind, and for a belief the statement too,
+     since every belief in a profile part shares one target. */
+  var BY_QUOTE = { confirm: 1, correct: 1 };
+  N.requestKey = function (target, kind, quoted) {
+    return target + "|" + kind + (BY_QUOTE[kind] ? "|" + clean(quoted, 1000).toLowerCase() : "");
+  };
+  /* The newest request per item, from a snapshot's rows ([{target, kind, quoted, created, state}]). */
   N.latestRequests = function (rows) {
     var out = {};
     N.list(rows).forEach(function (v) {
       if (!v || typeof v.target !== "string" || typeof v.kind !== "string") return;
-      var key = v.target + "|" + v.kind;
+      var key = N.requestKey(v.target, v.kind, v.quoted);
       if (!out[key] || String(v.created) > String(out[key].created)) out[key] = v;
     });
     return out;
@@ -323,7 +329,7 @@
   }
   function liveRequest(label, text, variant, check, spec) {
     var holder = h("span", { class: "atl-request", onclick: function (e) { e.stopPropagation(); } });
-    var view = N.requestView(N.live.requests[spec.target + "|" + spec.kind], spec.kind);
+    var view = N.requestView(N.live.requests[N.requestKey(clean(spec.target, 120), spec.kind, spec.quoted)], spec.kind);
     if (view.badge) { holder.appendChild(N.badge(view.badge, view.tone)); return holder; }
     function save(args) {
       var id = spec.kind + "-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);

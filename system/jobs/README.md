@@ -55,7 +55,7 @@ The kernel (§6) sends every routine here; this is the only full description.
 4. Commit after each job (`Atlas-Actor: routine:<name>`) and update `user/.state/jobs.yaml` for that job: `last_status` always; `last_success` only when the status is `ok` or `partial`.
 5. If a job fails, record it and continue with the next job unless the next job depends on it (for example, `daily-brief` still runs after a failed `intelligence`, noting the gap).
 6. Write one run report (`system/schemas/formats.md` §4) at `user/logs/runs/YYYY-MM/<routine>-<YYYYMMDD-HHMM>.md`. Check its counts against the commits before committing, so it never needs a correction. Commit it together with the activity-log lines for any change set not yet logged, then push. The run report's own commit gets no activity line (a commit can't name its own hash).
-7. **Guide's health.** If Guide is live and no job refreshed it in this run, refresh its sections now (`.claude/skills/atlas-dashboards/reference/live.md` §3), so its routines, runs and known issues include this run; commit `last_published` and push. A failure here is recorded as for any refresh (§6 there), not in the report already written.
+7. **Guide's health.** If Guide is live, refresh its sections now, even if a job already did (`.claude/skills/atlas-dashboards/reference/live.md` §3): only now do its routines, runs and known issues include this run. Commit `last_published` with its activity-log line and push. A failure here is recorded as for any refresh (§6 there), not in the report already written.
 
 ## Common job protocol
 Every job file follows the outline in `system/guide/authoring.md`. These rules apply to all jobs; job files state only what differs.

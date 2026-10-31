@@ -4,4 +4,4 @@ dashboards:
   daily-brief: { url: null, last_published: null }
   commitments: { url: null, last_published: null }
   control-center: { url: null, last_published: null }
-project_pages: {}                # project ID -> url, created on request
+project_pages: {}                # project ID -> url, or { url, live: true } once live; created on request
