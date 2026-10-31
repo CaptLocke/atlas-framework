@@ -7,7 +7,7 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
-## Unreleased
+## 2.5.0 (2026-10-30)
 
 ### What's new
 - Today, Guide and your project pages now update as Atlas works, like Work: Atlas switches each one over in your next chat. Their buttons save straight to Atlas instead of copying a request: approve or decline, answer a question, confirm or correct what Atlas believes about you, mark something done, ask for a follow-up draft, or say an insight wasn't useful. Atlas does it at its next run or chat.
