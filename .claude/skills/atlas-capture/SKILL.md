@@ -42,6 +42,7 @@ Follow `system/rules/knowledge.md` § Write path in order. How to apply each ste
 10. **Log and commit** (`system/rules/sync.md`): one commit per input batch with `Atlas-Records`; one activity-log line per change set.
 
 ### 2. Commitments: explicit vs vague
+- **Mine to track?** Before creating any commitment, check two things (`system/rules/knowledge.md` §Commitments): the user is the actor or the one promised, and no `## Triage rules` line excludes it. Either fails → no commitment; the promise is an Updates line on the project or person it concerns. A rule that keeps an item off the user's lists keeps it out of the records too, not only off the pages.
 - **Explicit** (clear actor, clear deliverable/action, a date or clear expectation) → commitment record. Direction `i_owe` if the user is the actor, `waiting_on` if someone promised the user. `owner` is the actor; `counterparty` is the other side; `due: null` if no date. `origin` = the source or event.
 - **Vague** ("we should look into that", "let's circle back", "I might send something") → a `question` record when it matters, or a `questions.md` entry of kind `commitment` ("Did you commit to sending Acme the SOC report?"), which the brief shows under Questions from Atlas.
 - Completion evidence seen while capturing (a sent email with the promised file, "done" from the user) → close the commitment (`status: done`, `completed_on`, Updates line citing evidence).

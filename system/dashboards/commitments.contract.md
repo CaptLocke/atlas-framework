@@ -103,7 +103,7 @@ Republished by `daily-brief` every run; by `triage` when this run changed its da
 | `goals[]` | `user/knowledge/goals/*.md` with `status: active|draft`: `id, title, status, period, rank, summary, metric, target, current, owner` |
 | `goals[].current_as_of` | The date in the goal's `current` text or its latest `## Updates` line that changed `current` |
 | `goals[].assessment`, `insight`, `evidence` | Weekly review / monthly goal progress output (`user/work/reviews/YYYY-Www.md`, `user/work/reports/YYYY-MM.md`) and linked records (projects' `health`, risks, decisions) |
-| `decisions[]` | `user/knowledge/decisions/*.md`, not superseded: `proposed` (any age) and `made`/`reversed` with `decided_on` in the last 30 days: `id, title, summary, status, decided_on, deciders, rationale, alternatives, reversible, revisit_on`; `projects` = `links.projects` |
+| `decisions[]` | `user/knowledge/decisions/*.md`, not superseded: `proposed` (any age) and `made`/`reversed` with `decided_on` in the last 30 days: `id, title, summary, status, decided_on, deciders, relayed_by, rationale, alternatives, reversible, revisit_on`; `projects` = `links.projects` |
 | `risks[]` | `user/knowledge/risks/*.md` with `status: potential|active`: `id, title, summary, status, likelihood, impact, owner, mitigation, updated`; `projects` = `links.projects` |
 | `people[]` | `user/knowledge/people/*.md`, `status: active`, `relationship` not `self`, and only those with an open or slipped commitment either way, a `next_meeting`, or `quiet: true`: `id, title, role, org, relationship, last_contact, cadence` |
 | `people[].quiet`, `quiet_reason` | `weekly-review` ("people to reconnect with", `user/work/reviews/YYYY-Www.md`) |

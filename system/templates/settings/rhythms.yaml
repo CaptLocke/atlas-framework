@@ -26,6 +26,9 @@ insights:
   brief_max: 3
   engagement: adaptive           # adaptive | fixed
   suppressed_kinds: []           # insight kinds the user turned off
+follow_ups:                      # channel for follow-ups on overdue waiting_on items: email | message
+  internal: email
+  external: email
 meetings:                        # which calendar events Atlas shows and preps (filter: system/schemas/settings.md)
   all_day: include               # include | skip (deadlines and milestones always show)
   tentative: include             # include | skip

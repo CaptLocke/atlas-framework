@@ -6,6 +6,8 @@ name: formats
 
 Exact formats for every non-record file Atlas reads or writes. Skills, jobs, hooks, validators, and dashboards rely on these.
 
+**Dates are the user's.** Every date Atlas writes, here and in records (status histories, `## Updates` lines, `completed_on`, IDs like `A-2026-10-12-01`, run reports, the activity log), is the user's local date: `TZ=<atlas.yaml timezone> date`, never the session's date, which is UTC in a routine and often in a chat. A run past midnight UTC but before midnight local is still the user's evening. Timestamps keep their offset.
+
 ---
 
 ## 1. State (`user/.state/`)
@@ -161,7 +163,7 @@ counts: { open: 1, answered: 0, dismissed: 0 }
 - **Proposed change:** voice-personal.md: "Keep emails under ~120 words" [observed · proposed]
 - **Asked:** 2026-10-12
 ```
-Kinds: `profile | migration | relationship | commitment | setup | action | other`. Statuses: `open | answered | dismissed`. An entry about particular records carries `- **Links:** [[…]]` naming them.
+Kinds: `profile | migration | relationship | commitment | setup | action | other`. Statuses: `open | answered | dismissed`. An entry about particular records carries `- **Links:** [[…]]` naming them. A `commitment` entry asking whether something was done (not whether it was promised) carries `- **Evidence:** <what was seen, where, when>`; the brief shows those as Looks done, and a yes closes the commitment citing that evidence.
 
 **Action entries** (`kind: action`) are things only the user can do, queued by `atlas-update` from a release's `### Action needed` list or a higher `bootstrap_version`, and by the chat boot check (kernel §2 step 0):
 ```markdown

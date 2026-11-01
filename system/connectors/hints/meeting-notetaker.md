@@ -25,6 +25,7 @@ Tool names vary; always verify from the live tool list. Guide: `system/connector
 
 ## Known quirks
 - **Vendor action items are suggestions.** Re-check each against the transcript and Atlas's commitment test (`system/rules/knowledge.md`); many are vague or misattributed.
+- **Vendor key decisions are suggestions too**, and their names are the least reliable part: a summary names whoever a decision is about or was relayed from. Take deciders from the transcript and attendee list (`atlas-capture/reference/extraction.md` §Decisions).
 - Bot-based notetakers join only meetings they were invited to or that are on a connected calendar; notes-app style tools (user-typed notes enhanced by AI) mix the user's own notes with transcript: treat the user's typed notes as `provenance: stated`.
 - The same meeting may also be transcribed by Zoom or Teams: file one Source per meeting (prefer the transcript with reliable speaker names) and link both URIs if useful.
 - Some tools auto-email summaries to all attendees; that is a vendor setting the user controls, not Atlas.

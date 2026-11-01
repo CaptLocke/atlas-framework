@@ -52,6 +52,7 @@ sources: ["[[events/2026-10-13-acme-msa-call]]", "[[commitments/maya-pricing-fee
 - A-2026-10-12-01: send the follow-up to Dana. Expires 10/26.
 
 ## Questions from Atlas
+- **Looks done (2):** SOC report to Acme (email with attachment, 10/12) · launch checklist to Jordan (shared in Slack, 10/13). Say which are done, or all.
 - Did you commit to sending Acme the onboarding guide? (from Friday's call) [[sources/2026-10-09-acme-onboarding-call]]
 - Is Lee Park at Acme a customer contact or their auditor? [[people/lee-park]]
 

@@ -36,7 +36,7 @@ Covers recordings, transcripts, and vendor summaries from meeting tools and note
 - `i_owe`: the user says "I'll…", "I can take that", "let me follow up with…", or accepts an assignment ("Maya, can you…?" "Yes").
 - `waiting_on`: another attendee says "I'll get you…", "we'll have it by…", or is assigned and agrees.
 - Speaker attribution is often wrong or missing. If you cannot tell who promised, record a `question` ("Who owns sending the revised timeline?") instead of guessing.
-- Decisions: "so we're agreed", "let's go with", "final answer is", "we'll proceed with". Capture deciders (who had authority in the room) and rationale from the discussion.
+- Decisions: "so we're agreed", "let's go with", "final answer is", "we'll proceed with". Capture deciders and rationale from the discussion; a decision reported for someone absent records `relayed_by` too (`atlas-capture/reference/extraction.md` §Decisions).
 - Risks: "my worry is", "this could slip if", "blocker".
 - Due dates stated loosely ("end of next week") resolve against the meeting date.
 

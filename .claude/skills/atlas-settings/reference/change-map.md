@@ -20,6 +20,7 @@ Formats: `system/schemas/settings.md`. Classes and locked levels: `system/rules/
 | "My hours are 9 to 5, Mon–Thu" | `rhythms.yaml · work_hours` | `behavior_settings` | re-derive work-hour schedules; update platform routines |
 | "Don't create people automatically", "deadline reminders 5 days ahead", "stop suggesting focus blocks", "don't start playbooks without asking" | `rhythms.yaml · triggers.<trigger>` (`on`/`off` or `{ enabled, days }`) | `behavior_settings` | none |
 | "Only one insight in the brief", "stop adapting insight volume" | `rhythms.yaml · insights` (`brief_max`, `engagement: adaptive|fixed`) | `behavior_settings` | none |
+| "Follow up with colleagues on Slack", "chase customers by email" | `rhythms.yaml · follow_ups` (`internal`, `external`: `email | message`) | `behavior_settings` | `message` needs a messaging tool tagged `draft` in `connectors.yaml`; if none is, say follow-ups will fall back to email |
 | "Stop suggesting ideas", "fewer people insights", "no more pattern insights" | `rhythms.yaml · insights.suppressed_kinds` (add the insight kind, e.g. `[idea]`; remove to bring it back) | `behavior_settings` | none; "fewer" (not none) → lower `brief_max` or keep adaptive, and say which |
 | "Pause/resume the weekly review", "I'm away" | `rhythms.yaml · away / paused` | `behavior_settings` | hand to `atlas-away` |
 | "Switch me to Standard" | `routines.yaml · profile` + rebuild `routines` | `behavior_settings` | reconcile platform routines; carry over user jobs |

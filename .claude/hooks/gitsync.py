@@ -155,6 +155,20 @@ def unpushed_count(proj):
         return None
 
 
+def local_today(proj, yaml):
+    """Today in the user's time zone (atlas.yaml: timezone), which is the date
+    every Atlas record carries; the machine's date is UTC in a routine."""
+    try:
+        with open(os.path.join(proj, "user", "settings", "atlas.yaml"), encoding="utf-8") as f:
+            tz = (yaml.safe_load(f) or {}).get("timezone")
+        if tz:
+            from zoneinfo import ZoneInfo
+            return dt.datetime.now(ZoneInfo(str(tz))).date()
+    except Exception:
+        pass
+    return dt.date.today()
+
+
 def emit(obj):
     import sys
     sys.stdout.write(json.dumps(obj))
@@ -185,7 +199,7 @@ def health_issue(proj, issue_id, summary, fix):
         if isinstance(it, dict) and it.get("id") == issue_id and it.get("status", "open") == "open":
             return True
     entry = "  - { id: %s, severity: high, since: %s, summary: %s, fix: %s, status: open }" % (
-        issue_id, dt.date.today().isoformat(), json.dumps(summary), json.dumps(fix))
+        issue_id, local_today(proj, yaml).isoformat(), json.dumps(summary), json.dumps(fix))
     lines = text.splitlines()
     idx = next((i for i, l in enumerate(lines) if re.match(r"^known_issues:", l)), None)
     if idx is None:

@@ -186,9 +186,17 @@ def read_only_name(toks):
     return False
 
 
+# Tools whose names say "send" but which only save a private draft, each
+# confirmed by the maintainer. Exact names only, and only here, in signed
+# system code: a connectors.yaml tag can add risk but never remove it.
+DRAFT_ONLY_TOOLS = {"slack_send_message_drafts"}  # Slack, confirmed 2026-11-01
+
+
 def name_risks(bare):
     """(risks, event_write): risk kinds from the name, and whether it writes a
     calendar event (a send unless tagged write and sent without attendees)."""
+    if str(bare).lower() in DRAFT_ONLY_TOOLS:
+        return {"draft"}, False
     toks = tokens(bare)
     risks = set()
     for t in toks:

@@ -188,6 +188,9 @@ insights:
   brief_max: 3
   engagement: adaptive                  # adaptive | fixed
   suppressed_kinds: []                  # insight kinds the user turned off, e.g. [idea] ("stop suggesting ideas in the brief")
+follow_ups:                             # the channel for follow-ups on overdue waiting_on items; optional, missing = email
+  internal: email                       # email | message: people whose email domain is in atlas.yaml company.email_domains
+  external: email                       # email | message: everyone else
 meetings:                               # which calendar events Atlas shows and preps; optional, every key defaults to include
   all_day: include                      # include | skip: all-day events (holidays, conference days, OOO notices)
   tentative: include                    # include | skip: meetings the user tentatively accepted
@@ -198,6 +201,8 @@ away:                                   # set by atlas-away; null when not away
   set_on: null
 paused: []                              # e.g. [{ job: weekly-review, until: 2026-11-01 }, { moment: evening_thoughts, until: null }]
 ```
+
+**Follow-up channel (`follow_ups`).** `message` drafts in the messaging tool tagged `draft`; with none mapped, a follow-up falls back to a mail draft and says so. Each user sets their own ("follow up with colleagues on Slack"); changing it is `behavior_settings`. Procedure: `.claude/skills/atlas-write/reference/email-drafts.md` §Follow-ups.
 
 **Meeting filter (`meetings`).** A missing block or key means `include`, so older files behave as before. An event is **shown** unless one of these applies:
 - `all_day: skip` and the event is all-day, **except** deadline and milestone events (`kind: deadline | milestone`), which always show under Due.
