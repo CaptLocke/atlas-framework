@@ -33,7 +33,7 @@ sources: ["[[events/2026-10-13-acme-msa-call]]", "[[commitments/maya-pricing-fee
 ## What changed
 - Orion launch back on track: supplier confirmed dates. [[projects/orion-launch]]
 - Decided: enterprise minimum applies to renewals. [[decisions/2026-10-12-enterprise-minimum-renewals]]
-- From your Evening Thoughts: 1 commitment (call Priya Thursday), 1 idea (partner tier). [[sources/2026-10-12-journal]]
+- From your Evening Thoughts: 1 commitment (call Priya Thursday) [[commitments/maya-call-priya-thursday]], 1 idea (partner tier) [[ideas/partner-tier]]. [[sources/2026-10-12-journal]]
 
 ## Top priorities
 1. Pricing feedback to Jordan: due tomorrow and tied to your Q4 revenue goal. [[goals/2026-q4-enterprise-revenue]]
