@@ -13,11 +13,22 @@ Fictional examples. User: Maya Chen at Brightline; manager Jordan Lee; Acme coun
 | "Let's sync next week." | Not a commitment; at most an expected event |
 | Maya: "I'll try to get to it." | Vague → confirm in the brief ("Did you commit to…?") |
 | Sam: "Finance will get you the numbers EOW." (Sam speaking for a team) | `waiting_on`, owner Sam (the speaker), due end of week |
+| Group email, Maya copied. Priya: "I'll send the launch checklist to the team by Thursday." | Not Maya's: an Updates line on the project. Maya is neither actor nor the one promised. |
+| "Accepted: Q4 planning review" | Not a commitment; the calendar has the event |
+| Jordan's plan names the owner of each workstream; Maya owns none | Updates on the project; no commitments for Maya |
 
 Due dates: resolve relative dates against the source's date and the user's timezone ("Friday" in a Wednesday email = that week's Friday; "EOW" = Friday; "end of month" = last business day). If ambiguous, set `due: null` and put the phrase in the body.
 
 ## Decisions
-Capture when a choice is clearly made ("we're going with per-seat", "approved", "let's not do the pilot"). Record deciders (who had the authority or said it), date, rationale if stated (else `rationale: unknown`), alternatives mentioned. A proposal not yet agreed → `status: proposed`.
+Capture when a choice is clearly made ("we're going with per-seat", "approved", "let's not do the pilot"). Record deciders (whose decision it is, per **Who decided** below, not whoever announced it), date, rationale if stated (else `rationale: unknown`), alternatives mentioned. A proposal not yet agreed → `status: proposed`.
+
+**Who decided.** A decider is someone the transcript has speaking, or on the attendee list, and saying the decision is theirs. Someone named as deciding who wasn't there is still the decider, with `relayed_by` the attendee who reported it. Take deciders from the transcript and the attendee list, never from a vendor's AI summary, which often names whoever the decision is about. Only a summary to go on: the decider it names, if on the attendee list; someone not on the list → `deciders` empty and ask (`questions.md`, kind `other`).
+
+| Text | Result |
+|---|---|
+| Transcript, Priya speaking: "Jordan's decided we're going per-seat." Jordan not in the meeting. | `deciders: [jordan-lee]`, `relayed_by: [priya]` |
+| Vendor summary: "Jordan decided to go per-seat." Transcript: Priya says it; Jordan absent | Same as above: the transcript wins |
+| Summary only: "Decision: go per-seat." No speaker | `deciders: []`, a question: "Who decided per-seat pricing?" |
 
 ## Risks, questions, ideas
 - **Risk:** an explicit concern or blocker ("the supplier may slip", "the migration failed again"). `potential` if it may happen, `active` if it is happening.

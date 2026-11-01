@@ -7,6 +7,15 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
+## 2.6.0 (2026-11-01)
+
+### What's new
+- Atlas only tracks promises you're part of: what you owe, and what others owe you. A promise between colleagues on an email you're copied on is noted on the project, not added to your list, and your own rules about what to track now apply before anything is filed. Items already on your lists stay: say "that's not mine" to drop one.
+- Follow-ups go where you'd send them. Tell Atlas "follow up with colleagues on Slack" and it drafts follow-ups to people at your company as Slack drafts, and to everyone else as email (you can set each). Atlas also skips a follow-up when it isn't yours to chase, and holds off for a few days when the other person has just written about it.
+- Atlas finds more of what you've finished: a Slack message delivering it, or a task marked complete, closes a commitment just as a sent email does. When it's likely but not certain, your brief asks once, in a single "Looks done" line, and you can say which are done.
+- Decisions from meetings name who actually made them. When someone passes on a decision made elsewhere, Atlas records who decided and who relayed it, and doesn't take names from the meeting tool's AI summary.
+- Dates in your records, approvals and run reports are always your local date, so an evening automation no longer stamps tomorrow's date.
+
 ## 2.5.0 (2026-10-31)
 
 ### What's new

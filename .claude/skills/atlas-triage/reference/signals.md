@@ -13,6 +13,18 @@ Fictional examples (user Maya Chen; manager Jordan Lee; Acme counsel Dana Ruiz).
 
 For `waiting_on`: the counterparty's message delivering it, or a Source showing the thing exists (e.g. the signed MSA arrived).
 
+**Where to look.** Every category mapped in `connectors.yaml`, not only mail. Read since the commitment was created, on the counterparty and the deliverable:
+| Category | Strong | Weak |
+|---|---|---|
+| mail | Sent to the counterparty with the file or answer; their "got it" | Sent about the topic, nothing attached |
+| messaging | The user's message to the counterparty (DM or channel) delivering it; their "thanks, got it" | A message about the topic; a thumbs-up reaction |
+| tasks | The mapped task marked complete | The task moved to review or a done-like column |
+| files | — | The deliverable shared with the counterparty, or edited after its last mention |
+| calendar | — | A held event that was the deliverable (a review, a walkthrough) |
+| meetings | The transcript has the counterparty confirming it | It came up in a meeting with them |
+
+A `waiting_on` reads the same table the other way round: the owner's message, task or file delivering it to the user.
+
 ## Priority rubric
 Score each open commitment, then map: high (top ~20%), medium, low.
 1. **Goal link:** linked (directly or via its project) to an active goal → a boost **scaled by the goal's `rank`** (`system/schemas/goal.md` §Ranking); to the user's manager's stated priorities → boost.

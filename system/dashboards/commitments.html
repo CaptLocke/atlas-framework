@@ -227,7 +227,7 @@
       var why = x.rationale && x.rationale !== "unknown" ? x.rationale : null;
       var row = N.row({
         title: x.title, tone: proposed ? "warn" : null,
-        meta: [x.decided_on ? "Decided " + N.date(x.decided_on) : "Not decided yet", L(x.deciders).length ? "By " + L(x.deciders).map(N.name).join(", ") : null],
+        meta: [x.decided_on ? "Decided " + N.date(x.decided_on) : "Not decided yet", L(x.deciders).length ? "By " + L(x.deciders).map(N.name).join(", ") + (L(x.relayed_by).length ? " (relayed by " + L(x.relayed_by).map(N.name).join(", ") + ")" : "") : null],
         badge: proposed ? N.badge("Proposed", "warn") : soon ? N.badge("Revisit " + N.date(x.revisit_on), "warn") : x.status !== "made" ? N.status(x.status) : null,
         action: proposed ? N.request("Decide", N.withId("Let's decide " + N.quote(x.title), x.id), "secondary") : null,
         search: [x.summary, why].join(" "),
@@ -236,7 +236,7 @@
             text: x.summary,
             blocks: [{ heading: "Why", nodes: N.para(why || "Not recorded. Ask Atlas to find or capture the reasoning.") },
               L(x.alternatives).length ? { heading: "Also considered", nodes: N.lines(x.alternatives) } : null],
-            facts: N.mergeDetails([["Decided", x.decided_on ? N.dateY(x.decided_on) : "Not decided yet"], ["Decided by", L(x.deciders).map(N.name).join(", ")],
+            facts: N.mergeDetails([["Decided", x.decided_on ? N.dateY(x.decided_on) : "Not decided yet"], ["Decided by", L(x.deciders).map(N.name).join(", ")], ["Relayed by", L(x.relayed_by).map(N.name).join(", ")],
               ["Projects", L(x.projects).map(N.name).join(", ")], ["Reversible", x.reversible === false ? "Hard to reverse" : x.reversible === true ? "Yes" : null],
               ["Revisit", x.revisit_on ? N.dateY(x.revisit_on) : null]], x.details),
             body: x.body, body_truncated: x.body_truncated, links: x.links, dates: N.datesLine(x.created, x.updated),

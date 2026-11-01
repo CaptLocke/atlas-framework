@@ -1,7 +1,7 @@
 ---
 type: connector-guide
 category: messaging
-operations: [list_recent, read_thread, search, post, delete]
+operations: [list_recent, read_thread, search, post, draft, delete]
 ---
 # Connector guide: messaging
 

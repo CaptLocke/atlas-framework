@@ -186,9 +186,17 @@ def read_only_name(toks):
     return False
 
 
+# Tools whose names say "send" but which only save a private draft, each
+# confirmed by the maintainer. Exact names only, and only here, in signed
+# system code: a connectors.yaml tag can add risk but never remove it.
+DRAFT_ONLY_TOOLS = {"slack_send_message_drafts"}  # Slack, confirmed 2026-11-01
+
+
 def name_risks(bare):
     """(risks, event_write): risk kinds from the name, and whether it writes a
     calendar event (a send unless tagged write and sent without attendees)."""
+    if str(bare).lower() in DRAFT_ONLY_TOOLS:
+        return {"draft"}, False
     toks = tokens(bare)
     risks = set()
     for t in toks:
@@ -466,6 +474,8 @@ def handle_mcp(payload, proj, ctx):
     server, bare = split_tool(tool_name)
     risks, event_write = name_risks(bare)
     tag, mapped, warning = lookup_tag(tool_name, proj)
+    if not mapped and str(bare).lower() in DRAFT_ONLY_TOOLS:
+        risks.add("send")  # the allowlist trusts a name only on a connector the user mapped
     if tag:
         risks.add(tag if tag in SEVERITY else "delete")  # unknown tag value: treat as risky
     if exposes_repo(server, payload.get("tool_input")):

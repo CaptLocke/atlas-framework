@@ -26,8 +26,8 @@ If `ingest` has not succeeded in the last 24 hours and is not earlier in this ro
 
 ## Steps
 1. Invoke `atlas-triage` in the requested mode with the window "since last triage success".
-2. Catch: scan new sources for explicit promises not yet recorded; create commitments per `system/rules/knowledge.md` (direction `i_owe` or `waiting_on` only). Vague intentions become questions.
-3. Close: mark `done` only on evidence (sent message, delivered file, user's word, source showing completion), with `completed_on` and an Updates line citing the evidence.
+2. Catch: scan new sources for explicit promises not yet recorded; create commitments per `system/rules/knowledge.md` (direction `i_owe` or `waiting_on` only, the user always one side, `## Triage rules` applied). Vague intentions become questions.
+3. Close: mark `done` only on evidence (sent message, delivered file, completed task, user's word, source showing completion), searched in every mapped category (`.claude/skills/atlas-triage/reference/signals.md` §Completion), with `completed_on` and an Updates line citing the evidence. Likely but uncertain → a Looks done question with its evidence.
 4. Prioritize (full mode only): set `priority` by the rubric (`.claude/skills/atlas-triage/reference/signals.md` §Priority rubric: goals, who's on the other side, time, consequence); set a one-line `insight` and `next_step`. Ask once for a date on an `i_owe` undated and quiet for 10 business days (same file, §Aging).
 5. Dedupe obvious duplicate commitments (`merge_supersede`); ambiguous ones become questions.
 6. Evaluate triggers: `playbook_start` (start or propose runs for active playbooks, `.claude/skills/atlas-triage/reference/playbooks.md` §2), `commitment_overdue` (set `status: slipped`, and back to `open` when the `due` moves to today or later; flag for the brief; for `waiting_on`, queue a pending approval to follow up; in routines triage doesn't draft: the `email-drafts` job creates the draft, or the follow-up text goes in the approval without a mail connector, `.claude/skills/atlas-triage/SKILL.md` step 9) and `deadline_approaching` (due within `days`, default 3: mark for the next brief's "Due soon"; the day before, mark for the top). Fire once per key.
@@ -49,4 +49,4 @@ In light mode: no commitments created or changed since the last triage and none 
 - Never set a `due` the user didn't give; propose one in `next_step` or a question.
 
 ## Run report
-Row: `triage | <status> | <N> reviewed, <c> closed, <s> slipped, <n> new | <mode>`. Adds approvals queued (follow-ups) and triggers fired.
+Row: `triage | <status> | <N> reviewed, <c> closed, <l> looks done, <s> slipped, <n> new | <mode>; evidence: <categories searched>`. Adds approvals queued (follow-ups) and triggers fired.

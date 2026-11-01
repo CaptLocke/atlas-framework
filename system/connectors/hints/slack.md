@@ -2,7 +2,7 @@
 type: connector-hint
 connector: slack
 categories: [messaging]
-checked: "2026-10: general knowledge of Slack's API model; tool names not verified"
+checked: "2026-10: general knowledge of Slack's API model; tool names not verified, except the draft tool (2026-11)"
 ---
 # Hint: Slack
 
@@ -18,6 +18,7 @@ Tool names vary; always verify from the live tool list. Guide: `system/connector
 | `read_thread` | Thread replies by parent timestamp |
 | `search` | Search messages (Slack modifiers such as `in:#channel`, `from:@user`, `after:YYYY-MM-DD`, `to:me`) |
 | `post` | Send message, reply in thread, schedule message |
+| `draft` | Save a message as a draft in the user's own Slack, posting nothing. Seen as `slack_send_message_drafts`: despite "send" in the name it only saves a private draft (confirmed 2026-11). Tag it `draft` (`drafts_create`); follow-ups with `rhythms.yaml: follow_ups` set to `message` use it. |
 | `delete` | Delete message |
 | (read) | List channels, user profile lookup |
 

@@ -28,11 +28,12 @@ For every input (chat statement, journal entry, connector item, file):
 
 ## Commitments
 - Record **explicit** promises only: a clear actor, a clear deliverable or action, and either a date or clear expectation. Direction: `i_owe` when the user promised; `waiting_on` when someone promised the user.
+- **The user is always one side**: the owner of an `i_owe`, the counterparty of a `waiting_on`. A promise between other people (a teammate's promise to a group the user is copied on, another leader's plan, a meeting acceptance) is context on the project or person record, never a commitment. The user's `preferences.md ## Triage rules` apply at the same point: a commitment a rule excludes is not created, in any job or chat.
 - Vague intentions become `questions` or a "confirm?" line in the next brief.
 - Close (`done`) only on evidence: a sent message, delivered file, the user's word, or a source showing completion. `slipped` is set by triage when past due and open. Whoever moves a slipped commitment's `due` to today or later sets it back to `open` in the same write (`atlas-triage` step 6 handles its follow-up approval).
 
 ## Decisions
-Capture who decided, when, and why. If the why is missing, set `rationale: unknown`.
+Capture who decided, when, and why. If the why is missing, set `rationale: unknown`. A decision someone reported on another's behalf records both: `deciders` the one who made it, `relayed_by` the one who said so (`atlas-capture/reference/extraction.md` §Decisions).
 
 ## Dedupe
 - People: same email → same person. Same full name + same organization → same person. Nicknames and initials go in `aliases`.
