@@ -142,10 +142,11 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
           N.request("Decline", N.withId("Decline " + N.quote(a.action), a.id), "secondary", false, { kind: "decline", target: a.id, quoted: a.action })] }));
     });
     qs.forEach(function (q) {
-      var proposal = !!q.proposed_change;
-      cards.push(N.card({ eyebrow: ["Question from Atlas", "info"], title: q.text,
+      var proposal = !!(q.proposed_change || q.evidence);
+      cards.push(N.card({ eyebrow: [q.evidence ? "Looks done" : "Question from Atlas", "info"], title: q.text,
         detail: q.asked ? "Asked " + N.date(q.asked) : null,
-        body: proposal ? h("p", null, h("b", null, "Proposed: "), N.rich(q.proposed_change)) : null,
+        body: q.proposed_change ? h("p", null, h("b", null, "Proposed: "), N.rich(q.proposed_change))
+          : q.evidence ? h("p", null, h("b", null, "Seen: "), N.rich(q.evidence)) : null,
         actions: proposal ? [N.request("Yes", N.withId("Yes to your question " + N.quote(q.text), q.id), "primary", true, { kind: "answer", target: q.id, quoted: q.text, args: { choice: "yes" } }),
           N.request("No", N.withId("No to your question " + N.quote(q.text), q.id), "secondary", false, { kind: "answer", target: q.id, quoted: q.text, args: { choice: "no" } })]
           : [N.request("Answer in chat", N.withId("About your question " + N.quote(q.text) + ":", q.id), "secondary")] }));

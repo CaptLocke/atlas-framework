@@ -474,6 +474,8 @@ def handle_mcp(payload, proj, ctx):
     server, bare = split_tool(tool_name)
     risks, event_write = name_risks(bare)
     tag, mapped, warning = lookup_tag(tool_name, proj)
+    if not mapped and str(bare).lower() in DRAFT_ONLY_TOOLS:
+        risks.add("send")  # the allowlist trusts a name only on a connector the user mapped
     if tag:
         risks.add(tag if tag in SEVERITY else "delete")  # unknown tag value: treat as risky
     if exposes_repo(server, payload.get("tool_input")):

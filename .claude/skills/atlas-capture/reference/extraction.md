@@ -20,9 +20,9 @@ Fictional examples. User: Maya Chen at Brightline; manager Jordan Lee; Acme coun
 Due dates: resolve relative dates against the source's date and the user's timezone ("Friday" in a Wednesday email = that week's Friday; "EOW" = Friday; "end of month" = last business day). If ambiguous, set `due: null` and put the phrase in the body.
 
 ## Decisions
-Capture when a choice is clearly made ("we're going with per-seat", "approved", "let's not do the pilot"). Record deciders (who had the authority or said it), date, rationale if stated (else `rationale: unknown`), alternatives mentioned. A proposal not yet agreed → `status: proposed`.
+Capture when a choice is clearly made ("we're going with per-seat", "approved", "let's not do the pilot"). Record deciders (whose decision it is, per **Who decided** below, not whoever announced it), date, rationale if stated (else `rationale: unknown`), alternatives mentioned. A proposal not yet agreed → `status: proposed`.
 
-**Who decided.** A decider is someone the transcript has speaking, or on the attendee list, and saying the decision is theirs. Someone named as deciding who wasn't there is still the decider, with `relayed_by` the attendee who reported it. Take deciders from the transcript and the attendee list, never from a vendor's AI summary, which often names whoever the decision is about. Only a summary to go on and the decider unclear → leave `deciders` empty and ask (`questions.md`, kind `other`).
+**Who decided.** A decider is someone the transcript has speaking, or on the attendee list, and saying the decision is theirs. Someone named as deciding who wasn't there is still the decider, with `relayed_by` the attendee who reported it. Take deciders from the transcript and the attendee list, never from a vendor's AI summary, which often names whoever the decision is about. Only a summary to go on: the decider it names, if on the attendee list; someone not on the list → `deciders` empty and ask (`questions.md`, kind `other`).
 
 | Text | Result |
 |---|---|

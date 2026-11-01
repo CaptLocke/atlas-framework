@@ -943,6 +943,15 @@ def check_rhythms(c, path, data, template):
         for k in ins:
             if k not in ("brief_max", "engagement", "suppressed_kinds"):
                 rep.warn(path, "insights: unknown key %r" % k)
+    fu = data.get("follow_ups")
+    if isinstance(fu, dict):
+        for k, v in fu.items():
+            if k not in ("internal", "external"):
+                rep.warn(path, "follow_ups: unknown key %r (known: internal, external)" % k)
+            elif v not in ("email", "message"):
+                rep.error(path, "follow_ups.%s must be email or message (got %r)" % (k, v))
+    elif fu is not None:
+        rep.error(path, "follow_ups must be a mapping (internal, external)")
     meetings = data.get("meetings")
     if isinstance(meetings, dict):
         for k, v in meetings.items():
