@@ -49,7 +49,7 @@ types:
       effort: [quick, hour, half_day, day]
   decision:
     folder: decisions
-    fields: [decided_on, deciders, rationale, alternatives, reversible, revisit_on]
+    fields: [decided_on, deciders, relayed_by, rationale, alternatives, reversible, revisit_on]
     enums:
       status: [proposed, made, reversed, superseded]
   event:
@@ -126,7 +126,7 @@ field_formats:
   project: { owner: ref, goal: ref, start: date, target: date }
   goal: { owner: ref, rank: int }
   commitment: { owner: ref, counterparty: ref, origin: ref, due: date, completed_on: date }
-  decision: { deciders: refs, decided_on: date, revisit_on: date, reversible: bool }
+  decision: { deciders: refs, relayed_by: refs, decided_on: date, revisit_on: date, reversible: bool }
   event: { attendees: refs, start: dt, end: dt, all_day: bool }
   risk: { owner: ref }
   question: { asked_by: ref, asked_on: date, answered_on: date }
