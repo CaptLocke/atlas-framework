@@ -710,6 +710,7 @@ def scan_for_secrets(cwd, include_worktree):
         rc, out = git(["ls-files", "--others", "--exclude-standard", "-z"], cwd, timeout=20)
         if rc == 0:
             for rel in [p for p in out.split("\0") if p][:2000]:
+                atlas.wait(1)  # the scan counts against the guard's budget too
                 path = os.path.join(cwd, rel)
                 try:
                     if os.path.getsize(path) > MAX_FILE_BYTES:

@@ -38,9 +38,11 @@ Policy (system/rules/governance.md):
 - Internal errors fail closed in routine context and for locked actions;
   otherwise the call is allowed with a warning on stderr.
 - Each guard shares one time budget across its git and release_check waits
-  (BUDGETS, a few seconds under its timeout in .claude/settings.json). A guard
-  that spends it blocks and says so, in any context, rather than letting the
-  platform cut it off with no reason given.
+  and the secret scan's file reads (BUDGETS, a few seconds under its timeout in
+  .claude/settings.json). A guard that spends it blocks and says so, in any
+  context, rather than letting the platform cut it off with no reason given.
+  Python's start-up and the work between waits aren't counted; the margin
+  under the timeout is for them.
 """
 import datetime as _dt
 import json

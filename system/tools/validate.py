@@ -1551,9 +1551,9 @@ def check_user(c):
         if f.endswith(".md"):
             check_template(c, os.path.join(tdir, f))
     adir = c.p("user", "logs", "activity")
-    months = sorted(f for f in listdir(adir) if re.match(r"^\d{4}-\d{2}\.md$", f))
-    if months:
-        check_activity(c, os.path.join(adir, months[-1]))
+    month = os.path.join(adir, local_today(c)[:7] + ".md")
+    if os.path.exists(month):
+        check_activity(c, month)
     idir = c.p("user", "inbox")
     for f in listdir(idir):
         if f in INBOX_STATUSES:
@@ -1604,13 +1604,25 @@ def check_inbox(c, path):
             rep.error(path, "counts don't match the entries: " + ", ".join(wrong))
 
 
+def local_today(c):
+    """The user's date (YYYY-MM-DD) in atlas.yaml's timezone, as index.py computes it; the machine's date if unset."""
+    try:
+        with open(c.p("user", "settings", "atlas.yaml"), encoding="utf-8") as f:
+            tz = (yaml.safe_load(f) or {}).get("timezone")
+        from zoneinfo import ZoneInfo
+        return dt.datetime.now(ZoneInfo(str(tz))).date().isoformat() if tz else dt.date.today().isoformat()
+    except Exception:
+        return dt.date.today().isoformat()
+
+
 ACTIVITY_RE = re.compile(r"^- \d{4}-\d{2}-\d{2} \d{2}:\d{2} · (chat|update|setup|routine:[A-Za-z0-9][A-Za-z0-9_-]*) "
-                         r"· [^·]+? · .+ · commit [0-9a-f]{7,40}$")
+                         r"· [^·]+? · .+$")
 
 
 def check_activity(c, path):
-    """The month's activity log: every line in the one format of formats.md §4. A warning, not an error:
-    older lines stay as written, and only the current month is checked, so the fix is for lines to come."""
+    """A month's activity log: every line opens with the date, time and actor of formats.md §4, then the job or
+    action and a summary. A warning, not an error: older lines stay as written, and check_user looks only at the
+    current month's file, so the fix is for lines to come."""
     try:
         with open(path, encoding="utf-8") as f:
             lines = f.read().splitlines()
