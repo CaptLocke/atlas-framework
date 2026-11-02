@@ -19,9 +19,9 @@ The `atlas-dashboards` skill owns rendering and publishing. This folder holds wh
 Any chat may also republish any dashboard after changing the records it shows (`dashboards_refresh: auto`). `atlas-setup` publishes all three for the first time. A dashboard added by an update is published at the user's next chat (`atlas-dashboards`, Publish).
 
 Shared files:
-- `_base.css`: the Atlas design system: tokens (light and dark), type, and the `atl-*` components. Templates hold `{{ATLAS_BASE_CSS}}` inside `<style id="atlas-base">`; `system/tools/render.py` fills it with this file when it builds a page.
-- `fonts/`: Newsreader (display) and Inter (everything you read or click), Latin subsets, with their SIL Open Font Licences. `render.py` embeds them in the base CSS as `data:` URIs, about 140 KB a page, since a page loads nothing from outside.
-- `_base.js`: runtime helpers (DOM builder, dates, record references) and the components: app header, stat tiles, tabs, segmented control, rows that expand in place, cards, buttons, the toast, find on the page, and request buttons. Templates hold `{{ATLAS_BASE_JS}}` inside `<script id="atlas-base-js">`, filled the same way.
+- `_base.css`: the Constellation design system: tokens (light and dark), type, and the `atl-*` components. Templates hold `{{ATLAS_BASE_CSS}}` inside `<style id="atlas-base">`; `system/tools/render.py` fills it with this file when it builds a page.
+- `fonts/`: Manrope, the one family (variable, weights 200 to 600, Latin subset), with its SIL Open Font Licence. `render.py` embeds it in the base CSS as a `data:` URI, about 30 KB a page, since a page loads nothing from outside.
+- `_base.js`: runtime helpers (DOM builder, dates, record references), the 36 Constellation icons, and the components: app header, stat tiles, the tab bar, segmented control and toggle, rows that expand in place, light and night cards, buttons, prompt chips, strands, the toast, find on the page, and request buttons. Templates hold `{{ATLAS_BASE_JS}}` inside `<script id="atlas-base-js">`, filled the same way.
 - These are the only copies, so every page always uses the current base. Published pages stay self-contained: the base is inside each page, not loaded from anywhere.
 
 ## Template anatomy
@@ -37,7 +37,7 @@ Shared files:
 ```
 Each template contains each placeholder **exactly once**. No other text is substituted.
 
-**Page anatomy.** Every page opens the same way (`N.page` in `_base.js`): the sticky **app header** (the Atlas mark and wordmark, the pages as tabs with the current one as an ink pill, the refresh marker, and the dark-theme toggle); the **title**; a **date line** (the day for Today, the project's summary on a project page, and a fixed line saying what the page is for everywhere else; no "As of" dates); the **lead** (`meta.headline`); then the page's counts as **stat tiles**. Every tile goes somewhere: on Work and Today some are filters (chosen again, they clear), the rest open their section. What each lead says:
+**Page anatomy.** Every page opens the same way (`N.page` in `_base.js`): the sticky, frosted **app header** (the Atlas mark and ATLAS wordmark, the pages as a pill bar with the current one in ink, the refresh marker, and the dark-theme toggle); a **date line** as the kicker above the title; the **title** (the day for Today, the project's summary on a project page, and a fixed line saying what the page is for everywhere else; no "As of" dates); the **lead** (`meta.headline`); then the page's counts as **stat tiles**. Every tile goes somewhere: on Work and Today some are filters (chosen again, they clear), the rest open their section. What each lead says:
 
 | Dashboard | Date line | The lead says |
 |---|---|---|
@@ -127,14 +127,14 @@ The theme comes from `user/profile/design-system.md` (`system/schemas/profile.md
 
 | Property | From the design system | Fallback |
 |---|---|---|
-| `--brand-accent` / `--brand-accent-dark` | Primary color, for links and the focus ring (the design system's `info`) | `#2f4a7d` / `#8fb0ea` |
+| `--brand-accent` / `--brand-accent-dark` | Primary color, for links and the info status (the design system's `info`) | `#33507a` / `#9db5d6` |
 | `--brand-accent-ink` / `--brand-accent-ink-dark` | Kept for older themes; the design system doesn't use it | none |
-| `--brand-highlight` / `--brand-highlight-dark` | The brand color: the Atlas mark, rank numerals, the current tab's underline (the design system's `accent`) | `#8a4430` / `#e08a66` (clay) |
-| `--brand-font-heading` | Display family (titles, headings, large numbers) | Newsreader, embedded |
-| `--brand-font-body` | Text family (everything you read or click) | Inter, embedded |
-| `--brand-bg`, `--brand-surface`, `--brand-ink` (+ `-dark`) | Optional background, surface, and text colors | warm paper: `#f4f0e8` / `#fcfaf6` / `#1f1b16` (dark `#171410` / `#221e19` / `#f2ede3`) |
+| `--brand-highlight` / `--brand-highlight-dark` | The brand color, used as the one focus on a screen: the focus ring, the now line, the #1 priority (Constellation's `ember`) | `#e8622c` / `#f0a07e` |
+| `--brand-font-heading` | Display family (titles, headings, large numbers) | Manrope, embedded |
+| `--brand-font-body` | Text family (everything you read or click) | Manrope, embedded |
+| `--brand-bg`, `--brand-surface`, `--brand-ink` (+ `-dark`) | Optional background, surface, and text colors | paper: `#f3f3f1` / `#ffffff` / `#16171a` (dark `#111214` / `#1b1c20` / `#f3f3f1`) |
 
-Rules: only `--brand-*` declarations; colors as hex; font names as CSS family lists that work without downloading fonts (no `@import`, no `url()`). Keep text contrast at WCAG AA (4.5:1) against the surface in both light and dark; if a brand color fails, darken it (light) or lighten it (dark) rather than using it as is. An empty theme block gives the Atlas design system's palette; the status colors (`bad`, `warn`, `good`) and the other non-brand tokens (`--ink-2`, `--muted`, `--line`, `--sunken`, `--accent-soft`) always come from it.
+Rules: only `--brand-*` declarations; colors as hex; font names as CSS family lists that work without downloading fonts (no `@import`, no `url()`). Keep text contrast at WCAG AA (4.5:1) against the surface in both light and dark; if a brand color fails, darken it (light) or lighten it (dark) rather than using it as is. An empty theme block gives Constellation's palette; the status colors (`bad`, `warn`, `good`), the night cards and the other non-brand tokens (`--ink-2`, `--muted`, `--line`, `--sunken`, `--accent-soft`) always come from it.
 
 Pages support light and dark (`prefers-color-scheme`), a viewer-chosen theme (`<html data-theme="light|dark">`, set by the header's toggle), phone widths down to 320 px with 16 px gutters and no horizontal scroll, keyboard focus states, and printing (filters hidden, black on white).
 

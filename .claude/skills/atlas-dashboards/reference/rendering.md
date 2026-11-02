@@ -30,7 +30,7 @@ Each contract's `republished_by` lists the jobs that republish it; any chat may 
 Map `user/profile/design-system.md` to the `--brand-*` tokens in `system/dashboards/README.md` §Theming contract (accent, highlight, text on accent, heading and body fonts, optional background, surface, and text), for light and dark. Rules:
 - Use only colors listed in the design system; if dark-mode colors are missing, derive them by keeping hue and adjusting lightness, and keep text contrast at WCAG AA (4.5:1) in both modes.
 - Fonts must have web-safe fallbacks; never load fonts or scripts from external URLs.
-- No company logo: pages show only the built-in Atlas mark, drawn in the highlight color. With no design system, the theme block stays empty and the default Atlas palette applies.
+- No company logo: pages show only the built-in Atlas mark and wordmark, in ink. With no design system, the theme block stays empty and Constellation's default palette applies.
 
 ## Size budget
 - Budget = contract `size_budget_kb` for the whole HTML file.
