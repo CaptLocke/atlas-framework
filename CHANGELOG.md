@@ -20,6 +20,7 @@ Each release's "What's new" section is shown to users in the Guide and their nex
 - A draft on Today says Approve, never Send: Atlas sends only from a chat, after you confirm.
 - Project pages are gone: Records zoomed to a project, or Work's Projects tab, shows what they did. A project's history and sources are a question for chat.
 - You can choose your shortest focus window: say "make my shortest focus window 45 minutes", or change it on Guide.
+- Every line in your brief links each record it names, so a line saying two projects are at risk links both projects.
 
 ### Action needed
 - If you made project pages, delete them in Claude when you like: they no longer update, so they'll go out of date. Ask Atlas "which old project pages can I delete?" for the links.
