@@ -190,7 +190,7 @@ Files attached in chat land here, then are filed by `atlas-capture` and removed 
 - 2026-10-12 20:09 · routine:nightly-cycle · ingest · filed 14 sources, 3 commitments, 2 decisions · commit 4f2a9c1
 - 2026-10-12 15:02 · chat · send_communication (approved) · follow-up to Dana Ruiz · commit 9b31e07
 ```
-Format: `- <date> <time> · <actor> · <job or action> · <summary> · commit <short-sha>`. Never includes sensitive content. An import logs its change sets with the action `import` (`import · notes 26–50 · 31 records`), which marks them as imported history.
+Format: `- <date> <time> · <actor> · <job or action> · <summary> · commit <short-sha>`; the commit is left out only for a change set that has none (an export). Never includes sensitive content. An import logs its change sets with the action `import` (`import · notes 26–50 · 31 records`), which marks them as imported history.
 
 ### runs/YYYY-MM/<routine>-<YYYYMMDD-HHMM>.md
 ```markdown
@@ -215,7 +215,9 @@ atlas_context: routine   # the ATLAS_CONTEXT value observed at the start of the 
 ## Errors
 ## Connector health
 ## Suspicious content flagged
+## Still unsent
 ```
+`## Still unsent` is `email-drafts`' (its step 5a), only when it has any.
 
 ## 5. Indexes (`user/knowledge/_index/`)
 Regenerable; never edited by hand.

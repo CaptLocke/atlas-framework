@@ -54,4 +54,4 @@ If every source returns nothing new, the drop folders are empty, and no journal 
 - A connector that fails or is unavailable in routines: continue with the others, record it under "Connector health", and add or update a known issue in `health.yaml` with the fix.
 
 ## Run report
-Row: `ingest | <status> | <N> in / <M> filed | <connectors used>`. Adds connector health per connector (ok, empty, failed, unavailable), triggers fired, and suspicious content flagged.
+Row: `ingest | <status> | <N> in / <M> filed | <connectors used>`: `<M>` is the records the commits added under `user/knowledge/` (`system/jobs/README.md` step 4), not library copies, and any split of `<N>` by channel adds up to `<N>`. Adds connector health per connector (ok, empty, failed, unavailable), triggers fired, and suspicious content flagged.

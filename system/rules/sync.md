@@ -30,7 +30,7 @@ Atlas-Actor: chat | routine:<routine-name> | update | setup
 Atlas-Reason: <why, one line>
 Atlas-Records: <record IDs or paths touched, comma-separated; may be "-" for settings/logs only>
 ```
-Hooks reject commits without `Atlas-Actor` and `Atlas-Reason` (N12). Commit messages never contain sensitive content.
+Hooks reject commits without `Atlas-Actor` and `Atlas-Reason` (N12). Repo hooks don't load in Cowork chats, so there Atlas keeps to this itself. The actor is who is running, not what the work is: `routine:<name>` is only for that routine's own run, so a chat that does a job's work (a catch-up brief, triage on request, a page refresh) commits as `chat`. `update` and `setup` stay as their procedures say, in a chat or not. The change set's activity line (`system/schemas/formats.md` §4) names the same actor. Commit messages never contain sensitive content.
 
 ## Conflict resolution
 - **Records:** merge both sides. Frontmatter: take the side with the later `updated` per field; union list fields (aliases, links, sources). Body: keep both sides' content; `## Updates` is the union in date order.

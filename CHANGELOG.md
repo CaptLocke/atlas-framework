@@ -7,6 +7,16 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
+## 2.6.1 (2026-11-01)
+
+### What's new
+- Drafts don't get forgotten. Your brief lists email drafts Atlas made that have sat unsent for 3 days or more, with how long they've waited, and tells you when a date in one has passed so you can update or delete it.
+- A suspicious email gets its own line under Needs attention in your brief, so it no longer crowds out what changed.
+- On your pages, an answer you saved shows whether you said Yes or No. A Nudge shows "Draft ready" for 3 days instead of two weeks; after that the button is back, and Atlas drafts again once something has changed.
+- A question Atlas asks you links the project and decision it's about, not only their topic.
+- Run reports count from what was actually saved, so their numbers match, and work you ask for in a chat is recorded as a chat rather than as an automation.
+- When one of Atlas's safety checks is too slow to finish (a busy disk or network), it now says so and asks you to try again, instead of refusing with no reason.
+
 ## 2.6.0 (2026-11-01)
 
 ### What's new

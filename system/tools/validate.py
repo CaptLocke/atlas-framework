@@ -1550,6 +1550,10 @@ def check_user(c):
     for f in listdir(tdir):
         if f.endswith(".md"):
             check_template(c, os.path.join(tdir, f))
+    adir = c.p("user", "logs", "activity")
+    month = os.path.join(adir, local_today(c)[:7] + ".md")
+    if os.path.exists(month):
+        check_activity(c, month)
     idir = c.p("user", "inbox")
     for f in listdir(idir):
         if f in INBOX_STATUSES:
@@ -1598,6 +1602,38 @@ def check_inbox(c, path):
         wrong = ["%s %s (file has %d)" % (s, counts.get(s, 0), n) for s, n in actual.items() if (counts.get(s) or 0) != n]
         if wrong:
             rep.error(path, "counts don't match the entries: " + ", ".join(wrong))
+
+
+def local_today(c):
+    """The user's date (YYYY-MM-DD) in atlas.yaml's timezone, as index.py computes it; the machine's date if unset."""
+    try:
+        with open(c.p("user", "settings", "atlas.yaml"), encoding="utf-8") as f:
+            tz = (yaml.safe_load(f) or {}).get("timezone")
+        from zoneinfo import ZoneInfo
+        return dt.datetime.now(ZoneInfo(str(tz))).date().isoformat() if tz else dt.date.today().isoformat()
+    except Exception:
+        return dt.date.today().isoformat()
+
+
+ACTIVITY_RE = re.compile(r"^- \d{4}-\d{2}-\d{2} \d{2}:\d{2} · (chat|update|setup|routine:[A-Za-z0-9][A-Za-z0-9_-]*) "
+                         r"· [^·]+? · .+$")
+
+
+def check_activity(c, path):
+    """A month's activity log: every line opens with the date, time and actor of formats.md §4, then the job or
+    action and a summary. A warning, not an error: older lines stay as written, and check_user looks only at the
+    current month's file, so the fix is for lines to come."""
+    try:
+        with open(path, encoding="utf-8") as f:
+            lines = f.read().splitlines()
+    except OSError as e:
+        c.rep.warn(path, "can't read the activity log (%s)" % e)
+        return
+    bad = [n for n, line in enumerate(lines, 1) if line.startswith("- ") and not ACTIVITY_RE.match(line.rstrip())]
+    if bad:
+        c.rep.warn(path, "%d line(s) not in the activity format (formats.md §4: `- <date> <time> · <actor> · "
+                         "<job or action> · <summary> · commit <sha>`), first at line %d; write new lines in it"
+                         % (len(bad), bad[0]))
 
 
 HOT_MAX = 75
@@ -1714,6 +1750,8 @@ def check_path(c, path):
         check_changelog(c)
     elif rel == "CHANGELOG.md":
         check_changelog(c)
+    elif re.match(r"^user/logs/activity/\d{4}-\d{2}\.md$", rel):
+        check_activity(c, p)
     elif rel == "user/.state/import.yaml":
         check_import(c, p)
     elif rel.startswith("system/dashboards/") or rel.startswith("system/migrations/"):
