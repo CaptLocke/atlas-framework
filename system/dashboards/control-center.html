@@ -315,7 +315,7 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
             N.setting({ key: "rhythms.moments.morning_thoughts", label: "Morning thoughts", tier: "now", options: [{ value: "on", label: "On" }, { value: "off", label: "Off" }], value: ON(mo.morning_thoughts) }),
             N.setting({ key: "rhythms.moments.evening_thoughts", label: "Evening thoughts", tier: "now", options: [{ value: "on", label: "On" }, { value: "off", label: "Off" }], value: ON(mo.evening_thoughts) })]),
           card("Your day", [
-            N.setting({ key: "rhythms.work_hours", label: "Working hours", help: "Open windows and focus time fall inside these.", tier: "now",
+            N.setting({ key: "rhythms.work_hours", label: "Working hours", help: "Open windows and focus time fall inside these.", tier: "chat",
               options: presets(["08:00-17:00", "08:30-17:30", "09:00-18:00", "08:00-18:00"], sv.work_hours, range), value: sv.work_hours }),
             N.setting({ key: "rhythms.focus.shortest_window", label: "Shortest focus window", help: "Gaps shorter than this aren't offered for priorities.", tier: "now",
               options: [15, 30, 45, 60].map(function (n) { return { value: String(n), label: n + " min" }; }), value: String(sv.focus_window || 30) }),
@@ -326,8 +326,8 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
             N.setting({ key: "send", label: "Ask before anything is sent", tier: "locked", lockedText: "Always on. Atlas never sends, shares or deletes without your OK." }),
             N.setting({ key: "routines.profile", label: "How much Atlas runs on its own", tier: "chat",
               options: [{ value: "lean", label: "Lean" }, { value: "standard", label: "Standard" }, { value: "full", label: "Full" }], value: sv.profile || "lean" }),
-            N.setting({ key: "rhythms.follow_ups.internal", label: "Follow-ups to colleagues", tier: "now", options: [{ value: "email", label: "Email" }, { value: "message", label: "Message" }], value: fu.internal || "email" }),
-            N.setting({ key: "rhythms.follow_ups.external", label: "Follow-ups to everyone else", tier: "now", options: [{ value: "email", label: "Email" }, { value: "message", label: "Message" }], value: fu.external || "email" }),
+            N.setting({ key: "rhythms.follow_ups.internal", label: "Follow-ups to colleagues", tier: "chat", options: [{ value: "email", label: "Email" }, { value: "message", label: "Message" }], value: fu.internal || "email" }),
+            N.setting({ key: "rhythms.follow_ups.external", label: "Follow-ups to everyone else", tier: "chat", options: [{ value: "email", label: "Email" }, { value: "message", label: "Message" }], value: fu.external || "email" }),
             N.setting({ key: "rhythms.moments.weekly_review", label: "Weekly review", tier: "now", options: [{ value: "on", label: "On" }, { value: "off", label: "Off" }], value: ON(mo.weekly_review) }),
             N.setting({ key: "rules", label: "What Atlas may read, and its connections", tier: "locked", lockedText: "Change these in chat: they decide what Atlas can see." })])),
         N.live ? null : h("p", { class: "small" }, "On this page, a change copies a request for your Atlas chat. Once the page is live, changes save straight to Atlas.")]));

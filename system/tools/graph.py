@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Build the Records page's data: every record Atlas keeps, and how they link.
 
-    python3 -I system/tools/graph.py [--root DIR] [--today YYYY-MM-DD] [--max N]
+    python3 -I system/tools/graph.py [--root DIR] [--today YYYY-MM-DD] [--max N] [--out FILE]
 
-Standard library plus the vendored YAML parser; reads only the repo. Prints JSON
+Standard library plus the vendored YAML parser; reads only the repo. Prints JSON (or
+writes it to --out: in a routine, a file under .atlas-tmp/, which the guard allows)
 in the shape `system/dashboards/records.contract.md` defines (without `meta`, which
 atlas-dashboards adds). Titles and statuses only, never a record's body or summary,
 so the page shows nothing the indexes don't already list.
@@ -94,7 +95,7 @@ def front_links(fm):
 
 def build(root, today, max_records=MAX_RECORDS):
     tmap = index.types(root)
-    keep = []
+    keep, ids_seen = [], set()
     for name in TYPES:
         if name not in tmap:
             continue
@@ -110,6 +111,9 @@ def build(root, today, max_records=MAX_RECORDS):
             if fm is None or fm.get("archived") is True or fm.get("superseded_by"):
                 continue
             rid = str(fm.get("id") or "%s/%s" % (folder, f[:-3]))
+            if rid in ids_seen:   # two files claiming one id: the first (by file name) is drawn
+                continue
+            ids_seen.add(rid)
             st = str(fm.get("status") or "")
             updated = index.as_date(fm.get("updated")) or index.as_date(fm.get("created"))
             if st in closed and (name == "question" or not updated or (today - updated).days > RECENT_DAYS):
@@ -141,6 +145,7 @@ def main(argv=None):
     ap.add_argument("--root", default=os.path.abspath(os.path.join(HERE, "..", "..")))
     ap.add_argument("--today", help="YYYY-MM-DD (default: today in atlas.yaml's time zone)")
     ap.add_argument("--max", type=int, default=MAX_RECORDS, help="most records to keep (default %d)" % MAX_RECORDS)
+    ap.add_argument("--out", help="write the JSON here instead of printing it")
     a = ap.parse_args(argv)
     today = index.as_date(a.today) if a.today else index.local_today(a.root)
     if today is None:
@@ -149,8 +154,14 @@ def main(argv=None):
     if a.max < 1:
         print("--max must be at least 1", file=sys.stderr)
         return 2
-    json.dump(build(a.root, today, a.max), sys.stdout, ensure_ascii=False, separators=(",", ":"))
-    sys.stdout.write("\n")
+    data = build(a.root, today, a.max)
+    if a.out:
+        with open(a.out, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
+            f.write("\n")
+    else:
+        json.dump(data, sys.stdout, ensure_ascii=False, separators=(",", ":"))
+        sys.stdout.write("\n")
     return 0
 
 

@@ -59,22 +59,21 @@ Only when its template changed (an update) or the user asks for it: render from 
    | `correct` | the same | the statement is replaced by `args.text`, tagged `[stated · confirmed <date>]`; its `profile` question, if any, `answered`. A correction in `preferences` (its statements are standing instructions), or one that would change a setting or governance: `needs_chat` | `profile_update` |
    | `nudge` | a `waiting_on` commitment (`open`, `slipped`), or a person who owes the user one | a follow-up **draft** through `atlas-write` on the recipient's channel (`rhythms.yaml: follow_ups`), honouring `atlas-triage`'s shared follow-up marker, plus an `approvals.md` entry to send it if none is pending. Never a send | `drafts_create` |
    | `approve` | an approval (`pending`), including the one that sends a draft (a draft's Approve on Today) | **routine:** `waiting_chat` with no `note`, never acted on. **Chat:** the press is the user's yes for that entry: write the approval record with `user_confirmation` quoting the row ("Approve, pressed on Today at 09:12"), then act; Cowork's approval card is the final gate. No pending approval, or more than one: `needs_chat` | the approval's own class |
+   | `set_setting` | a key in the table below, with `args.value` one of its values | **A key marked *next run*:** the setting changes through `atlas-settings` (its change map), as if the user had said it ("set my shortest focus window to 45 minutes"), routines included. **A key marked *chat*:** routine: `waiting_chat`; chat: `atlas-settings` applies it with its follow-ups (re-timing platform routines, a connector check). Any other key: `refused`, "That setting can only change in chat" | `behavior_settings`, applied in routines for *next run* keys (the press is the user's yes to that exact change: `system/rules/governance.md` §Routines and approvals) |
+   | `undo` | an earlier row on the same page: `target` is its id; it is `applied`, applied within 14 days, of a kind that can be undone (all of the above but `nudge` and `approve`), and has `before`; `args.kind` matches its kind | put back `before`, but only if the record (or setting) still holds what that press set: a commitment marked done is reopened (`status` and `completed_on` as they were, Updates line "Reopened: undone on the <Page> page"), a moved date goes back, a declined approval is `pending` again (unless it has expired), a dismissed insight returns to `seen`, a confirmed belief is `proposed` again, a corrected one gets its old text back, an answered entry or question is open again, a setting gets its old value. Something changed since, or an `answer` that applied a profile or record change: `needs_chat` ("It has changed since; I'll check with you"). In a routine, the undo of a *chat* setting is `waiting_chat`, like the press | the original row's class; routines may apply it wherever they could apply the original |
 
-   | `set_setting` | a key in the table below, with `args.value` one of its values | **`rhythms.*`:** the setting changes through `atlas-settings`, as if the user had said it ("set my shortest focus window to 45 minutes"), routines included. **`routines.*`:** routine: `waiting_chat`; chat: `atlas-settings` applies it, re-timing or re-creating platform routines as its procedure says. Anything else: `refused`, "That setting can only change in chat" | `behavior_settings`, applied in routines for `rhythms.*` (the press is the user's yes to that exact change: `system/rules/governance.md` §Routines and approvals) |
-   | `undo` | an earlier row on the same page: `target` is its id; it is `applied`, applied within 14 days, of a kind that can be undone (all of the above but `nudge` and `approve`), and has `before`; `args.kind` matches its kind | put back `before`, but only if the record (or setting) still holds what that press set: a commitment marked done is reopened (`status` and `completed_on` as they were, Updates line "Reopened: undone on the <Page> page"), a moved date goes back, a declined approval is `pending` again (unless it has expired), a dismissed insight returns to `seen`, a confirmed belief is `proposed` again, a corrected one gets its old text back, an answered entry or question is open again, a setting gets its old value. Something changed since, or an `answer` that applied a profile or record change: `needs_chat` ("It has changed since; I'll check with you") | the original row's class |
-
-   **Settings a page may change** (Guide's Settings; values as the page sends them):
-   | `target` | `args.value` | Changes |
-   |---|---|---|
-   | `rhythms.work_hours` | `"HH:MM-HH:MM"`, start before end | `work_hours.start` and `.end` (days unchanged) |
-   | `rhythms.focus.shortest_window` | `"15"`, `"30"`, `"45"`, `"60"` | `focus.shortest_window` |
-   | `rhythms.insights.brief_max` | `"0"`–`"5"` | `insights.brief_max` |
-   | `rhythms.moments.morning_thoughts`, `.evening_thoughts`, `.weekly_review` | `on`, `off` | that moment |
-   | `rhythms.meetings.tentative`, `.not_responded`, `.all_day` | `on` (`include`), `off` (`skip`) | that meeting filter |
-   | `rhythms.follow_ups.internal`, `.external` | `email`, `message` | that follow-up channel |
-   | `routines.brief_ready` | `"HH:MM"` | the schedule of the routine that builds the next day's brief (chat only) |
-   | `routines.weekend_briefs` | `on`, `off` | that routine's `daily-brief` `when` (chat only) |
-   | `routines.profile` | `lean`, `standard`, `full` | `routines.yaml: profile`, through `atlas-settings` (chat only) |
+   **Settings a page may change** (Guide's Settings). The page sends values as text; write numbers as numbers (`45`, not `"45"`), `on`/`off` as the file's own form:
+   | `target` | `args.value` | Applied | Changes |
+   |---|---|---|---|
+   | `rhythms.focus.shortest_window` | `15`, `30`, `45`, `60` | next run | `focus.shortest_window` |
+   | `rhythms.insights.brief_max` | `0`–`5` | next run | `insights.brief_max` |
+   | `rhythms.moments.morning_thoughts`, `.evening_thoughts`, `.weekly_review` | `on`, `off` | next run | that moment |
+   | `rhythms.meetings.tentative`, `.not_responded`, `.all_day` | `on` (`include`), `off` (`skip`) | next run | that meeting filter |
+   | `rhythms.work_hours` | `"HH:MM-HH:MM"`, start before end | chat | `work_hours.start` and `.end` (days unchanged), and the work-hour routines re-timed |
+   | `rhythms.follow_ups.internal`, `.external` | `email`, `message` | chat | that follow-up channel, after the connector check |
+   | `routines.brief_ready` | `"HH:MM"` | chat | the schedule of the routine that builds the next day's brief |
+   | `routines.weekend_briefs` | `on`, `off` | chat | that routine's `daily-brief` `when` |
+   | `routines.profile` | `lean`, `standard`, `full` | chat | `routines.yaml: profile`, through `atlas-settings` |
 
    Governance, data rules and connectors never change from a page.
 

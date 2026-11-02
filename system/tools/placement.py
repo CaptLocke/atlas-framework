@@ -67,17 +67,22 @@ def local_minutes(iso, tz, date):
     """Minutes since the day's midnight in the user's time zone, clipped to the day."""
     dt = datetime.fromisoformat(str(iso).replace("Z", "+00:00"))
     if dt.tzinfo is not None and tz:
-        try:
-            from zoneinfo import ZoneInfo
-            dt = dt.astimezone(ZoneInfo(tz))
-        except Exception:
-            pass   # keep the offset the time was written with (the user's own)
+        dt = dt.astimezone(zone(tz))
     day = dt.date().isoformat()
     if day < date:
         return 0
     if day > date:
         return 24 * 60
     return dt.hour * 60 + dt.minute
+
+
+def zone(tz):
+    """The user's time zone; an unknown one is an error, never a silent UTC."""
+    try:
+        from zoneinfo import ZoneInfo
+        return ZoneInfo(str(tz))
+    except Exception:
+        raise ValueError("timezone %r isn't a known time zone" % (tz,))
 
 
 def urgency(c):
@@ -90,6 +95,8 @@ def place(inp):
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", date):
         raise ValueError("date must be YYYY-MM-DD")
     tz = inp.get("timezone")
+    if tz:
+        zone(tz)
     wh = inp.get("work_hours") or {}
     start, end = hm(wh.get("start"), "work_hours.start"), hm(wh.get("end"), "work_hours.end")
     if end <= start:
@@ -113,6 +120,9 @@ def place(inp):
                 items.append({"key": pid, "minutes": None})
                 continue
             c = sorted(open_, key=urgency)[0]
+            if c.get("id") in seen:   # already placed as a priority of its own: share its slot, spend no time twice
+                items.append({"key": pid, "same": c.get("id")})
+                continue
             seen.add(c.get("id"))
             items.append({"key": pid, "also": c.get("id"), "minutes": SIZE.get(c.get("effort"), DEFAULT_SIZE), "sized": c.get("effort") in SIZE})
             continue
@@ -150,7 +160,7 @@ def place(inp):
             merged.append(b)
     floor = start
     if inp.get("now"):
-        floor = max(start, hm(inp["now"], "now"))
+        floor = max(start, hm(str(inp["now"])[:5], "now"))
     gaps, t = [], start
     for s, f in merged + [[end, end]]:
         g0 = max(t, floor)
@@ -160,9 +170,14 @@ def place(inp):
     windows = [{"start": g[0], "end": g[1], "left": g[1] - g[0], "items": []} for g in gaps]
 
     for it in items:
+        if it.get("same"):
+            continue
         place_one(it, windows, out)
         if it.get("also"):
             out["slots"][it["also"]] = out["slots"][it["key"]]
+    for it in items:
+        if it.get("same"):
+            out["slots"][it["key"]] = out["slots"].get(it["same"], {"kind": "none"})
     out["windows"] = [{"start": fmt(w["start"]), "end": fmt(w["end"]), "minutes": w["end"] - w["start"],
                        "items": w["items"], "left": w["left"]} for w in windows]
     out["open_minutes"] = sum(w["end"] - w["start"] for w in windows)
@@ -199,6 +214,8 @@ def main(argv):
         sys.stdout.write("\n")
     except (OSError, ValueError) as e:
         fail(str(e))
+    except (TypeError, AttributeError, KeyError) as e:
+        fail("the input isn't in the shape the docstring gives (%s)" % e)
 
 
 if __name__ == "__main__":

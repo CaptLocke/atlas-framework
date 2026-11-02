@@ -308,6 +308,8 @@
       var text = "Set " + o.label.toLowerCase() + " to " + (byVal[v] || v) + ".";
       if (!N.live || !LIVE_KINDS.set_setting) { N.copyText(text, wrap); return; }
       var id = "set_setting-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
+      if (row && row.id && (row.state === "queued" || row.state === "waiting_chat")) N.live.db.collection("requests").doc(row.id).delete().catch(function () {});
+      row = { id: id, state: "queued", kind: "set_setting" };
       N.live.db.collection("requests").doc(id).set({ kind: "set_setting", target: clean(o.key, 120), quoted: clean(o.label, 200),
         args: { value: v }, created: new Date().toISOString(), state: "queued" }).then(function () {
         status.textContent = "";
@@ -335,7 +337,7 @@
     else if (row && row.state === "applied") add(status, [N.undoControl(row)]);
     else if (row && row.state === "refused") status.appendChild(h("span", { class: "atl-request__note" }, "Atlas couldn't change this" + (row.note ? ": " + clean(row.note, 160) : ".")));
     add(wrap, [isToggle ? null : head, isToggle ? h("div", { class: "atl-setting__head" }, control, o.help ? h("span", { class: "atl-setting__help" }, o.help) : null) : control, status,
-      o.tier === "chat" ? h("p", { class: "atl-setting__note" }, "Changes your routines, so Atlas does it in your next chat.") : null]);
+      o.tier === "chat" ? h("p", { class: "atl-setting__note" }, "Atlas makes this change in your next chat, where it can finish it.") : null]);
     return wrap;
   };
 
@@ -602,13 +604,14 @@
       return smooth([p, p.c, { x: p.c.x + dx / 2 - dy / len * bow, y: p.c.y + dy / 2 + dx / len * bow }, q.c, q]);
     }
     function label(text, icon, x, y, opts) {
-      var b = h("button", { type: "button", class: "atl-web__lab" + (opts.cls ? " " + opts.cls : ""), style: "left:" + f(x) + "%;top:" + f(y) + "%",
+      var b = h("button", { type: "button", class: "atl-web__lab" + (opts.cls ? " " + opts.cls : ""), style: "left:" + f(x) + "%;top:" + f(y) + "%", "data-key": opts.key,
         "aria-label": opts.aria, "aria-pressed": opts.pressed ? "true" : "false",
         onclick: function (e) { e.stopPropagation(); opts.pick(); } }, N.icon(icon), h("span", null, text), opts.sub ? h("span", { class: "atl-web__sub" }, opts.sub) : null);
       if (opts.enter) { b.addEventListener("mouseenter", opts.enter); b.addEventListener("focus", opts.enter); b.addEventListener("mouseleave", opts.leave); b.addEventListener("blur", opts.leave); }
       labels.appendChild(b);
     }
-    function paint() {
+    /* paths only: a hover lights a type without rebuilding the labels, so focus and clicks survive */
+    function paint(pathsOnly) {
       var V = view, z = W / V.w, rs = 1 / Math.sqrt(z), sel = st.sel, center = st.center, level = st.level;
       svg.setAttribute("viewBox", f(V.x) + " " + f(V.y) + " " + f(V.w) + " " + f(V.h));
       var g = {}; LAYERS.forEach(function (x) { g[x[0]] = ""; });
@@ -658,7 +661,12 @@
       svg.setAttribute("aria-label", level === "record" ? by[center].title + " and its " + deg(center) + " linked records, zoomed in"
         : level === "type" ? "Zoomed in on " + T[st.focus].label.toLowerCase() : "Web of " + recs.length + " records by type, and the links between them");
 
+      if (pathsOnly) {
+        labels.querySelectorAll(".atl-web__lab--type").forEach(function (b) { b.classList.toggle("is-lit", !sel && ch === b.getAttribute("data-key")); });
+        return;
+      }
       /* labels: types, then the chosen record and its strongest links, without overlaps */
+      var act = document.activeElement, focusKey = act && labels.contains(act) ? act.getAttribute("data-key") : null;
       labels.textContent = "";
       var boxes = [];
       function hit(b) { return boxes.some(function (q) { return b.x < q.x + q.w && b.x + b.w > q.x && b.y < q.y + q.h && b.y + b.h > q.y; }); }
@@ -669,11 +677,11 @@
         var px = X(t.x) / 100 * FW, py = Y(t.y) / 100 * FH, wpx = 60 + t.label.length * 8 + (crit || warn ? 90 : 20);
         boxes.push({ x: px - wpx / 2, y: py - 40, w: wpx, h: 32 });
         var lit = !sel && ch === t.id;
-        label(t.label, t.icon, X(t.x), Y(t.y), { cls: "atl-web__lab--type" + (lit ? " is-lit" : "") + (st.focus === t.id ? " is-focus" : ""),
+        label(t.label, t.icon, X(t.x), Y(t.y), { key: t.id, cls: "atl-web__lab--type" + (lit ? " is-lit" : "") + (st.focus === t.id ? " is-focus" : ""),
           sub: String(tr.ids.length) + (level === "record" ? "" : crit ? " · " + crit + " critical" : warn ? " · " + warn + " attention" : ""),
           aria: (st.focus === t.id && level === "all" ? "Zoom in on " : "Light the links of ") + t.label, pressed: st.focus === t.id,
           pick: function () { clickType(t.id); },
-          enter: function () { if (!st.sel) { st.hover = t.id; paint(); } }, leave: function () { if (st.hover === t.id) { st.hover = null; paint(); } } });
+          enter: function () { if (!st.sel && st.hover !== t.id) { st.hover = t.id; paint(true); } }, leave: function () { if (st.hover === t.id) { st.hover = null; paint(true); } } });
       });
       var done = {};
       function put(id, opt) {
@@ -684,13 +692,14 @@
         var b = { x: left ? px - wpx - 8 : px + 6, y: py - 13, w: wpx, h: 26 };
         if (opt.optional && hit(b)) return;
         boxes.push(b);
-        label(r.title, (T[r.type] || {}).icon || "records", X(p.x), Y(p.y), { cls: "atl-web__lab--rec" + (left ? " is-left" : "") + (id === sel ? " is-sel" : "") + (isC ? " is-center" : "") + (r.attention ? " is-" + r.attention : ""),
+        label(r.title, (T[r.type] || {}).icon || "records", X(p.x), Y(p.y), { key: id, cls: "atl-web__lab--rec" + (left ? " is-left" : "") + (id === sel ? " is-sel" : "") + (isC ? " is-center" : "") + (r.attention ? " is-" + r.attention : ""),
           aria: (id === sel ? (isC ? "Selected: " : "Zoom in on ") : "Light the links of ") + r.title, pressed: id === sel,
           pick: function () { clickRecord(id); } });
       }
       if (level === "record" && center) { var cp = P(center); put(center, {}); ringL.forEach(function (n) { put(n.id, { side: P(n.id).x < cp.x - 4 ? "left" : "right" }); }); }
       if (sel) { put(sel, {}); adj[sel].slice().sort(function (a, b) { return score(b.id) - score(a.id); }).slice(0, 10).forEach(function (n) { put(n.id, { optional: true }); }); }
       if (level === "type" && st.focus) tree[st.focus].ids.slice().sort(function (a, b) { return score(b) - score(a); }).slice(0, 16).forEach(function (id) { put(id, { optional: true }); });
+      if (focusKey) labels.querySelectorAll(".atl-web__lab").forEach(function (b) { if (b.getAttribute("data-key") === focusKey) b.focus({ preventScroll: true }); });
 
       if (o.compact) return;
       crumbs.textContent = "";
@@ -711,7 +720,10 @@
     }
     if (o.start && by[o.start]) { st = { level: "record", focus: by[o.start].type, sel: o.start, center: o.start, hover: null }; moveTo({}, true); }
     else paint();
-    return { el: el, go: go, light: function (id) { if (by[id]) set({ sel: id, focus: by[id].type }); }, focusType: function (t) { if (T[t]) clickType(t); },
+    return { el: el, go: go, restore: function (k) {
+        if (!k || (k.center && !by[k.center]) || (k.focus && !T[k.focus])) return;
+        moveTo({ level: k.level, focus: k.focus, sel: k.sel && by[k.sel] ? k.sel : null, center: k.center }, true);
+      }, light: function (id) { if (by[id]) set({ sel: id, focus: by[id].type }); }, focusType: function (t) { if (T[t]) clickType(t); },
       zoomOut: zoomOut, state: function () { return { level: st.level, focus: st.focus, sel: st.sel, center: st.center }; },
       record: function (id) { return by[id]; }, neighbours: function (id) { var seen = {}; return (adj[id] || []).filter(function (n) { if (seen[n.id]) return false; seen[n.id] = 1; return true; }).map(function (n) { return by[n.id]; }); },
       degree: deg, score: score, types: types, records: recs };
@@ -816,12 +828,15 @@
       return w;
     }
     if (row.state !== "applied") return null;
-    if (!UNDOABLE[row.kind]) return h("span", { class: "atl-request__note" }, row.kind === "approve" ? "Done, and can't be undone" : row.kind === "nudge" ? "The draft stays in your drafts" : null);
+    var yes = row.kind === "answer" && row.args && row.args.choice === "yes";
+    if (!UNDOABLE[row.kind] || yes) return h("span", { class: "atl-request__note" }, row.kind === "approve" ? "Done, and can't be undone"
+      : row.kind === "nudge" ? "The draft stays in your drafts" : yes ? "To take back a Yes, say so in chat" : null);
     var at = Date.parse(row.applied_at || "");
     if (!(at > Date.now() - UNDO_DAYS * 864e5)) return null;
     var pending = N.live.requests[N.requestKey(row.id, "undo", "")];
     if (pending && (pending.state === "queued" || pending.state === "waiting_chat")) return N.badge("Undo waiting for Atlas", "neutral", "pending");
     if (pending && pending.state === "applied") return N.badge("Undone", "good", "undo");
+    if (pending && pending.state === "needs_chat") return N.badge("Undo: Atlas will ask you in chat", "neutral", "chat");
     if (pending && pending.state === "refused") return h("span", { class: "atl-request__note" }, "Atlas couldn't undo this" + (pending.note ? ": " + clean(pending.note, 160) : "."));
     var u = h("button", { type: "button", class: "atl-undo", onclick: function (e) {
       e.stopPropagation(); u.disabled = true;
@@ -883,6 +898,8 @@
     }
     var btn = N.button({ label: label, variant: variant, check: check });
     holder.appendChild(btn);
+    var last = N.live.requests[N.requestKey(clean(spec.target, 120), spec.kind, spec.quoted)];
+    if (last && last.state === "applied" && !CLOSES[spec.kind]) { var un = N.undoControl(last); if (un) holder.appendChild(un); }
     if (view.note) holder.appendChild(h("span", { class: "atl-request__note" }, view.note));
     btn.addEventListener("click", function () {
       var input, ok;

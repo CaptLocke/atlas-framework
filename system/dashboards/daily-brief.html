@@ -46,7 +46,9 @@
 .tl-block--win[aria-pressed="true"] .tl-block__time { color: var(--muted); }
 .tl-block--win[aria-pressed="true"] .tl-tag { color: var(--accent-text); }
 .tl-rank { flex: none; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--ink); color: var(--on-ink); font-size: 12px; font-weight: 600; }
-.tl-rank--one { background: var(--accent); color: #ffffff; }
+.tl-rank--one { background: var(--accent-text); color: #ffffff; }   /* ember's text tone: white on it passes AA at 12px */
+:root[data-theme="dark"] .tl-rank--one { color: #16171a; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tl-rank--one { color: #16171a; } }
 .brief__group--fit h3 { color: var(--accent-text); }
 .brief__group--fit .mini { background: var(--accent-soft); }
 .brief__group--fit .mini__when { color: var(--accent-text); }
@@ -491,7 +493,7 @@
     /* ================= Waiting on, by person, one nudge each ================= */
     if (waiting.length) {
       var wb = {}, wo = [];
-      waiting.forEach(function (c) { var k = idOf(c.counterparty) || "?"; if (!wb[k]) { wb[k] = []; wo.push(k); } wb[k].push(c); });
+      waiting.forEach(function (c) { var k = idOf(c.counterparty) || N.name(c.counterparty) || c.id; if (!wb[k]) { wb[k] = []; wo.push(k); } wb[k].push(c); });
       var wgroups = wo.map(function (k) {
         var it = wb[k].sort(function (a, b) { return (overdue(b) ? late(b) : -99) - (overdue(a) ? late(a) : -99) || String(a.due || "9").localeCompare(String(b.due || "9")); });
         return { who: it[0].counterparty, items: it };

@@ -150,7 +150,7 @@
     /* Start from */
     function top(list, f) { return list.slice().sort(function (a, b) { return f(b) - f(a); })[0]; }
     var starts = [
-      ["Focus", "focus", top(recs.filter(function (r) { return r.attention === "critical" && r.type === "commitment"; }), function (r) { return web.degree(r.id); })],
+      ["Focus", "focus", top(recs.filter(function (r) { return r.attention === "critical"; }), function (r) { return web.degree(r.id); })],
       ["Off track", "off", top(recs.filter(function (r) { return r.attention && (r.type === "project" || r.type === "goal"); }), function (r) { return (r.attention === "critical" ? 1000 : 0) + web.degree(r.id); })],
       ["Most connected", null, top(recs, function (r) { return web.degree(r.id); })],
       ["Recent", null, top(recs.filter(function (r) { return r.type === "person" && name(r) !== "You"; }), function (r) { return Date.parse(r.updated || "") || 0; })]
@@ -165,7 +165,7 @@
     if (recs.length) main.appendChild(lib);
     main.appendChild(h("div", null, N.more("records"), d.truncated ? h("p", { class: "more" }, d.truncated + " older records aren't drawn. Ask Atlas in chat about them.") : null));
 
-    if (keep && keep.center) web.go(keep.center); else if (keep && keep.focus) web.focusType(keep.focus);
+    if (keep) web.restore(keep);
     paintLib();
 
     return {

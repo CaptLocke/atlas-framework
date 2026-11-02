@@ -4,7 +4,7 @@ name: records
 template: records.html
 republished_by: [triage, weekly-review]
 size_budget_kb: 900
-stale_after_hours: 36
+stale_after_hours: 192
 ---
 # Dashboard: Records (`records`)
 
