@@ -532,7 +532,7 @@ def _temp_only(path, payload, proj, allow_scratch):
 
 # A page's requests are the user's own words (system/rules/governance.md, N7), so a routine never
 # creates or rewrites one: it only records what happened to it, and clears finished ones.
-REQUEST_FIELDS = {"state", "note", "applied_at", "applied_by"}
+REQUEST_FIELDS = {"state", "note", "applied_at", "applied_by", "before"}
 
 
 def _request_write_problem(w, single):
@@ -542,10 +542,12 @@ def _request_write_problem(w, single):
     if coll.split("/")[0] != "requests" or op in ("get", "list", "query", "profiles", "delete"):
         return None
     data = w.get("data") if isinstance(w.get("data"), dict) else None
-    if op == "update" and data is not None and set(data) <= REQUEST_FIELDS and not w.get("file_path"):
+    if (op == "update" and data is not None and set(data) <= REQUEST_FIELDS and not w.get("file_path")
+            and ("before" not in data or data.get("state") == "applied")):   # `before` is only saved when applying
         return None
     return ("A page's requests are what the user pressed, so a routine only updates a request's state, note, "
-            "applied_at and applied_by, or deletes a finished one; it never creates or rewrites a request.")
+            "applied_at, applied_by and (when applying it) before, or deletes a finished one; it never creates or "
+            "rewrites a request.")
 
 
 def handle_artifact(payload, proj, ctx):

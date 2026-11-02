@@ -107,6 +107,9 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
 .swatch p { padding: 6px 10px 0; font-weight: 600; }
 .swatch span { display: block; padding: 0 10px 8px; color: var(--muted); }
 .findbar { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+.settings { display: grid; gap: var(--space-7); grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); align-items: start; }
+.settings__list { display: flex; flex-direction: column; }
+.act__end { display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px; }
 </style>
 <style id="atlas-theme">{{ATLAS_THEME_CSS}}</style>
 </head>
@@ -126,7 +129,7 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
   var STMT = { confirmed: ["Confirmed", "good"], proposed: ["Not yet confirmed", "warn"] };
   var PROV = { stated: "You said so", observed: "Observed", researched: "Researched", uploaded: "From your documents", inferred: "Inferred" };
   /* What a page press reads as in Activity */
-  var VERB = { mark_done: ["done", "You marked {q} done"], mark_received: ["done", "You marked {q} received"], move_date: ["snooze", "You moved {q}"],
+  var VERB = { set_setting: ["settings", "You set {q}"], undo: ["undo", "You asked Atlas to undo {q}"], mark_done: ["done", "You marked {q} done"], mark_received: ["done", "You marked {q} received"], move_date: ["snooze", "You moved {q}"],
     answer: ["chat", "You answered {q}"], decline: ["dismiss", "You declined {q}"], not_useful: ["dismiss", "You said {q} wasn't useful"],
     confirm: ["done", "You confirmed {q}"], correct: ["draft", "You corrected {q}"], nudge: ["mail", "You asked for a nudge on {q}"], approve: ["done", "You approved {q}"] };
   var REQ = { queued: ["Waiting", "neutral", "pending"], waiting_chat: ["Waiting for a chat", "neutral", "pending"], needs_chat: ["Needs a chat", "warn", "chat"],
@@ -267,10 +270,11 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
     reqs.forEach(function (r) {
       var v = VERB[r.kind]; if (!v) return;
       var s = REQ[r.state] || REQ.queued, q = "“" + N.clean(r.quoted || "") + "”";
-      var text = v[1].replace("{q}", q) + (r.kind === "move_date" && r.args && r.args.due ? " to " + N.weekday(r.args.due) : "");
+      var text = v[1].replace("{q}", q) + (r.kind === "move_date" && r.args && r.args.due ? " to " + N.weekday(r.args.due) : "")
+        + (r.kind === "set_setting" && r.args && r.args.value != null ? " to " + N.clean(String(r.args.value)) : "");
       acts2.push({ at: r.created, data: { state: r.state }, el: h("li", { class: "act" }, h("time", { datetime: r.created }, N.time(r.created) || N.date(r.created)), N.icon(v[0]),
         h("span", { class: "act__t" }, text, r.state === "refused" && r.note ? h("span", { class: "act__note" }, "Atlas: " + N.clean(r.note)) : null),
-        N.badge(s[0], s[1], s[2])) });
+        h("span", { class: "act__end" }, N.badge(s[0], s[1], s[2]), r.kind === "undo" ? null : N.undoControl(r))) });
     });
     L(d.runs).forEach(function (r) {
       var w = RUN[r.status] || RUN.never_run;
@@ -286,6 +290,48 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
           { key: "refused", label: "Not applied", test: function (x) { return x.state === "refused"; } },
           { key: "atlas", label: "Atlas", test: function (x) { return x.state === "atlas"; } }],
         empty: "Nothing yet." }), N.more("runs")]));
+
+    /* ================= Settings: changed here, applied by Atlas ================= */
+    var sv = d.settings;
+    if (sv) {
+      var ON = function (v) { return v === false || v === "off" || v === "skip" ? "off" : "on"; };
+      function presets(list, cur, fmt) {
+        var vals = list.slice(); if (cur && vals.indexOf(cur) === -1) vals.unshift(cur);
+        return vals.map(function (v) { return { value: v, label: fmt(v) }; });
+      }
+      function hhmm(t) { var m = /^(\d\d):(\d\d)$/.exec(t || ""); if (!m) return t; var hh = +m[1], h12 = hh % 12 || 12; return h12 + ":" + m[2] + (hh < 12 ? " am" : " pm"); }
+      function range(v) { var p = String(v || "").split("-"); return p.length === 2 ? hhmm(p[0]).replace(/ [ap]m$/, "") + "–" + hhmm(p[1]).replace(/ [ap]m$/, "") : v; }
+      var mo = sv.moments || {}, mt = sv.meetings || {}, fu = sv.follow_ups || {};
+      var card = function (title, kids) { return N.card({ title: title, body: h("div", { class: "settings__list" }, kids) }); };
+      parts.appendChild(part("settings", "Settings", "Changes apply at Atlas's next run or chat. Those that change your routines wait for a chat.", [
+        h("div", { class: "settings" },
+          card("Briefs", [
+            N.setting({ key: "routines.brief_ready", label: "Daily brief ready by", help: "When Today is ready each morning.", tier: "chat",
+              options: presets(["05:30", "06:00", "07:00", "08:00"], sv.brief_ready, hhmm), value: sv.brief_ready }),
+            N.setting({ key: "routines.weekend_briefs", label: "Weekend briefs", help: "A brief on Saturdays and Sundays too.", tier: "chat",
+              options: [{ value: "on", label: "On" }, { value: "off", label: "Off" }], value: ON(sv.weekend_briefs) }),
+            N.setting({ key: "rhythms.insights.brief_max", label: "Insights per brief", help: "Patterns Atlas noticed, most useful first.", tier: "now",
+              options: [0, 1, 2, 3, 4, 5].map(function (n) { return { value: String(n), label: String(n) }; }), value: String(sv.brief_max != null ? sv.brief_max : 3) }),
+            N.setting({ key: "rhythms.moments.morning_thoughts", label: "Morning thoughts", tier: "now", options: [{ value: "on", label: "On" }, { value: "off", label: "Off" }], value: ON(mo.morning_thoughts) }),
+            N.setting({ key: "rhythms.moments.evening_thoughts", label: "Evening thoughts", tier: "now", options: [{ value: "on", label: "On" }, { value: "off", label: "Off" }], value: ON(mo.evening_thoughts) })]),
+          card("Your day", [
+            N.setting({ key: "rhythms.work_hours", label: "Working hours", help: "Open windows and focus time fall inside these.", tier: "now",
+              options: presets(["08:00-17:00", "08:30-17:30", "09:00-18:00", "08:00-18:00"], sv.work_hours, range), value: sv.work_hours }),
+            N.setting({ key: "rhythms.focus.shortest_window", label: "Shortest focus window", help: "Gaps shorter than this aren't offered for priorities.", tier: "now",
+              options: [15, 30, 45, 60].map(function (n) { return { value: String(n), label: n + " min" }; }), value: String(sv.focus_window || 30) }),
+            N.setting({ key: "rhythms.meetings.tentative", label: "Show tentative meetings", tier: "now", options: [{ value: "on", label: "On" }, { value: "off", label: "Off" }], value: ON(mt.tentative) }),
+            N.setting({ key: "rhythms.meetings.not_responded", label: "Show meetings you haven't answered", tier: "now", options: [{ value: "on", label: "On" }, { value: "off", label: "Off" }], value: ON(mt.not_responded) }),
+            N.setting({ key: "rhythms.meetings.all_day", label: "Show all-day events", help: "Deadlines and milestones always show.", tier: "now", options: [{ value: "on", label: "On" }, { value: "off", label: "Off" }], value: ON(mt.all_day) })]),
+          card("Atlas", [
+            N.setting({ key: "send", label: "Ask before anything is sent", tier: "locked", lockedText: "Always on. Atlas never sends, shares or deletes without your OK." }),
+            N.setting({ key: "routines.profile", label: "How much Atlas runs on its own", tier: "chat",
+              options: [{ value: "lean", label: "Lean" }, { value: "standard", label: "Standard" }, { value: "full", label: "Full" }], value: sv.profile || "lean" }),
+            N.setting({ key: "rhythms.follow_ups.internal", label: "Follow-ups to colleagues", tier: "now", options: [{ value: "email", label: "Email" }, { value: "message", label: "Message" }], value: fu.internal || "email" }),
+            N.setting({ key: "rhythms.follow_ups.external", label: "Follow-ups to everyone else", tier: "now", options: [{ value: "email", label: "Email" }, { value: "message", label: "Message" }], value: fu.external || "email" }),
+            N.setting({ key: "rhythms.moments.weekly_review", label: "Weekly review", tier: "now", options: [{ value: "on", label: "On" }, { value: "off", label: "Off" }], value: ON(mo.weekly_review) }),
+            N.setting({ key: "rules", label: "What Atlas may read, and its connections", tier: "locked", lockedText: "Change these in chat: they decide what Atlas can see." })])),
+        N.live ? null : h("p", { class: "small" }, "On this page, a change copies a request for your Atlas chat. Once the page is live, changes save straight to Atlas.")]));
+    }
 
     /* ================= What Atlas knows: recently filed, about you ================= */
     var rf = d.recently_filed || {}, filed = L(rf.items), days = rf.days || 14;
@@ -401,8 +447,8 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
       folds.length ? h("div", { class: "folds" }, folds) : N.empty("Ask Atlas in chat what it can do."), guideEmpty]));
 
     /* ================= The section list ================= */
-    var SIDE = [["status", "Status", "automation", issues.length], ["approvals", "Approvals", "pending", nWaiting], ["activity", "Activity", "sync", waitingN],
-      ["knows", "What Atlas knows", "memory", 0], ["how", "How it works", "help", 0]];
+    var SIDE = [["status", "Status", "automation", issues.length], ["approvals", "Approvals", "pending", nWaiting], ["activity", "Activity", "sync", waitingN], d.settings ? ["settings", "Settings", "settings", 0] : null,
+      ["knows", "What Atlas knows", "memory", 0], ["how", "How it works", "help", 0]].filter(Boolean);
     main.appendChild(h("div", { class: "guide" },
       h("nav", { class: "side", "aria-label": "Sections of this page" }, SIDE.map(function (x) {
         return h("a", { href: "#" + x[0] }, N.icon(x[2]), x[1], x[3] ? h("b", null, String(x[3])) : null);

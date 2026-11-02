@@ -290,6 +290,55 @@
     return h("span", { class: "atl-prompt" }, N.icon("chat"), h("span", { class: "atl-prompt__text" }, q), copy);
   };
 
+  /* ---- A setting on a page (Guide's Settings). o: {key, label, help, options: [{value, label}], value,
+     tier: "now" (applied at the next run) | "chat" (waits for a chat) | "locked" (read-only)}. Two options
+     on/off draw a toggle, more a segmented control. On a live page a change writes a set_setting request
+     (shown at once, Waiting for Atlas, with Undo); elsewhere it copies the request for chat. ---- */
+  N.setting = function (o) {
+    var wrap = h("div", { class: "atl-setting" });
+    var head = h("div", { class: "atl-setting__head" }, h("span", { class: "atl-setting__label" }, o.label), o.help ? h("span", { class: "atl-setting__help" }, o.help) : null);
+    var opts = N.list(o.options), byVal = {};
+    opts.forEach(function (x) { byVal[String(x.value)] = x.label; });
+    if (o.tier === "locked") { add(wrap, [head, h("p", { class: "atl-setting__locked" }, N.icon("alert"), h("span", null, o.lockedText || "Change it in chat."))]); return wrap; }
+    var row = N.live && N.live.requests ? N.live.requests[N.requestKey(o.key, "set_setting", "")] : null;
+    var pend = row && (row.state === "queued" || row.state === "waiting_chat") && row.args ? String(row.args.value) : null;
+    var shown = pend != null ? pend : String(o.value);
+    var status = h("div", { class: "atl-setting__status" });
+    function save(v) {
+      var text = "Set " + o.label.toLowerCase() + " to " + (byVal[v] || v) + ".";
+      if (!N.live || !LIVE_KINDS.set_setting) { N.copyText(text, wrap); return; }
+      var id = "set_setting-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
+      N.live.db.collection("requests").doc(id).set({ kind: "set_setting", target: clean(o.key, 120), quoted: clean(o.label, 200),
+        args: { value: v }, created: new Date().toISOString(), state: "queued" }).then(function () {
+        status.textContent = "";
+        add(status, [N.badge(o.tier === "chat" ? "Waiting for a chat" : REQUEST_STATE.queued, "neutral", "pending"), N.undoControl({ id: id, state: "queued", kind: "set_setting" })]);
+        N.toast(o.tier === "chat" ? "Saved. Atlas changes this in your next chat." : "Waiting for Atlas: it applies this at its next run or chat.");
+      }, function () { N.copyText(text, wrap); });
+    }
+    var control;
+    var isToggle = opts.length === 2 && opts[0].value === "on" && opts[1].value === "off";
+    if (isToggle) control = N.toggle(o.label, shown === "on", function (on) { save(on ? "on" : "off"); });
+    else {
+      var btns = opts.map(function (x) {
+        return h("button", { type: "button", "data-value": String(x.value), "aria-pressed": String(String(x.value) === shown),
+          class: "atl-seg__btn" + (String(x.value) === shown ? " atl-seg__btn--on" : ""),
+          onclick: function () {
+            if (String(x.value) === shown) return;
+            shown = String(x.value);
+            btns.forEach(function (b) { var on = b.getAttribute("data-value") === shown; b.setAttribute("aria-pressed", String(on)); b.className = "atl-seg__btn" + (on ? " atl-seg__btn--on" : ""); });
+            save(x.value);
+          } }, x.label);
+      });
+      control = h("div", { class: "atl-seg", role: "group", "aria-label": o.label }, btns);
+    }
+    if (row && pend != null) add(status, [N.badge(row.state === "waiting_chat" || o.tier === "chat" ? "Waiting for a chat" : REQUEST_STATE.queued, "neutral", "pending"), N.undoControl(row)]);
+    else if (row && row.state === "applied") add(status, [N.undoControl(row)]);
+    else if (row && row.state === "refused") status.appendChild(h("span", { class: "atl-request__note" }, "Atlas couldn't change this" + (row.note ? ": " + clean(row.note, 160) : ".")));
+    add(wrap, [isToggle ? null : head, isToggle ? h("div", { class: "atl-setting__head" }, control, o.help ? h("span", { class: "atl-setting__help" }, o.help) : null) : control, status,
+      o.tier === "chat" ? h("p", { class: "atl-setting__note" }, "Changes your routines, so Atlas does it in your next chat.") : null]);
+    return wrap;
+  };
+
   /* ---- Toggle (SettingControl): a switch with its label. onChange(on). ---- */
   N.toggle = function (label, on, onChange) {
     var btn = h("button", { type: "button", role: "switch", class: "atl-toggle", "aria-checked": String(!!on) },
@@ -725,15 +774,19 @@
      live: {kind, target (record or inbox ID, or profile/<part>), quoted (the title, a reminder only),
      due (move_date), args (fixed, e.g. {choice: "yes"}), input: "text" (asks for a few words first)} */
   var LIVE_KINDS = { mark_done: 1, mark_received: 1, move_date: 1, answer: 1, decline: 1, not_useful: 1,
-    confirm: 1, correct: 1, nudge: 1, approve: 1 };
+    confirm: 1, correct: 1, nudge: 1, approve: 1, set_setting: 1 };
+  /* kinds Atlas can reverse once applied, from the `before` it saved on the row (an `undo` request);
+     a send, a nudge's draft and an answer that applied a profile change can't be taken back */
+  var UNDOABLE = { mark_done: 1, mark_received: 1, move_date: 1, answer: 1, decline: 1, not_useful: 1, confirm: 1, correct: 1, set_setting: 1 };
+  var UNDO_DAYS = 14;   /* as long as applied rows are kept (maintenance clears them after 14 days) */
   /* kinds whose item leaves the page once applied; the others give their button back */
   var CLOSES = { mark_done: 1, mark_received: 1, answer: 1, decline: 1, not_useful: 1, confirm: 1, correct: 1, approve: 1 };
   /* kinds that keep a badge for a few days once applied (from applied_at), then give the button back */
   var APPLIED = { nudge: { text: "Draft ready", days: 3 } };
   var REQUEST_STATE = {
-    queued: "Saved. Atlas does this at its next run or chat",
-    applied: "Done",
-    waiting_chat: "Waiting for your next chat",
+    queued: "Waiting for Atlas",
+    applied: "Applied",
+    waiting_chat: "Waiting for a chat",
     needs_chat: "Atlas will ask you about this in chat"
   };
   /* What a button shows for the newest request of its own kind on its record: {badge, tone} in place
@@ -746,8 +799,38 @@
       return at > Date.now() - APPLIED[kind].days * 864e5 ? { badge: APPLIED[kind].text, tone: "good", icon: "done" } : {};
     }
     if (row.state === "applied" && !CLOSES[kind]) return {};
-    return row.state === "applied" ? { badge: N.chosen(row.args) + REQUEST_STATE[row.state], tone: "good", icon: "done" }
-      : { badge: N.chosen(row.args) + REQUEST_STATE[row.state], tone: "neutral", icon: "pending" };
+    return row.state === "applied" ? { badge: N.chosen(row.args) + REQUEST_STATE[row.state], tone: "good", icon: "done", row: row }
+      : { badge: N.chosen(row.args) + REQUEST_STATE[row.state], tone: "neutral", icon: "pending", row: row };
+  };
+  /* Undo for a press: while it's still waiting, withdraw it (delete the row, so Atlas never sees it);
+     once applied, ask Atlas to reverse it (an `undo` request naming the row), for UNDO_DAYS days.
+     Returns a node (a button, or a note saying why not), or null when there's nothing to undo. */
+  N.undoControl = function (row) {
+    if (!N.live || !row || !row.id) return null;
+    if (row.state === "queued" || row.state === "waiting_chat") {
+      var w = h("button", { type: "button", class: "atl-undo", onclick: function (e) {
+        e.stopPropagation(); w.disabled = true;
+        N.live.db.collection("requests").doc(row.id).delete().then(function () { N.toast("Withdrawn. Atlas won't do it."); },
+          function () { w.disabled = false; N.toast("Couldn't withdraw it. Try again, or say so in chat."); });
+      } }, N.icon("undo"), h("span", null, "Undo"));
+      return w;
+    }
+    if (row.state !== "applied") return null;
+    if (!UNDOABLE[row.kind]) return h("span", { class: "atl-request__note" }, row.kind === "approve" ? "Done, and can't be undone" : row.kind === "nudge" ? "The draft stays in your drafts" : null);
+    var at = Date.parse(row.applied_at || "");
+    if (!(at > Date.now() - UNDO_DAYS * 864e5)) return null;
+    var pending = N.live.requests[N.requestKey(row.id, "undo", "")];
+    if (pending && (pending.state === "queued" || pending.state === "waiting_chat")) return N.badge("Undo waiting for Atlas", "neutral", "pending");
+    if (pending && pending.state === "applied") return N.badge("Undone", "good", "undo");
+    if (pending && pending.state === "refused") return h("span", { class: "atl-request__note" }, "Atlas couldn't undo this" + (pending.note ? ": " + clean(pending.note, 160) : "."));
+    var u = h("button", { type: "button", class: "atl-undo", onclick: function (e) {
+      e.stopPropagation(); u.disabled = true;
+      var id = "undo-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
+      N.live.db.collection("requests").doc(id).set({ kind: "undo", target: clean(row.id, 120), quoted: clean(row.quoted || "", 1000),
+        args: { kind: row.kind }, created: new Date().toISOString(), state: "queued" }).then(function () { N.toast("Atlas will undo it at its next run or chat."); },
+        function () { u.disabled = false; N.toast("Couldn't save the undo. Say it in chat instead."); });
+    } }, N.icon("undo"), h("span", null, "Undo"));
+    return u;
   };
   /* "Yes · " for a request that carries a choice, so a badge says which button was pressed */
   N.chosen = function (args) {
@@ -777,7 +860,7 @@
   function liveRequest(label, text, variant, check, spec) {
     var holder = h("span", { class: "atl-request", onclick: function (e) { e.stopPropagation(); } });
     var view = N.requestView(N.live.requests[N.requestKey(clean(spec.target, 120), spec.kind, spec.quoted)], spec.kind);
-    if (view.badge) { holder.appendChild(N.badge(view.badge, view.tone, view.icon)); return holder; }
+    if (view.badge) { add(holder, [N.badge(view.badge, view.tone, view.icon), N.undoControl(view.row)]); return holder; }
     function save(args) {
       var id = spec.kind + "-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
       N.live.db.collection("requests").doc(id).set({
@@ -788,9 +871,9 @@
         var hadFocus = holder.contains(document.activeElement);
         var badge = N.badge(N.chosen(args || spec.args) + REQUEST_STATE.queued, "neutral", "pending");
         holder.textContent = "";
-        holder.appendChild(badge);
+        add(holder, [badge, N.undoControl({ id: id, state: "queued", kind: spec.kind })]);
         if (hadFocus) { badge.setAttribute("tabindex", "-1"); badge.focus({ preventScroll: true }); }
-        N.toast("Saved. Atlas will do this at its next run or chat.");
+        N.toast("Waiting for Atlas: it does this at its next run or chat.");
       }, function () {
         holder.textContent = "";
         holder.appendChild(btn);
@@ -1429,7 +1512,7 @@
         render();
       }, unavailable);
       db.collection("requests").onSnapshot(function (snap) {
-        var latest = N.latestRequests(snap.docs.map(function (doc) { return doc.data(); }));
+        var latest = N.latestRequests(snap.docs.map(function (doc) { var v = doc.data() || {}; v.id = doc.id; return v; }));
         for (var key in requests) delete requests[key];
         for (key in latest) requests[key] = latest[key];
         render();
