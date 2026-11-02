@@ -8,42 +8,141 @@
 <title>Today</title>
 <style id="atlas-base">{{ATLAS_BASE_CSS}}</style>
 <style id="atlas-page">
-/* Top priorities: rank numerals in the brand color */
-.prio { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); }
-.prio li { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 4px var(--space-4); padding: var(--space-5); border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
-.prio-n { grid-row: span 3; font-family: var(--font-display); font-size: 40px; line-height: 40px; font-weight: 500; color: var(--accent); }
-.prio-title { font-family: var(--font-display); font-size: 22px; line-height: 27px; font-weight: 500; }
-.prio-why { color: var(--muted); font-size: 14px; line-height: 20px; }
-.prio .chips { margin-top: 4px; }
-/* I owe beside Waiting on */
-.cols { display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); align-items: start; }
-.col { display: flex; flex-direction: column; gap: var(--space-3); min-width: 0; }
+/* ---- Your day: a proportional timeline (1.6px a minute), the now line in ember, meeting blocks ---- */
+.day-sec { display: flex; flex-direction: column; gap: var(--space-4); }
+.allday { display: flex; flex-wrap: wrap; gap: 8px; }
+.earlier { display: flex; flex-direction: column; gap: 6px; padding: 14px 18px; border-radius: var(--radius-lg); background: var(--sunken); font-size: 14px; color: var(--ink-2); }
+.earlier p { display: flex; align-items: center; gap: 10px; }
+.earlier b { color: var(--ink); font-weight: 600; }
+.earlier .atl-icon { color: var(--muted); width: 15px; height: 15px; }
+.tl { position: relative; --tl-gutter: 88px; }
+@media (max-width: 40rem) { .tl { --tl-gutter: 52px; } .tl-tick span { flex-basis: 40px; font-size: 11px; } .tl-strand { left: 34px; width: 16px; } .tl-now { left: 40px; } .tl-block { padding: 0 10px; gap: 8px; } .tl-block > .atl-icon, .tl-tag { display: none; } }
+.tl-tick { position: absolute; left: 0; right: 0; display: flex; align-items: center; gap: 10px; pointer-events: none; }
+.tl-tick span { flex: 0 0 52px; font-size: 12px; color: var(--muted); transform: translateY(-50%); }
+.tl-tick i { flex: 1 1 auto; height: 1px; background: var(--line); }
+.tl-strand { position: absolute; left: 50px; top: 0; width: 28px; height: 100%; pointer-events: none; overflow: visible; }
+.tl-strand path { fill: none; stroke: var(--strand); vector-effect: non-scaling-stroke; }
+.tl-now { position: absolute; left: 56px; right: 0; z-index: 3; display: flex; align-items: center; gap: 8px; pointer-events: none; }
+.tl-now i { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+.tl-now b { flex: 1 1 auto; height: 1px; background: var(--accent); }
+.tl-now span { font-size: 11px; font-weight: 600; letter-spacing: 0.2em; color: var(--accent-text); }
+.tl-block { position: absolute; z-index: 2; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 0 16px; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); color: var(--ink); font-family: inherit; text-align: left; cursor: pointer; transition: border-color 160ms ease, background 160ms ease; }
+.tl-block:hover { border-color: var(--ink); }
+.tl-block[aria-pressed="true"] { background: var(--night); border-color: var(--night); color: var(--night-text); }
+.tl-block > .atl-icon { width: 15px; height: 15px; }
+.tl-block__text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.tl-block__title { font-size: 15px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tl-block__time { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tl-block[aria-pressed="true"] .tl-block__time { color: var(--night-muted); }
+.tl-block--short .tl-block__time { display: none; }
+.tl-due { flex: none; padding: 3px 9px; border-radius: var(--radius-pill); background: var(--warn-bg); color: var(--warn); font-size: 11px; font-weight: 600; white-space: nowrap; }
+.tl-block[aria-pressed="true"] .tl-due { background: var(--night-raised); color: var(--warn-on-night); }
+.tl-tag { flex: none; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; color: var(--muted); white-space: nowrap; }
+.tl-block[aria-pressed="true"] .tl-tag { color: var(--accent-on-night); }
+.tl-quiet { padding: var(--space-7) var(--space-8); border-radius: var(--radius-card); background: var(--sunken); color: var(--ink-2); }
+
+/* ---- The brief for the chosen block ---- */
+.brief { gap: var(--space-4); }
+.brief__kicker { font-size: 12px; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.brief__kicker span + span { letter-spacing: 0; font-weight: 500; text-transform: none; font-size: 13px; }
+.brief__meta { font-size: 14px; color: var(--muted); }
+.brief__facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 20px; margin: 0; font-size: 14px; }
+.brief__facts dt { color: var(--muted); }
+.brief__facts dd { margin: 0; color: var(--ink); }
+.brief__group { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.brief__group h3 { font-size: 12px; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; }
+.brief__group--owe h3 { color: var(--warn); }
+.brief__group--out h3 { color: var(--bad); }
+.mini { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; border-radius: var(--radius-md); background: var(--warn-bg); }
+.brief__group--out .mini { background: var(--bad-bg); }
+.mini > .atl-icon { margin-top: 2px; color: var(--ink-2); }
+.mini__text { flex: 1 1 auto; min-width: 0; }
+.mini__title { display: block; font-size: 14px; font-weight: 500; color: var(--ink); }
+.mini__sub { display: block; font-size: 12px; color: var(--muted); }
+.mini__when { flex: none; font-size: 12px; font-weight: 600; color: var(--warn); }
+.brief__group--out .mini__when { color: var(--bad); }
+
+/* ---- Needs you rows ---- */
+.need { display: flex; flex-direction: column; gap: 8px; padding: var(--space-5) var(--space-8); border-top: 1px solid var(--line-soft); }
+.need:first-child { border-top: 0; }
+.need__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.need__title { display: flex; align-items: flex-start; gap: 8px; font-size: 15px; font-weight: 500; }
+.need__title .atl-icon { margin-top: 3px; width: 14px; height: 14px; }
+.need__meta { font-size: 12px; color: var(--muted); }
+.need__note { font-size: 13px; line-height: 1.45; color: var(--ink-2); }
+.need .atl-actions { margin-top: 4px; }
+@media (max-width: 40rem) { .need { padding: var(--space-4) var(--space-6); } }
+
+/* ---- Top priorities: the night card; only #1 takes ember ---- */
+.prio-card { padding: var(--space-9) var(--space-8); display: flex; flex-direction: column; gap: var(--space-4); }
+.prio-card .kicker-row .overline, .prio-card .kicker-row .meta { color: var(--night-muted); }
+.prio { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.prio li { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 4px 12px; padding: var(--space-5) var(--space-4); border-top: 1px solid var(--night-line); }
+.prio li:first-child { border-top: 0; background: var(--night-raised); border-radius: var(--radius-md); }
+.prio-n { grid-row: span 2; font-size: 30px; line-height: 1; font-weight: 200; color: var(--night-muted); }
+.prio li:first-child .prio-n { color: var(--accent-on-night); }
+.prio-title { display: flex; align-items: flex-start; gap: 8px; font-size: 16px; font-weight: 500; color: var(--night-text); }
+.prio-title .atl-icon { margin-top: 3px; width: 14px; height: 14px; color: var(--night-muted); }
+.prio-why { font-size: 13px; line-height: 1.45; color: var(--night-muted); }
+
+/* ---- Overdue: age bar and people, oldest first ---- */
+.od { padding: var(--space-8); display: flex; flex-direction: column; gap: var(--space-4); }
+.od__kicker { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.24em; color: var(--bad); }
+.od__kicker .atl-icon { width: 13px; height: 13px; }
+.od__bar { display: flex; height: 10px; gap: 3px; border-radius: var(--radius-pill); overflow: hidden; }
+.od__bar i { display: block; height: 100%; }
+.od__legend { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 13px; color: var(--ink-2); }
+.od__legend span { display: inline-flex; align-items: center; gap: 7px; }
+.od__legend i { width: 9px; height: 9px; border-radius: 3px; }
+.age1 { background: #e9a9b4; } .age2 { background: #c2566a; } .age3 { background: var(--bad); }
+:root[data-theme="dark"] .age3 { background: #a83a4c; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .age3 { background: #a83a4c; } }
+.people { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.person { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 4px 14px; padding: 14px 0; border-top: 1px solid var(--line-soft); }
+.person:first-child { border-top: 0; }
+.person .atl-avatar { grid-row: span 3; }
+.person__name { font-size: 15px; font-weight: 600; }
+.person__name span { font-weight: 400; color: var(--muted); font-size: 13px; }
+.person__items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.person__items li { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 13px; color: var(--ink-2); }
+.person__items .atl-icon { width: 11px; height: 11px; }
+.late { font-weight: 600; color: var(--bad); }
+.late--soft { color: #a5384b; }
+:root[data-theme="dark"] .late--soft { color: var(--bad); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .late--soft { color: var(--bad); } }
+.soon { font-weight: 600; color: var(--warn); }
+.person .atl-actions { margin-top: 4px; }
+.person .atl-btn { min-height: 36px; padding: 0 14px; font-size: 13px; }
+
+/* ---- Below the columns: while away, worth knowing, this week, coming up ---- */
 .notes { margin: 0; padding-left: 18px; display: grid; gap: 6px; max-width: var(--measure); }
-/* This week: the seven-day strip */
 .week-wrap { overflow-x: auto; padding: 2px; }
-.week { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, minmax(96px, 1fr)); gap: var(--space-2); min-width: 700px; }
-.day { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 12px; display: grid; gap: 8px; align-content: start; min-width: 0; }
-.day[data-today="1"] { border: 2px solid var(--ink); padding: 11px; }
-.day[data-off="1"] { background: transparent; border-style: dashed; color: var(--muted); }
-.day-name { font-size: 13px; line-height: 18px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
-.day-num { font-family: var(--font-display); font-size: 28px; line-height: 28px; font-weight: 500; color: var(--ink); }
-.load { height: 48px; background: var(--sunken); border-radius: var(--radius-sm); display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; }
-.load i { display: block; background: var(--neutral-dot); }
-.day[data-heavy="1"] .load i { background: var(--warn-dot); }
-.day-hrs { font-size: 13px; line-height: 18px; color: var(--muted); }
-.day-hrs b { color: var(--ink); font-weight: 600; }
+.week { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, minmax(110px, 1fr)); gap: var(--space-3); min-width: 790px; }
+.wday { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-card-sm); padding: 16px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.wday[data-today="1"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.wday[data-off="1"] { background: transparent; border-style: dashed; color: var(--muted); }
+.wday-name { font-size: 12px; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--muted); }
+.wday-num { font-size: 32px; line-height: 1; font-weight: 200; letter-spacing: -0.03em; color: var(--ink); }
+.load { height: 6px; background: var(--sunken); border-radius: var(--radius-pill); overflow: hidden; }
+.load i { display: block; height: 100%; background: var(--ink); border-radius: var(--radius-pill); }
+.wday[data-heavy="1"] .load i { background: var(--warn-mark); }
+.wday-hrs { font-size: 12px; line-height: 1.5; color: var(--muted); }
+.wday-hrs b { color: var(--ink); font-weight: 600; }
 .pins { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
-.pin { font-size: 12px; line-height: 16px; padding: 3px 8px; border-radius: var(--radius-sm); background: var(--neutral-bg); color: var(--ink-2); overflow-wrap: break-word; hyphens: auto; }
+.pin { font-size: 12px; line-height: 1.35; padding: 4px 9px; border-radius: 10px; background: var(--neutral-bg); color: var(--ink-2); overflow-wrap: break-word; hyphens: auto; }
 .pin[data-tone="owe"] { background: var(--bad-bg); color: var(--bad); }
-.pin[data-tone="star"] { background: var(--accent-soft); color: var(--accent); }
+.pin[data-tone="star"] { background: var(--info-bg); color: var(--info); }
 .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; color: var(--muted); }
 .legend span { display: inline-flex; align-items: center; gap: 6px; }
-.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; }
-.legend .lg-meet { background: var(--neutral-dot); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; }
+.legend .lg-meet { background: var(--ink); }
 .legend .lg-owe { background: var(--bad-bg); border: 1px solid var(--bad); }
-.legend .lg-star { background: var(--accent-soft); border: 1px solid var(--accent); }
+.legend .lg-star { background: var(--info-bg); border: 1px solid var(--info); }
 .week-free { font-size: 14px; color: var(--ink-2); }
 .week-free b { color: var(--ink); font-weight: 600; }
+.guide-link { display: flex; align-items: center; gap: 12px; padding: var(--space-5) var(--space-7); border: 1px solid var(--line); border-radius: var(--radius-card-sm); background: var(--surface); font-size: 14px; color: var(--ink-2); }
+.guide-link .atl-icon { color: var(--ink); }
+.guide-link a { margin-left: auto; font-weight: 600; color: var(--ink); }
 </style>
 <style id="atlas-theme">{{ATLAS_THEME_CSS}}</style>
 </head>
@@ -54,152 +153,306 @@
 <script id="atlas-page-js">
 (function () {
   var N = window.Atlas, h = N.h, L = N.list;
+  var S = 1.6;                 /* the timeline's scale: 1.6px a minute */
+  var picked = null;           /* the block whose brief is open; kept across live repaints */
 
   function hrs(x) { return (Math.round((x || 0) * 10) / 10) + " h"; }
-  function mins(start, end) {
-    var a = Date.parse(start), b = Date.parse(end);
-    if (isNaN(a) || isNaN(b) || b <= a) return null;
-    var m = Math.round((b - a) / 60000);
-    return m < 60 ? m + " min" : (m % 60 ? hrs(m / 60) : (m / 60) + " h");
+  /* Minutes since midnight in the user's time zone. */
+  function mins(s) {
+    var d = s instanceof Date ? s : new Date(s);
+    if (isNaN(d.getTime())) return null;
+    try {
+      var p = new Intl.DateTimeFormat("en-GB", { timeZone: N.meta.timezone || undefined, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(d);
+      var hh = 0, mm = 0;
+      p.forEach(function (x) { if (x.type === "hour") hh = +x.value; if (x.type === "minute") mm = +x.value; });
+      return hh * 60 + mm;
+    } catch (e) { return d.getHours() * 60 + d.getMinutes(); }
   }
+  function clock(m) { var hh = Math.floor(m / 60) % 24, mm = m % 60, h12 = hh % 12 || 12; return h12 + (mm ? ":" + (mm < 10 ? "0" : "") + mm : ""); }
+  function ampm(m) { var hh = Math.floor(m / 60) % 24; return clock(m) + (hh < 12 ? " am" : " pm"); }
   function overdue(c) { return c.status === "slipped" || (!!c.due && N.daysFromToday(c.due) < 0); }
+  function late(c) { var n = c.due ? -N.daysFromToday(c.due) : 0; return n > 0 ? n : 1; }
+  function lateText(n) { return n === 1 ? "1 day late" : n + " days late"; }
   function first(r) { return String(N.name(r) || "").split(" ")[0]; }
+  function idOf(r) { return r && (typeof r === "string" ? r : r.id); }
 
   N.page({ title: "Today" }, function (d, main) {
     var b = d.brief || {};
     var catchUp = b.kind === "catch-up";
+    var day = b.date || N.meta.as_of;
     var today = L(d.today), due = L(d.due), waiting = L(d.waiting_on);
     var acts = L(d.actions), asks = L(d.approvals), qs = L(d.questions), drafts = L(d.drafts);
-    var dueFilter = null;   /* "today" | "overdue" | null, from the stat tiles */
-    var dueRows = [];
+    var T = N.meta.truncated || {};
 
-    /* Order: needs you (only-you actions, approvals, questions, drafts), while you were away (catch-up),
-       top priorities, schedule, due and slipping (I owe beside Waiting on), worth knowing, this week, coming up. */
-
-    /* ================= Needs you ================= */
-    var cards = [];
-    acts.forEach(function (a) {
-      cards.push(N.card({ eyebrow: ["Only you can do this", "warn"], title: a.text, detail: a.how || null,
-        body: a.copy_text ? h("p", null, "The text to copy is on the ", N.pageLink("control-center", "Guide"), " page, or ask Atlas in chat.") : null,
-        actions: [N.request("I've done this", N.withId("I've done this: " + N.quote(a.text), a.id), "primary", true,
-          { kind: "mark_done", target: a.id, quoted: a.text })] }));
-    });
-    asks.forEach(function (a) {
-      cards.push(N.card({ eyebrow: ["Waiting for your OK", "warn"], title: a.action, detail: a.why || null,
-        actions: [N.request("Approve", N.withId("Approve " + N.quote(a.action), a.id), "primary", true, { kind: "approve", target: a.id, quoted: a.action }),
-          N.request("Decline", N.withId("Decline " + N.quote(a.action), a.id), "secondary", false, { kind: "decline", target: a.id, quoted: a.action })] }));
-    });
-    qs.forEach(function (q) {
-      cards.push(N.card({ eyebrow: ["Question from Atlas", "info"], title: q.text,
-        actions: [N.request("Answer in chat", N.withId("About your question " + N.quote(q.text) + ":", q.id), "secondary")] }));
-    });
-    drafts.forEach(function (x) {
-      cards.push(N.card({ eyebrow: ["Draft ready", "good"], title: x.title,
-        detail: [x.to ? "To " + x.to : null, x.where ? "In your " + x.where : null].filter(Boolean).join(" · "),
-        body: x.why ? h("p", null, N.rich(x.why)) : null,
-        actions: [N.request("Send it", N.withId("Send the draft " + N.quote(x.title), x.ref && x.ref.id), "primary", false,
-          x.approval ? { kind: "approve", target: x.approval.id, quoted: x.approval.action } : null),
-          N.request("Change it", N.withId("Change the draft " + N.quote(x.title), x.ref && x.ref.id), "secondary")] }));
-    });
-    var needsN = cards.length + ((N.meta.truncated || {}).approvals || 0) + ((N.meta.truncated || {}).questions || 0) + ((N.meta.truncated || {}).drafts || 0);
-    main.appendChild(N.section({ id: "needs", title: "Needs you", count: needsN || null,
-      note: needsN ? "Atlas won't do these until you say so. Each button copies a request for your Atlas chat." : null,
-      body: [needsN ? h("div", { class: "atl-grid" }, cards) : N.empty("Nothing needs you right now."),
-        N.more("approvals"), N.more("questions"), N.more("drafts")] }));
+    /* The now line follows the viewer's clock, and only on the brief's own day. */
+    var nowMin = N.dayKey(new Date().toISOString()) === day ? mins(new Date()) : null;
 
     if (catchUp && L(d.while_away).length) {
       main.appendChild(N.section({ id: "away", title: "While you were away", note: "What happened while you were out, most important first.",
         body: h("ul", { class: "notes" }, L(d.while_away).map(function (n) { return h("li", null, N.rich(n.text)); })), key: "while_away" }));
     }
 
-    /* ================= Top priorities ================= */
-    main.appendChild(N.section({ id: "priorities", title: "Top priorities", note: "Ranked against your goals, not just due dates.",
-      body: L(d.priorities).length ? h("ol", { class: "prio" }, L(d.priorities).map(function (p, i) {
-        return h("li", null, h("span", { class: "prio-n", "aria-hidden": "true" }, String(i + 1)),
-          h("p", { class: "prio-title" }, p.text), p.why ? h("p", { class: "prio-why" }, N.rich(p.why)) : null);
-      })) : N.empty("No priorities set for today.") }));
+    var left = h("div", { class: "atl-col" }), right = h("div", { class: "atl-col" });
+    main.appendChild(h("div", { class: "atl-cols" }, left, right));
 
-    /* ================= Schedule ================= */
-    var PREP_TONE = { ready: "good", planned: "info", none: "warn", not_needed: "neutral" };
-    var schedRows = today.map(function (e) {
-      var prep = e.prep || {}, dated = e.kind === "deadline" || e.kind === "milestone";
-      var len = !e.all_day && e.end ? mins(e.start, e.end) : null;
-      var when = e.all_day ? "All day" : N.time(e.start) + (len ? " · " + len : "");
-      return N.row({
-        title: e.title, tone: e.kind === "deadline" ? "bad" : prep.status === "none" ? "warn" : prep.status === "ready" ? "good" : null,
-        meta: [when, e.location, L(e.attendees).length ? "With " + L(e.attendees).map(N.name).join(", ") : null],
-        badge: dated ? N.badge(N.label(e.kind), e.kind === "deadline" ? "bad" : "accent") : prep.status ? N.badge(N.label(prep.status), PREP_TONE[prep.status]) : null,
-        detail: prep.summary || prep.todo || e.project ? function () {
-          return N.detail({
-            blocks: [prep.summary ? { heading: "Prep", nodes: N.para(prep.summary) } : null,
-              prep.todo ? { heading: "To prepare", nodes: N.para(prep.todo) } : null],
-            facts: [["Project", N.name(e.project)], ["Where", e.location]],
-            actions: [prep.status === "ready" ? N.request("Open the prep note", N.withId("Show me the prep note for " + N.quote(e.title), e.id), "secondary") : null,
-              N.request("Ask Atlas", N.withId("What do I need to know for " + N.quote(e.title) + "?", e.id), "ghost")]
-          });
-        } : null
-      });
+    /* ================= Your day ================= */
+    var meetings = [], allDay = [];
+    today.forEach(function (e) {
+      var s = mins(e.start), en = e.end ? mins(e.end) : null;
+      if (e.all_day || s == null || en == null || en <= s) allDay.push(e);
+      else meetings.push({ e: e, s: s, en: en });
     });
-    main.appendChild(N.section({ id: "schedule", title: "Schedule", count: today.length || null, key: "today",
-      note: "Today's meetings with whether prep is ready, and what's due today.",
-      body: N.listBox(schedRows, "No meetings or deadlines today.") }));
+    meetings.sort(function (a, b) { return a.s - b.s; });
+    var earlier = nowMin == null ? [] : meetings.filter(function (m) { return m.en <= nowMin; });
+    var ahead = meetings.filter(function (m) { return earlier.indexOf(m) === -1; });
+    var next = ahead.filter(function (m) { return nowMin == null || m.s >= nowMin; })[0] || null;
+    var current = nowMin == null ? null : ahead.filter(function (m) { return m.s <= nowMin && m.en > nowMin; })[0] || null;
 
-    /* ================= Due and slipping: I owe beside Waiting on ================= */
-    function badgeFor(c) {
-      if (c.status === "slipped" && !(c.due && N.daysFromToday(c.due) < 0)) return N.badge("Slipped", "bad");
-      if (overdue(c)) return N.badge(N.due(c.due), "bad");
-      if (c.due && N.daysFromToday(c.due) <= 1) return N.badge(N.due(c.due), "warn");
-      return N.badge(c.due ? N.due(c.due) : "No date");
+    /* Who each meeting is with, to pull in what's owed either way. */
+    function people(e) { var ids = {}; L(e.attendees).forEach(function (a) { var k = idOf(a); if (k) ids[k] = 1; }); return ids; }
+    function owedFor(e) {
+      var ids = people(e);
+      return { owe: due.filter(function (c) { return ids[idOf(c.counterparty)]; }), out: waiting.filter(function (c) { return ids[idOf(c.counterparty)]; }) };
     }
-    function cRow(c, owe) {
-      var other = c.counterparty;   /* on this page, the other person either way (daily-brief.contract.md) */
-      var row = N.row({
-        title: c.title, tone: overdue(c) ? "bad" : c.due && N.daysFromToday(c.due) <= 1 ? "warn" : null,
-        meta: [other ? (owe ? "For " : "From ") + N.name(other) : null, !owe && c.since ? "Asked " + N.date(c.since) : null, owe && c.priority ? N.label(c.priority) + " priority" : null],
-        badge: badgeFor(c),
-        action: owe ? N.request("Mark done", N.withId("Mark " + N.quote(c.title) + " as done", c.id), "secondary", true, { kind: "mark_done", target: c.id, quoted: c.title })
-          : N.request("Nudge " + first(other), N.withId("Draft a follow-up to " + N.name(other) + " about " + N.quote(c.title), c.id), "secondary", false, { kind: "nudge", target: c.id, quoted: c.title }),
-        detail: c.next_step ? function () {
-          return N.detail({ blocks: [{ heading: "Next step", nodes: N.para(c.next_step) }],
-            actions: [N.request("Ask Atlas", N.withId("Show me " + N.quote(c.title), c.id), "ghost")] });
-        } : null
+
+    var briefHolder = h("div");
+    function prepText(p) {
+      p = p || {};
+      var s = p.status ? N.label(p.status) : null;
+      return [s, p.summary || p.todo].filter(Boolean).join(" · ");
+    }
+    function mini(c, owe) {
+      var n = c.due ? N.daysFromToday(c.due) : null;
+      var when = overdue(c) ? lateText(late(c)) : c.due ? N.due(c.due) : null;
+      return h("div", { class: "mini" }, N.icon("commitment"),
+        h("span", { class: "mini__text" }, h("span", { class: "mini__title" }, c.title),
+          h("span", { class: "mini__sub" }, [owe ? "For " + N.name(c.counterparty) : N.name(c.counterparty), c.priority ? N.label(c.priority) : null].filter(Boolean).join(" · "))),
+        when ? h("span", { class: "mini__when" }, n === 0 && !overdue(c) ? "Due today" : when) : null);
+    }
+    function paintBrief() {
+      briefHolder.textContent = "";
+      var m = ahead.concat(earlier).filter(function (x) { return x.e.id === picked; })[0] || current || next || ahead[0] || earlier[earlier.length - 1];
+      if (!m) return;
+      var e = m.e, len = m.en - m.s, k;
+      if (current === m) k = "Now · until " + clock(m.en);
+      else if (nowMin != null && m.en <= nowMin) k = "Earlier today";
+      else if (m === next && nowMin != null) k = "Up next · " + (m.s - nowMin < 90 ? "in " + (m.s - nowMin) + " min" : "at " + clock(m.s));
+      else k = catchUp ? "On " + N.weekday(day) : "Later today";
+      var o = owedFor(e), prep = e.prep || {};
+      var facts = [["Project", e.project ? N.name(e.project) : null], ["Prep", prepText(prep) || null]].filter(function (f) { return f[1]; });
+      briefHolder.appendChild(h("section", { class: "atl-card brief", id: "brief", "aria-live": "polite", "aria-label": "Brief: " + e.title },
+          h("p", { class: "brief__kicker" }, h("span", null, k), h("span", null, clock(m.s) + "–" + clock(m.en) + " · " + len + " min")),
+          h("h2", { class: "atl-card__title" }, e.title),
+          [e.location, L(e.attendees).length ? "With " + L(e.attendees).map(N.name).join(", ") : null].filter(Boolean).length
+            ? h("p", { class: "brief__meta" }, [e.location, L(e.attendees).length ? "With " + L(e.attendees).map(N.name).join(", ") : null].filter(Boolean).join(" · ")) : null,
+          facts.length ? h("dl", { class: "brief__facts" }, facts.map(function (f) { return [h("dt", null, f[0]), h("dd", null, N.rich(f[1]))]; })) : null,
+          o.owe.length ? h("div", { class: "brief__group brief__group--owe" }, h("h3", null, "You owe for this"), o.owe.map(function (c) { return mini(c, true); })) : null,
+          o.out.length ? h("div", { class: "brief__group brief__group--out" }, h("h3", null, "Related · still out"), o.out.map(function (c) { return mini(c, false); })) : null,
+          h("div", { class: "atl-actions" }, N.prompt("Brief me for the " + N.time(e.start) + " " + e.title),
+            prep.status === "ready" ? N.request("Open the prep note", N.withId("Show me the prep note for " + N.quote(e.title), e.id), "secondary") : null)));
+    }
+
+    var tl = null;
+    if (ahead.length) {
+      var start = Math.floor(Math.min(ahead[0].s, nowMin != null ? nowMin : 1440) / 60) * 60;
+      var end = Math.ceil(Math.max.apply(null, ahead.map(function (m) { return m.en; })) / 60) * 60;
+      tl = h("div", { class: "tl", style: "height:" + Math.round((end - start) * S + 8) + "px" });
+      for (var t = start; t <= end; t += 60) tl.appendChild(h("div", { class: "tl-tick", style: "top:" + Math.round((t - start) * S) + "px", "aria-hidden": "true" }, h("span", null, ampm(t)), h("i")));
+      /* a strand down the hours, drawn the same way each refresh */
+      var r = N.rng(day || "today"), pts = [], H = 1000;
+      for (var j = 0; j <= 8; j++) pts.push([20 + (r() - 0.5) * 22, H * j / 8]);
+      var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("viewBox", "0 0 40 1000"); svg.setAttribute("preserveAspectRatio", "none"); svg.setAttribute("aria-hidden", "true"); svg.setAttribute("class", "tl-strand atl-strands");
+      [[1, 0.45], [0.5, 0.25]].forEach(function (w, i) {
+        var g = document.createElementNS("http://www.w3.org/2000/svg", "g"), p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        p.setAttribute("d", N.catmull(pts.map(function (q) { return [q[0] + (i ? (r() - 0.5) * 10 : 0), q[1]]; })));
+        p.setAttribute("stroke-width", String(w[0])); p.setAttribute("opacity", String(w[1]));
+        g.appendChild(p); svg.appendChild(g);
       });
-      dueRows.push({ el: row, late: overdue(c), today: !overdue(c) && N.daysFromToday(c.due) === 0, owe: owe });
-      return row;
-    }
-    var oweBox = N.listBox(due.map(function (c) { return cRow(c, true); }), "Nothing you owe is due in the next few days.");
-    var waitBox = N.listBox(waiting.map(function (c) { return cRow(c, false); }), "You're not waiting on anyone.");
-    var oweNone = h("p", { class: "empty", hidden: true }, "Nothing here matches."), waitNone = h("p", { class: "empty", hidden: true }, "Nothing here matches.");
-    var oweCount = h("span", { class: "count" }, String(N.total("due", due.length)));
-    var waitCount = h("span", { class: "count" }, String(N.total("waiting_on", waiting.length)));
-    var dueNote = h("p", { class: "sec-note", role: "status" }, "Due soon or overdue, either way.");
-    var dueSec = N.section({ id: "due", title: "Due and slipping",
-      body: [dueNote, h("div", { class: "cols" },
-        h("div", { class: "col" }, h("h3", { class: "sub" }, "I owe", oweCount), oweBox, oweNone, N.more("due")),
-        h("div", { class: "col" }, h("h3", { class: "sub" }, "Waiting on", waitCount), waitBox, waitNone, N.more("waiting_on")))] });
-    main.appendChild(dueSec);
-    function applyDue() {
-      var o = 0, w = 0;
-      dueRows.forEach(function (r) {
-        var ok = !dueFilter || (dueFilter === "overdue" ? r.late : r.today);
-        r.el.hidden = !ok; if (ok) { if (r.owe) o++; else w++; }
+      tl.appendChild(svg);
+      if (nowMin != null && nowMin >= start && nowMin <= end) {
+        tl.appendChild(h("div", { class: "tl-now", style: "top:" + Math.round((nowMin - start) * S - 5) + "px" }, h("i"), h("b"), h("span", null, "NOW · " + clock(nowMin))));
+      }
+      /* overlapping meetings share the width, side by side */
+      var lanes = [], groupEnd = -1, group = [];
+      function flush() { group.forEach(function (m) { m.n = group.reduce(function (n, x) { return Math.max(n, x.lane + 1); }, 1); }); group = []; }
+      ahead.forEach(function (m) {
+        if (m.s >= groupEnd) { flush(); lanes = []; }
+        var lane = 0; while (lanes[lane] != null && lanes[lane] > m.s) lane++;
+        lanes[lane] = m.en; m.lane = lane; group.push(m); groupEnd = Math.max(groupEnd, m.en);
       });
-      if (due.length) { oweBox.hidden = !!dueFilter && !o; oweNone.hidden = !(dueFilter && !o); }
-      if (waiting.length) { waitBox.hidden = !!dueFilter && !w; waitNone.hidden = !(dueFilter && !w); }
-      oweCount.textContent = String(dueFilter ? o : N.total("due", due.length));
-      waitCount.textContent = String(dueFilter ? w : N.total("waiting_on", waiting.length));
-      dueNote.textContent = dueFilter === "overdue" ? "Showing only what's overdue. Choose the tile again to show everything."
-        : dueFilter === "today" ? "Showing only what's due today. Choose the tile again to show everything." : "Due soon or overdue, either way.";
+      flush();
+      var btns = [];
+      ahead.forEach(function (m) {
+        var e = m.e, len = m.en - m.s, hgt = Math.max(30, len * S - 4), o = owedFor(e), nd = o.owe.length + o.out.length;
+        var prep = e.prep || {};
+        var btn = h("button", { type: "button", class: "tl-block" + (hgt < 46 ? " tl-block--short" : ""), "aria-pressed": "false",
+          "aria-label": e.title + ", " + clock(m.s) + " to " + clock(m.en) + (nd ? ", " + nd + " open items with these people" : ""),
+          style: "top:" + Math.round((m.s - start) * S + 2) + "px;height:" + Math.round(hgt) + "px;left:calc(var(--tl-gutter) + (100% - var(--tl-gutter)) * " + m.lane + " / " + m.n + ");width:calc((100% - var(--tl-gutter)) / " + m.n + " - " + (m.n > 1 ? 4 : 0) + "px)",
+          onclick: function () { picked = e.id; btns.forEach(function (x) { x.b.setAttribute("aria-pressed", String(x.id === picked)); }); paintBrief(); } },
+          N.icon("event"),
+          h("span", { class: "tl-block__text" }, h("span", { class: "tl-block__title" }, e.title),
+            h("span", { class: "tl-block__time" }, clock(m.s) + "–" + clock(m.en) + " · " + len + " min" + (prep.status ? " · " + N.label(prep.status) : ""))),
+          nd ? h("span", { class: "tl-due" }, nd + " open") : null,
+          m === current ? h("span", { class: "tl-tag" }, "NOW") : m === next && nowMin != null ? h("span", { class: "tl-tag" }, "UP NEXT") : null);
+        btns.push({ b: btn, id: e.id });
+        tl.appendChild(btn);
+      });
+      var sel = (ahead.concat(earlier).filter(function (x) { return x.e.id === picked; })[0] || current || next || ahead[0]).e.id;
+      picked = sel;
+      btns.forEach(function (x) { x.b.setAttribute("aria-pressed", String(x.id === sel)); });
     }
+    var hoursIn = meetings.reduce(function (n, m) { return n + (m.en - m.s); }, 0) / 60;
+    left.appendChild(h("section", { class: "day-sec", id: "schedule", "aria-labelledby": "schedule-h" },
+      h("div", { class: "kicker-row" }, h("h2", { class: "overline", id: "schedule-h" }, "Your day"),
+        h("span", { class: "meta" }, meetings.length ? meetings.length + (meetings.length === 1 ? " meeting · " : " meetings · ") + hrs(hoursIn) : "No meetings")),
+      allDay.length ? h("div", { class: "allday" }, allDay.map(function (e) {
+        return N.badge((e.kind === "deadline" ? "Deadline · " : e.kind === "milestone" ? "Milestone · " : "All day · ") + e.title, e.kind === "deadline" ? "bad" : e.kind === "milestone" ? "info" : null);
+      })) : null,
+      earlier.length ? h("div", { class: "earlier" }, earlier.map(function (m) {
+        return h("p", null, N.icon("done"), h("span", null, h("b", null, "Earlier · " + m.e.title), " · " + clock(m.s) + " to " + clock(m.en)));
+      })) : null,
+      tl || h("p", { class: "tl-quiet" }, meetings.length ? "No more meetings today." : "No meetings today. Your priorities have the day."),
+      N.more("today")));
+    left.appendChild(briefHolder);
+    paintBrief();
+
+    /* ================= Needs you ================= */
+    var needs = [];
+    function need(icon, kind, title, meta, note, actions) {
+      return { el: h("li", { class: "need" },
+        h("div", { class: "need__head" }, h("span", { class: "need__title" }, N.icon(icon), title), N.badge(kind[0], kind[1])),
+        meta ? h("span", { class: "need__meta" }, meta) : null,
+        note ? h("p", { class: "need__note" }, N.rich(note)) : null,
+        h("div", { class: "atl-actions" }, actions)), data: {} };
+    }
+    acts.forEach(function (a) {
+      needs.push(need("alert", ["Only you", "warn"], a.text, null,
+        a.copy_text ? h("span", null, a.how ? N.rich(a.how) + " " : "", "The text to copy is on the ", N.pageLink("control-center", "Guide"), " page.") : a.how,
+        [N.request("I've done this", N.withId("I've done this: " + N.quote(a.text), a.id), "primary", true, { kind: "mark_done", target: a.id, quoted: a.text })]));
+    });
+    asks.forEach(function (a) {
+      needs.push(need("pending", ["Your OK", "warn"], a.action, a.requested_on ? "Asked " + N.date(a.requested_on) : null, a.why,
+        [N.request("Approve", N.withId("Approve " + N.quote(a.action), a.id), "primary", true, { kind: "approve", target: a.id, quoted: a.action }),
+          N.request("Decline", N.withId("Decline " + N.quote(a.action), a.id), "secondary", false, { kind: "decline", target: a.id, quoted: a.action })]));
+    });
+    drafts.forEach(function (x) {
+      needs.push(need("draft", ["Draft", "good"], x.title, [x.to ? "To " + x.to : null, x.where ? "In your " + x.where : null].filter(Boolean).join(" · "),
+        [x.why, "Atlas sends it only from a chat, once you confirm."].filter(Boolean).join(" "),
+        [N.request("Approve", N.withId("Approve sending the draft " + N.quote(x.title), x.ref && x.ref.id), "primary", true,
+          x.approval ? { kind: "approve", target: x.approval.id, quoted: x.approval.action } : null),
+          N.request("Change it", N.withId("Change the draft " + N.quote(x.title), x.ref && x.ref.id), "secondary")]));
+    });
+    qs.forEach(function (q) {
+      needs.push(need("help", ["Question", "info"], q.text, null, null,
+        [N.request("Answer in chat", N.withId("About your question " + N.quote(q.text) + ":", q.id), "secondary")]));
+    });
+    var needsN = needs.length + (T.approvals || 0) + (T.questions || 0) + (T.drafts || 0);
+    left.appendChild(N.listCard({ id: "needs", title: "Needs you", count: needsN || null, items: needs, show: 4, noun: "",
+      note: needsN ? "Atlas won't do these until you say so." : null, empty: "Nothing needs you right now." }));
+    ["approvals", "questions", "drafts"].forEach(function (k) { var m = N.more(k); if (m) left.appendChild(m); });
+
+    /* ================= Top priorities: the night card ================= */
+    var pr = L(d.priorities);
+    right.appendChild(h("section", { class: "atl-night prio-card", id: "priorities", "aria-labelledby": "prio-h" },
+      h("div", { class: "kicker-row" }, h("h2", { class: "overline", id: "prio-h" }, "Top priorities"), h("span", { class: "meta" }, "Ranked against your goals")),
+      pr.length ? h("ol", { class: "prio" }, pr.map(function (p, i) {
+        return h("li", null, h("span", { class: "prio-n", "aria-hidden": "true" }, String(i + 1)),
+          h("p", { class: "prio-title" }, N.icon(/^projects\//.test(idOf(p.ref) || "") ? "project" : "commitment"), p.text),
+          p.why ? h("p", { class: "prio-why" }, N.rich(p.why)) : null);
+      })) : h("p", { class: "prio-why" }, "No priorities set for today.")));
+
+    /* ================= Overdue, by person, oldest first ================= */
+    var od = due.filter(overdue).map(function (c) { return { c: c, owe: true }; })
+      .concat(waiting.filter(overdue).map(function (c) { return { c: c, owe: false }; }));
+    var counts = d.counts || {};
+    if (od.length) {
+      var oweN = od.filter(function (x) { return x.owe; }).length, outN = od.length - oweN;
+      var total = typeof counts.overdue === "number" ? Math.max(counts.overdue, od.length) : od.length;
+      var ages = [od.filter(function (x) { return late(x.c) === 1; }).length, od.filter(function (x) { var n = late(x.c); return n >= 2 && n <= 6; }).length, od.filter(function (x) { return late(x.c) >= 7; }).length];
+      var byP = {}, order = [];
+      od.forEach(function (x) { var k = idOf(x.c.counterparty) || N.name(x.c.counterparty) || "?"; if (!byP[k]) { byP[k] = []; order.push(k); } byP[k].push(x); });
+      var groups = order.map(function (k) { var it = byP[k].sort(function (a, b) { return late(b.c) - late(a.c); }); return { who: it[0].c.counterparty, items: it, oldest: late(it[0].c) }; })
+        .sort(function (a, b) { return b.oldest - a.oldest || b.items.length - a.items.length; });
+      var allPeople = false, plist = h("ul", { class: "people" }), more = h("div");
+      var paintPeople = function () {
+        plist.textContent = ""; more.textContent = "";
+        (allPeople ? groups : groups.slice(0, 5)).forEach(function (g) {
+          var theirs = !g.items[0].owe, oldest = g.items[0].c;
+          plist.appendChild(h("li", { class: "person" }, N.avatar(N.name(g.who), theirs),
+            h("p", { class: "person__name" }, N.name(g.who) || "Someone", h("span", null, " · " + g.items.length + " · " + (theirs ? "they owe you" : "you owe"))),
+            h("ul", { class: "person__items" }, g.items.map(function (x) {
+              var n = late(x.c);
+              return h("li", null, N.icon("commitment"), h("span", null, x.c.title), h("span", { class: "late" + (n < 7 ? " late--soft" : "") }, lateText(n)),
+                x.owe ? N.request("Mark done", N.withId("Mark " + N.quote(x.c.title) + " as done", x.c.id), "ghost", true, { kind: "mark_done", target: x.c.id, quoted: x.c.title }) : null);
+            })),
+            theirs ? h("div", { class: "atl-actions" }, N.request("Nudge " + first(g.who), N.withId("Draft one follow-up to " + N.name(g.who) + " covering " + g.items.map(function (x) { return N.quote(x.c.title); }).join(", "), oldest.id), "secondary", false, { kind: "nudge", target: oldest.id, quoted: oldest.title })) : null));
+        });
+        if (groups.length > 5) more.appendChild(N.button({ label: allPeople ? "Show fewer" : "All " + groups.length + " people", icon: allPeople ? "collapse" : "expand",
+          onClick: function () { allPeople = !allPeople; paintPeople(); } }));
+      };
+      paintPeople();
+      right.appendChild(h("section", { class: "atl-card od", id: "overdue", "aria-labelledby": "od-h" },
+        h("div", { class: "kicker-row" }, h("h2", { class: "od__kicker", id: "od-h" }, N.icon("alert"), total + " OVERDUE"),
+          h("span", { class: "meta" }, oweN + " you owe · " + outN + " they owe you")),
+        h("div", { class: "od__bar", role: "img", "aria-label": "Overdue by age: " + ages[0] + " one day, " + ages[1] + " two to six days, " + ages[2] + " seven days or more" },
+          ages.map(function (n, i) { return n ? h("i", { class: "age" + (i + 1), style: "flex:" + n }) : null; })),
+        h("p", { class: "od__legend", "aria-hidden": "true" }, [["1 day", 0], ["2–6 days", 1], ["7+ days", 2]].map(function (a) { return h("span", null, h("i", { class: "age" + (a[1] + 1) }), h("b", null, String(ages[a[1]])), " " + a[0]); })),
+        h("p", { class: "overline" }, "By person · oldest first"), plist, more,
+        h("div", null, N.prompt("Which overdue items can I drop?"))));
+    }
+
+    /* ================= Due soon (what you owe, not yet late) ================= */
+    var soon = due.filter(function (c) { return !overdue(c); });
+    if (soon.length || T.due) {
+      right.appendChild(N.listCard({ id: "due", title: "Due soon", count: soon.length + (T.due || 0), noun: "due soon",
+        items: soon.map(function (c) {
+          var n = c.due ? N.daysFromToday(c.due) : null;
+          return { data: c, el: N.row({ title: c.title, tone: n != null && n <= 1 ? "warn" : null,
+            meta: [c.counterparty ? "For " + N.name(c.counterparty) : null, c.priority ? N.label(c.priority) + " priority" : null],
+            badge: N.badge(c.due ? N.due(c.due) : "No date", n != null && n <= 1 ? "warn" : null),
+            action: N.request("Mark done", N.withId("Mark " + N.quote(c.title) + " as done", c.id), "secondary", true, { kind: "mark_done", target: c.id, quoted: c.title }),
+            detail: c.next_step ? function () { return N.detail({ blocks: [{ heading: "Next step", nodes: N.para(c.next_step) }] }); } : null }) };
+        }) }));
+    }
+
+    /* ================= Waiting on, by person, one nudge each ================= */
+    if (waiting.length) {
+      var wb = {}, wo = [];
+      waiting.forEach(function (c) { var k = idOf(c.counterparty) || "?"; if (!wb[k]) { wb[k] = []; wo.push(k); } wb[k].push(c); });
+      var wgroups = wo.map(function (k) {
+        var it = wb[k].sort(function (a, b) { return (overdue(b) ? late(b) : -99) - (overdue(a) ? late(a) : -99) || String(a.due || "9").localeCompare(String(b.due || "9")); });
+        return { who: it[0].counterparty, items: it };
+      }).sort(function (a, b) { return b.items.filter(overdue).length - a.items.filter(overdue).length || b.items.length - a.items.length; });
+      right.appendChild(N.listCard({ id: "waiting", title: "Waiting on", count: waiting.length + (T.waiting_on || 0), noun: "people", show: 4,
+        note: wgroups.length + (wgroups.length === 1 ? " person" : " people") + " · one nudge each",
+        items: wgroups.map(function (g) {
+          var lateN = g.items.filter(overdue).length, todayN = g.items.filter(function (c) { return !overdue(c) && N.daysFromToday(c.due) === 0; }).length;
+          var top = g.items[0];
+          return { data: g, el: h("li", { class: "need person-out" },
+            h("div", { class: "person" }, N.avatar(N.name(g.who), true),
+              h("p", { class: "person__name" }, N.name(g.who) || "Someone",
+                h("span", null, " · " + g.items.length + (g.items.length === 1 ? " item" : " items") + (lateN ? " · " + lateN + " late" : "") + (todayN ? " · " + todayN + " due today" : ""))),
+              h("ul", { class: "person__items" }, g.items.map(function (c) {
+                var n = c.due ? N.daysFromToday(c.due) : null;
+                return h("li", null, N.icon("commitment"), h("span", null, c.title),
+                  overdue(c) ? h("span", { class: "late" + (late(c) < 7 ? " late--soft" : "") }, lateText(late(c)))
+                    : h("span", { class: n === 0 ? "soon" : "" }, c.due ? N.due(c.due) : "No date"));
+              })),
+              h("div", { class: "atl-actions" }, N.request("Nudge " + first(g.who), N.withId("Draft one follow-up to " + N.name(g.who) + " covering " + g.items.map(function (c) { return N.quote(c.title); }).join(", "), top.id), "secondary", false, { kind: "nudge", target: top.id, quoted: top.title })))) };
+        }) }));
+    }
+
+    right.appendChild(h("p", { class: "guide-link" }, N.icon("automation"), h("span", null, "How Atlas is running, and what it knows."), N.pageLink("control-center", "Guide")));
 
     /* ================= Worth knowing ================= */
     if (L(d.insights).length) {
       main.appendChild(N.section({ id: "insights", title: "Worth knowing", note: "Patterns Atlas noticed, with the reasoning.",
         body: h("div", { class: "atl-grid" }, L(d.insights).map(function (i) {
           var draft = i.draft && i.draft.where;
-          return N.card({ eyebrow: draft ? ["Draft ready", "good"] : ["Atlas noticed", "accent"], title: i.text, detail: i.why || null,
+          return N.card({ eyebrow: draft ? ["Draft ready", "good"] : ["Atlas noticed", "info"], title: i.text, detail: i.why || null,
             body: [i.suggested_action ? h("p", null, h("b", null, "Suggested: "), N.rich(i.suggested_action)) : null,
-              draft ? h("p", null, "Draft " + (i.draft.to ? "to " + i.draft.to + " " : "") + "in your " + i.draft.where + ". Review and send it yourself, or say “send it” in chat.") : null,
+              draft ? h("p", null, "Draft " + (i.draft.to ? "to " + i.draft.to + " " : "") + "in your " + i.draft.where + ". Review it, then approve sending in chat.") : null,
               L(i.refs).length ? h("p", { class: "atl-card__detail" }, "Based on ", N.refs(i.refs)) : null],
             actions: [i.suggested_action ? N.request("Do this", N.withId("Let's do the suggested action " + N.quote(i.suggested_action), i.id), "primary") : null,
               N.request("Not useful", N.withId("That insight wasn't useful: " + N.quote(i.text), i.id), "secondary", false,
@@ -210,22 +463,22 @@
     /* ================= This week ================= */
     var wk = d.week || {}, days = L(wk.days), cap = wk.work_hours_per_day || 10;
     if (days.length) {
-      var strip = h("ul", { class: "week", "aria-label": "The next seven days" }, days.map(function (day) {
-        var off = day.work_day === false, mh = day.meeting_hours || 0, n = N.daysFromToday(day.date);
-        var its = L(day.due), more = (N.meta.truncated || {})["week." + day.date] || 0;
+      var strip = h("ul", { class: "week", "aria-label": "The next seven days" }, days.map(function (dd) {
+        var off = dd.work_day === false, mh = dd.meeting_hours || 0, n = N.daysFromToday(dd.date);
+        var its = L(dd.due), more = T["week." + dd.date] || 0;
         var dueWords = its.map(function (x) {
           return (x.kind === "milestone" ? "milestone: " : x.kind === "deadline" ? "deadline: " : x.direction === "waiting_on" ? "from " + N.name(x.counterparty) + ": " : "you owe: ") + x.title;
         });
-        var label = (n === 0 ? "Today, " : "") + N.longDate(day.date) + ". " +
-          (off ? "Not a work day" : (day.meetings != null ? day.meetings + (day.meetings === 1 ? " meeting, " : " meetings, ") : "") + hrs(mh) + " in meetings, " + hrs(day.free_hours) + " free") +
+        var label = (n === 0 ? "Today, " : "") + N.longDate(dd.date) + ". " +
+          (off ? "Not a work day" : (dd.meetings != null ? dd.meetings + (dd.meetings === 1 ? " meeting, " : " meetings, ") : "") + hrs(mh) + " in meetings, " + hrs(dd.free_hours) + " free") +
           (dueWords.length ? ". Due: " + dueWords.join("; ") : "") + (more ? "; and " + more + " more" : "") + ".";
-        return h("li", { class: "day", "aria-label": label, "data-today": n === 0 ? "1" : null, "data-off": off ? "1" : null,
+        return h("li", { class: "wday", "aria-label": label, "data-today": n === 0 ? "1" : null, "data-off": off ? "1" : null,
             "data-heavy": !off && mh / cap > 0.6 ? "1" : null },
-          h("span", { class: "day-name", "aria-hidden": "true" }, n === 0 ? "Today" : N.dayName(day.date).slice(0, 3)),
-          h("span", { class: "day-num", "aria-hidden": "true" }, N.date(day.date).replace(/^\D+/, "")),
-          off ? h("span", { class: "day-hrs", "aria-hidden": "true" }, "Day off")
-            : [h("span", { class: "load", "aria-hidden": "true" }, h("i", { style: "height:" + Math.min(100, Math.round(mh / cap * 100)) + "%" })),
-              h("span", { class: "day-hrs", "aria-hidden": "true" }, h("b", null, hrs(mh)), " meetings", h("br"), h("b", null, hrs(day.free_hours)), " free")],
+          h("span", { class: "wday-name", "aria-hidden": "true" }, n === 0 ? "Today" : N.dayName(dd.date).slice(0, 3)),
+          h("span", { class: "wday-num", "aria-hidden": "true" }, N.date(dd.date).replace(/^\D+/, "")),
+          off ? h("span", { class: "wday-hrs", "aria-hidden": "true" }, "Day off")
+            : [h("span", { class: "load", "aria-hidden": "true" }, h("i", { style: "width:" + Math.min(100, Math.round(mh / cap * 100)) + "%" })),
+              h("span", { class: "wday-hrs", "aria-hidden": "true" }, h("b", null, hrs(mh)), " meetings", h("br"), h("b", null, hrs(dd.free_hours)), " free")],
           its.length || more ? h("ul", { class: "pins", "aria-hidden": "true" }, its.map(function (x) {
               var tone = x.kind === "milestone" ? "star" : (x.kind === "deadline" || x.direction === "i_owe") ? "owe" : null;
               return h("li", { class: "pin", "data-tone": tone }, x.title);
@@ -247,35 +500,16 @@
       main.appendChild(N.section({ id: "coming", title: "Coming up", key: "milestones", note: "Milestones and deadlines in the next two months.",
         body: N.listBox(ms.map(function (m) {
           var dl = m.kind === "deadline";
-          return N.row({ title: m.title, tone: dl ? "bad" : null,
+          return N.row({ title: m.title, tone: dl ? "bad" : "info",
             meta: [N.weekday(m.date) + ", " + N.rel(m.date), m.project ? N.name(m.project) : null, m.note ? N.rich(m.note) : null],
-            badge: N.badge(dl ? "Deadline" : "Milestone", dl ? "bad" : "accent") });
+            badge: N.badge(dl ? "Deadline" : "Milestone", dl ? "bad" : "info") });
         }), "No milestones or deadlines in the next two months.") }));
     }
 
-    /* ================= Stat tiles: each one goes somewhere ================= */
-    var meetings = today.filter(function (e) { return e.kind !== "deadline" && e.kind !== "milestone"; });
-    var prepped = meetings.filter(function (e) { return (e.prep || {}).status === "ready"; }).length;
-    var counts = d.counts || {};   /* covers items cut to fit the budget; without it, count what's shown */
-    var dueToday = typeof counts.due_today === "number" ? counts.due_today
-      : due.concat(waiting).filter(function (c) { return c.status !== "slipped" && N.daysFromToday(c.due) === 0; }).length;
-    var lateOwe = due.filter(overdue).length, lateWait = waiting.filter(overdue).length;
-    var late = typeof counts.overdue === "number" ? counts.overdue : lateOwe + lateWait;
-    function go(id) { var el = document.getElementById(id); if (el && el.scrollIntoView) el.scrollIntoView({ block: "start" }); }
     return {
       title: catchUp ? "Catch-up Brief" : "Today",
-      dateLine: catchUp && b.away ? "Away " + N.date(b.away.start) + " to " + N.date(b.away.end) : N.longDate(b.date || N.meta.as_of),
-      lead: b.headline,
-      stats: [
-        { key: "needs", jump: "needs", value: needsN, label: ["needs you", "need you"] },
-        { key: "meetings", jump: "schedule", value: meetings.length, label: (meetings.length === 1 ? "meeting" : "meetings") + (prepped ? ", " + prepped + " prepped" : "") },
-        { key: "today", filter: true, value: dueToday, label: "due today" },
-        { key: "overdue", filter: true, tone: "bad", value: late, label: late && lateOwe + lateWait === late ? "overdue: " + lateOwe + " you owe, " + lateWait + " waiting" : "overdue" }],
-      onStat: function (key) {
-        dueFilter = key === "today" || key === "overdue" ? key : null;
-        applyDue();
-        if (key) go("due");
-      }
+      dateLine: catchUp && b.away ? "Away " + N.date(b.away.start) + " to " + N.date(b.away.end) : "Your brief · " + N.longDate(day),
+      lead: b.headline
     };
   });
 })();

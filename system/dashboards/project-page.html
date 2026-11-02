@@ -9,10 +9,10 @@
 <style id="atlas-base">{{ATLAS_BASE_CSS}}</style>
 <style id="atlas-page">
 .desc { display: grid; gap: var(--space-2); max-width: var(--measure); color: var(--ink-2); }
-.callout { display: grid; gap: 6px; padding: var(--space-4) var(--space-5); background: var(--sunken); border-radius: var(--radius-md); }
+.callout { display: grid; gap: 6px; padding: var(--space-5) var(--space-7); background: var(--sunken); border-radius: var(--radius-lg); }
 .callout b { font-weight: 600; }
 /* Timeline: start to target, today marked, dated items placed by date */
-.track-wrap { padding: var(--space-5); border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); display: grid; gap: var(--space-3); }
+.track-wrap { padding: var(--space-7) var(--space-8); border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface); display: grid; gap: var(--space-3); }
 .track { position: relative; height: 44px; margin: 0 8px; }
 .track-line { position: absolute; left: 0; right: 0; top: 21px; height: 2px; background: var(--line-strong); border-radius: 2px; }
 .track-done { position: absolute; left: 0; top: 20px; height: 4px; background: var(--ink); border-radius: 2px; }
@@ -27,11 +27,11 @@
 .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; color: var(--muted); }
 .legend span { display: inline-flex; align-items: center; gap: 6px; }
 .people { display: flex; flex-wrap: wrap; gap: var(--space-2); list-style: none; margin: 0; padding: 0; }
-.people li { display: grid; padding: 8px 14px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); }
+.people li { display: grid; padding: 10px 16px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
 .people .role { color: var(--muted); font-size: 13px; }
 .cols { display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); align-items: start; }
 .col { display: flex; flex-direction: column; gap: var(--space-3); min-width: 0; }
-details.fold { border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
+details.fold { border: 1px solid var(--line); border-radius: var(--radius-card-sm); background: var(--surface); }
 details.fold > summary { min-height: 52px; display: flex; align-items: center; gap: var(--space-2); padding: 0 20px; cursor: pointer; font-weight: 500; list-style: none; }
 details.fold > summary::-webkit-details-marker { display: none; }
 details.fold > summary::after { content: ""; margin-left: auto; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); }
@@ -117,7 +117,7 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
         seen[g] = 1; kids.push(N.group(g));
         inG.forEach(function (x) { kids.push(N.row({ title: x.title, tone: x.tone, meta: [N.weekday(x.date) + ", " + N.rel(x.date)], badge: N.badge(x.kind, x.tone === "bad" ? "bad" : x.tone === "info" ? "info" : "neutral") })); });
       });
-      if (endK) { kids.push(N.group("Target")); kids.push(N.row({ title: "Target date", tone: "accent", meta: [N.weekday(endK) + ", " + N.rel(endK)], badge: N.badge("Target", "accent") })); }
+      if (endK) { kids.push(N.group("Target")); kids.push(N.row({ title: "Target date", tone: "info", meta: [N.weekday(endK) + ", " + N.rel(endK)], badge: N.badge("Target", "info") })); }
       main.appendChild(N.section({ id: "timeline", title: "Timeline", note: "From the start to the target date, with today marked.",
         body: [h("div", { class: "track-wrap" },
             h("p", { class: "track-ends" }, h("span", null, "Start ", h("b", null, startK ? N.date(startK) : "not set")), h("span", null, "Target ", h("b", null, endK ? N.date(endK) : "not set"))),
@@ -191,7 +191,7 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
           return N.row({ title: q.title, tone: "info", meta: [q.asked_on ? "Asked " + N.date(q.asked_on) : null], badge: N.badge("Question", "info"),
             action: N.request("Answer", N.withId("About " + N.quote(q.title) + ":", q.id), "secondary", false, { kind: "answer", target: q.id, quoted: q.title, input: "text" }) });
         }).concat(ideas.map(function (i) {
-          return N.row({ title: i.title, badge: N.badge("Idea: " + N.label(i.status).toLowerCase(), "accent") });
+          return N.row({ title: i.title, badge: N.badge("Idea: " + N.label(i.status).toLowerCase(), "info") });
         }))), key: "questions" }));
       if (N.more("ideas")) main.lastChild.querySelector(".sec-body").appendChild(N.more("ideas"));
     }

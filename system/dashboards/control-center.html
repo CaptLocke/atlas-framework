@@ -8,66 +8,105 @@
 <title>Guide</title>
 <style id="atlas-base">{{ATLAS_BASE_CSS}}</style>
 <style id="atlas-page">
-.part { display: flex; flex-direction: column; gap: var(--space-6); }
-.part-head { display: flex; flex-direction: column; gap: 4px; padding-top: var(--space-2); border-top: 1px solid var(--line); }
-.part-head h2 { font-size: 30px; line-height: 34px; letter-spacing: -0.01em; padding-top: var(--space-4); }
-.part-head p { color: var(--muted); font-size: 14px; }
-.block { display: flex; flex-direction: column; gap: var(--space-3); min-width: 0; scroll-margin-top: calc(var(--header-h, 66px) + 16px); }
-@media (max-width: 40rem) { .block { scroll-margin-top: 16px; } }
-.block-tools { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; justify-content: space-between; }
-.small { font-size: 14px; color: var(--muted); }
-/* Status in one line */
-.status { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); padding: var(--space-5); border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
-.status-word { font-family: var(--font-display); font-size: 22px; line-height: 27px; font-weight: 500; }
-.status-text { flex: 1 1 18rem; min-width: 0; color: var(--ink-2); }
-.status .atl-dot { width: 12px; height: 12px; }
-.copy-text { margin: 0; padding: 12px 14px; background: var(--sunken); border-radius: var(--radius-md); font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 13px; line-height: 19px; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--ink); }
-/* Automations table */
-.tbl-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
-.tbl { width: 100%; border-collapse: collapse; font-size: 15px; }
-.tbl th, .tbl td { text-align: left; padding: 12px 20px; border-top: 1px solid var(--line-soft); vertical-align: top; }
-.tbl thead th { border-top: 0; background: var(--sunken); font-size: 13px; line-height: 18px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
-.tbl td:first-child { font-weight: 500; }
-.tbl .small { display: block; margin-top: 2px; font-weight: 400; }
-.run { display: inline-flex; align-items: center; gap: 8px; font-weight: 500; }
-@media (max-width: 34rem) {
-  .tbl thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-  .tbl tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; padding: 12px 16px; border-top: 1px solid var(--line-soft); }
-  .tbl tbody tr:first-child { border-top: 0; }
-  .tbl td { border: 0; padding: 0; }
-  .tbl td[data-wide] { grid-column: 1 / -1; }
-  .tbl td[data-label]::before { content: attr(data-label) " "; color: var(--muted); font-weight: 400; }
+/* ---- A sticky section list on the left, the sections on the right ---- */
+.guide { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: var(--space-10); align-items: start; }
+.side { position: sticky; top: calc(var(--header-h, 74px) + 24px); display: flex; flex-direction: column; gap: 2px; }
+.side a { display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 14px; border-radius: var(--radius-pill); color: var(--ink-2); font-size: 14px; font-weight: 500; text-decoration: none; }
+.side a:hover { background: var(--sunken-hover); color: var(--ink); }
+.side a .atl-icon { width: 14px; height: 14px; }
+.side a b { margin-left: auto; font-weight: 600; color: var(--warn); }
+.parts { display: flex; flex-direction: column; gap: var(--space-11); min-width: 0; }
+.part { display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; scroll-margin-top: calc(var(--header-h, 74px) + 24px); }
+.part-head h2 { font-size: clamp(28px, 3vw, 34px); line-height: 1.15; font-weight: 300; letter-spacing: -0.02em; }
+.part-head p { margin-top: 6px; font-size: 14px; color: var(--muted); }
+@media (max-width: 60rem) {
+  .guide { grid-template-columns: minmax(0, 1fr); gap: var(--space-7); }
+  .side { position: static; flex-direction: row; flex-wrap: nowrap; overflow-x: auto; gap: 6px; scrollbar-width: none; }
+  .side::-webkit-scrollbar { display: none; }
+  .side a { flex: none; border: 1px solid var(--line); background: var(--surface); }
+  .part { scroll-margin-top: 16px; }
 }
-/* Folds */
-details.fold { border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
-details.fold > summary { min-height: 52px; display: flex; align-items: center; gap: var(--space-2); padding: 0 20px; cursor: pointer; font-weight: 500; list-style: none; }
+.small { font-size: 13px; color: var(--muted); }
+
+/* ---- Status: health, automations beside connections ---- */
+.health { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: var(--space-5) var(--space-7); border: 1px solid var(--line); border-radius: var(--radius-card-sm); background: var(--surface); }
+.health__word { font-size: 18px; font-weight: 500; }
+.health__text { flex: 1 1 18rem; min-width: 0; font-size: 14px; color: var(--ink-2); }
+.status-cards { display: flex; flex-wrap: wrap; gap: var(--space-7); align-items: flex-start; }
+.scard { flex: 3 1 420px; min-width: 0; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface); padding: var(--space-7) 0 var(--space-3); }
+.scard + .scard { flex: 2 1 300px; }
+.scard h3 { padding: 0 var(--space-7) var(--space-3); font-size: 15px; font-weight: 600; }
+.srow { display: flex; align-items: flex-start; gap: 12px; padding: 12px var(--space-7); border-top: 1px solid var(--line-soft); }
+.srow > .atl-icon { margin-top: 3px; width: 15px; height: 15px; }
+.srow > .atl-icon.ok { color: var(--good-mark); }
+.srow > .atl-icon.bad { color: var(--bad); }
+.srow > .atl-icon.warn { color: var(--warn-mark); }
+.srow__t { flex: 1 1 auto; min-width: 0; }
+.srow__t b { display: block; font-size: 14px; font-weight: 600; }
+.srow__t span { display: block; font-size: 12px; color: var(--muted); }
+.srow__end { flex: none; text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.srow__end .w { font-size: 12px; font-weight: 600; }
+.srow__end .w.good { color: var(--good); } .srow__end .w.warn { color: var(--warn); } .srow__end .w.bad { color: var(--bad); } .srow__end .w.neutral { color: var(--muted); }
+.srow__end span:last-child { font-size: 12px; color: var(--muted); }
+.copy-text { margin: 0; padding: 12px 14px; background: var(--sunken); border-radius: var(--radius-md); font-family: var(--font-id); font-size: 13px; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--ink); }
+
+/* ---- Rows with their own actions (Waiting for your OK, Activity) ---- */
+.okrow { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: var(--space-5) var(--space-8); border-top: 1px solid var(--line-soft); }
+.okrow:first-child { border-top: 0; }
+.okrow__t { flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.okrow__t b { display: flex; align-items: flex-start; gap: 8px; font-size: 15px; font-weight: 600; }
+.okrow__t b .atl-icon { margin-top: 3px; width: 14px; height: 14px; }
+.okrow__t span { font-size: 12px; color: var(--muted); }
+.okrow__t p { font-size: 13px; color: var(--ink-2); }
+.okrow__t p strong { color: var(--ink); font-weight: 600; }
+.okrow .atl-actions { flex: 0 1 auto; max-width: 100%; }
+.act { display: grid; grid-template-columns: 56px 18px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 12px var(--space-8); border-top: 1px solid var(--line-soft); font-size: 14px; }
+.act:first-child { border-top: 0; }
+.act time { font-size: 12px; color: var(--muted); }
+.act .atl-icon { width: 14px; height: 14px; color: var(--ink-2); }
+.act__t b { font-weight: 600; }
+.act__note { display: block; font-size: 12px; color: var(--warn); }
+@media (max-width: 40rem) { .okrow, .act { padding-left: var(--space-6); padding-right: var(--space-6); } .act { grid-template-columns: 18px minmax(0, 1fr); } .act time { grid-column: 2; grid-row: 2; } .act > .atl-badge { grid-column: 2; justify-self: start; } }
+
+/* ---- Folds ---- */
+details.fold { border: 1px solid var(--line); border-radius: var(--radius-card-sm); background: var(--surface); }
+details.fold > summary { min-height: 56px; display: flex; align-items: center; gap: var(--space-3); padding: 0 var(--space-7); cursor: pointer; font-size: 15px; font-weight: 500; list-style: none; }
 details.fold > summary::-webkit-details-marker { display: none; }
-details.fold > summary::after { content: ""; margin-left: auto; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); transition: transform .15s; }
+details.fold > summary > .atl-icon:first-child { width: 14px; height: 14px; color: var(--muted); }
+details.fold > summary::after { content: ""; margin-left: auto; width: 8px; height: 8px; border-right: 1.5px solid var(--muted); border-bottom: 1.5px solid var(--muted); transform: rotate(45deg); transition: transform 160ms ease; }
 details.fold[open] > summary::after { transform: rotate(-135deg); }
-details.fold > summary:focus-visible { outline: 2px solid var(--info); outline-offset: 2px; border-radius: var(--radius-lg); }
 details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
-.fold-body { padding: var(--space-5); display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; }
-.fold-body h3 { font-size: 22px; line-height: 27px; }
-.fold-body h4 { font-family: var(--font-sans); font-size: 13px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
-/* Guide entries */
+.fold-body { padding: var(--space-6) var(--space-7); display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; }
+.fold-body h3 { font-size: 20px; line-height: 1.3; font-weight: 400; }
+.fold-body h4 { font-size: 12px; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--muted); }
+.folds { display: flex; flex-direction: column; gap: var(--space-3); }
+.block { display: flex; flex-direction: column; gap: var(--space-3); min-width: 0; }
+
+/* ---- How Atlas works: guide entries, a legend of icons and colors ---- */
 .entries { display: grid; gap: var(--space-4); }
 .entry { display: grid; gap: 6px; padding-top: var(--space-4); border-top: 1px solid var(--line-soft); }
 .entry:first-child { border-top: 0; padding-top: 0; }
-.entry h3 { font-size: 20px; line-height: 26px; display: flex; gap: var(--space-2); align-items: baseline; flex-wrap: wrap; }
-.entry h3 span { font-family: var(--font-sans); font-size: 14px; color: var(--muted); font-weight: 400; }
+.entry h3 { font-size: 18px; font-weight: 500; display: flex; gap: var(--space-2); align-items: baseline; flex-wrap: wrap; }
+.entry h3 span { font-size: 13px; color: var(--muted); font-weight: 400; }
 .entry p { max-width: var(--measure); color: var(--ink-2); }
 .entry ul, .entry ol { margin: 0; padding-left: 20px; display: grid; gap: 4px; max-width: var(--measure); color: var(--ink-2); }
 .say { list-style: none !important; padding: 0 !important; display: flex !important; flex-wrap: wrap; gap: 8px !important; max-width: none !important; }
-.say li { background: var(--accent-soft); color: var(--accent); border-radius: var(--radius-pill); padding: 3px 12px; font-size: 14px; }
-/* Design system swatches */
+.say li { background: var(--sunken); color: var(--ink); border-radius: var(--radius-pill); padding: 5px 14px; font-size: 13px; font-weight: 500; }
+.legend { display: flex; flex-wrap: wrap; gap: var(--space-7); align-items: flex-start; }
+.legend > .atl-card { flex: 3 1 360px; }
+.legend > .atl-card + .atl-card { flex: 2 1 280px; }
+.icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px 16px; list-style: none; margin: 0; padding: 0; font-size: 13px; color: var(--ink-2); }
+.icons li { display: flex; align-items: center; gap: 10px; }
+.icons .atl-icon { width: 15px; height: 15px; color: var(--ink); }
+.states { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; font-size: 13px; color: var(--ink-2); }
+.states li { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 12px; align-items: center; }
+.states .atl-badge { justify-self: start; }
 .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--space-3); list-style: none; margin: 0; padding: 0; }
-.swatch { border: 1px solid var(--line); border-radius: var(--radius-md); overflow: hidden; font-size: 14px; background: var(--surface); }
+.swatch { border: 1px solid var(--line); border-radius: var(--radius-md); overflow: hidden; font-size: 13px; background: var(--surface); }
 .swatch i { display: block; height: 40px; border-bottom: 1px solid var(--line); }
-.swatch p { padding: 6px 10px 0; font-weight: 500; }
+.swatch p { padding: 6px 10px 0; font-weight: 600; }
 .swatch span { display: block; padding: 0 10px 8px; color: var(--muted); }
-.conns { display: flex; flex-wrap: wrap; gap: var(--space-2); list-style: none; margin: 0; padding: 0; }
-.conn { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 14px; border: 1px solid var(--line); border-radius: var(--radius-pill); background: var(--surface); font-size: 14px; }
-.conn .small { margin-left: 2px; }
+.findbar { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
 </style>
 <style id="atlas-theme">{{ATLAS_THEME_CSS}}</style>
 </head>
@@ -78,26 +117,28 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
 <script id="atlas-page-js">
 (function () {
   var N = window.Atlas, h = N.h, L = N.list;
-  var RUN_TONE = { ok: "good", early_exit: "good", partial: "warn", failed: "bad" };
+  var RUN = { ok: ["Ran fine", "good"], early_exit: ["Ran fine", "good"], partial: ["Partly ran", "warn"], failed: ["Failed", "bad"],
+    skipped_away: ["Skipped: away", "neutral"], skipped_paused: ["Paused", "neutral"], never_run: ["Not run yet", "neutral"] };
   var SEV_TONE = { high: "bad", medium: "warn", low: "neutral" };
-  var CONN = { ok: ["Connected", "good"], issue: ["Needs attention", "bad"], unknown: ["Not checked yet", "neutral"], fallback: ["No connector (manual)", "neutral"] };
+  var CONN = { ok: ["Connected", "good"], issue: ["Needs attention", "bad"], unknown: ["Not checked yet", "neutral"], fallback: ["Not connected", "warn"] };
+  var CAT_ICON = { mail: "mail", calendar: "event", files: "records", messages: "chat", chat: "chat", tasks: "commitment", notes: "draft" };
   var HEALTH = { ok: ["Running well", "good"], attention: ["Needs a look", "warn"], problem: ["Something's wrong", "bad"] };
   var STMT = { confirmed: ["Confirmed", "good"], proposed: ["Not yet confirmed", "warn"] };
   var PROV = { stated: "You said so", observed: "Observed", researched: "Researched", uploaded: "From your documents", inferred: "Inferred" };
+  /* What a page press reads as in Activity */
+  var VERB = { mark_done: ["done", "You marked {q} done"], mark_received: ["done", "You marked {q} received"], move_date: ["snooze", "You moved {q}"],
+    answer: ["chat", "You answered {q}"], decline: ["dismiss", "You declined {q}"], not_useful: ["dismiss", "You said {q} wasn't useful"],
+    confirm: ["done", "You confirmed {q}"], correct: ["draft", "You corrected {q}"], nudge: ["mail", "You asked for a nudge on {q}"], approve: ["done", "You approved {q}"] };
+  var REQ = { queued: ["Waiting", "neutral", "pending"], waiting_chat: ["Waiting for a chat", "neutral", "pending"], needs_chat: ["Needs a chat", "warn", "chat"],
+    applied: ["Applied", "good", "done"], refused: ["Not applied", "warn", null] };
 
   function small(text) { return text ? h("span", { class: "small" }, text) : null; }
-  function run(text, tone) { return h("span", { class: "run" }, N.dot(tone), text); }
-  function fold(summary, count, body) {
-    return h("details", { class: "fold" }, h("summary", null, h("span", null, summary), count != null ? N.badge(String(count)) : null), h("div", { class: "fold-body" }, body));
+  function fold(summary, count, body, icon) {
+    return h("details", { class: "fold" }, h("summary", null, icon ? N.icon(icon) : null, h("span", null, summary), count != null ? N.badge(String(count)) : null), h("div", { class: "fold-body" }, body));
   }
-  function block(id, title, count, note, body, tools) {
-    return h("div", { class: "block", id: id },
-      h("div", { class: "block-tools" }, h("h3", { class: "sub" }, title, count != null ? h("span", { class: "count" }, String(count)) : null), tools || null),
-      note ? h("p", { class: "small" }, note) : null, body);
-  }
-  function part(id, title, note, blocks) {
+  function part(id, title, note, body) {
     return h("section", { class: "part", id: id, "aria-labelledby": id + "-h" },
-      h("div", { class: "part-head" }, h("h2", { id: id + "-h" }, title), note ? h("p", null, note) : null), blocks);
+      h("div", { class: "part-head" }, h("h2", { id: id + "-h" }, title), note ? h("p", null, note) : null), body);
   }
   function zoneName() {
     try {
@@ -125,38 +166,9 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
       main.appendChild(h("ul", { class: "notices" }, h("li", { class: "notice", "data-level": "info" },
         h("p", null, "Away mode is on until " + N.dateY(d.away.end) + ". Briefs and drafts are paused; information is still collected. Say “I'm back” in chat to end it."))));
     }
+    var parts = h("div", { class: "parts" });
 
-    /* ================= Needs you: action needed, approvals, questions ================= */
-    var cards = [];
-    acts.forEach(function (q) {
-      cards.push(N.card({ eyebrow: ["Only you can do this", "warn"], title: q.text, detail: q.how || null,
-        body: q.copy_text ? h("pre", { class: "copy-text" }, q.copy_text) : null,
-        actions: [q.copy_text ? h("button", { type: "button", class: "atl-btn atl-btn--secondary", onclick: function (e) { N.copyText(q.copy_text, e.currentTarget); } }, N.icon("copy"), h("span", null, "Copy the text")) : null,
-          N.request("I've done this", N.withId("I've done this: " + N.quote(q.text), q.id), "primary", true, { kind: "mark_done", target: q.id, quoted: q.text })] }));
-    });
-    asks.forEach(function (a) {
-      cards.push(N.card({ eyebrow: ["Waiting for your OK", "warn"], title: a.action,
-        detail: [a.prepared ? "Prepared: " + a.prepared : null, byWhom(a.requested_by), a.requested_on ? "Asked " + N.date(a.requested_on) : null].filter(Boolean).join(" · "),
-        body: a.why ? h("p", null, N.rich(a.why)) : null,
-        actions: [N.request("Approve", N.withId("Approve " + N.quote(a.action), a.id), "primary", true, { kind: "approve", target: a.id, quoted: a.action }),
-          N.request("Decline", N.withId("Decline " + N.quote(a.action), a.id), "secondary", false, { kind: "decline", target: a.id, quoted: a.action })] }));
-    });
-    qs.forEach(function (q) {
-      var proposal = !!(q.proposed_change || q.evidence);
-      cards.push(N.card({ eyebrow: [q.evidence ? "Looks done" : "Question from Atlas", "info"], title: q.text,
-        detail: q.asked ? "Asked " + N.date(q.asked) : null,
-        body: q.proposed_change ? h("p", null, h("b", null, "Proposed: "), N.rich(q.proposed_change))
-          : q.evidence ? h("p", null, h("b", null, "Seen: "), N.rich(q.evidence)) : null,
-        actions: proposal ? [N.request("Yes", N.withId("Yes to your question " + N.quote(q.text), q.id), "primary", true, { kind: "answer", target: q.id, quoted: q.text, args: { choice: "yes" } }),
-          N.request("No", N.withId("No to your question " + N.quote(q.text), q.id), "secondary", false, { kind: "answer", target: q.id, quoted: q.text, args: { choice: "no" } })]
-          : [N.request("Answer in chat", N.withId("About your question " + N.quote(q.text) + ":", q.id), "secondary")] }));
-    });
-    var nWaiting = acts.length + N.total("approvals", asks.length) + N.total("questions", qs.length);
-    main.appendChild(N.section({ id: "needs", title: "Needs you", count: nWaiting || null,
-      note: nWaiting ? "Atlas won't do these until you say so. Requests for your OK expire after 14 days that you're not away. Each button copies a reply for your Atlas chat." : null,
-      body: [cards.length ? h("div", { class: "atl-grid" }, cards) : N.empty("Nothing is waiting for you."), N.more("approvals"), N.more("questions")] }));
-
-    /* ================= How Atlas runs: status, issues, automations, connections ================= */
+    /* ================= Status: health, automations, connections ================= */
     var st = d.status || {}, hs = HEALTH[st.overall] || HEALTH.ok;
     var sys = d.system || {}, up = sys.update || {}, imp = sys.notes_import, impText = null;
     if (imp) {
@@ -178,82 +190,118 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
     var flagged = L(d.suspicious);
     var issueRows = issues.map(function (i) {
       return N.row({ title: i.summary, tone: SEV_TONE[i.severity] || null, meta: [i.since ? "Since " + N.date(i.since) : null],
-        badge: N.badge(i.severity === "high" ? "Problem" : i.severity === "medium" ? "Needs attention" : "Minor", SEV_TONE[i.severity] || "neutral"),
+        badge: N.badge(i.severity === "high" ? "Critical" : i.severity === "medium" ? "Needs action" : "Minor", SEV_TONE[i.severity] || "neutral"),
         detail: i.fix ? function () { return N.detail({ blocks: [{ heading: "To fix", nodes: N.para(i.fix) }],
           actions: [N.request("Help me fix this", N.withId("Help me fix " + N.quote(i.summary), i.id), "secondary")] }); } : null });
     });
-    var healthBlock = block("health", "Health", null, null, [
-      h("div", { class: "status" }, N.dot(hs[1]), h("span", { class: "status-word" }, hs[0]),
-        h("span", { class: "status-text" }, N.rich(st.headline) || (issues.length ? "" : "Everything Atlas checks is working."))),
-      issues.length ? N.listBox(issueRows) : null,
-      N.more("known_issues"),
+    var zone = zoneName();
+    var autoCard = h("div", { class: "scard", id: "automations" }, h("h3", null, "Automations"),
+      routines.length ? routines.map(function (r) {
+        var lr = r.last_run || {}, s = lr.status || "never_run", off = r.enabled === false, word = off ? ["Off", "neutral"] : r.paused ? ["Paused", "neutral"] : RUN[s] || RUN.never_run;
+        return h("div", { class: "srow" }, N.icon(word[1] === "good" ? "done" : word[1] === "bad" || word[1] === "warn" ? "alert" : "pending", word[1] === "good" ? "ok" : word[1]),
+          h("span", { class: "srow__t" }, h("b", null, r.title || r.name), h("span", null, r.schedule_text || r.schedule),
+            lr.summary ? h("span", null, N.rich(lr.summary)) : null),
+          h("span", { class: "srow__end" }, h("span", { class: "w " + word[1] }, word[0]),
+            h("span", null, lr.started ? N.dateTime(lr.started) : off || r.paused ? "" : r.next_run ? "Next " + N.dateTime(r.next_run) : "")));
+      }) : h("p", { class: "srow" }, "No automations are set up yet."),
+      h("p", { class: "srow small" }, [zone ? "Times are yours, in " + zone + "." : "", d.profile ? " Your " + N.label(d.profile).toLowerCase() + " profile." : "", " Ask Atlas in chat to pause, move or change one."].join("")));
+    var conns = L(d.connections);
+    var connCard = conns.length ? h("div", { class: "scard", id: "connections" }, h("h3", null, "Connections"), conns.map(function (c) {
+      var s = CONN[c.status] || CONN.unknown, cat = L(c.categories)[0];
+      return h("div", { class: "srow" }, N.icon(CAT_ICON[cat] || "link"),
+        h("span", { class: "srow__t" }, h("b", null, c.name), h("span", null, c.note ? N.rich(c.note) : L(c.categories).map(N.label).join(", "))),
+        N.badge(s[0], s[1]));
+    })) : null;
+    var jobs = L(d.jobs);
+    parts.appendChild(part("status", "Status", "What Atlas runs on its own, and what it's connected to.", [
+      h("div", { class: "health", role: "status" }, N.dot(hs[1]), h("span", { class: "health__word" }, hs[0]),
+        h("span", { class: "health__text" }, N.rich(st.headline) || (issues.length ? "" : "Everything Atlas checks is working."))),
+      issues.length ? N.listBox(issueRows) : null, N.more("known_issues"),
+      h("div", { class: "status-cards" }, autoCard, connCard),
       up.available && up.notes ? h("p", { class: "small" }, N.rich(up.notes)) : null,
       sysLine ? h("p", { class: "small" }, sysLine + ".") : null,
+      jobs.length ? fold("Each step of the automations", jobs.length, N.listBox(jobs.map(function (j) {
+        var w = RUN[j.last_status] || RUN.never_run;
+        return N.row({ title: j.title || j.name, tone: w[1] === "neutral" ? null : w[1],
+          meta: [j.last_success ? "Last succeeded " + N.dateTime(j.last_success) : "Not run yet", j.detail, j.paused ? "Paused" + (j.paused_until ? " until " + N.date(j.paused_until) : "") : null],
+          badge: N.badge(w[0], w[1]) });
+      })), "automation") : null,
       flagged.length ? fold("Suspicious instructions Atlas ignored", flagged.length,
         [h("p", { class: "small" }, "Found inside emails or documents in the last 14 days. Atlas did not follow them."),
-          N.listBox(flagged.map(function (f) { return N.row({ title: N.rich(f.summary), meta: [N.dateTime(f.at)] }); }))]) : null]);
+          N.listBox(flagged.map(function (f) { return N.row({ title: N.rich(f.summary), meta: [N.dateTime(f.at)] }); }))], "alert") : null]));
 
-    var zone = zoneName();
-    var autoBody = routines.length ? h("div", { class: "tbl-wrap" }, h("table", { class: "tbl" },
-      h("thead", null, h("tr", null, ["Automation", "When", "Last run", "Next run"].map(function (c) { return h("th", { scope: "col" }, c); }))),
-      h("tbody", null, routines.map(function (r) {
-        var lr = r.last_run || {}, s = lr.status || "never_run", off = r.enabled === false;
-        return h("tr", null,
-          h("td", null, r.title || r.name, r.paused ? small("Paused" + (r.paused_until ? " until " + N.date(r.paused_until) : "")) : null),
-          h("td", null, r.schedule_text || r.schedule),
-          h("td", { "data-wide": "" }, run(off ? "Off" : N.label(s), off ? null : RUN_TONE[s]), lr.started ? " " + N.dateTime(lr.started) : "", small(lr.summary)),
-          h("td", { "data-label": "Next:" }, off || r.paused ? "Not scheduled" : (r.next_run ? N.dateTime(r.next_run) : "")));
-      })))) : N.empty("No automations are set up yet.");
-    var conns = L(d.connections);
-    var connList = conns.length ? h("ul", { class: "conns", "aria-label": "Connections" }, conns.map(function (c) {
-      var s = CONN[c.status] || CONN.unknown;
-      return h("li", { class: "conn" }, N.dot(s[1]), h("span", null, c.name), c.status !== "ok" ? small(s[0] + (c.note ? ": " + N.rich(c.note) : "")) : null);
-    })) : null;
-    var jobs = L(d.jobs), runs = L(d.runs);
-    var detail = (jobs.length || runs.length) ? fold("Each step and recent runs", null, [
-      jobs.length ? h("div", { class: "tbl-wrap" }, h("table", { class: "tbl" },
-        h("thead", null, h("tr", null, h("th", { scope: "col" }, "Step"), h("th", { scope: "col" }, "Last result"), h("th", { scope: "col" }, "Details"))),
-        h("tbody", null, jobs.map(function (j) {
-          return h("tr", null, h("td", null, j.title || j.name),
-            h("td", null, run(N.label(j.last_status || "never_run"), RUN_TONE[j.last_status])),
-            h("td", { "data-wide": "" }, [j.last_success ? "Last succeeded " + N.dateTime(j.last_success) : "Not run yet", j.detail ? ". " + j.detail : "",
-              j.paused ? ". Paused" + (j.paused_until ? " until " + N.date(j.paused_until) : "") : ""].join("")));
-        })))) : null,
-      runs.length ? [h("h4", null, "Recent runs"), N.listBox(runs.map(function (r) {
-        return N.row({ title: (r.title || r.routine) + ", " + N.dateTime(r.started), tone: RUN_TONE[r.status] || null,
-          meta: [r.duration_min != null ? r.duration_min + " min" : null, r.summary], badge: N.badge(N.label(r.status), RUN_TONE[r.status] || "neutral") });
-      })), N.more("runs")] : null]) : null;
-    var autoBlock = block("automations", "Automations", routines.length,
-      [zone ? "Times are yours, in " + zone + ". " : "", d.profile ? "Your " + N.label(d.profile).toLowerCase() + " profile. " : "", "Ask Atlas in chat to pause, move or change one."].join(""),
-      [autoBody, connList, detail]);
-    main.appendChild(part("runs", "How Atlas runs", null, [healthBlock, autoBlock]));
-
-    /* ================= What Atlas knows: recently filed, about you, the guide ================= */
-    var rf = d.recently_filed || {}, filed = L(rf.items), days = rf.days || 14;
-    var filedRows = filed.map(function (f) {
-      var isNew = f.change === "new";
-      var row = N.row({ title: f.title, tone: isNew ? "info" : null,
-        meta: [N.label(f.kind), f.what, f.from ? "From " + f.from : null, f.at ? N.weekday(f.at) : null],
-        badge: N.badge(isNew ? "New" : "Updated", isNew ? "good" : "neutral"),
-        action: N.request("Wrong?", N.withId("That's filed wrong: " + N.quote(f.title), f.id), "ghost") });
-      row._change = isNew ? "new" : "updated";
-      return row;
-    });
-    var filedShow = "all", filedQ = "";
-    var filedEmpty = h("p", { class: "empty", hidden: true }, "Nothing here matches.");
-    function applyFiled() {
-      var n = 0;
-      filedRows.forEach(function (r) { var ok = (filedShow === "all" || r._change === filedShow) && N.matches(r, filedQ); r.hidden = !ok; n += ok ? 1 : 0; });
-      filedEmpty.hidden = n > 0;
+    /* ================= Waiting for your OK: action needed, approvals, questions ================= */
+    var oks = [];
+    function okRow(icon, title, meta, note, actions) {
+      return { data: {}, el: h("li", { class: "okrow" }, h("span", { class: "okrow__t" }, h("b", null, N.icon(icon), title), meta ? h("span", null, meta) : null, note), h("div", { class: "atl-actions" }, actions)) };
     }
+    acts.forEach(function (q) {
+      oks.push(okRow("alert", q.text, "Only you can do this", [q.how ? h("p", null, N.rich(q.how)) : null, q.copy_text ? h("pre", { class: "copy-text" }, q.copy_text) : null],
+        [q.copy_text ? h("button", { type: "button", class: "atl-btn atl-btn--secondary", onclick: function (e) { N.copyText(q.copy_text, e.currentTarget); } }, N.icon("copy"), h("span", null, "Copy the text")) : null,
+          N.request("I've done this", N.withId("I've done this: " + N.quote(q.text), q.id), "primary", true, { kind: "mark_done", target: q.id, quoted: q.text })]));
+    });
+    asks.forEach(function (a) {
+      oks.push(okRow(/send|reply|forward/i.test(a.action) ? "mail" : "pending", a.action,
+        [a.prepared ? "Prepared: " + a.prepared : null, byWhom(a.requested_by), a.requested_on ? "Asked " + N.date(a.requested_on) : null].filter(Boolean).join(" · "),
+        a.why ? h("p", null, N.rich(a.why)) : null,
+        [N.request("Approve", N.withId("Approve " + N.quote(a.action), a.id), "primary", true, { kind: "approve", target: a.id, quoted: a.action }),
+          N.request("Decline", N.withId("Decline " + N.quote(a.action), a.id), "secondary", false, { kind: "decline", target: a.id, quoted: a.action })]));
+    });
+    qs.forEach(function (q) {
+      var proposal = !!(q.proposed_change || q.evidence);
+      oks.push(okRow("help", q.text, [q.evidence ? "Looks done" : "Question from Atlas", q.asked ? "Asked " + N.date(q.asked) : null].filter(Boolean).join(" · "),
+        q.proposed_change ? h("p", null, h("strong", null, "Atlas suggests: "), N.rich(q.proposed_change)) : q.evidence ? h("p", null, h("strong", null, "Seen: "), N.rich(q.evidence)) : null,
+        proposal ? [N.request("Yes", N.withId("Yes to your question " + N.quote(q.text), q.id), "primary", true, { kind: "answer", target: q.id, quoted: q.text, args: { choice: "yes" } }),
+          N.request("No", N.withId("No to your question " + N.quote(q.text), q.id), "secondary", false, { kind: "answer", target: q.id, quoted: q.text, args: { choice: "no" } })]
+          : [N.request("Answer in chat", N.withId("About your question " + N.quote(q.text) + ":", q.id), "secondary")]));
+    });
+    var nWaiting = acts.length + N.total("approvals", asks.length) + N.total("questions", qs.length);
+    parts.appendChild(part("approvals", "Waiting for your OK",
+      "Atlas sends or changes nothing here until you approve it. Anything that leaves Atlas goes out from a chat, once you confirm. Requests expire after 14 days that you're not away.",
+      [N.listCard({ id: "ok-list", title: "Needs you", count: nWaiting || null, items: oks, show: 5, noun: "", empty: "Nothing is waiting for you." }),
+        N.more("approvals"), N.more("questions")]));
+
+    /* ================= Activity: your page presses (live pages) and Atlas's runs ================= */
+    var acts2 = [];
+    var reqs = N.live && N.live.requests ? Object.keys(N.live.requests).map(function (k) { return N.live.requests[k]; }) : [];
+    reqs.forEach(function (r) {
+      var v = VERB[r.kind]; if (!v) return;
+      var s = REQ[r.state] || REQ.queued, q = "“" + N.clean(r.quoted || "") + "”";
+      var text = v[1].replace("{q}", q) + (r.kind === "move_date" && r.args && r.args.due ? " to " + N.weekday(r.args.due) : "");
+      acts2.push({ at: r.created, data: { state: r.state }, el: h("li", { class: "act" }, h("time", { datetime: r.created }, N.time(r.created) || N.date(r.created)), N.icon(v[0]),
+        h("span", { class: "act__t" }, text, r.state === "refused" && r.note ? h("span", { class: "act__note" }, "Atlas: " + N.clean(r.note)) : null),
+        N.badge(s[0], s[1], s[2])) });
+    });
+    L(d.runs).forEach(function (r) {
+      var w = RUN[r.status] || RUN.never_run;
+      acts2.push({ at: r.started, data: { state: "atlas" }, el: h("li", { class: "act" }, h("time", { datetime: r.started }, N.dateTime(r.started)), N.icon("sync"),
+        h("span", { class: "act__t" }, h("b", null, "Atlas"), " ran the " + (r.title || r.routine) + (r.summary ? ": " + N.clean(r.summary) : "") + (r.duration_min != null ? " (" + r.duration_min + " min)" : "")),
+        N.badge(w[1] === "good" ? "Atlas" : w[0], w[1] === "good" ? "info" : w[1])) });
+    });
+    acts2.sort(function (a, b) { return String(b.at || "").localeCompare(String(a.at || "")); });
+    var waitingN = acts2.filter(function (a) { return /^(queued|waiting_chat|needs_chat)$/.test(a.data.state); }).length;
+    parts.appendChild(part("activity", "Activity", N.live ? "What you changed on your pages, and what Atlas did. Your changes apply at Atlas's next run or chat." : "What Atlas ran lately. On a live page, your changes show here too.",
+      [N.listCard({ id: "activity-list", title: "Lately", count: acts2.length || null, items: acts2, show: 8, noun: "",
+        filters: [{ key: "waiting", label: "Waiting", test: function (x) { return /^(queued|waiting_chat|needs_chat)$/.test(x.state); } },
+          { key: "refused", label: "Not applied", test: function (x) { return x.state === "refused"; } },
+          { key: "atlas", label: "Atlas", test: function (x) { return x.state === "atlas"; } }],
+        empty: "Nothing yet." }), N.more("runs")]));
+
+    /* ================= What Atlas knows: recently filed, about you ================= */
+    var rf = d.recently_filed || {}, filed = L(rf.items), days = rf.days || 14;
     var left = (N.meta.truncated || {}).recently_filed;
-    var filedBlock = block("filed", "Recently filed", N.total("recently_filed", filed.length),
-      "What Atlas filed in the last " + days + " days, newest first. If one is wrong, say so.",
-      filed.length ? [N.listBox(filedRows), filedEmpty, h("p", { class: "more" }, (left ? left + " more in the last " + days + " days. " : "") + "For anything older, ask Atlas in chat.")]
-        : N.empty("Atlas hasn't filed anything in the last " + days + " days."),
-      filed.length ? [N.segmented("Show", [{ value: "all", label: "All" }, { value: "new", label: "New" + (rf["new"] != null ? " (" + rf["new"] + ")" : "") },
-        { value: "updated", label: "Updated" + (rf.updated != null ? " (" + rf.updated + ")" : "") }], "all", function (v) { filedShow = v; applyFiled(); }),
-        N.search("Find in recently filed", function (q) { filedQ = q; applyFiled(); })] : null);
+    var KIND_ICON = { person: "person", organization: "organization", project: "project", commitment: "commitment", goal: "goal", decision: "decision", risk: "risk", event: "event", idea: "idea", topic: "topic" };
+    var filedCard = N.listCard({ id: "filed", title: "Recently filed", count: N.total("recently_filed", filed.length) || null, show: 6, noun: "filed",
+      note: "The last " + days + " days, newest first. If one is wrong, say so.",
+      items: filed.map(function (f) {
+        var isNew = f.change === "new";
+        return { data: f, el: N.row({ title: f.title, tone: isNew ? "info" : null,
+          meta: [N.label(f.kind), f.what, f.from ? "From " + f.from : null, f.at ? N.weekday(f.at) : null],
+          badge: N.badge(isNew ? "New" : "Updated", isNew ? "good" : null, KIND_ICON[f.kind] || null),
+          action: N.request("Wrong?", N.withId("That's filed wrong: " + N.quote(f.title), f.id), "ghost") }) };
+      }),
+      filters: [{ key: "new", label: "New", test: function (f) { return f.change === "new"; } }, { key: "updated", label: "Updated", test: function (f) { return f.change !== "new"; } }],
+      empty: "Atlas hasn't filed anything in the last " + days + " days." });
 
     var ab = d.about || {}, b = ab.basics || {}, files = L(ab.files);
     /* A belief is named by its profile file; its text (quoted) says which statement (plans: live pages). */
@@ -294,11 +342,15 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
         })) : null,
         L(ds.fonts).length ? N.facts(L(ds.fonts).map(function (f) { return [f.role, f.family]; })) : null));
     }
-    var aboutBlock = block("about", "About you", null,
-      (who ? who + ". " : "") + "What Atlas believes about you, and where each belief came from. Only confirmed ones are treated as fact.",
-      [featured.length ? N.listBox(featured.map(statement)) : N.empty("Atlas hasn't learned anything about you yet."),
-        fold("Everything else Atlas knows about you", restCount > 0 ? restCount + " more" : null, foldBody)]);
+    var aboutCard = h("section", { class: "atl-listcard", id: "about", "aria-labelledby": "about-h" },
+      h("div", { class: "atl-listcard__head" }, h("h2", { class: "atl-listcard__title", id: "about-h" }, "About you"),
+        h("p", { class: "atl-listcard__note" }, (who ? who + ". " : "") + "Only confirmed beliefs are treated as fact.")),
+      featured.length ? h("ul", { class: "atl-list atl-list--bare" }, featured.map(statement)) : N.empty("Atlas hasn't learned anything about you yet."));
+    parts.appendChild(part("knows", "What Atlas knows", "What Atlas filed lately, and what it believes about you. Correct anything that's wrong.",
+      [filedCard, h("p", { class: "more" }, (left ? left + " more in the last " + days + " days. " : "") + "For anything older, ask Atlas in chat."),
+        aboutCard, fold("Everything else Atlas knows about you", restCount > 0 ? restCount + " more" : null, foldBody, "memory")]));
 
+    /* ================= How Atlas works: the guide, and how to read these pages ================= */
     var g = d.guide || {}, news = L(g.whats_new), secs = L(g.sections);
     function paras(list) { return L(list).map(function (p) { return h("p", null, N.rich(p)); }); }
     var entryEls = [];
@@ -315,11 +367,11 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
       folds.push(fold("What's new in Atlas " + news[0].version, null, [h("div", { class: "entries" }, news.map(function (r) {
         return h("article", { class: "entry" }, h("h3", null, "Atlas " + r.version, r.date ? h("span", null, N.dateY(r.date)) : null),
           h("ul", null, L(r.items).map(function (x) { return h("li", null, N.rich(x)); })));
-      })), N.more("guide.whats_new")]));
+      })), N.more("guide.whats_new")], "idea"));
     }
     var secFolds = secs.map(function (s) {
       var f = fold(s.title, null, [s.intro ? h("p", { class: "small" }, N.rich(s.intro)) : null,
-        L(s.items).length ? h("div", { class: "entries" }, L(s.items).map(entry)) : N.empty("Nothing here yet."), N.more("guide.sections." + s.id)]);
+        L(s.items).length ? h("div", { class: "entries" }, L(s.items).map(entry)) : N.empty("Nothing here yet."), N.more("guide.sections." + s.id)], "help");
       folds.push(f);
       return f;
     });
@@ -333,18 +385,42 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
       });
       guideEmpty.hidden = !q || any;
     }
-    var guideBlock = block("guide", "Guide", null, "What Atlas can do, how to ask, and what changed lately.",
-      [g.intro ? h("p", null, N.rich(g.intro)) : null, folds.length ? folds : N.empty("Ask Atlas in chat what it can do."), guideEmpty],
-      secs.length ? N.search("How do I…", findGuide) : null);
-    main.appendChild(part("knows", "What Atlas knows", null, [filedBlock, aboutBlock, guideBlock]));
+    var ICONS = [["commitment", "Commitment"], ["project", "Project"], ["goal", "Goal"], ["decision", "Decision"], ["risk", "Risk"], ["person", "Person"],
+      ["organization", "Organization"], ["event", "Meeting or event"], ["idea", "Idea"], ["topic", "Topic"], ["done", "Done"], ["snooze", "Snooze or move"],
+      ["dismiss", "Drop or dismiss"], ["pending", "Waiting for Atlas"], ["draft", "Draft"], ["mail", "Email"], ["chat", "Ask in chat"], ["sync", "Atlas ran"]];
+    var STATES = [["Critical", "bad", "Late, off track or at risk of real harm. Always with the triangle."], ["Attention", "warn", "Due today, at risk, or needs a decision soon."],
+      ["Focus", "accent", "Your #1 priority and the time now. One per screen."], ["On track", "good", "Healthy, applied, or connected."],
+      ["Info", "info", "Context, like an upcoming meeting or something Atlas did."], ["Waiting", null, "A change you made, waiting for Atlas's next run or chat."]];
+    parts.appendChild(part("how", "How Atlas works", "What it does, how to read these pages, and answers to common questions.", [
+      g.intro ? h("p", null, N.rich(g.intro)) : null,
+      h("div", { class: "legend" },
+        N.card({ title: "Icons", body: h("ul", { class: "icons" }, ICONS.map(function (x) { return h("li", null, N.icon(x[0]), x[1]); })) }),
+        N.card({ title: "Colors and states", body: h("ul", { class: "states" }, STATES.map(function (x) { return h("li", null, N.badge(x[0], x[1], x[0] === "Waiting" ? "pending" : null), h("span", null, x[2])); })) })),
+      h("div", null, N.prompt("What changed since yesterday?")),
+      secs.length ? h("div", { class: "findbar" }, N.search("How do I…", findGuide)) : null,
+      folds.length ? h("div", { class: "folds" }, folds) : N.empty("Ask Atlas in chat what it can do."), guideEmpty]));
 
+    /* ================= The section list ================= */
+    var SIDE = [["status", "Status", "automation", issues.length], ["approvals", "Approvals", "pending", nWaiting], ["activity", "Activity", "sync", waitingN],
+      ["knows", "What Atlas knows", "memory", 0], ["how", "How it works", "help", 0]];
+    main.appendChild(h("div", { class: "guide" },
+      h("nav", { class: "side", "aria-label": "Sections of this page" }, SIDE.map(function (x) {
+        return h("a", { href: "#" + x[0] }, N.icon(x[2]), x[1], x[3] ? h("b", null, String(x[3])) : null);
+      })), parts));
+
+    /* ================= The title band ================= */
+    var lastRun = L(d.runs).concat(routines.map(function (r) { return r.last_run && { started: r.last_run.finished || r.last_run.started }; }).filter(Boolean))
+      .map(function (r) { return r.finished || r.started; }).filter(Boolean).sort().pop();
+    /* a time on the page's own day, else the day with it */
+    function when(t) { var n = N.daysFromToday(t); return n === 0 ? N.time(t) : (n === 1 ? "Tomorrow " : n === -1 ? "Yesterday " : N.date(t) + ", ") + N.time(t); }
+    var nextRun = routines.filter(function (r) { return r.enabled !== false && !r.paused && r.next_run; }).map(function (r) { return r.next_run; }).sort()[0];
     return {
-      dateLine: "How Atlas is running, and what it knows about you.", lead: st.headline,
+      dateLine: "How Atlas is running, and what it knows about you.", lead: st.headline, band: true,
       stats: [
-        { key: "needs", jump: "needs", value: nWaiting, label: ["needs you", "need you"] },
-        { key: "issues", jump: "health", tone: "bad", value: N.total("known_issues", issues.length), label: ["known issue", "known issues"] },
-        { key: "automations", jump: "automations", value: routines.length, label: ["automation", "automations"] },
-        sys.installed_version ? { key: "version", jump: "health", value: sys.installed_version, label: up.available ? "Atlas version, update available" : "Atlas version" } : null]
+        { key: "last", jump: "status", value: lastRun ? when(lastRun) : "None yet", label: "Last run" },
+        { key: "next", jump: "automations", value: nextRun ? when(nextRun) : "None", label: "Next run" },
+        { key: "waiting", jump: "approvals", value: nWaiting, label: "Waiting" },
+        sys.installed_version ? { key: "version", jump: "status", value: sys.installed_version, label: up.available ? "Update available" : "Version" } : null]
     };
   });
 })();

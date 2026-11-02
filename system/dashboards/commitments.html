@@ -8,31 +8,65 @@
 <title>Work</title>
 <style id="atlas-base">{{ATLAS_BASE_CSS}}</style>
 <style id="atlas-page">
-/* Tabs, the page-wide filter and find, sticky under the header */
-.toolbar { display: flex; flex-direction: column; gap: var(--space-3); padding-top: var(--space-2); }
-.toolbar-row { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; justify-content: space-between; }
-.toolbar .atl-tabs { flex: 1 1 100%; }
-.panel { display: flex; flex-direction: column; gap: var(--space-6); }
-/* I owe beside Waiting on */
-.cols { display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); align-items: start; }
-.col { display: flex; flex-direction: column; gap: var(--space-3); min-width: 0; }
-.col-note { font-size: 14px; color: var(--muted); }
-/* Goals */
-.rank { font-family: var(--font-display); font-size: 40px; line-height: 40px; font-weight: 500; color: var(--accent); }
-.goal-top { display: flex; gap: var(--space-4); align-items: flex-start; }
-.goal-top .atl-card__title { flex: 1; }
-.measure { display: flex; flex-direction: column; gap: 6px; }
-.measure p { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; font-size: 14px; color: var(--muted); }
-.measure b { color: var(--ink); font-weight: 600; }
-.ev { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 14px; line-height: 20px; color: var(--ink-2); }
+.work { display: flex; flex-direction: column; gap: var(--space-7); }
+.panel { display: flex; flex-direction: column; gap: var(--space-7); }
+.panel-note { font-size: 14px; color: var(--muted); }
+
+/* ---- Overview: one card per kind; every number opens its list, already filtered ---- */
+.ov { display: grid; gap: var(--space-7); grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); }
+.ov-card { display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-8); border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface); }
+.ov-kind { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: var(--ink-2); }
+.ov-num { display: inline-flex; align-items: baseline; gap: 12px; padding: 4px 8px; margin: -4px -8px; border: 0; border-radius: var(--radius-md); background: none; color: inherit; font-family: inherit; text-align: left; cursor: pointer; }
+.ov-num:hover { background: color-mix(in srgb, var(--ink) 6%, transparent); }
+.ov-num b { font-size: 56px; line-height: 1; font-weight: 200; letter-spacing: -0.03em; }
+.ov-num span { font-size: 15px; font-weight: 600; }
+.ov-num[data-tone="bad"] { color: var(--bad); }
+.ov-num[data-tone="warn"] { color: var(--warn); }
+.ov-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ov-pair .ov-num { flex-direction: column; gap: 2px; align-items: flex-start; }
+.ov-pair .ov-num b { font-size: 26px; font-weight: 300; }
+.ov-pair .ov-num span { font-size: 13px; font-weight: 400; color: var(--muted); }
+.ov-foot { padding-top: var(--space-4); border-top: 1px solid var(--line); font-size: 15px; font-weight: 500; }
+
+/* ---- Hero (Projects, Goals): a night card, linked records beside it at the same height ---- */
+.hero-wrap { display: flex; flex-wrap: wrap; gap: var(--space-7); align-items: stretch; }
+.hero { flex: 3 1 460px; min-width: 0; padding: var(--space-9); display: flex; flex-direction: column; gap: var(--space-5); }
+.hero__kicker { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-size: 12px; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--night-muted); }
+.hero__title { font-size: clamp(28px, 3.4vw, 40px); line-height: 1.12; font-weight: 300; letter-spacing: -0.02em; color: var(--night-text); }
+.hero__lede { font-size: 17px; line-height: 1.55; font-weight: 300; color: var(--night-text); max-width: 60ch; }
+.hero__facts { display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 0; }
+.hero__facts div { display: flex; flex-direction: column; gap: 2px; }
+.hero__facts dt { font-size: 12px; color: var(--night-muted); }
+.hero__facts dd { margin: 0; font-size: 15px; font-weight: 500; color: var(--night-text); }
+.hero__block { display: flex; flex-direction: column; gap: 4px; }
+.hero__block h3 { font-size: 12px; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--night-muted); }
+.hero__block p { font-size: 15px; line-height: 1.55; color: var(--night-text); max-width: 64ch; }
+.hero .atl-actions { margin-top: auto; padding-top: var(--space-2); }
+.measure { display: flex; flex-direction: column; gap: 8px; }
+.measure p { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; font-size: 14px; color: var(--night-muted); }
+.measure b { color: var(--night-text); font-weight: 600; }
+.hero .bar { background: var(--night-raised); }
+.ev { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 14px; line-height: 1.5; color: var(--night-text); }
 .ev li { display: flex; gap: 8px; align-items: baseline; }
 .ev .atl-badge { flex: none; }
-.proj-counts { font-size: 14px; color: var(--muted); }
-.proj-counts b { color: var(--bad); font-weight: 600; }
+.linked { flex: 2 1 320px; min-width: 0; max-height: 640px; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--radius-card-lg); background: var(--surface); overflow: hidden; }
+.linked__head { padding: var(--space-7) var(--space-8) var(--space-3); }
+.linked__head h3 { font-size: 22px; font-weight: 300; letter-spacing: -0.01em; }
+.linked__body { overflow-y: auto; padding: 0 var(--space-8) var(--space-7); display: flex; flex-direction: column; gap: var(--space-5); }
+.linked__group { display: flex; flex-direction: column; gap: 6px; }
+.linked__group h4 { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--muted); }
+.linked__group h4 .atl-icon { width: 13px; height: 13px; }
+.lk { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line-soft); font-size: 14px; }
+.lk:first-of-type { border-top: 0; }
+.lk__t { min-width: 0; }
+.lk__t b { display: block; font-weight: 500; color: var(--ink); }
+.lk__t span { font-size: 12px; color: var(--muted); }
+@media (max-width: 40rem) { .hero { padding: var(--space-7); } .linked__head, .linked__body { padding-left: var(--space-6); padding-right: var(--space-6); } }
+
 .others { color: var(--muted); font-size: 14px; }
 .owes { display: grid; gap: var(--space-3) var(--space-6); grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); }
 .owes .late { color: var(--bad); font-weight: 500; }
-.nomatch { color: var(--muted); }
+.rank-badge { font-size: 13px; font-weight: 600; color: var(--muted); }
 </style>
 <style id="atlas-theme">{{ATLAS_THEME_CSS}}</style>
 </head>
@@ -47,6 +81,7 @@
   var LEVEL = { low: 1, medium: 2, high: 3 };
   var PRIORITY = { high: 0, medium: 1, low: 2 };
   var REL = ["manager", "report", "board", "customer", "stakeholder", "prospect", "partner", "peer", "vendor", "external", "other"];
+  var chosen = { project: null, goal: null };   /* the record in each hero; kept across live repaints */
 
   /* ---- What "needs attention" means, per kind (system/dashboards/commitments.contract.md §Needs attention) ---- */
   function overdue(c) { return c.status === "slipped" || (!!c.due && N.daysFromToday(c.due) < 0); }
@@ -63,13 +98,21 @@
   function title(x) { return String(x.title || ""); }
   function first(r) { return String(N.name(r) || "").split(" ")[0]; }
   function byDue(a, b) { var da = a.due || "", db = b.due || ""; return da === db ? 0 : !da ? 1 : !db ? -1 : cmp(da, db); }
+  function plural(n, one, many) { return n + " " + (n === 1 ? one : many); }
 
   N.page({ title: "Work" }, function (d, main) {
     var me = N.meta.user_display_name;
     function who(r) { return r && me && N.name(r) === me ? "You" : N.name(r); }
-    var state = { tab: "commitments", filter: "all", tile: null, q: "" };
-    var items = [];   /* every row or card: { el, tab, att, kind, dir, late, list } */
-    function track(el, o) { o.el = el; items.push(o); return el; }
+    var T = N.meta.truncated || {};
+    var cards = {};      /* list cards by id, so a tile or an Overview number can open one filtered */
+    var tabs = null, stats = null;
+    function open(tab, card, filter) {
+      if (stats) stats.clear();
+      tabs.set(tab, true);
+      N.list(card).forEach(function (c) { if (cards[c]) cards[c]._listCard.setFilter(filter); });
+      var el = cards[N.list(card)[0]];
+      if (el && el.scrollIntoView) setTimeout(function () { el.scrollIntoView({ block: "start" }); }, 0);
+    }
 
     /* ================= Commitments ================= */
     var cs = L(d.commitments).slice().sort(function (a, b) {
@@ -91,7 +134,7 @@
           { kind: "mark_done", target: c.id, quoted: c.title })
         : N.request("Nudge " + first(other), N.withId("Draft a follow-up to " + N.quote(N.name(other)) + " about " + N.quote(c.title), c.id), "secondary", false,
           { kind: "nudge", target: c.id, quoted: c.title });
-      var row = N.row({
+      return N.row({
         title: c.title, tone: late ? "bad" : cAtt(c) ? "warn" : null,
         meta: [owe ? (other ? "For " + who(other) : null) : (other ? "From " + who(other) : null), N.name(c.project) || null],
         badge: dueBadge(c), action: action,
@@ -111,33 +154,36 @@
           });
         }
       });
-      return track(row, { tab: "commitments", att: cAtt(c), kind: "commitment", dir: c.direction, late: late, prio: c.priority });
     }
-    /* Grouped: overdue first, then by priority; dates ascending inside each group. */
-    var GROUPS = [["late", "Overdue"], ["high", "High priority"], ["medium", "Medium priority"], ["low", "Low priority"], ["none", "No priority set"]];
+    var GROUP = { late: "Overdue", high: "High priority", medium: "Medium priority", low: "Low priority", none: "No priority set" };
     function groupOf(c) { return overdue(c) ? "late" : c.priority in PRIORITY ? c.priority : "none"; }
-    function commitList(list) {
-      var heads = [], kids = [];
-      GROUPS.forEach(function (g) {
-        var inG = list.filter(function (c) { return groupOf(c) === g[0]; });
-        if (!inG.length) return;
-        var head = N.group(g[1]);
-        var rows = inG.map(cRow);
-        heads.push({ el: head, rows: rows });
-        kids.push(head); kids = kids.concat(rows);
-      });
-      var box = N.listBox(kids, "");
-      return { box: box, heads: heads };
-    }
+    var C_FILTERS = [
+      { key: "overdue", label: "Overdue", test: overdue },
+      { key: "soon", label: "Due in 7 days", test: function (c) { return !overdue(c) && !!c.due && N.daysFromToday(c.due) <= 7; } },
+      { key: "high", label: "High priority", test: function (c) { return c.priority === "high"; } },
+      { key: "nodate", label: "No date", test: function (c) { return !c.due && !overdue(c); } }];
+    var C_SORTS = [{ key: "due", label: "Due date", cmp: byDue }, { key: "title", label: "A to Z", cmp: function (a, b) { return cmp(title(a), title(b)); } }];
     var oweList = cs.filter(function (c) { return c.direction === "i_owe"; });
     var waitList = cs.filter(function (c) { return c.direction === "waiting_on"; });
-    var oweL = commitList(oweList), waitL = commitList(waitList);
-    var oweCount = h("span", { class: "count" }, ""), waitCount = h("span", { class: "count" }, "");
-    var oweNone = N.empty("You don't owe anyone anything right now."), waitNone = N.empty("You're not waiting on anyone.");
-    var commitPanel = h("div", { class: "panel" },
-      h("div", { class: "cols" },
-        h("div", { class: "col" }, h("h3", { class: "sub" }, "I owe", oweCount), oweList.length ? oweL.box : null, oweNone, N.more("i_owe")),
-        h("div", { class: "col" }, h("h3", { class: "sub" }, "Waiting on", waitCount), waitList.length ? waitL.box : null, waitNone, N.more("waiting_on"))));
+    function cItems(list) { return list.map(function (c) { return { data: c, el: cRow(c), group: GROUP[groupOf(c)] }; }); }
+    cards.i_owe = N.listCard({ id: "i-owe", title: "I owe", count: N.total("i_owe", oweList.length), noun: "I owe", show: 4, items: cItems(oweList),
+      filters: C_FILTERS, sorts: C_SORTS, empty: "You don't owe anyone anything right now." });
+    cards.waiting_on = N.listCard({ id: "waiting-on", title: "Waiting on", count: N.total("waiting_on", waitList.length), noun: "waiting on", show: 4, items: cItems(waitList),
+      filters: C_FILTERS, sorts: C_SORTS, empty: "You're not waiting on anyone." });
+    var commitPanel = h("div", { class: "panel" }, h("div", { class: "atl-cols" },
+      h("div", { class: "atl-col" }, cards.i_owe, N.more("i_owe")), h("div", { class: "atl-col" }, cards.waiting_on, N.more("waiting_on"))));
+
+    /* Linked records, from what the page already carries (nothing extra in the data) */
+    function linkedCard(heading, groups, empty) {
+      var n = groups.reduce(function (s, g) { return s + g.items.length; }, 0);
+      return h("aside", { class: "linked", "aria-label": heading },
+        h("div", { class: "linked__head" }, h("h3", null, heading, n ? h("span", { class: "sec-count" }, String(n)) : null)),
+        h("div", { class: "linked__body" }, n ? groups.filter(function (g) { return g.items.length; }).map(function (g) {
+          return h("div", { class: "linked__group" }, h("h4", null, N.icon(g.icon), g.label), g.items.map(function (x) {
+            return h("div", { class: "lk" }, h("span", { class: "lk__t" }, h("b", null, x.title), x.sub ? h("span", null, x.sub) : null), x.badge || null);
+          }));
+        }) : h("p", { class: "panel-note" }, empty)));
+    }
 
     /* ================= Projects ================= */
     var HEALTH_ORDER = { off_track: 0, at_risk: 1, unknown: 2, on_track: 3 };
@@ -152,31 +198,56 @@
       if (a.target !== b.target) { if (!a.target) return 1; if (!b.target) return -1; return cmp(a.target, b.target); }
       return cmp(title(a), title(b));
     });
-    var projCards = ps.map(function (p) {
+    var decisions = L(d.decisions), risks = L(d.risks), goals = L(d.goals);
+    function pBadge(p) { return p.status === "active" ? N.badge(N.label(p.health || "unknown"), HEALTH_TONE[p.health] || "neutral") : N.badge(N.label(p.status)); }
+    var projHero = h("div", { class: "hero-wrap", id: "project-hero" });
+    function paintProject() {
+      projHero.textContent = "";
+      var p = ps.filter(function (x) { return x.id === chosen.project; })[0] || ps[0];
+      if (!p) return;
+      chosen.project = p.id;
       var url = p.page_url && /^https:\/\//.test(p.page_url) ? p.page_url : null;
       var pcs = cs.filter(function (c) { return idOf(c.project) === p.id; });
+      var pd = decisions.filter(function (x) { return L(x.projects).some(function (r) { return idOf(r) === p.id; }); });
+      var pr = risks.filter(function (x) { return L(x.projects).some(function (r) { return idOf(r) === p.id; }); });
       var lateN = pcs.filter(overdue).length;
-      var eyebrow = p.status === "active" ? N.badge(N.label(p.health || "unknown"), HEALTH_TONE[p.health] || "neutral") : N.badge(N.label(p.status));
-      var card = N.card({
-        eyebrow: eyebrow,
-        title: url ? h("a", { class: "atl-card__link", href: url, target: "_blank", rel: "noopener noreferrer" }, p.title) : p.title,
-        detail: [p.owner ? "Owner " + who(p.owner) : null, p.target ? "Target " + N.date(p.target) : null, p.goal ? "Serves " + N.name(p.goal) : null].filter(Boolean).join(" · "),
-        body: [p.insight ? h("p", null, N.rich(p.insight)) : null,
-          p.next_step ? h("p", null, h("b", null, "Next step: "), N.rich(p.next_step)) : null,
-          pcs.length ? h("p", { class: "proj-counts" }, pcs.length + (pcs.length === 1 ? " open commitment" : " open commitments"),
-            lateN ? [", ", h("b", null, lateN + " overdue")] : null) : null],
-        actions: [url ? h("a", { class: "atl-btn atl-btn--secondary", href: url, target: "_blank", rel: "noopener noreferrer" }, "Open project page")
-          : N.request("Ask Atlas", N.withId("Show me the project " + N.quote(p.title), p.id), "secondary")]
-      });
-      return track(card, { tab: "projects", att: pAtt(p), kind: "project" });
-    });
-    var projAtt = ps.filter(pAtt).length;
-    var projPanel = h("div", { class: "panel" }, ps.length ? h("div", { class: "atl-grid" }, projCards) : N.empty("No active projects."), N.more("projects"));
+      projHero.appendChild(h("section", { class: "atl-night hero", "aria-labelledby": "ph-t" },
+        N.strands({ seed: p.id, count: 2, ambient: 4, band: [0.55, 0.95] }),
+        h("p", { class: "hero__kicker" }, N.icon("project"), "Project", pBadge(p)),
+        h("h2", { class: "hero__title", id: "ph-t" }, p.title),
+        p.summary ? h("p", { class: "hero__lede" }, N.rich(p.summary)) : null,
+        h("dl", { class: "hero__facts" }, [["Owner", p.owner ? who(p.owner) : null], ["Target", p.target ? N.dateY(p.target) : null], ["Serves", p.goal ? N.name(p.goal) : null],
+          ["Open", pcs.length ? plural(pcs.length, "commitment", "commitments") + (lateN ? ", " + lateN + " overdue" : "") : null]]
+          .filter(function (f) { return f[1]; }).map(function (f) { return h("div", null, h("dt", null, f[0]), h("dd", null, f[1])); })),
+        p.insight ? h("div", { class: "hero__block" }, h("h3", null, "What Atlas noticed"), h("p", null, N.rich(p.insight))) : null,
+        p.next_step ? h("div", { class: "hero__block" }, h("h3", null, "Next step"), h("p", null, N.rich(p.next_step))) : null,
+        h("div", { class: "atl-actions" }, N.prompt("What's blocking " + p.title + "?"), N.prompt("Draft a status update for " + p.title),
+          url ? h("a", { class: "atl-btn atl-btn--secondary", href: url, target: "_blank", rel: "noopener noreferrer" }, N.icon("link"), h("span", null, "Open project page")) : null)));
+      projHero.appendChild(linkedCard("Linked records", [
+        { label: "Commitments", icon: "commitment", items: pcs.map(function (c) { return { title: c.title, sub: (c.direction === "i_owe" ? "You owe" : "From " + who(c.owner)), badge: dueBadge(c) }; }) },
+        { label: "Decisions", icon: "decision", items: pd.map(function (x) { return { title: x.title, sub: x.decided_on ? "Decided " + N.date(x.decided_on) : "Not decided yet", badge: x.status === "proposed" ? N.badge("Proposed", "warn") : null }; }) },
+        { label: "Risks", icon: "risk", items: pr.map(function (r) { return { title: r.title, sub: r.owner ? "Owner " + who(r.owner) : null, badge: r.status === "active" ? N.badge("Issue", "bad") : null }; }) },
+        { label: "Goal", icon: "goal", items: p.goal ? [{ title: N.name(p.goal) }] : [] }], "Nothing else on this page links to this project."));
+    }
+    function pickProject(p) { chosen.project = p.id; paintProject(); if (projHero.scrollIntoView) projHero.scrollIntoView({ block: "start" }); }
+    cards.projects = N.listCard({ id: "projects-list", title: "All projects", count: N.total("projects", ps.length), noun: "projects", show: 6,
+      items: ps.map(function (p) {
+        var pcs = cs.filter(function (c) { return idOf(c.project) === p.id; }), lateN = pcs.filter(overdue).length;
+        return { data: p, el: N.row({ title: p.title, tone: HEALTH_TONE[p.health] || null,
+          meta: [p.owner ? "Owner " + who(p.owner) : null, p.target ? "Target " + N.date(p.target) : null, pcs.length ? plural(pcs.length, "open", "open") + (lateN ? ", " + lateN + " overdue" : "") : null],
+          badge: pBadge(p), action: N.button({ label: "View", onClick: function () { pickProject(p); } }) }) };
+      }),
+      filters: [{ key: "attention", label: "Need attention", test: pAtt }, { key: "unknown", label: "Not assessed", test: function (p) { return p.status === "active" && (!p.health || p.health === "unknown"); } },
+        { key: "on_track", label: "On track", test: function (p) { return p.health === "on_track"; } }, { key: "later", label: "Proposed or paused", test: function (p) { return p.status !== "active"; } }],
+      sorts: [{ key: "target", label: "Target date", cmp: function (a, b) { return byDue({ due: a.target }, { due: b.target }); } }, { key: "title", label: "A to Z", cmp: function (a, b) { return cmp(title(a), title(b)); } }],
+      empty: "No active projects." });
+    var projPanel = h("div", { class: "panel" }, ps.length ? projHero : null, cards.projects);
+    paintProject();
 
     /* ================= Goals ================= */
     var GSTATUS = { active: 0, draft: 1 };
     var GASSESS = { off_track: 0, at_risk: 1, on_track: 3 };
-    var goals = L(d.goals).slice().sort(function (a, b) {
+    goals = goals.slice().sort(function (a, b) {
       var sa = a.status in GSTATUS ? GSTATUS[a.status] : 2, sb = b.status in GSTATUS ? GSTATUS[b.status] : 2;
       if (sa !== sb) return sa - sb;
       var ra = typeof a.rank === "number" ? a.rank : Infinity, rb = typeof b.rank === "number" ? b.rank : Infinity;
@@ -184,96 +255,117 @@
       var aa = a.assessment in GASSESS ? GASSESS[a.assessment] : 2, ab = b.assessment in GASSESS ? GASSESS[b.assessment] : 2;
       return aa - ab || cmp(title(a), title(b));
     });
-    var goalCards = goals.map(function (g) {
-      var ev = L(g.evidence);
-      var behind = ps.filter(function (p) { return idOf(p.goal) === g.id; });
-      var tone = HEALTH_TONE[g.assessment] || null;
-      var badge = g.assessment ? N.badge(N.label(g.assessment), tone) : g.status === "active" ? N.badge("Not assessed") : N.badge(N.label(g.status));
+    function gBadge(g) { return g.assessment ? N.badge(N.label(g.assessment), HEALTH_TONE[g.assessment]) : g.status === "active" ? N.badge("Not assessed") : N.badge(N.label(g.status)); }
+    var goalHero = h("div", { class: "hero-wrap", id: "goal-hero" });
+    function paintGoal() {
+      goalHero.textContent = "";
+      var g = goals.filter(function (x) { return x.id === chosen.goal; })[0] || goals[0];
+      if (!g) return;
+      chosen.goal = g.id;
+      var ev = L(g.evidence), behind = ps.filter(function (p) { return idOf(p.goal) === g.id; }), tone = HEALTH_TONE[g.assessment] || null;
       var ranked = g.status === "active" && typeof g.rank === "number";
-      var card = N.card({
-        eyebrow: badge,
-        title: h("span", { class: "goal-top" }, ranked ? h("span", { class: "rank", "aria-label": "Rank " + g.rank }, String(g.rank)) : null, h("span", null, g.title)),
-        detail: [g.period, g.owner ? "Owner " + who(g.owner) : null].filter(Boolean).join(" · "),
-        body: [g.metric ? h("div", { class: "measure" },
-            h("p", null, h("span", null, g.metric), h("span", null, h("b", null, g.current || "No reading yet"), g.target ? " of " + g.target : "", g.current_as_of ? " · as of " + N.date(g.current_as_of) : "")),
-            N.bar(g.progress, g.progress != null ? Math.round(g.progress * 100) + "% of target" : null, tone)) : null,
-          g.insight ? h("p", null, N.rich(g.insight)) : null,
-          ev.length ? h("ul", { class: "ev", "aria-label": "Evidence" }, ev.map(function (e) {
-            var dir = e.direction === "for" || e.direction === "against" ? e.direction : "neutral";
-            return h("li", null, N.badge(dir === "for" ? "For" : dir === "against" ? "Against" : "Note", dir === "for" ? "good" : dir === "against" ? "bad" : "neutral"), h("span", null, N.rich(e.text)));
-          })) : null,
-          behind.length ? h("p", { class: "proj-counts" }, "Projects: " + behind.map(function (p) { return p.title; }).join(", ")) : null],
-        actions: [N.request("Ask Atlas", N.withId("How is the goal " + N.quote(g.title) + " going?", g.id), "secondary")]
-      });
-      return track(card, { tab: "goals", att: gAtt(g), kind: "goal" });
-    });
-    var period = d.period && d.period.label ? d.period.label + ", by your rank." : "By your rank.";
-    var goalPanel = h("div", { class: "panel" }, h("p", { class: "col-note" }, period),
-      goals.length ? h("div", { class: "atl-grid" }, goalCards) : N.empty("No active goals. Tell Atlas your goals in chat to add them."), N.more("goals"));
+      goalHero.appendChild(h("section", { class: "atl-night hero", "aria-labelledby": "gh-t" },
+        N.strands({ seed: g.id, count: 2, ambient: 4, band: [0.55, 0.95] }),
+        h("p", { class: "hero__kicker" }, N.icon("goal"), ranked ? "#" + g.rank + " goal" : "Goal", g.period || null, gBadge(g)),
+        h("h2", { class: "hero__title", id: "gh-t" }, g.title),
+        g.summary ? h("p", { class: "hero__lede" }, N.rich(g.summary)) : null,
+        g.metric ? h("div", { class: "measure" },
+          h("p", null, h("span", null, g.metric), h("span", null, h("b", null, g.current || "No reading yet"), g.target ? " of " + g.target : "", g.current_as_of ? " · as of " + N.date(g.current_as_of) : "")),
+          N.bar(g.progress, g.progress != null ? Math.round(g.progress * 100) + "% of target" : null, tone)) : null,
+        g.insight ? h("div", { class: "hero__block" }, h("h3", null, "What Atlas noticed"), h("p", null, N.rich(g.insight))) : null,
+        ev.length ? h("ul", { class: "ev", "aria-label": "Evidence" }, ev.map(function (e) {
+          var dir = e.direction === "for" || e.direction === "against" ? e.direction : "neutral";
+          return h("li", null, N.badge(dir === "for" ? "For" : dir === "against" ? "Against" : "Note", dir === "for" ? "good" : dir === "against" ? "bad" : "neutral"), h("span", null, N.rich(e.text)));
+        })) : null,
+        h("div", { class: "atl-actions" }, N.prompt("How is " + g.title + " going?"), N.prompt("What would move " + g.title + " most this week?"))));
+      goalHero.appendChild(linkedCard("Linked records", [
+        { label: "Projects", icon: "project", items: behind.map(function (p) { return { title: p.title, sub: p.owner ? "Owner " + who(p.owner) : null, badge: pBadge(p) }; }) },
+        { label: "Evidence", icon: "link", items: ev.filter(function (e) { return e.ref; }).map(function (e) { return { title: N.name(e.ref), sub: N.label(e.direction || "neutral") }; }) }],
+        "No projects on this page serve this goal yet."));
+    }
+    function pickGoal(g) { chosen.goal = g.id; paintGoal(); if (goalHero.scrollIntoView) goalHero.scrollIntoView({ block: "start" }); }
+    cards.goals = N.listCard({ id: "goals-list", title: d.period && d.period.label ? "Goals · " + d.period.label : "All goals", count: N.total("goals", goals.length), noun: "goals", show: 6,
+      note: "By your rank.",
+      items: goals.map(function (g) {
+        var ranked = g.status === "active" && typeof g.rank === "number";
+        return { data: g, el: N.row({ title: g.title, tone: HEALTH_TONE[g.assessment] || null,
+          meta: [ranked ? "#" + g.rank : null, g.metric ? g.metric + ": " + (g.current || "no reading yet") + (g.target ? " of " + g.target : "") : null, g.owner ? "Owner " + who(g.owner) : null],
+          badge: gBadge(g), action: N.button({ label: "View", onClick: function () { pickGoal(g); } }) }) };
+      }),
+      filters: [{ key: "attention", label: "Off track or at risk", test: gAtt }, { key: "unknown", label: "Not assessed", test: function (g) { return g.status === "active" && !g.assessment; } },
+        { key: "on_track", label: "On track", test: function (g) { return g.assessment === "on_track"; } }],
+      empty: "No active goals. Tell Atlas your goals in chat to add them." });
+    var goalPanel = h("div", { class: "panel" }, goals.length ? goalHero : null, cards.goals);
+    paintGoal();
 
-    /* ================= Decisions & risks ================= */
-    var allRisks = L(d.risks);
-    var decisions = L(d.decisions).slice().sort(function (a, b) {
+    /* ================= Decisions ================= */
+    var decs = decisions.slice().sort(function (a, b) {
       var pa = a.status === "proposed" ? 0 : 1, pb = b.status === "proposed" ? 0 : 1;
       if (pa !== pb) return pa - pb;
       return cmp(b.decided_on || "", a.decided_on || "") || cmp(title(a), title(b));
     });
-    var risks = allRisks.slice().sort(function (a, b) {
+    cards.decisions = N.listCard({ id: "decisions-list", title: "Decisions", count: N.total("decisions", decs.length), noun: "decisions", show: 8,
+      note: "The last 30 days, and anything still to decide.",
+      items: decs.map(function (x) {
+        var soon = revisitSoon(x), proposed = x.status === "proposed";
+        var why = x.rationale && x.rationale !== "unknown" ? x.rationale : null;
+        return { data: x, el: N.row({
+          title: x.title, tone: proposed ? "warn" : null,
+          meta: [x.decided_on ? "Decided " + N.date(x.decided_on) : "Not decided yet", L(x.deciders).length ? "By " + L(x.deciders).map(N.name).join(", ") + (L(x.relayed_by).length ? " (relayed by " + L(x.relayed_by).map(N.name).join(", ") + ")" : "") : null],
+          badge: proposed ? N.badge("Needs action", "warn") : soon ? N.badge("Revisit " + N.date(x.revisit_on), "warn") : x.status === "made" ? N.badge("Decided", "good") : N.status(x.status),
+          action: proposed ? N.request("Decide", N.withId("Let's decide " + N.quote(x.title), x.id), "secondary") : null,
+          search: [x.summary, why].join(" "),
+          detail: function () {
+            return N.detail({
+              text: x.summary,
+              blocks: [{ heading: "Why", nodes: N.para(why || "Not recorded. Ask Atlas to find or capture the reasoning.") },
+                L(x.alternatives).length ? { heading: "Also considered", nodes: N.lines(x.alternatives) } : null],
+              facts: N.mergeDetails([["Decided", x.decided_on ? N.dateY(x.decided_on) : "Not decided yet"], ["Decided by", L(x.deciders).map(N.name).join(", ")], ["Relayed by", L(x.relayed_by).map(N.name).join(", ")],
+                ["Projects", L(x.projects).map(N.name).join(", ")], ["Reversible", x.reversible === false ? "Hard to reverse" : x.reversible === true ? "Yes" : null],
+                ["Revisit", x.revisit_on ? N.dateY(x.revisit_on) : null]], x.details),
+              body: x.body, body_truncated: x.body_truncated, links: x.links, dates: N.datesLine(x.created, x.updated),
+              actions: [N.request("Ask Atlas", N.withId("Show me the decision " + N.quote(x.title), x.id), "ghost")]
+            });
+          } }) };
+      }),
+      filters: [{ key: "proposed", label: "Needs action", test: function (x) { return x.status === "proposed"; } }, { key: "revisit", label: "Revisit soon", test: revisitSoon },
+        { key: "hard", label: "Hard to reverse", test: function (x) { return x.reversible === false; } }],
+      sorts: [{ key: "old", label: "Oldest first", cmp: function (a, b) { return cmp(a.decided_on || "9", b.decided_on || "9"); } }],
+      empty: "No decisions in the last 30 days." });
+    var decPanel = h("div", { class: "panel" }, cards.decisions, N.more("decisions"));
+
+    /* ================= Risks ================= */
+    var rs = risks.slice().sort(function (a, b) {
       var ia = a.status === "active" ? 0 : 1, ib = b.status === "active" ? 0 : 1;
       return ia - ib || exposure(b) - exposure(a) || cmp(b.updated || "", a.updated || "") || cmp(title(a), title(b));
     });
-    var dRows = decisions.map(function (x) {
-      var soon = revisitSoon(x), proposed = x.status === "proposed";
-      var why = x.rationale && x.rationale !== "unknown" ? x.rationale : null;
-      var row = N.row({
-        title: x.title, tone: proposed ? "warn" : null,
-        meta: [x.decided_on ? "Decided " + N.date(x.decided_on) : "Not decided yet", L(x.deciders).length ? "By " + L(x.deciders).map(N.name).join(", ") + (L(x.relayed_by).length ? " (relayed by " + L(x.relayed_by).map(N.name).join(", ") + ")" : "") : null],
-        badge: proposed ? N.badge("Proposed", "warn") : soon ? N.badge("Revisit " + N.date(x.revisit_on), "warn") : x.status !== "made" ? N.status(x.status) : null,
-        action: proposed ? N.request("Decide", N.withId("Let's decide " + N.quote(x.title), x.id), "secondary") : null,
-        search: [x.summary, why].join(" "),
-        detail: function () {
-          return N.detail({
-            text: x.summary,
-            blocks: [{ heading: "Why", nodes: N.para(why || "Not recorded. Ask Atlas to find or capture the reasoning.") },
-              L(x.alternatives).length ? { heading: "Also considered", nodes: N.lines(x.alternatives) } : null],
-            facts: N.mergeDetails([["Decided", x.decided_on ? N.dateY(x.decided_on) : "Not decided yet"], ["Decided by", L(x.deciders).map(N.name).join(", ")], ["Relayed by", L(x.relayed_by).map(N.name).join(", ")],
-              ["Projects", L(x.projects).map(N.name).join(", ")], ["Reversible", x.reversible === false ? "Hard to reverse" : x.reversible === true ? "Yes" : null],
-              ["Revisit", x.revisit_on ? N.dateY(x.revisit_on) : null]], x.details),
-            body: x.body, body_truncated: x.body_truncated, links: x.links, dates: N.datesLine(x.created, x.updated),
-            actions: [N.request("Ask Atlas", N.withId("Show me the decision " + N.quote(x.title), x.id), "ghost")]
-          });
-        }
-      });
-      return track(row, { tab: "decisions", att: dAtt(x), kind: "decision" });
-    });
-    var rRows = risks.map(function (r) {
-      var issue = r.status === "active", e = exposure(r);
-      var row = N.row({
-        title: r.title, tone: issue || e >= 6 ? "bad" : e >= 3 ? "warn" : null,
-        meta: [r.owner ? "Owner " + who(r.owner) : "No owner", "Likelihood " + (r.likelihood ? N.label(r.likelihood).toLowerCase() : "not rated"),
-          "Impact " + (r.impact ? N.label(r.impact).toLowerCase() : "not rated")],
-        badge: N.badge(issue ? "Issue" : "Risk", issue ? "bad" : e >= 6 ? "warn" : "neutral"),
-        search: [r.summary, r.mitigation, r.insight].join(" "),
-        detail: function () {
-          return N.detail({
-            text: r.summary,
-            blocks: [{ heading: "Mitigation", nodes: N.para(r.mitigation || "None recorded.") },
-              r.insight ? { heading: "What Atlas noticed", nodes: N.para(r.insight) } : null],
-            facts: N.mergeDetails([["Status", issue ? "Happening now" : N.label(r.status)], ["Projects", L(r.projects).map(N.name).join(", ")],
-              ["Updated", r.updated ? N.dateY(r.updated) : null]], r.details),
-            body: r.body, body_truncated: r.body_truncated, links: r.links, dates: N.datesLine(r.created, r.updated),
-            actions: [N.request("Ask Atlas", N.withId("Show me the risk " + N.quote(r.title) + " and what we're doing about it", r.id), "ghost")]
-          });
-        }
-      });
-      return track(row, { tab: "decisions", att: rAtt(r), kind: "risk" });
-    });
-    var decCount = h("span", { class: "count" }, ""), riskCount = h("span", { class: "count" }, "");
-    var drPanel = h("div", { class: "panel" },
-      h("div", { class: "cols" },
-        h("div", { class: "col" }, h("h3", { class: "sub" }, "Recent decisions", decCount), N.listBox(dRows, "No decisions in the last 30 days."), N.more("decisions")),
-        h("div", { class: "col" }, h("h3", { class: "sub" }, "Risks and issues", riskCount),
-          h("p", { class: "col-note" }, "An issue is a risk that's happening now."), N.listBox(rRows, "No open risks or issues."), N.more("risks"))));
+    cards.risks = N.listCard({ id: "risks-list", title: "Risks and issues", count: N.total("risks", rs.length), noun: "risks", show: 8,
+      note: "An issue is a risk that's happening now.",
+      items: rs.map(function (r) {
+        var issue = r.status === "active", e = exposure(r);
+        return { data: r, el: N.row({
+          title: r.title, tone: issue || e >= 6 ? "bad" : e >= 3 ? "warn" : null,
+          meta: [r.owner ? "Owner " + who(r.owner) : "No owner", "Likelihood " + (r.likelihood ? N.label(r.likelihood).toLowerCase() : "not rated"),
+            "Impact " + (r.impact ? N.label(r.impact).toLowerCase() : "not rated")],
+          badge: issue ? N.badge("Critical", "bad") : e >= 6 ? N.badge("On edge", "warn") : N.badge("Monitoring"),
+          search: [r.summary, r.mitigation, r.insight].join(" "),
+          detail: function () {
+            return N.detail({
+              text: r.summary,
+              blocks: [{ heading: "Mitigation", nodes: N.para(r.mitigation || "None recorded.") },
+                r.insight ? { heading: "What Atlas noticed", nodes: N.para(r.insight) } : null],
+              facts: N.mergeDetails([["Status", issue ? "Happening now" : N.label(r.status)], ["Projects", L(r.projects).map(N.name).join(", ")],
+                ["Updated", r.updated ? N.dateY(r.updated) : null]], r.details),
+              body: r.body, body_truncated: r.body_truncated, links: r.links, dates: N.datesLine(r.created, r.updated),
+              actions: [N.request("Ask Atlas", N.withId("Show me the risk " + N.quote(r.title) + " and what we're doing about it", r.id), "ghost")]
+            });
+          } }) };
+      }),
+      filters: [{ key: "issue", label: "Happening now", test: function (r) { return r.status === "active"; } }, { key: "edge", label: "High exposure", test: function (r) { return r.status !== "active" && exposure(r) >= 6; } },
+        { key: "noowner", label: "No owner", test: function (r) { return !r.owner; } }],
+      sorts: [{ key: "updated", label: "Recently updated", cmp: function (a, b) { return cmp(b.updated || "", a.updated || ""); } }],
+      empty: "No open risks or issues." });
+    var riskPanel = h("div", { class: "panel" }, cards.risks, N.more("risks"));
 
     /* ================= People ================= */
     function youOwe(p) { return cs.filter(function (c) { return c.direction === "i_owe" && idOf(c.counterparty) === p.id; }); }
@@ -300,104 +392,100 @@
         return [c.title, " · ", h("span", { class: overdue(c) ? "late" : null }, c.status === "slipped" && !c.due ? "Slipped" : N.due(c.due))];
       }));
     }
-    var pRows = people.map(function (o) {
-      var p = o.p, late = anyLate(o.mine.concat(o.theirs));
-      var meet = meetingText(p.next_meeting);
-      var row = N.row({
-        title: p.title, tone: p.quiet ? "warn" : late ? "bad" : null,
-        meta: [[p.role, p.org ? N.name(p.org) : null].filter(Boolean).join(", ") || null,
-          p.last_contact ? "Last contact " + N.rel(p.last_contact) : "No contact recorded", meet ? "Next: " + meet : null],
-        badge: p.quiet ? N.badge("Gone quiet", "warn") : p.relationship ? N.badge(N.label(p.relationship)) : null,
-        action: o.theirs.length ? N.request("Nudge " + first(p), N.withId("Draft a follow-up to " + N.quote(p.title) + " about what they owe me", p.id), "secondary", false,
-          { kind: "nudge", target: p.id, quoted: p.title }) : null,
-        search: [p.role, N.name(p.org), p.quiet_reason, p.insight].join(" "),
-        detail: function () {
-          return N.detail({
-            blocks: [p.quiet && p.quiet_reason ? { heading: "Why they've gone quiet", nodes: N.para(p.quiet_reason) } : null,
-              p.insight ? { heading: "What Atlas noticed", nodes: N.para(p.insight) } : null,
-              o.theirs.length || o.mine.length ? { heading: null, nodes: h("div", { class: "owes" },
-                h("div", { class: "detail-block" }, h("h4", null, first(p) + " owes you"), owedList(o.theirs)),
-                h("div", { class: "detail-block" }, h("h4", null, "You owe " + first(p)), owedList(o.mine))) } : null],
-            facts: N.mergeDetails([["Relationship", p.relationship ? N.label(p.relationship) : null], ["Usually", p.cadence],
-              ["Last contact", p.last_contact ? N.dateY(p.last_contact) : "No contact recorded"], ["Next meeting", meet]], p.details),
-            body: p.body, body_truncated: p.body_truncated, links: p.links, dates: N.datesLine(p.created, p.updated),
-            actions: [N.request("Ask Atlas", N.withId("What do I know about " + N.quote(p.title) + "?", p.id), "ghost")]
-          });
-        }
-      });
-      return track(row, { tab: "people", att: !!p.quiet || o.mine.concat(o.theirs).some(cAtt), kind: "person" });
-    });
-    var peoplePanel = h("div", { class: "panel" },
-      h("p", { class: "col-note" }, "Who you have something open with, are meeting in the next 7 days, or haven't heard from."),
-      N.listBox(pRows, "Nobody has anything open with you, and no meetings this week."), N.more("people"),
+    cards.people = N.listCard({ id: "people-list", title: "People", count: N.total("people", people.length), noun: "people", show: 8,
+      note: "Who you have something open with, are meeting in the next 7 days, or haven't heard from.",
+      items: people.map(function (o) {
+        var p = o.p, late = anyLate(o.mine.concat(o.theirs)), meet = meetingText(p.next_meeting);
+        return { data: o, el: N.row({
+          title: p.title, tone: p.quiet ? "warn" : late ? "bad" : null,
+          meta: [[p.role, p.org ? N.name(p.org) : null].filter(Boolean).join(", ") || null,
+            p.last_contact ? "Last contact " + N.rel(p.last_contact) : "No contact recorded", meet ? "Next: " + meet : null],
+          badge: p.quiet ? N.badge("Gone quiet", "warn") : p.relationship ? N.badge(N.label(p.relationship)) : null,
+          action: o.theirs.length ? N.request("Nudge " + first(p), N.withId("Draft a follow-up to " + N.quote(p.title) + " about what they owe me", p.id), "secondary", false,
+            { kind: "nudge", target: p.id, quoted: p.title }) : null,
+          search: [p.role, N.name(p.org), p.quiet_reason, p.insight].join(" "),
+          detail: function () {
+            return N.detail({
+              blocks: [p.quiet && p.quiet_reason ? { heading: "Why they've gone quiet", nodes: N.para(p.quiet_reason) } : null,
+                p.insight ? { heading: "What Atlas noticed", nodes: N.para(p.insight) } : null,
+                o.theirs.length || o.mine.length ? { heading: null, nodes: h("div", { class: "owes" },
+                  h("div", { class: "detail-block" }, h("h4", null, first(p) + " owes you"), owedList(o.theirs)),
+                  h("div", { class: "detail-block" }, h("h4", null, "You owe " + first(p)), owedList(o.mine))) } : null],
+              facts: N.mergeDetails([["Relationship", p.relationship ? N.label(p.relationship) : null], ["Usually", p.cadence],
+                ["Last contact", p.last_contact ? N.dateY(p.last_contact) : "No contact recorded"], ["Next meeting", meet]], p.details),
+              body: p.body, body_truncated: p.body_truncated, links: p.links, dates: N.datesLine(p.created, p.updated),
+              actions: [N.request("Ask Atlas", N.withId("What do I know about " + N.quote(p.title) + "?", p.id), "ghost")]
+            });
+          } }) };
+      }),
+      filters: [{ key: "quiet", label: "Gone quiet", test: function (o) { return !!o.p.quiet; } }, { key: "owes", label: "Waiting on them", test: function (o) { return o.theirs.length > 0; } },
+        { key: "mine", label: "You owe them", test: function (o) { return o.mine.length > 0; } }, { key: "meeting", label: "Meeting this week", test: function (o) { return !!o.p.next_meeting; } }],
+      sorts: [{ key: "contact", label: "Longest since contact", cmp: function (a, b) { return cmp(a.p.last_contact || "", b.p.last_contact || ""); } }, { key: "title", label: "A to Z", cmp: function (a, b) { return cmp(title(a.p), title(b.p)); } }],
+      empty: "Nobody has anything open with you, and no meetings this week." });
+    var peoplePanel = h("div", { class: "panel" }, cards.people, N.more("people"),
       h("p", { class: "others" }, "Anyone else is a chat question: ask Atlas, for example, “What do I know about Sam?”"));
 
-    /* ================= Tabs, filter, find ================= */
-    var PANELS = { commitments: commitPanel, projects: projPanel, goals: goalPanel, decisions: drPanel, people: peoplePanel };
-    var TABS = [
-      { id: "commitments", label: "Commitments" }, { id: "projects", label: "Projects" }, { id: "goals", label: "Goals" },
-      { id: "decisions", label: "Decisions & risks" }, { id: "people", label: "People" }];
-    var nomatch = h("p", { class: "nomatch", role: "status" }, "");
-    var tabs = N.tabs(TABS, "commitments", function (id, user) {
-      state.tab = id;
-      if (user && stats) { stats.clear(); state.tile = null; }
-      apply();
-    });
-    var filterSeg = N.segmented("Show", [{ value: "all", label: "Everything" }, { value: "attention", label: "Needs attention" }], "all",
-      function (v) { state.filter = v; apply(); });
-    var find = N.search("Find on this page", function (q) { state.q = q; apply(); });
-    var EMPTY = {}, TAB_KEYS = { commitments: ["i_owe", "waiting_on"], projects: ["projects"], goals: ["goals"], decisions: ["decisions", "risks"], people: ["people"] };
-    var panelWrap = h("div", null, TABS.map(function (t) {
-      EMPTY[t.id] = h("p", { class: "empty", hidden: true }, "Nothing on this tab matches. Choose Everything, or clear the tile above.");
-      return h("div", { id: "panel-" + t.id, role: "tabpanel", "aria-labelledby": "tab-" + t.id }, EMPTY[t.id], PANELS[t.id]);
-    }));
-    main.appendChild(h("section", { class: "sec", "aria-label": "Your work" },
-      h("div", { class: "toolbar atl-tabs-sticky" }, tabs.el, h("div", { class: "toolbar-row" }, filterSeg, find)),
-      nomatch, panelWrap));
-
-    function tileOk(it) {
-      if (!state.tile) return true;
-      if (state.tile === "i_owe" || state.tile === "waiting_on") return it.kind !== "commitment" || it.dir === state.tile;
-      if (state.tile === "overdue") return it.kind !== "commitment" || it.late;
-      if (state.tile === "projects") return it.kind !== "project" || it.att;
-      return true;
-    }
-    function visible(it) { return N.matches(it.el, state.q) && (state.filter === "all" || it.att) && tileOk(it); }
-    function apply() {
-      var per = {};
-      items.forEach(function (it) { var ok = visible(it); it.el.hidden = !ok; if (ok) per[it.tab] = (per[it.tab] || 0) + 1; });
-      /* group headers hide with their rows */
-      [oweL, waitL].forEach(function (lst) { lst.heads.forEach(function (g) { g.el.hidden = !g.rows.some(function (r) { return !r.hidden; }); }); });
-      function shown(list) { return list.filter(function (el) { return !el.hidden; }).length; }
-      var oweRows = items.filter(function (i) { return i.dir === "i_owe"; }).map(function (i) { return i.el; });
-      var waitRows = items.filter(function (i) { return i.dir === "waiting_on"; }).map(function (i) { return i.el; });
-      var oN = shown(oweRows), wN = shown(waitRows);
-      oweCount.textContent = String(state.filter === "all" && !state.q && !state.tile ? N.total("i_owe", oweList.length) : oN);
-      waitCount.textContent = String(state.filter === "all" && !state.q && !state.tile ? N.total("waiting_on", waitList.length) : wN);
-      oweL.box.hidden = !oN; waitL.box.hidden = !wN;
-      oweNone.hidden = !!oN; waitNone.hidden = !!wN;
-      oweNone.textContent = oweList.length ? "Nothing here matches." : "You don't owe anyone anything right now.";
-      waitNone.textContent = waitList.length ? "Nothing here matches." : "You're not waiting on anyone.";
-      decCount.textContent = String(shown(dRows)); riskCount.textContent = String(shown(rRows));
-      var unfiltered = state.filter === "all" && !state.q && !state.tile;
-      TABS.forEach(function (t) {
-        var n = per[t.id] || 0, any = items.some(function (i) { return i.tab === t.id; });
-        if (unfiltered) n += TAB_KEYS[t.id].reduce(function (s, k) { return s + ((N.meta.truncated || {})[k] || 0); }, 0);
-        tabs.count(t.id, n, (t.id === "projects" && projAtt > 0) || (t.id === "commitments" && cs.some(overdue)));
-        PANELS[t.id].parentNode.hidden = t.id !== state.tab;
-        /* filtered to nothing: say so, and hide the empty lists and grids */
-        var blank = any && !(per[t.id] || 0) && !state.q;
-        EMPTY[t.id].hidden = !blank;
-        PANELS[t.id].hidden = blank;
-      });
-      nomatch.textContent = state.q && !(per[state.tab] || 0) ? "Nothing on this tab matches “" + state.q + "”." + (Object.keys(per).length ? " Try the other tabs." : "") : "";
-      nomatch.hidden = !nomatch.textContent;
-    }
-
-    var stats = null;
+    /* ================= Overview: one card per kind; every number opens its list, filtered ================= */
     var s = d.summary || {};
     var lateOwe = oweList.filter(overdue).length, lateWait = waitList.filter(overdue).length;
     var overdueN = s.overdue != null ? s.overdue : lateOwe + lateWait;
+    var projAtt = s.projects_attention != null ? s.projects_attention : ps.filter(pAtt).length;
+    function num(n, label, tone, go) {
+      return h("button", { type: "button", class: "ov-num", "data-tone": n ? tone || null : null, onclick: go, "aria-label": n + " " + label + ": open the list" }, h("b", null, String(n)), h("span", null, label));
+    }
+    function ovCard(icon, kind, main, pair, foot) {
+      return h("article", { class: "ov-card" }, h("p", { class: "ov-kind" }, N.icon(icon), kind), main, h("div", { class: "ov-pair" }, pair), foot ? h("p", { class: "ov-foot" }, foot) : null);
+    }
+    var worstC = cs.filter(overdue)[0], worstP = ps.filter(pAtt)[0], topG = goals.filter(function (g) { return g.status === "active"; })[0];
+    var quietN = people.filter(function (o) { return o.p.quiet; }).length, owesN = people.filter(function (o) { return o.theirs.length; }).length;
+    var issues = rs.filter(function (r) { return r.status === "active"; }), edge = rs.filter(function (r) { return r.status !== "active" && exposure(r) >= 6; });
+    var proposed = decs.filter(function (x) { return x.status === "proposed"; }).length;
+    var overview = h("div", { class: "ov" },
+      ovCard("commitment", "Commitments", num(overdueN, "overdue", "bad", function () { open("commitments", ["i_owe", "waiting_on"], "overdue"); }),
+        [num(s.i_owe != null ? s.i_owe : oweList.length, "you owe", null, function () { open("commitments", "i_owe", null); }),
+          num(s.waiting_on != null ? s.waiting_on : waitList.length, "waiting on others", null, function () { open("commitments", "waiting_on", null); })],
+        worstC ? (worstC.status === "slipped" ? "Slipped: " : "Overdue: ") + worstC.title : "Nothing overdue."),
+      ovCard("project", "Projects", num(projAtt, "need attention", "warn", function () { open("projects", "projects", "attention"); }),
+        [num(ps.filter(function (p) { return p.status === "active" && (!p.health || p.health === "unknown"); }).length, "not assessed", null, function () { open("projects", "projects", "unknown"); }),
+          num(N.total("projects", ps.length), "total", null, function () { open("projects", "projects", null); })],
+        worstP ? N.label(worstP.health) + ": " + worstP.title : "Every project is on track."),
+      ovCard("goal", "Goals", num(goals.filter(gAtt).length, "off track or at risk", "warn", function () { open("goals", "goals", "attention"); }),
+        [num(goals.filter(function (g) { return g.status === "active" && !g.assessment; }).length, "not assessed", null, function () { open("goals", "goals", "unknown"); }),
+          num(N.total("goals", goals.length), "total", null, function () { open("goals", "goals", null); })],
+        topG ? (typeof topG.rank === "number" ? "#" + topG.rank + ": " : "") + topG.title : "No active goals."),
+      ovCard("decision", "Decisions", num(proposed, "need action", "warn", function () { open("decisions", "decisions", "proposed"); }),
+        [num(decs.filter(revisitSoon).length, "revisit soon", null, function () { open("decisions", "decisions", "revisit"); }),
+          num(N.total("decisions", decs.length), "total", null, function () { open("decisions", "decisions", null); })],
+        decs.filter(function (x) { return x.status !== "proposed"; })[0] ? "Newest: " + decs.filter(function (x) { return x.status !== "proposed"; })[0].title
+          : decs[0] ? "To decide: " + decs[0].title : "No decisions in the last 30 days."),
+      ovCard("risk", "Risks", num(issues.length, "critical", "bad", function () { open("risks", "risks", "issue"); }),
+        [num(edge.length, "on edge", null, function () { open("risks", "risks", "edge"); }),
+          num(N.total("risks", rs.length), "total", null, function () { open("risks", "risks", null); })],
+        issues[0] ? "Critical: " + issues[0].title : rs[0] ? "Highest: " + rs[0].title : "No open risks."),
+      ovCard("person", "People", num(quietN, "gone quiet", "warn", function () { open("people", "people", "quiet"); }),
+        [num(owesN, "waiting on", null, function () { open("people", "people", "owes"); }),
+          num(N.total("people", people.length), "total", null, function () { open("people", "people", null); })],
+        people[0] ? (people[0].p.quiet ? "Gone quiet: " : "First up: ") + people[0].p.title : null));
+
+    /* ================= Tabs ================= */
+    var PANELS = { overview: overview, commitments: commitPanel, projects: projPanel, goals: goalPanel, decisions: decPanel, risks: riskPanel, people: peoplePanel };
+    var TABS = [
+      { id: "overview", label: "Overview" },
+      { id: "commitments", label: "Commitments", count: N.total("i_owe", oweList.length) + N.total("waiting_on", waitList.length), warn: overdueN > 0 },
+      { id: "projects", label: "Projects", count: N.total("projects", ps.length), warn: projAtt > 0 },
+      { id: "goals", label: "Goals", count: N.total("goals", goals.length), warn: goals.some(gAtt) },
+      { id: "decisions", label: "Decisions", count: N.total("decisions", decs.length), warn: proposed > 0 },
+      { id: "risks", label: "Risks", count: N.total("risks", rs.length), warn: issues.length > 0 },
+      { id: "people", label: "People", count: N.total("people", people.length), warn: quietN > 0 }];
+    tabs = N.tabs(TABS, "overview", function (id) {
+      TABS.forEach(function (t) { PANELS[t.id].parentNode.hidden = t.id !== id; });
+    });
+    main.appendChild(h("section", { class: "work", "aria-label": "Your work" },
+      h("div", { class: "atl-tabs-sticky" }, tabs.el),
+      h("div", null, TABS.map(function (t) {
+        return h("div", { id: "panel-" + t.id, role: "tabpanel", "aria-labelledby": "tab-" + t.id }, PANELS[t.id]);
+      }))));
+
     return {
       dateLine: "Where everything you're responsible for stands.",
       stats: [
@@ -405,12 +493,15 @@
         { key: "waiting_on", filter: true, value: s.waiting_on != null ? s.waiting_on : N.total("waiting_on", waitList.length), label: "waiting on others" },
         { key: "overdue", filter: true, tone: "bad", value: overdueN,
           label: overdueN && lateOwe + lateWait === overdueN ? "overdue: " + lateOwe + " you owe, " + lateWait + " waiting" : "overdue" },
-        { key: "projects", filter: true, tone: "bad", value: s.projects_attention != null ? s.projects_attention : projAtt, label: ["project needs attention", "projects need attention"] }],
+        { key: "projects", filter: true, tone: "bad", value: projAtt, label: ["project needs attention", "projects need attention"] }],
       onStat: function (key) {
-        state.tile = key;
-        var tab = key === "projects" ? "projects" : "commitments";
-        if (key && state.tab !== tab) { state.tab = tab; tabs.set(tab, false); }
-        apply();
+        var st = stats; stats = null;   /* opening a list clears the tile; keep this one chosen */
+        if (key === "i_owe") open("commitments", "i_owe", null);
+        else if (key === "waiting_on") open("commitments", "waiting_on", null);
+        else if (key === "overdue") open("commitments", ["i_owe", "waiting_on"], "overdue");
+        else if (key === "projects") open("projects", "projects", "attention");
+        else { cards.i_owe._listCard.setFilter(null); cards.waiting_on._listCard.setFilter(null); cards.projects._listCard.setFilter(null); }
+        stats = st;
       },
       onStatsReady: function (st) { stats = st; tabs.start(); }
     };

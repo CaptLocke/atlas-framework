@@ -270,10 +270,10 @@
   N.total = function (key, shown) { return shown + ((N.meta.truncated || {})[key] || 0); };
 
   /* ---- Buttons ---- */
-  /* opts: {label, variant: primary|secondary|ghost, check, onClick, ariaLabel} */
+  /* opts: {label, variant: primary|secondary|ghost, check, icon (before the label), onClick, ariaLabel} */
   N.button = function (o) {
     return h("button", { type: "button", class: "atl-btn atl-btn--" + (o.variant || "secondary"), onclick: o.onClick || null, "aria-label": o.ariaLabel || null },
-      o.check ? N.icon("check") : null, h("span", null, o.label));
+      o.check ? N.icon("check") : o.icon ? N.icon(o.icon) : null, h("span", null, o.label));
   };
 
   /* ---- PromptChip: an open-ended ask that belongs in chat, quoted, with Copy ("Copied" for 1.6 s).
@@ -320,6 +320,8 @@
     }
     return d;
   }
+  N.catmull = catmull;
+  N.rng = rng;
   N.strands = function (o) {
     o = o || {};
     var r = rng(o.seed || N.meta.dashboard || "atlas"), band = o.band || [0.15, 0.85], W = 1000, H = 400;
@@ -545,6 +547,82 @@
     }
     li._search = [typeof o.title === "string" ? o.title : li.textContent, metas.join(" "), o.search || ""].join(" ").toLowerCase();
     return li;
+  };
+
+  /* ---- List card: "Title · N", the first rows, and "All N" to open the rest in place. Open, the card
+     spans the full width and gains filter chips with counts, a sort, and pages of 10.
+     opts: {id, title, count (defaults to items), note, items: [{el, data}], show (rows before "All", 4),
+     noun ("I owe"), filters: [{key, label, test(data)}], sorts: [{key, label, cmp(a, b)}], empty, tools, night} ---- */
+  N.listCard = function (o) {
+    var items = N.list(o.items), show = o.show || 4, open = false, filter = null, sort = null, page = 0, PAGE = 10;
+    var total = o.count != null ? o.count : items.length;
+    var list = h("ul", { class: "atl-list atl-list--bare" });
+    var foot = h("div", { class: "atl-listcard__foot" });
+    var chips = h("div", { class: "atl-listcard__chips", role: "group", "aria-label": "Filter " + o.title, hidden: true });
+    var sortEl = h("div", { class: "atl-listcard__sort", hidden: true });
+    var hid = (o.id || "lc") + "-h";
+    var card = h("section", { class: "atl-listcard" + (o.night ? " atl-night" : ""), id: o.id || null, "aria-labelledby": hid },
+      h("div", { class: "atl-listcard__head" },
+        h("h2", { class: "atl-listcard__title", id: hid }, o.title, total ? h("span", { class: "sec-count" }, String(total)) : null),
+        o.tools || null, o.note ? h("p", { class: "atl-listcard__note" }, o.note) : null),
+      chips, sortEl, items.length ? list : N.empty(o.empty || "Nothing here right now."), foot);
+    function rows() {
+      var r = items.filter(function (it) { return !filter || filter.test(it.data); });
+      if (sort) r = r.slice().sort(function (a, b) { return sort.cmp(a.data, b.data); });
+      return r;
+    }
+    function paint() {
+      var r = rows(), shown = open ? r.slice(page * PAGE, page * PAGE + PAGE) : r.slice(0, show);
+      list.textContent = "";
+      var lastGroup = null;
+      shown.forEach(function (it) {
+        if (it.group && it.group !== lastGroup && !sort) list.appendChild(N.group(it.group));
+        lastGroup = it.group;
+        list.appendChild(it.el);
+      });
+      card.classList.toggle("atl-listcard--open", open);
+      chips.hidden = sortEl.hidden = !open;
+      foot.textContent = "";
+      var pages = Math.ceil(r.length / PAGE);
+      if (!open && items.length > show) foot.appendChild(N.button({ label: "All " + items.length + (o.noun ? " " + o.noun : ""), icon: "expand", onClick: function () { open = true; page = 0; paint(); } }));
+      if (open) {
+        if (pages > 1) add(foot, [N.button({ label: "Previous", variant: "ghost", onClick: function () { if (page > 0) { page--; paint(); } } }),
+          h("span", { class: "atl-listcard__page" }, "Page " + (page + 1) + " of " + pages),
+          N.button({ label: "Next", variant: "ghost", onClick: function () { if (page < pages - 1) { page++; paint(); } } })]);
+        foot.appendChild(N.button({ label: "Show less", icon: "collapse", variant: "ghost", onClick: function () { open = false; filter = null; sort = null; paintChips(); paint(); card.scrollIntoView && card.scrollIntoView({ block: "nearest" }); } }));
+      }
+      foot.hidden = !foot.firstChild;
+    }
+    function paintChips() {
+      chips.textContent = "";
+      var fs = [{ key: null, label: "All", test: null }].concat(N.list(o.filters));
+      fs.forEach(function (f) {
+        var n = items.filter(function (it) { return !f.test || f.test(it.data); }).length;
+        if (f.key && !n) return;
+        chips.appendChild(h("button", { type: "button", class: "atl-chipbtn", "aria-pressed": String((filter && filter.key) === f.key),
+          onclick: function () { filter = f.key ? f : null; page = 0; paintChips(); paint(); } }, f.label, h("span", { class: "atl-chipbtn__n" }, String(n))));
+      });
+      sortEl.textContent = "";
+      if (N.list(o.sorts).length) {
+        sortEl.appendChild(h("span", { class: "overline" }, "Sort"));
+        [{ key: null, label: "Suggested" }].concat(o.sorts).forEach(function (x) {
+          sortEl.appendChild(h("button", { type: "button", class: "atl-chipbtn atl-chipbtn--quiet", "aria-pressed": String((sort && sort.key) === x.key),
+            onclick: function () { sort = x.key ? x : null; page = 0; paintChips(); paint(); } }, x.label));
+        });
+      }
+    }
+    paintChips(); paint();
+    card._listCard = { refresh: paint, setFilter: function (key) {
+      filter = N.list(o.filters).filter(function (f) { return f.key === key; })[0] || null; open = !!filter || open; page = 0; paintChips(); paint();
+    } };
+    return card;
+  };
+
+  /* A person's initials in a circle: ink when you owe them, outlined when they owe you. */
+  N.avatar = function (name, theirs) {
+    var w = String(name || "").replace(/[^\w\s'-]/g, " ").trim().split(/\s+/).filter(Boolean);
+    return h("span", { class: "atl-avatar" + (theirs ? " atl-avatar--out" : ""), "aria-hidden": "true" },
+      w.length ? (w[0][0] + (w.length > 1 ? w[w.length - 1][0] : "")).toUpperCase() : "·");
   };
 
   /* What goes inside an expanded row or a card. opts: {facts:[[label, value]], text, blocks:[{heading, nodes}],
@@ -871,7 +949,7 @@
 
   /* ---- Render a page ----
      build(data, main) appends sections to main and returns the page head:
-       {title, dateLine (or subtitle), lead, stats:[...], onStat(key, stat)} */
+       {title, dateLine (or subtitle), lead, stats:[...], onStat(key, stat), band (the head as a night title band)} */
   var resizeBound = false, hashDone = false;
   function paint(defaults, build, data, waiting) {
     var app = document.getElementById("app");
@@ -905,8 +983,8 @@
       h("a", { class: "skip", href: "#main" }, "Skip to content"),
       headerEl,
       h("div", { class: "wrap" },
-        h("div", { class: "page-head" },
-          N.strands({ band: [0.1, 0.6] }),
+        h("div", { class: "page-head" + (head.band ? " page-head--band atl-night" : "") },
+          N.strands({ band: head.band ? [0.05, 0.95] : [0.1, 0.6] }),
           h("h1", { class: "page-title" }, head.title),
           head.dateLine || head.subtitle ? h("p", { class: "date-line" }, head.dateLine || head.subtitle) : null,
           lead ? h("p", { class: "lead" }, N.rich(lead)) : null,
