@@ -1550,6 +1550,10 @@ def check_user(c):
     for f in listdir(tdir):
         if f.endswith(".md"):
             check_template(c, os.path.join(tdir, f))
+    adir = c.p("user", "logs", "activity")
+    months = sorted(f for f in listdir(adir) if re.match(r"^\d{4}-\d{2}\.md$", f))
+    if months:
+        check_activity(c, os.path.join(adir, months[-1]))
     idir = c.p("user", "inbox")
     for f in listdir(idir):
         if f in INBOX_STATUSES:
@@ -1598,6 +1602,26 @@ def check_inbox(c, path):
         wrong = ["%s %s (file has %d)" % (s, counts.get(s, 0), n) for s, n in actual.items() if (counts.get(s) or 0) != n]
         if wrong:
             rep.error(path, "counts don't match the entries: " + ", ".join(wrong))
+
+
+ACTIVITY_RE = re.compile(r"^- \d{4}-\d{2}-\d{2} \d{2}:\d{2} · (chat|update|setup|routine:[A-Za-z0-9][A-Za-z0-9_-]*) "
+                         r"· [^·]+? · .+ · commit [0-9a-f]{7,40}$")
+
+
+def check_activity(c, path):
+    """The month's activity log: every line in the one format of formats.md §4. A warning, not an error:
+    older lines stay as written, and only the current month is checked, so the fix is for lines to come."""
+    try:
+        with open(path, encoding="utf-8") as f:
+            lines = f.read().splitlines()
+    except OSError as e:
+        c.rep.warn(path, "can't read the activity log (%s)" % e)
+        return
+    bad = [n for n, line in enumerate(lines, 1) if line.startswith("- ") and not ACTIVITY_RE.match(line.rstrip())]
+    if bad:
+        c.rep.warn(path, "%d line(s) not in the activity format (formats.md §4: `- <date> <time> · <actor> · "
+                         "<job or action> · <summary> · commit <sha>`), first at line %d; write new lines in it"
+                         % (len(bad), bad[0]))
 
 
 HOT_MAX = 75
@@ -1714,6 +1738,8 @@ def check_path(c, path):
         check_changelog(c)
     elif rel == "CHANGELOG.md":
         check_changelog(c)
+    elif re.match(r"^user/logs/activity/\d{4}-\d{2}\.md$", rel):
+        check_activity(c, p)
     elif rel == "user/.state/import.yaml":
         check_import(c, p)
     elif rel.startswith("system/dashboards/") or rel.startswith("system/migrations/"):

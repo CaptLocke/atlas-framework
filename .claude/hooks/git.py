@@ -99,8 +99,8 @@ MAX_FILE_BYTES = 2 * 1024 * 1024
 
 def git(args, cwd, timeout=10):
     try:
-        r = subprocess.run(["git"] + args, cwd=cwd, capture_output=True, text=True,
-                           timeout=timeout, errors="replace")
+        r = atlas.timed_run(["git"] + args, timeout, cwd=cwd, capture_output=True, text=True,
+                            errors="replace")
         return r.returncode, r.stdout
     except (OSError, subprocess.SubprocessError):
         return 1, ""

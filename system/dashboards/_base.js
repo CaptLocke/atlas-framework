@@ -291,7 +291,8 @@
     confirm: 1, correct: 1, nudge: 1, approve: 1 };
   /* kinds whose item leaves the page once applied; the others give their button back */
   var CLOSES = { mark_done: 1, mark_received: 1, answer: 1, decline: 1, not_useful: 1, confirm: 1, correct: 1, approve: 1 };
-  var APPLIED = { nudge: "Draft ready" };   /* kinds that keep a badge once applied, and its text */
+  /* kinds that keep a badge for a few days once applied (from applied_at), then give the button back */
+  var APPLIED = { nudge: { text: "Draft ready", days: 3 } };
   var REQUEST_STATE = {
     queued: "Saved. Atlas does this at its next run or chat",
     applied: "Done",
@@ -303,9 +304,17 @@
   N.requestView = function (row, kind) {
     if (!row || !REQUEST_STATE[row.state] && row.state !== "refused") return {};
     if (row.state === "refused") return { note: row.note ? "Atlas couldn't do this: " + clean(row.note, 160) : "Atlas couldn't do this." };
-    if (row.state === "applied" && APPLIED[kind]) return { badge: APPLIED[kind], tone: "good" };
+    if (row.state === "applied" && APPLIED[kind]) {
+      var at = Date.parse(row.applied_at || "");
+      return at > Date.now() - APPLIED[kind].days * 864e5 ? { badge: APPLIED[kind].text, tone: "good" } : {};
+    }
     if (row.state === "applied" && !CLOSES[kind]) return {};
-    return { badge: REQUEST_STATE[row.state], tone: row.state === "applied" ? "good" : "neutral" };
+    return { badge: N.chosen(row.args) + REQUEST_STATE[row.state], tone: row.state === "applied" ? "good" : "neutral" };
+  };
+  /* "Yes · " for a request that carries a choice, so a badge says which button was pressed */
+  N.chosen = function (args) {
+    var c = args && typeof args.choice === "string" ? clean(args.choice, 40) : "";
+    return c ? c.charAt(0).toUpperCase() + c.slice(1) + " · " : "";
   };
   /* Which item a request belongs to: its record and kind, and for a belief the statement too,
      since every belief in a profile part shares one target. */
@@ -339,7 +348,7 @@
       }).then(function () {
         /* the picker must go: an open one holds every live re-render */
         var hadFocus = holder.contains(document.activeElement);
-        var badge = N.badge(REQUEST_STATE.queued, "neutral");
+        var badge = N.badge(N.chosen(args || spec.args) + REQUEST_STATE.queued, "neutral");
         holder.textContent = "";
         holder.appendChild(badge);
         if (hadFocus) { badge.setAttribute("tabindex", "-1"); badge.focus({ preventScroll: true }); }

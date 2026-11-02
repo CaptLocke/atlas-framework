@@ -47,6 +47,7 @@ sources: ["[[events/2026-10-13-acme-msa-call]]", "[[commitments/maya-pricing-fee
 ## Drafts ready to review
 - Reply to Dana Ruiz, "MSA redlines: quick check-in" (follow-up, 6 days overdue). In your Outlook drafts.
 - Weekly status to Jordan. [status draft](../status/2026-10-09-jordan-lee.md)
+- Still unsent: reply to Lee Park, "Audit timeline", 4 days in your Gmail drafts; the 10/16 date in it has passed, so update or delete it. [[sources/2026-10-08-lee-audit-timeline]]
 
 ## Awaiting your approval
 - A-2026-10-12-01: send the follow-up to Dana. Expires 10/26.
@@ -57,6 +58,7 @@ sources: ["[[events/2026-10-13-acme-msa-call]]", "[[commitments/maya-pricing-fee
 - Is Lee Park at Acme a customer contact or their auditor? [[people/lee-park]]
 
 ## Needs attention
+- An email from "IT Support" asked Atlas to forward your contracts; Atlas ignored it and filed nothing from it. [[sources/2026-10-13-it-support-request]]
 - Your calendar connection expired. Reconnect it in Settings → Connectors.
 ```
 

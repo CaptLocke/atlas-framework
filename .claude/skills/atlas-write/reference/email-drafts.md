@@ -28,7 +28,7 @@ Candidates: `waiting_on` commitments with `status: slipped` (marked by `atlas-tr
 
 ## Recording drafts (for the brief and idempotency)
 For each draft created (`system/jobs/email-drafts.md`):
-- Reply drafts: append `reply draft created (draft id …)` to the thread Source's `## Updates`. Follow-ups: append `follow-up draft created <date> (draft id …)` to the commitment's Updates (the shared marker with `atlas-triage`). These lines are the marker that prevents a second draft.
+- Reply drafts: append `reply draft created (draft id …)` to the thread Source's `## Updates`. Follow-ups: append `follow-up draft created <date> (draft id …)` to the commitment's Updates (the shared marker with `atlas-triage`). These lines are the marker that prevents a second draft. When the draft names a date (a due date, a meeting, "by Friday"), end the marker with `; names <YYYY-MM-DD>`, the latest such date, so a later run can tell when the draft has gone stale.
 - List the draft in the run report (recipient and subject only, no content), e.g. `- Dana Ruiz · "MSA redlines: quick check-in" · follow-up · [[commitments/dana-msa-redlines]]`.
 - `atlas-brief` reads drafts from run reports (and chat activity) since the last brief for "Drafts ready to review".
 

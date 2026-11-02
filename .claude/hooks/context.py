@@ -37,6 +37,10 @@ Policy (system/rules/governance.md):
   then fall back to DEFAULT_OWNED_PATHS.
 - Internal errors fail closed in routine context and for locked actions;
   otherwise the call is allowed with a warning on stderr.
+- Each guard shares one time budget across its git and release_check waits
+  (BUDGETS, a few seconds under its timeout in .claude/settings.json). A guard
+  that spends it blocks and says so, in any context, rather than letting the
+  platform cut it off with no reason given.
 """
 import datetime as _dt
 import json
@@ -44,6 +48,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 
 TMP_DIR = ".atlas-tmp"
 MAINTAINER_MARKER = ".atlas-maintainer"
@@ -72,6 +77,37 @@ DEFAULT_OWNED_PATHS = ["CLAUDE.md", "README.md", "LICENSE", "CHANGELOG.md", "SEC
 
 _CACHE = {}
 
+# Seconds each guard may spend in total, under its "timeout" in .claude/settings.json
+# (git 30, paths 20, actions 20), leaving room for Python to start and report.
+BUDGETS = {"git": 25, "paths": 16, "actions": 16}
+
+
+class OutOfTime(Exception):
+    """The guard's time budget ran out before its checks finished."""
+
+
+def wait(cap):
+    """Seconds a subprocess may take: its own cap, or what's left of the budget if less.
+    Raises OutOfTime when less than a second is left."""
+    if STATE.deadline is None:
+        return cap
+    left = STATE.deadline - time.monotonic()
+    if left < 1:
+        raise OutOfTime()
+    return min(cap, left)
+
+
+def timed_run(argv, cap, **kwargs):
+    """subprocess.run within the budget. A wait cut short by the budget raises OutOfTime;
+    one that hit its own cap raises TimeoutExpired as before."""
+    limit = wait(cap)
+    try:
+        return subprocess.run(argv, timeout=limit, **kwargs)
+    except subprocess.TimeoutExpired:
+        if limit < cap:
+            raise OutOfTime()
+        raise
+
 
 class State:
     """Per-call state the error handler consults (fail-closed decisions)."""
@@ -79,6 +115,7 @@ class State:
     context = "routine"
     locked = False      # set once the call is known to be a locked action
     raw = None          # raw stdin text (for failsafe.py)
+    deadline = None     # time.monotonic() by which the guard must decide (run sets it)
 
 
 STATE = State()
@@ -197,8 +234,8 @@ def is_upstream(proj):
 def origin_slug(proj):
     """'owner/repo' of the origin remote, or ''."""
     try:
-        r = subprocess.run(["git", "-C", proj, "remote", "get-url", "origin"],
-                           capture_output=True, text=True, timeout=3)
+        r = timed_run(["git", "-C", proj, "remote", "get-url", "origin"], 3,
+                      capture_output=True, text=True)
         return repo_slug(r.stdout) if r.returncode == 0 else ""
     except (OSError, subprocess.SubprocessError):
         return ""
@@ -272,8 +309,8 @@ def dashboard_pages(proj):
 def _git(proj, args, timeout=10):
     """(returncode, stdout); 1 on any error."""
     try:
-        r = subprocess.run(["git", "-C", proj] + args, capture_output=True, text=True,
-                           timeout=timeout, errors="replace", stdin=subprocess.DEVNULL)
+        r = timed_run(["git", "-C", proj] + args, timeout, capture_output=True, text=True,
+                      errors="replace", stdin=subprocess.DEVNULL)
         return r.returncode, r.stdout
     except (OSError, subprocess.SubprocessError):
         return 1, ""
@@ -302,8 +339,8 @@ def release_verified(proj, full_ref):
         tool = os.path.join(proj, "system", "tools", "release_check.py")
         name = full_ref[len("refs/atlas-upstream/"):]
         try:
-            r = subprocess.run([sys.executable, "-I", tool, "verify", full_ref, name], cwd=proj,
-                               capture_output=True, timeout=30, stdin=subprocess.DEVNULL)
+            r = timed_run([sys.executable, "-I", tool, "verify", full_ref, name], 30, cwd=proj,
+                          capture_output=True, stdin=subprocess.DEVNULL)
             _CACHE[key] = r.returncode == 0
         except (OSError, subprocess.SubprocessError):
             _CACHE[key] = False
@@ -552,6 +589,7 @@ def run(hook_name, handler):
     The handler ends by calling block(), ask() or allow(); returning normally
     means allow."""
     STATE.hook = hook_name
+    STATE.deadline = time.monotonic() + BUDGETS.get(hook_name, 16)
     STATE.context = atlas_context()
     try:
         raw = sys.stdin.read()
@@ -584,6 +622,11 @@ def run(hook_name, handler):
         handler(payload, proj, STATE.context)
     except SystemExit:
         raise
+    except OutOfTime:
+        block("ran out of time (%ds) before its checks finished, so this was blocked to stay safe. "
+              "Nothing was found wrong with it: git or the release check was slow, often a busy disk or "
+              "network. Try it again; if it keeps happening, record it as a known issue."
+              % BUDGETS.get(hook_name, 16))
     except Exception as e:
         detail = "%s: %s" % (type(e).__name__, e)
         if STATE.context == "routine" or STATE.locked:
