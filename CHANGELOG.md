@@ -7,6 +7,23 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
+## 3.0.0 (2026-11-01)
+
+### What's new
+- Your pages have a new look, Constellation: a calmer, lighter design with one dark card for what matters most, a single typeface, and phone and dark-mode layouts. Your brand colours from your design system still apply.
+- **Today** shows your day to scale: meetings, the time between them, and a line for now. Atlas places your top priorities in the open windows ("11:30 window"), says what won't fit and suggests sending a new date. Choose a meeting or window to see its brief: who's in it, what you owe them and what they owe you.
+- Overdue items are grouped by person, oldest first, and Waiting on gives each person one nudge.
+- **Work** opens on an Overview: every number takes you to its list, already filtered. Risks have their own tab, every list can be filtered, sorted and paged, and each project and goal opens with a summary and a web of what it links to.
+- **Guide** has Settings you can change on the page: working hours, your shortest focus window, insights per brief, which meetings show, follow-up channels, and more. Changes that move your routines wait for your next chat.
+- **Records** is a new page: everything Atlas keeps and how it connects, as a web you can zoom into. Search by name, or start from what needs attention.
+- Every button you press shows "Waiting for Atlas" with Undo. Undo works before Atlas acts and for 14 days after, except for anything already sent.
+- A draft on Today says Approve, never Send: Atlas sends only from a chat, after you confirm.
+- Project pages are gone: Records zoomed to a project, or Work's Projects tab, shows what they did. A project's history and sources are a question for chat.
+- You can choose your shortest focus window: say "make my shortest focus window 45 minutes", or change it on Guide.
+
+### Action needed
+- If you made project pages, delete them in Claude when you like: they no longer update, so they'll go out of date. Ask Atlas "which old project pages can I delete?" for the links.
+
 ## 2.6.1 (2026-11-01)
 
 ### What's new
