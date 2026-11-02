@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<title>Records</title>
+<style id="atlas-base">{{ATLAS_BASE_CSS}}</style>
+<style id="atlas-page">
+/* The head's counts: plain numbers beside the title, not tiles */
+.page-head .atl-stats { position: absolute; right: 0; top: var(--space-10); margin: 0; display: flex; gap: var(--space-8); }
+.page-head .atl-stat { min-height: 0; padding: 0; background: none; border: 0; color: var(--ink); align-items: flex-end; }
+.page-head .atl-stat__num { font-size: clamp(36px, 4vw, 48px); font-weight: 200; }
+.page-head .atl-stat__label { color: var(--muted); font-size: 13px; }
+.page-head .atl-stat--action:hover { background: none; }
+@media (max-width: 52rem) { .page-head .atl-stats { position: static; } .page-head .atl-stat { align-items: flex-start; } }
+
+/* Search and Start from */
+.finder { display: flex; flex-direction: column; gap: var(--space-4); }
+.find { position: relative; max-width: 560px; }
+.find .atl-search { max-width: none; }
+.results { position: absolute; z-index: 15; left: 0; right: 0; top: calc(100% + 6px); list-style: none; margin: 0; padding: 6px; border: 1px solid var(--line); border-radius: var(--radius-card-sm); background: var(--surface); box-shadow: var(--shadow-lift); }
+.results button { width: 100%; display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 12px; border: 0; border-radius: var(--radius-md); background: none; color: var(--ink); font-family: inherit; font-size: 14px; text-align: left; cursor: pointer; }
+.results button:hover, .results button:focus-visible { background: var(--row-hover); }
+.results button span:last-child { margin-left: auto; font-size: 12px; color: var(--muted); }
+.results .is-critical { color: var(--bad) !important; } .results .is-warning { color: var(--warn) !important; }
+.starts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.starts .overline { margin-right: 6px; }
+.start { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px; border: 1px solid var(--line); border-radius: var(--radius-pill); background: var(--surface); color: var(--ink); font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; }
+.start:hover { border-color: var(--ink); }
+.start .atl-icon { width: 13px; height: 13px; }
+.start { max-width: 100%; text-align: left; }
+.start b, .start .atl-icon { flex: none; white-space: nowrap; }
+.start b { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.start b.focus { color: var(--accent-text); } .start b.off { color: var(--bad); }
+
+/* The library card: follows the web */
+.lib { padding: var(--space-9); display: flex; flex-direction: column; gap: var(--space-5); }
+.lib__kicker { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--night-muted); }
+.lib__title { font-size: clamp(24px, 2.6vw, 30px); font-weight: 300; letter-spacing: -0.01em; color: var(--night-text); }
+.lib__sub { font-size: 15px; color: var(--night-muted); }
+.lib__cols { display: flex; flex-wrap: wrap; gap: var(--space-7) var(--space-9); }
+.lib__col { flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; }
+.lib__col h3 { padding-bottom: 10px; font-size: 12px; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--night-muted); }
+.lib__col h3.crit { color: var(--bad-on-night); }
+.lrow { display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 12px; border: 0; border-top: 1px solid var(--night-line); border-radius: 0; background: none; color: var(--night-text); font-family: inherit; font-size: 15px; text-align: left; cursor: pointer; width: 100%; }
+.lrow:hover, .lrow:focus-visible { background: var(--night-raised); }
+.lrow .atl-icon { width: 14px; height: 14px; color: var(--night-muted); }
+.lrow.is-critical .atl-icon, .lrow.is-critical .lrow__m { color: var(--bad-on-night); }
+.lrow.is-warning .atl-icon, .lrow.is-warning .lrow__m { color: var(--warn-on-night); }
+.lrow__t { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lrow__m { flex: none; font-size: 12px; color: var(--night-muted); }
+.lib .atl-seg { background: var(--night-raised); }
+.lib .atl-seg__btn { color: var(--night-muted); }
+.lib .atl-seg__btn--on { background: var(--night-text); color: var(--night); }
+.lib__more { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--night-muted); }
+.lib__group + .lib__group { margin-top: var(--space-4); }
+.lib__group h4 { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 12px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--night-muted); }
+.lib__group h4 .atl-icon { width: 12px; height: 12px; }
+@media (max-width: 40rem) { .lib { padding: var(--space-7); } }
+</style>
+<style id="atlas-theme">{{ATLAS_THEME_CSS}}</style>
+</head>
+<body>
+<div id="app"></div>
+<script id="atlas-data" type="application/json">{{ATLAS_DATA}}</script>
+<script id="atlas-base-js">{{ATLAS_BASE_JS}}</script>
+<script id="atlas-page-js">
+(function () {
+  var N = window.Atlas, h = N.h, L = N.list;
+  var keep = null;   /* the web's view, kept across live repaints */
+
+  N.page({ title: "Records" }, function (d, main) {
+    var recs = L(d.records), links = L(d.links), me = N.meta.user_display_name;
+    var T = {}; N.webTypes.forEach(function (t) { T[t.id] = t; });
+    var lib = h("section", { class: "atl-night lib", "aria-live": "polite", "aria-label": "Your library" });
+    var sort = "attention", limit = 12;
+    var web = N.web({ records: recs, links: links, onChange: function () { keep = web ? web.state() : keep; sort = "attention"; limit = 12; paintLib(); } });
+    function name(r) { return me && r.title === me && r.type === "person" ? "You" : r.title; }
+    function rowFor(r, meta) {
+      return h("button", { type: "button", class: "lrow" + (r.attention ? " is-" + r.attention : ""), onclick: function () { web.go(r.id); web.el.scrollIntoView && web.el.scrollIntoView({ block: "nearest" }); } },
+        N.icon((T[r.type] || {}).icon || "records"), h("span", { class: "lrow__t" }, name(r)), h("span", { class: "lrow__m" }, meta != null ? meta : r.status_word || web.degree(r.id) + " links"));
+    }
+    function sorted(list) {
+      var a = list.slice();
+      if (sort === "az") a.sort(function (x, y) { return name(x).localeCompare(name(y)); });
+      else if (sort === "links") a.sort(function (x, y) { return web.degree(y.id) - web.degree(x.id); });
+      else a.sort(function (x, y) { return web.score(y.id) - web.score(x.id); });
+      return a;
+    }
+    function listBlock(list) {
+      var a = sorted(list), shown = a.slice(0, limit);
+      return [N.segmented("Sort", [{ value: "attention", label: "Needs attention" }, { value: "links", label: "Most linked" }, { value: "az", label: "A to Z" }], sort,
+          function (v) { if (v !== sort) { sort = v; limit = 12; paintLib(); } }),
+        h("div", { class: "lib__col" }, shown.map(function (r) { return rowFor(r); })),
+        a.length > limit ? h("p", { class: "lib__more" }, "Showing " + shown.length + " of " + a.length, N.button({ label: "Show 12 more", variant: "secondary", onClick: function () { limit += 12; paintLib(); } })) : null];
+    }
+    function paintLib() {
+      lib.textContent = "";
+      var s = web.state();
+      if (s.sel) {
+        var r = web.record(s.sel), ns = web.neighbours(s.sel), centered = s.level === "record" && s.center === s.sel, groups = {};
+        ns.forEach(function (n) { (groups[n.type] = groups[n.type] || []).push(n); });
+        N.add(lib, [h("p", { class: "lib__kicker" }, N.icon(T[r.type].icon), T[r.type].one, r.attention ? N.badge(r.status_word, r.attention === "critical" ? "bad" : "warn") : null),
+          h("h2", { class: "lib__title" }, name(r)),
+          h("p", { class: "lib__sub" }, ns.length + (ns.length === 1 ? " linked record" : " linked records") + (r.updated ? " · updated " + N.date(r.updated) : "")),
+          h("div", { class: "atl-actions" }, centered ? null : N.button({ label: "Zoom in", icon: "expand", variant: "primary", onClick: function () { web.go(r.id); } }),
+            N.prompt("What's the latest on " + name(r) + "?"), r.type === "project" ? N.prompt("What's blocking " + name(r) + "?") : null),
+          ns.length ? h("div", { class: "lib__cols" }, h("div", { class: "lib__col" }, N.webTypes.filter(function (t) { return groups[t.id]; }).map(function (t) {
+            return h("div", { class: "lib__group" }, h("h4", null, N.icon(t.icon), t.label + " · " + groups[t.id].length),
+              sorted(groups[t.id]).slice(0, 8).map(function (n) { return rowFor(n); }));
+          }))) : h("p", { class: "lib__sub" }, "Nothing links to this record yet.")]);
+      } else if (s.focus) {
+        var t = T[s.focus], list = recs.filter(function (x) { return x.type === s.focus; });
+        N.add(lib, [h("p", { class: "lib__kicker" }, N.icon(t.icon), t.label), h("h2", { class: "lib__title" }, list.length + " " + t.label.toLowerCase()), listBlock(list)]);
+      } else {
+        var att = recs.filter(function (x) { return x.attention === "critical"; }).sort(function (a, b) { return web.score(b.id) - web.score(a.id); }).slice(0, 5);
+        var con = recs.slice().sort(function (a, b) { return web.degree(b.id) - web.degree(a.id); }).slice(0, 5);
+        N.add(lib, [h("p", { class: "lib__kicker" }, N.icon("records"), "Your library"),
+          h("h2", { class: "lib__title" }, recs.length.toLocaleString() + " records, " + links.length.toLocaleString() + " links"),
+          h("p", { class: "lib__sub" }, "Choose a type in the web to light its links, or start from one of these."),
+          h("div", { class: "lib__cols" },
+            h("div", { class: "lib__col" }, h("h3", { class: "crit" }, "Needs attention"), att.length ? att.map(function (r) { return rowFor(r); }) : h("p", { class: "lib__sub" }, "Nothing critical.")),
+            h("div", { class: "lib__col" }, h("h3", null, "Most connected"), con.map(function (r) { return rowFor(r, web.degree(r.id) + " links"); })))]);
+      }
+    }
+
+    /* Search by name, on the page */
+    var results = h("ul", { class: "results", hidden: true, role: "listbox", "aria-label": "Matching records" });
+    function find(q) {
+      results.textContent = "";
+      if (!q) { results.hidden = true; return; }
+      var hits = recs.filter(function (r) { return name(r).toLowerCase().indexOf(q) >= 0; }).sort(function (a, b) { return web.score(b.id) - web.score(a.id); }).slice(0, 8);
+      results.hidden = false;
+      if (!hits.length) { results.appendChild(h("li", { class: "small", style: "padding:10px 12px" }, "No matches")); return; }
+      hits.forEach(function (r) {
+        results.appendChild(h("li", null, h("button", { type: "button", role: "option", onclick: function () { results.hidden = true; web.go(r.id); } },
+          N.icon((T[r.type] || {}).icon || "records"), h("span", null, name(r)),
+          h("span", { class: r.attention ? "is-" + r.attention : null }, T[r.type].one + (r.status_word ? " · " + r.status_word : "")))));
+      });
+    }
+    var search = N.search("Search " + recs.length.toLocaleString() + " records by name", find);
+    var input = search.querySelector("input");
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") { var b = results.querySelector("button"); if (b) b.click(); }
+      else if (e.key === "Escape") { input.value = ""; find(""); }
+    });
+
+    /* Start from */
+    function top(list, f) { return list.slice().sort(function (a, b) { return f(b) - f(a); })[0]; }
+    var starts = [
+      ["Focus", "focus", top(recs.filter(function (r) { return r.attention === "critical" && r.type === "commitment"; }), function (r) { return web.degree(r.id); })],
+      ["Off track", "off", top(recs.filter(function (r) { return r.attention && (r.type === "project" || r.type === "goal"); }), function (r) { return (r.attention === "critical" ? 1000 : 0) + web.degree(r.id); })],
+      ["Most connected", null, top(recs, function (r) { return web.degree(r.id); })],
+      ["Recent", null, top(recs.filter(function (r) { return r.type === "person" && name(r) !== "You"; }), function (r) { return Date.parse(r.updated || "") || 0; })]
+    ].filter(function (x) { return x[2]; });
+
+    main.appendChild(h("section", { class: "finder", "aria-label": "Find a record" },
+      h("div", { class: "find" }, search, results),
+      starts.length ? h("div", { class: "starts" }, h("span", { class: "overline" }, "Start from"), starts.map(function (x) {
+        return h("button", { type: "button", class: "start", onclick: function () { web.go(x[2].id); } }, h("b", { class: x[1] }, x[0]), N.icon(T[x[2].type].icon), name(x[2]));
+      })) : null));
+    main.appendChild(recs.length ? web.el : N.empty("Atlas hasn't filed any records yet."));
+    if (recs.length) main.appendChild(lib);
+    main.appendChild(h("div", null, N.more("records"), d.truncated ? h("p", { class: "more" }, d.truncated + " older records aren't drawn. Ask Atlas in chat about them.") : null));
+
+    if (keep && keep.center) web.go(keep.center); else if (keep && keep.focus) web.focusType(keep.focus);
+    paintLib();
+
+    return {
+      dateLine: "Everything Atlas keeps, and how it connects.",
+      stats: [{ key: "records", value: recs.length.toLocaleString(), label: "records" }, { key: "links", value: links.length.toLocaleString(), label: "links" }]
+    };
+  });
+})();
+</script>
+</body>
+</html>

@@ -99,7 +99,7 @@ Full detail, including copy-paste text: `reference/automations.md`.
 5. **Test run:** run one routine now (the platform's "run now", or ask the user to press it; pick the shortest, e.g. `upkeep`, or any routine whose jobs will early-exit before step 12). When it finishes, pull and read its run report in `user/logs/runs/`: it must show `atlas_context: routine`. If it shows anything else, the routine isn't attached to the environment: walk the user through fixing it (`reference/automations.md` §3) and test again. If no run can be started now, record `notes: {10: "routine test pending"}`; the weekly health check catches a missing marker (`routine-env-missing`).
 
 ### Step 11. Dashboards
-Use `atlas-dashboards` to publish the three dashboards (Today, Work and Guide) privately and save their links in `user/settings/dashboards.yaml`. Suggest bookmarking Today. If publishing fails, continue setup and add a known issue (`health.yaml`); briefs still work in chat.
+Use `atlas-dashboards` to publish the four dashboards (Today, Work, Guide and Records) privately and save their links in `user/settings/dashboards.yaml`. Suggest bookmarking Today. If publishing fails, continue setup and add a known issue (`health.yaml`); briefs still work in chat.
 
 ### Step 12. First pass and first Daily Brief
 1. **Approval cards, checked before the first pass.** Step 12 reads about two weeks of the user's mail and other sources in this chat. The cards were set as each connector was connected (§Approval cards before reading); now check against `connectors.yaml` that every tool it tags `send`, `share`, or `delete` is covered, and walk the user through any that aren't, the same way. A connector the user already declined in `notes.cards` stays declined: don't ask again. Save `notes: {12: "approval cards set: <connectors>"}`. Don't start the first pass until this is done or the user has declined.
@@ -131,6 +131,6 @@ Use `atlas-dashboards` to publish the three dashboards (Today, Work and Guide) p
 - The "Atlas routine" environment exists with `ATLAS_CONTEXT=routine`, every routine uses it, and a test run's report shows `atlas_context: routine` (or `setup.yaml: notes` says the test is pending).
 - `atlas.yaml` has a full attestation; every settings file passes `python3 system/tools/validate.py --all`.
 - Each `routines.yaml` routine has a `routine_id` or the user confirmed creating it from the copy-paste text.
-- `dashboards.yaml` has URLs for the three dashboards (or a known issue says why not).
+- `dashboards.yaml` has URLs for the four dashboards (or a known issue says why not).
 - The first Daily Brief exists and the user has seen it; `first_brief_delivered` is set.
 - An import, if started, is `complete` (or the user chose to stop it; `notes` says so) before the first brief.

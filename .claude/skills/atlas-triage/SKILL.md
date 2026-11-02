@@ -55,7 +55,7 @@ Keep the user's commitments honest and their priorities clear: nothing promised 
 ## Outputs
 - Commitment and project records (`status`, `priority`, `insight`, `next_step`, `health`, `completed_on`, Updates).
 - New commitments (via `atlas-capture`), questions in `user/inbox/questions.md`, follow-up approvals in `user/inbox/approvals.md` (drafts themselves come from `atlas-write`).
-- Republished Work and project pages (`atlas-dashboards`).
+- Republished Work and Records (`atlas-dashboards`).
 - `user/.state/triggers.yaml` entries; index lines; activity-log line; run-report row.
 - Data Work and the brief read directly from records (no separate file).
 
@@ -71,5 +71,5 @@ Keep the user's commitments honest and their priorities clear: nothing promised 
 - Every open/slipped commitment and every active project has a current `insight` and `next_step` (full mode).
 - Every closed commitment cites its evidence in Updates.
 - Every overdue `waiting_on` (not away) has exactly one pending approvals entry and is handed to the email-drafts procedure for its single follow-up draft (marker `follow-up draft created <date>`); the firing is recorded once in `triggers.yaml`.
-- Dashboards listing `triage` (Commitments, Projects, changed project pages) are republished when their data changed.
+- Dashboards listing `triage` (Work, Records) are republished when their data changed.
 - Indexes and the run report reflect the changes; everything is committed.

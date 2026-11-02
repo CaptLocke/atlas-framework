@@ -42,6 +42,7 @@
 .hero__block h3 { font-size: 12px; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--night-muted); }
 .hero__block p { font-size: 15px; line-height: 1.55; color: var(--night-text); max-width: 64ch; }
 .hero .atl-actions { margin-top: auto; padding-top: var(--space-2); }
+.hero .atl-web { margin: var(--space-2) calc(-1 * var(--space-5)) 0; }
 .measure { display: flex; flex-direction: column; gap: 8px; }
 .measure p { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; font-size: 14px; color: var(--night-muted); }
 .measure b { color: var(--night-text); font-weight: 600; }
@@ -173,6 +174,21 @@
     var commitPanel = h("div", { class: "panel" }, h("div", { class: "atl-cols" },
       h("div", { class: "atl-col" }, cards.i_owe, N.more("i_owe")), h("div", { class: "atl-col" }, cards.waiting_on, N.more("waiting_on"))));
 
+    /* A hero's web: the record at the centre, its linked records around it (N.web, compact) */
+    var ATT = { off_track: ["critical", "Off track"], at_risk: ["warning", "At risk"] };
+    function heroWeb(subject, linked) {
+      var recs = [subject].concat(linked.filter(function (x) { return x && x.id && x.id !== subject.id; }));
+      var seen = {}; recs = recs.filter(function (x) { if (seen[x.id]) return false; seen[x.id] = 1; return true; });
+      if (recs.length < 2) return null;
+      return N.web({ records: recs, links: recs.slice(1).map(function (x, i) { return [0, i + 1]; }), start: subject.id, compact: true }).el;
+    }
+    function asRec(x, type) {
+      if (!x) return null;
+      var a = type === "commitment" && overdue(x) ? ["critical", x.status === "slipped" ? "Slipped" : "Overdue"]
+        : type === "risk" && x.status === "active" ? ["critical", "Critical"] : ATT[x.health || x.assessment] || [];
+      return { id: idOf(x), type: type, title: x.title || N.name(x), attention: a[0], status_word: a[1] };
+    }
+
     /* Linked records, from what the page already carries (nothing extra in the data) */
     function linkedCard(heading, groups, empty) {
       var n = groups.reduce(function (s, g) { return s + g.items.length; }, 0);
@@ -206,7 +222,6 @@
       var p = ps.filter(function (x) { return x.id === chosen.project; })[0] || ps[0];
       if (!p) return;
       chosen.project = p.id;
-      var url = p.page_url && /^https:\/\//.test(p.page_url) ? p.page_url : null;
       var pcs = cs.filter(function (c) { return idOf(c.project) === p.id; });
       var pd = decisions.filter(function (x) { return L(x.projects).some(function (r) { return idOf(r) === p.id; }); });
       var pr = risks.filter(function (x) { return L(x.projects).some(function (r) { return idOf(r) === p.id; }); });
@@ -221,8 +236,9 @@
           .filter(function (f) { return f[1]; }).map(function (f) { return h("div", null, h("dt", null, f[0]), h("dd", null, f[1])); })),
         p.insight ? h("div", { class: "hero__block" }, h("h3", null, "What Atlas noticed"), h("p", null, N.rich(p.insight))) : null,
         p.next_step ? h("div", { class: "hero__block" }, h("h3", null, "Next step"), h("p", null, N.rich(p.next_step))) : null,
-        h("div", { class: "atl-actions" }, N.prompt("What's blocking " + p.title + "?"), N.prompt("Draft a status update for " + p.title),
-          url ? h("a", { class: "atl-btn atl-btn--secondary", href: url, target: "_blank", rel: "noopener noreferrer" }, N.icon("link"), h("span", null, "Open project page")) : null)));
+        heroWeb(asRec(p, "project"), pcs.map(function (c) { return asRec(c, "commitment"); }).concat(pd.map(function (x) { return asRec(x, "decision"); }),
+          pr.map(function (x) { return asRec(x, "risk"); }), [p.goal ? asRec(p.goal, "goal") : null, p.owner ? asRec(p.owner, "person") : null])),
+        h("div", { class: "atl-actions" }, N.prompt("What's blocking " + p.title + "?"), N.prompt("Draft a status update for " + p.title))));
       projHero.appendChild(linkedCard("Linked records", [
         { label: "Commitments", icon: "commitment", items: pcs.map(function (c) { return { title: c.title, sub: (c.direction === "i_owe" ? "You owe" : "From " + who(c.owner)), badge: dueBadge(c) }; }) },
         { label: "Decisions", icon: "decision", items: pd.map(function (x) { return { title: x.title, sub: x.decided_on ? "Decided " + N.date(x.decided_on) : "Not decided yet", badge: x.status === "proposed" ? N.badge("Proposed", "warn") : null }; }) },
@@ -277,6 +293,9 @@
           var dir = e.direction === "for" || e.direction === "against" ? e.direction : "neutral";
           return h("li", null, N.badge(dir === "for" ? "For" : dir === "against" ? "Against" : "Note", dir === "for" ? "good" : dir === "against" ? "bad" : "neutral"), h("span", null, N.rich(e.text)));
         })) : null,
+        heroWeb(asRec(g, "goal"), behind.map(function (p) { return asRec(p, "project"); }).concat(ev.filter(function (e) { return e.ref; }).map(function (e) {
+          var t = String(idOf(e.ref) || "").split("/")[0], ty = { people: "person", organizations: "organization", projects: "project", commitments: "commitment", decisions: "decision", risks: "risk", events: "event", ideas: "idea", topics: "topic", questions: "question", goals: "goal" }[t];
+          return ty ? asRec(e.ref, ty) : null; }), [g.owner ? asRec(g.owner, "person") : null])),
         h("div", { class: "atl-actions" }, N.prompt("How is " + g.title + " going?"), N.prompt("What would move " + g.title + " most this week?"))));
       goalHero.appendChild(linkedCard("Linked records", [
         { label: "Projects", icon: "project", items: behind.map(function (p) { return { title: p.title, sub: p.owner ? "Owner " + who(p.owner) : null, badge: pBadge(p) }; }) },

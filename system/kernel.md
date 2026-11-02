@@ -70,7 +70,7 @@ Do these quietly, then answer the user. Never narrate them unless something need
 | Settings, autonomy, data rules, rhythms | `atlas-settings` |
 | Away mode, pausing | `atlas-away` |
 | Connectors | `atlas-connectors` |
-| Dashboards, project pages | `atlas-dashboards` |
+| Dashboards (Today, Work, Guide, Records) | `atlas-dashboards` |
 | Health checks | `atlas-health` |
 | Updates and rollback | `atlas-update` |
 | New skills, automations, triggers, types | `atlas-extend` |

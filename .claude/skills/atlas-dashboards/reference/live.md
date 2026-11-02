@@ -1,6 +1,6 @@
 # Live pages
 
-A **live page** keeps its data in its own artifact database instead of inside its HTML, and its buttons queue requests there for Atlas to apply. **Today, Work, Guide and project pages** can be live (`live: true` on the page's entry in `dashboards.yaml`; a project page's entry is then `{ url, live: true }` instead of a plain link). User dashboards stay embedded and are published as in `SKILL.md`. Why and how it was designed: `system/dashboards/README.md` §Live pages.
+A **live page** keeps its data in its own artifact database instead of inside its HTML, and its buttons queue requests there for Atlas to apply. **Today, Work, Guide and Records** can be live (`live: true` on the page's entry in `dashboards.yaml`). User dashboards stay embedded and are published as in `SKILL.md`. Why and how it was designed: `system/dashboards/README.md` §Live pages.
 
 Contents: 1. The database · 2. Switching a page to live · 3. Refreshing a live page · 4. Republishing a live page · 5. Working the request queue · 6. When the database fails
 
@@ -12,12 +12,12 @@ Two collections, both writable only by the owner (the page declares the rules):
 The tool is `ArtifactData` with the page's URL from `dashboards.yaml`. In routines Atlas's guard allows it only on those URLs, only with files from `.atlas-tmp/` or a temp folder, and on `requests` only to update a row's `state`, `note`, `applied_at` and `applied_by` or delete it. **Atlas never creates or rewrites a request, in any context**: a request stands for the user's press, and the database can't tell a press from Atlas's own write (both carry the user's identity), so §5 step 2 checks each row's history instead. In routines the guard enforces this; in a chat only this rule does, and the check catches a row that was changed, not one deleted and made again.
 
 ## 2. Switching a page to live (chat only)
-Adding a database is a capability change, which routines can't make. In a chat, for each page in `dashboards.yaml` with a link and without `live: true` whose template supports it (Today, Work, Guide and project pages; not a user dashboard or a user override), switch it over once, without asking (`dashboards_refresh`), and tell the user in one line for all of them ("Your Today, Guide and project pages now update as Atlas works, and their buttons save straight to Atlas"):
+Adding a database is a capability change, which routines can't make. In a chat, for each page in `dashboards.yaml` with a link and without `live: true` whose template supports it (Today, Work, Guide and Records; not a user dashboard or a user override), switch it over once, without asking (`dashboards_refresh`), and tell the user in one line for all of them ("Your Today, Guide and Records pages now update as Atlas works, and their buttons save straight to Atlas"):
 1. Build the data as in `SKILL.md` steps 1–4, then cut it: `python3 -I system/tools/sections.py .atlas-tmp/dashboards/<name>.json .atlas-tmp/dashboards/sections/<name>`. It writes one file per section plus `live.json`, and stops if a section is too large for one write (trim by the contract's rules, then run it again).
 2. Render the page from `live.json`: `python3 -I system/tools/render.py <template> .atlas-tmp/dashboards/sections/<name>/live.json <theme or -> .atlas-tmp/dashboards/<name>.html`.
 3. Republish it to its stored URL with the capabilities `{ "db": { "rules": [ { "path": "sections", "read": "view", "write": "owner" }, { "path": "requests", "read": "view", "write": "owner" } ] } }`. Keep it private, as always.
 4. Write the sections as in §3 step 2: list `sections` first, so a retry after a half-finished switch-over pins the documents already there.
-5. Set `live: true` on the page's entry in `dashboards.yaml` (a project page's plain link becomes `{ url: <link>, live: true }`) and `last_published`; commit.
+5. Set `live: true` on the page's entry in `dashboards.yaml`  and `last_published`; commit.
 
 If any step fails, leave `live` unset and add or update the low-severity known issue `dashboards-live-switch` naming the step and the error: the page keeps working as an embedded page, and the next chat tries again, once per day at most. A switch-over that works closes the issue.
 
@@ -52,7 +52,7 @@ Only when its template changed (an update) or the user asks for it: render from 
    | `mark_received` | a `waiting_on` commitment (`open`, `slipped`) | as `mark_done`, Updates line "Marked received on the <Page> page" | `records_write` |
    | `move_date` | a commitment (`open`, `slipped`) | `due` = `args.due` (a real date, not in the past: otherwise `needs_chat`); a `slipped` item due today or later goes back to `open` (`atlas-triage` step 6) | `records_write` |
    | `answer` | a question (`open`) of kind `profile`, `relationship`, `commitment` or `other` | `args.choice` `yes` applies the entry's `Proposed change` (a Looks done entry, with `Evidence:`: closes the commitment it links, citing that evidence), `no` declines it; `args.text` is recorded as the answer. Then as for the same answer in chat, limited to the records the question links. Kind `setup` or `migration`, or an answer that would change a setting or governance: `needs_chat` | `records_write`; `profile_update` for a profile proposal |
-   | `answer` | a question record (`questions/…`, `open`; a project page's Answer) | `answer` = `args.text`, `answered_on` today, `status: answered`, Updates line "Answered on the <Page> page". An answer that would change a setting or governance: `needs_chat` | `records_write` |
+   | `answer` | a question record (`questions/…`, `open`) | `answer` = `args.text`, `answered_on` today, `status: answered`, Updates line "Answered on the <Page> page". An answer that would change a setting or governance: `needs_chat` | `records_write` |
    | `decline` | an approval (`pending`) | `rejected`, status history `rejected <date>: declined on the <Page> page` | `records_write` |
    | `not_useful` | an insight (`new`, `seen`) | `dismissed`, logged as `insight_noise` (`atlas-triage` `reference/learning.md` §1) | `records_write` |
    | `confirm` | `profile/<part>`: the statement in `user/profile/<part>.md` whose text matches `quoted`, still `proposed` | the statement's status becomes `confirmed <date>`; its `profile` question, if any, `answered` | `profile_update` |

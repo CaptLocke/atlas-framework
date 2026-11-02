@@ -344,6 +344,330 @@
     return svg;
   };
 
+  /* ---- Record web (Constellation's Rhizome): each record type grows a root system (branches, twigs,
+     a dot per record) on a night card; links between types pinch at a waist whose width grows with the
+     number of links. Click a type or record once to light its links, again to zoom in; a zoomed record
+     pulls its linked records in around it, with a dashed thread back to where each lives. The trail and
+     Zoom out step back up. Ported from the design canvas; drawn the same way each time (seeded).
+     opts: {records: [{id, type, title, attention, status_word}], links: [[i, j]], start (an id to open
+     zoomed on), compact (no type labels or trail: a hero's web), onChange(state)}
+     Returns {el, go(id), light(id), focusType(type), zoomOut(), state()} ---- */
+  var WEB_TYPES = [
+    { id: "person", label: "People", one: "Person", icon: "person", x: 468, y: 300 },
+    { id: "organization", label: "Organizations", one: "Organization", icon: "organization", x: 230, y: 150 },
+    { id: "project", label: "Projects", one: "Project", icon: "project", x: 1028, y: 390 },
+    { id: "commitment", label: "Commitments", one: "Commitment", icon: "commitment", x: 804, y: 220 },
+    { id: "goal", label: "Goals", one: "Goal", icon: "goal", x: 1224, y: 190 },
+    { id: "event", label: "Meetings and events", one: "Meeting or event", icon: "event", x: 342, y: 490 },
+    { id: "question", label: "Questions", one: "Question", icon: "help", x: 636, y: 545 },
+    { id: "decision", label: "Decisions", one: "Decision", icon: "decision", x: 846, y: 485 },
+    { id: "risk", label: "Risks", one: "Risk", icon: "risk", x: 1224, y: 520 },
+    { id: "idea", label: "Ideas", one: "Idea", icon: "idea", x: 177, y: 335 },
+    { id: "topic", label: "Topics", one: "Topic", icon: "topic", x: 587, y: 108 }
+  ];
+  N.webTypes = WEB_TYPES;
+  N.web = function (o) {
+    var W = 1400, H = 640, AR = W / H, FW = 1328, FH = FW / AR;
+    var T = {}; WEB_TYPES.forEach(function (t) { T[t.id] = t; });
+    var recs = N.list(o.records).filter(function (r) { return r && T[r.type]; });
+    var by = {}, adj = {};
+    recs.forEach(function (r) { by[r.id] = r; adj[r.id] = []; });
+    var all = N.list(o.records), E = [];
+    N.list(o.links).forEach(function (l, i) {
+      var a = all[l[0]], b = all[l[1]];
+      if (!a || !b || !by[a.id] || !by[b.id] || a.id === b.id) return;
+      E.push([a.id, b.id]); adj[a.id].push({ id: b.id, i: i }); adj[b.id].push({ id: a.id, i: i });
+    });
+    var types = WEB_TYPES.filter(function (t) { return recs.some(function (r) { return r.type === t.id; }); });
+    function rnd(i) { var x = Math.sin(i * 12.9898 + 78.233) * 43758.5453; return x - Math.floor(x); }
+    function f(n) { return n.toFixed(1); }
+    function deg(id) { return adj[id].length; }
+    function score(id) { var r = by[id]; return (r.attention === "critical" ? 500 : r.attention === "warning" ? 300 : 0) + deg(id); }
+    function smooth(P) {
+      var d = "M " + f(P[0].x) + " " + f(P[0].y);
+      for (var i = 0; i < P.length - 1; i++) {
+        var p0 = P[i - 1] || P[i], p1 = P[i], p2 = P[i + 1], p3 = P[i + 2] || P[i + 1];
+        d += " C " + f(p1.x + (p2.x - p0.x) / 6) + " " + f(p1.y + (p2.y - p0.y) / 6) + ", " + f(p2.x - (p3.x - p1.x) / 6) + " " + f(p2.y - (p3.y - p1.y) / 6) + ", " + f(p2.x) + " " + f(p2.y);
+      }
+      return d + " ";
+    }
+    /* ---- grow the root systems (positions are fixed for the same records) ---- */
+    var s = 31;
+    function r1() { return rnd(s++); }
+    function gauss() { var u = Math.max(r1(), 0.001), v = r1(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+    function lerp(a, b, t) { return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t }; }
+    function jit(p, k) { return { x: p.x + gauss() * k, y: p.y + gauss() * k }; }
+    var pos = {}, tree = {};
+    types.forEach(function (t) {
+      var ids = recs.filter(function (x) { return x.type === t.id; }).map(function (x) { return x.id; }), n = ids.length;
+      t.n = n;
+      var k = 2 + Math.floor(Math.sqrt(n) / 3), spread = 30 + Math.sqrt(n) * 4.4, cl = [], branches = "", twigs = "";
+      for (var i = 0; i < k; i++) {
+        var a = (i / k) * Math.PI * 2 + r1() * 0.8, d = spread * (0.65 + r1() * 0.45);
+        var c = { x: t.x + Math.cos(a) * d, y: t.y + Math.sin(a) * d * 0.8, a: a };
+        cl.push(c);
+        var fibers = 3 + Math.round(n / k / 8);
+        for (var j = 0; j < fibers; j++) { var off = (j - (fibers - 1) / 2) * 1.1; branches += smooth([t, { x: t.x + Math.cos(a + 0.35) * d * 0.5 + off, y: t.y + Math.sin(a + 0.35) * d * 0.4 - off }, c]); }
+      }
+      ids.forEach(function (id, i) {
+        var c = cl[i % k], a = c.a + gauss() * 0.9, d = 8 + Math.abs(gauss()) * (5 + Math.sqrt(n / k) * 2.6);
+        var p = { x: c.x + Math.cos(a) * d, y: c.y + Math.sin(a) * d * 0.85, c: c };
+        twigs += smooth([c, jit({ x: c.x + Math.cos(a) * d * 0.45, y: c.y + Math.sin(a) * d * 0.4 }, 2), p]);
+        pos[id] = p;
+      });
+      tree[t.id] = { branches: branches, twigs: twigs, ids: ids };
+    });
+    var groups = {}, edges = [];
+    E.forEach(function (e) { var ta = by[e[0]].type, tb = by[e[1]].type; if (ta === tb) return; var key = ta < tb ? ta + "|" + tb : tb + "|" + ta; (groups[key] = groups[key] || []).push(ta < tb ? e : [e[1], e[0]]); });
+    Object.keys(groups).sort().forEach(function (key, ki) {
+      var tt = key.split("|"), list = groups[key], n = list.length, A = T[tt[0]], B = T[tt[1]];
+      var dx = B.x - A.x, dy = B.y - A.y, len = Math.hypot(dx, dy) || 1, nx = -dy / len, ny = dx / len;
+      var bow = (rnd(ki * 13 + 5) - 0.5) * len * 0.32, M = { x: A.x + dx / 2 + nx * bow, y: A.y + dy / 2 + ny * bow };
+      var H1 = lerp(A, M, 0.82), H2 = lerp(B, M, 0.82), waist = 0.8 + Math.sqrt(n) * 0.16;
+      var m = Math.min(60, Math.max(Math.min(n, 6), Math.round(n / 3.5))), step = n / m;
+      for (var j = 0; j < m; j++) {
+        var pr = list[Math.floor(j * step)], p = pos[pr[0]], q = pos[pr[1]], o2 = gauss() * waist;
+        var sh = function (pt) { return { x: pt.x + nx * o2, y: pt.y + ny * o2 }; };
+        edges.push({ a: tt[0], b: tt[1], d: smooth([p, p.c, jit(lerp(p.c, H1, 0.5), 3), sh(H1), sh(H2), jit(lerp(q.c, H2, 0.5), 3), q.c, q]) });
+      }
+    });
+
+    /* ---- state, view and motion ---- */
+    var st = { level: "all", focus: null, sel: null, center: null, hover: null };
+    var view = { x: 0, y: 0, w: W, h: H }, cur = {}, raf = null;
+    function P(id) { return cur[id] || pos[id]; }
+    function ring(center) {
+      var seen = {}, out = [];
+      adj[center].slice().sort(function (a, b) { return score(b.id) - score(a.id); }).forEach(function (n) { if (!seen[n.id] && out.length < 12) { seen[n.id] = 1; out.push(n); } });
+      return out;
+    }
+    function clampVb(v) { return { x: Math.max(-60, Math.min(W + 60 - v.w, v.x)), y: Math.max(-40, Math.min(H + 40 - v.h, v.y)), w: v.w, h: v.h }; }
+    function vbFor(level, focus, center) {
+      if (level === "type" && focus && tree[focus]) {
+        var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+        tree[focus].ids.forEach(function (id) { var p = pos[id]; x0 = Math.min(x0, p.x); y0 = Math.min(y0, p.y); x1 = Math.max(x1, p.x); y1 = Math.max(y1, p.y); });
+        var w = Math.min(W, Math.max(460, (x1 - x0) * 2.3, (y1 - y0) * 2.3 * AR)), h2 = w / AR;
+        return clampVb({ x: (x0 + x1) / 2 - w / 2, y: (y0 + y1) / 2 - h2 / 2, w: w, h: h2 });
+      }
+      if (level === "record" && center) { var p2 = pos[center], w2 = 760; return clampVb({ x: p2.x - w2 / 2, y: p2.y - w2 / AR / 2, w: w2, h: w2 / AR }); }
+      return { x: 0, y: 0, w: W, h: H };
+    }
+    function targets(center, v) {
+      var cx = v.x + v.w / 2, cy = v.y + v.h / 2 + v.h * 0.02, out = {}, home = pos[center];
+      out[center] = { x: cx, y: cy };
+      var list = ring(center), n = list.length;
+      if (!n) return out;
+      var step = Math.PI * 2 / n;
+      var ha = list.map(function (m) { var q = pos[m.id]; return Math.atan2(q.y - home.y, q.x - home.x); });
+      var ord = list.map(function (m, i) { return i; }).sort(function (a, b) { return ha[a] - ha[b]; });
+      var sx = 0, sy = 0;
+      ord.forEach(function (j, i) { sx += Math.cos(ha[j] - i * step); sy += Math.sin(ha[j] - i * step); });
+      var base = Math.atan2(sy, sx), rx = v.w * (o.compact ? 0.25 : 0.33), ry = v.h * (o.compact ? 0.3 : 0.34);
+      ord.forEach(function (j, i) { var a = base + i * step; out[list[j].id] = { x: cx + Math.cos(a) * rx, y: cy + Math.sin(a) * ry }; });
+      return out;
+    }
+    function moveTo(next, instant) {
+      for (var k in next) st[k] = next[k];
+      st.hover = null;
+      var tv = vbFor(st.level, st.focus, st.center), tp = st.level === "record" ? targets(st.center, tv) : {};
+      var v0 = { x: view.x, y: view.y, w: view.w, h: view.h }, c0 = {}, keys = {};
+      Object.keys(tp).concat(Object.keys(cur)).forEach(function (id) { keys[id] = 1; var p = P(id); c0[id] = { x: p.x, y: p.y }; });
+      var reduce = instant || (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+      if (raf) cancelAnimationFrame(raf);
+      var t0 = null, dur = reduce ? 0 : 800, cx0 = v0.x + v0.w / 2, cy0 = v0.y + v0.h / 2, cx1 = tv.x + tv.w / 2, cy1 = tv.y + tv.h / 2;
+      function frame(now) {
+        if (t0 == null) t0 = now;
+        var kk = dur ? Math.min(1, (now - t0) / dur) : 1, e = kk < 0.5 ? 4 * kk * kk * kk : 1 - Math.pow(-2 * kk + 2, 3) / 2;
+        var w = v0.w * Math.pow(tv.w / v0.w, e);
+        view = { x: cx0 + (cx1 - cx0) * e - w / 2, y: cy0 + (cy1 - cy0) * e - w / AR / 2, w: w, h: w / AR };
+        var c = {};
+        Object.keys(keys).forEach(function (id) { var a = c0[id], b = tp[id] || pos[id]; c[id] = { x: a.x + (b.x - a.x) * e, y: a.y + (b.y - a.y) * e }; });
+        cur = kk < 1 ? c : tp;
+        paint();
+        if (kk < 1) raf = requestAnimationFrame(frame);
+      }
+      if (reduce) frame(0); else raf = requestAnimationFrame(frame);
+      changed();
+    }
+    function set(next) { for (var k in next) st[k] = next[k]; paint(); changed(); }
+    function changed() { if (o.onChange) o.onChange({ level: st.level, focus: st.focus, sel: st.sel, center: st.center }); }
+    function go(id) { if (by[id]) moveTo({ level: "record", center: id, sel: id, focus: by[id].type }); }
+    function clickType(t) {
+      if (st.focus !== t || st.sel) { if (st.level === "all") set({ focus: t, sel: null }); else moveTo({ level: "type", focus: t, sel: null, center: null }); }
+      else if (st.level === "all") moveTo({ level: "type" });
+    }
+    function clickRecord(id) {
+      if (st.sel !== id) set({ sel: id, focus: st.level === "record" ? st.focus : by[id].type });
+      else if (!(st.level === "record" && st.center === id)) go(id);
+    }
+    function zoomOut() {
+      if (st.level === "record") moveTo({ level: "type", focus: by[st.center].type, sel: null, center: null });
+      else moveTo({ level: "all", sel: null, center: null });
+    }
+
+    /* ---- drawing ---- */
+    var NS = SVGNS, svg = document.createElementNS(NS, "svg");
+    svg.setAttribute("class", "atl-web__svg"); svg.setAttribute("role", "img"); svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+    var LAYERS = [["haloA", "#F3F3F1", null, 0.03], ["haloB", "#F3F3F1", null, 0.045], ["haloC", "#F3F3F1", null, 0.07],
+      ["edges", null, "#C9D0DC", null, 0.55, "b"], ["branches", null, "#E6E8EC", null, 0.75, "a"], ["twigs", null, "#E6E8EC", null, 0.45, "a"],
+      ["edgesHi", null, "#F0A07E", null, 0.6], ["treeHi", null, "#F6C9B2", 0.75, 0.6], ["tethers", null, "#A3A6AD", 0.35, 0.6, null, "2 4"],
+      ["linksFaint", null, "#F0A07E", 0.22, 0.6], ["links", null, "#F0A07E", null, 0.9, "a"], ["linksHi", null, "#F3F3F1", 0.95, 1.2],
+      ["dots", "#EEF0F3", null, null], ["warn", "#E9C27A", null, 1], ["crit", "#F28FA4", null, 1], ["lit", "#F3F3F1", null, 1],
+      ["cores", "#111214", "#F3F3F1", 1, 1.2], ["centerRing", null, "#F3F3F1", 0.6, 1], ["selHalo", "#E8622C", null, 0.22], ["selDot", "#E8622C", "#F3F3F1", 1, 1.2]];
+    var L = {};
+    LAYERS.forEach(function (x) {
+      var p = document.createElementNS(NS, "path");
+      p.setAttribute("fill", x[1] || "none");
+      if (x[2]) { p.setAttribute("stroke", x[2]); p.setAttribute("stroke-width", String(x[4])); p.setAttribute("vector-effect", "non-scaling-stroke"); p.setAttribute("stroke-linecap", "round"); }
+      if (x[3] != null) p.setAttribute("opacity", String(x[3]));
+      if (x[6]) p.setAttribute("stroke-dasharray", x[6]);
+      var parent = svg;
+      if (x[5]) { parent = document.createElementNS(NS, "g"); parent.setAttribute("class", "atl-web__drift-" + x[5]); svg.appendChild(parent); }
+      parent.appendChild(p); L[x[0]] = p;
+    });
+    svg.addEventListener("click", function () {
+      if (st.level === "record") { if (st.sel !== st.center) set({ sel: st.center }); }
+      else if (st.sel) set({ sel: null });
+      else if (st.level === "all" && st.focus) set({ focus: null });
+    });
+    var labels = h("div", { class: "atl-web__labels" });
+    var crumbs = h("nav", { class: "atl-web__trail", "aria-label": "Zoom level" });
+    var outBtn = h("button", { type: "button", class: "atl-web__out", onclick: function (e) { e.stopPropagation(); zoomOut(); } }, N.icon("collapse"), h("span", null, "Zoom out"));
+    var hint = h("p", { class: "atl-web__hint", "aria-live": "polite" });
+    var el = h("div", { class: "atl-web atl-night" + (o.compact ? " atl-web--compact" : "") }, h("div", { class: "atl-web__stage" }, svg, labels), o.compact ? null : crumbs, o.compact ? null : outBtn, o.compact ? null : hint);
+
+    function circle(x, y, r) { return "M " + f(x - r) + " " + f(y) + " a " + f(r) + " " + f(r) + " 0 1 0 " + f(2 * r) + " 0 a " + f(r) + " " + f(r) + " 0 1 0 " + f(-2 * r) + " 0 "; }
+    function fiber(A, B, seed, count, spread) {
+      var out = [], dx = B.x - A.x, dy = B.y - A.y, len = Math.hypot(dx, dy) || 1, nx = -dy / len, ny = dx / len;
+      for (var k = 0; k < count; k++) {
+        var b1 = (rnd(seed * 7 + 1) - 0.5) * len * 0.42 + (k - (count - 1) / 2) * spread;
+        var b2 = b1 * (0.5 + rnd(seed * 7 + 3) * 0.5) + (k - (count - 1) / 2) * spread * 0.4;
+        out.push("M " + f(A.x) + " " + f(A.y) + " C " + f(A.x + dx * 0.3 + nx * b1) + " " + f(A.y + dy * 0.3 + ny * b1) + ", " + f(A.x + dx * 0.7 + nx * b2) + " " + f(A.y + dy * 0.7 + ny * b2) + ", " + f(B.x) + " " + f(B.y));
+      }
+      return out.join(" ");
+    }
+    function root(a, b, seed) {
+      var p = pos[a], q = pos[b];
+      if (by[a].type === by[b].type) return smooth([p, p.c, q.c, q]);
+      var dx = q.c.x - p.c.x, dy = q.c.y - p.c.y, len = Math.hypot(dx, dy) || 1, bow = (rnd(seed * 3 + 11) - 0.5) * len * 0.3;
+      return smooth([p, p.c, { x: p.c.x + dx / 2 - dy / len * bow, y: p.c.y + dy / 2 + dx / len * bow }, q.c, q]);
+    }
+    function label(text, icon, x, y, opts) {
+      var b = h("button", { type: "button", class: "atl-web__lab" + (opts.cls ? " " + opts.cls : ""), style: "left:" + f(x) + "%;top:" + f(y) + "%",
+        "aria-label": opts.aria, "aria-pressed": opts.pressed ? "true" : "false",
+        onclick: function (e) { e.stopPropagation(); opts.pick(); } }, N.icon(icon), h("span", null, text), opts.sub ? h("span", { class: "atl-web__sub" }, opts.sub) : null);
+      if (opts.enter) { b.addEventListener("mouseenter", opts.enter); b.addEventListener("focus", opts.enter); b.addEventListener("mouseleave", opts.leave); b.addEventListener("blur", opts.leave); }
+      labels.appendChild(b);
+    }
+    function paint() {
+      var V = view, z = W / V.w, rs = 1 / Math.sqrt(z), sel = st.sel, center = st.center, level = st.level;
+      svg.setAttribute("viewBox", f(V.x) + " " + f(V.y) + " " + f(V.w) + " " + f(V.h));
+      var g = {}; LAYERS.forEach(function (x) { g[x[0]] = ""; });
+      var X = function (x) { return (x - V.x) / V.w * 100; }, Y = function (y) { return (y - V.y) / V.h * 100; };
+      var inView = function (p, m) { return p.x >= V.x - m && p.x <= V.x + V.w + m && p.y >= V.y - m && p.y <= V.y + V.h + m; };
+      var selN = {}; if (sel) adj[sel].forEach(function (n) { selN[n.id] = 1; });
+      var ringL = level === "record" && center ? ring(center) : [], ringS = {}; ringL.forEach(function (n) { ringS[n.id] = 1; });
+      var ch = !sel ? ((st.hover && T[st.hover]) ? st.hover : st.focus) : null;
+      edges.forEach(function (e) { if (ch && (e.a === ch || e.b === ch)) g.edgesHi += e.d; else g.edges += e.d; });
+      types.forEach(function (t) {
+        var tr = tree[t.id], lit = ch === t.id;
+        if (lit) g.treeHi += tr.branches + tr.twigs; else { g.branches += tr.branches; g.twigs += tr.twigs; }
+        tr.ids.forEach(function (id) {
+          if (id === sel) return;
+          var p = P(id), a = by[id].attention;
+          if (sel && selN[id]) g.lit += circle(p.x, p.y, 2.4 * rs);
+          else if (a === "critical") g.crit += circle(p.x, p.y, 2 * rs);
+          else if (a === "warning") g.warn += circle(p.x, p.y, 2 * rs);
+          else g.dots += circle(p.x, p.y, 1.25 * rs);
+          if (cur[id]) { var h0 = pos[id]; if (Math.hypot(p.x - h0.x, p.y - h0.y) > 3) g.tethers += "M " + f(p.x) + " " + f(p.y) + " L " + f(h0.x) + " " + f(h0.y) + " " + circle(h0.x, h0.y, 1.6 * rs); }
+        });
+        g.cores += circle(t.x, t.y, 4 * rs);
+        if (!sel && (!ch || lit)) { var hr = 22 + Math.sqrt(t.n) * 3.6; g.haloA += circle(t.x, t.y, hr); g.haloB += circle(t.x, t.y, hr * 0.6); g.haloC += circle(t.x, t.y, hr * 0.3); }
+      });
+      if (level === "record" && center) {
+        var A = P(center);
+        ringL.forEach(function (n) { var d = fiber(A, P(n.id), n.i, 3, 3); if (sel === center) g.links += d + " "; else g.linksFaint += d + " "; });
+        g.centerRing = circle(A.x, A.y, 11 * rs);
+      }
+      if (sel) {
+        var S0 = P(sel), seen = {};
+        adj[sel].slice(0, 160).forEach(function (n) {
+          if (seen[n.id]) return; seen[n.id] = 1;
+          if (level === "record" && sel === center && ringS[n.id]) return;
+          var d = (cur[sel] || cur[n.id]) ? fiber(S0, P(n.id), n.i, 1, 0) : root(sel, n.id, n.i);
+          if (level === "record" && sel === center) g.linksFaint += d + " "; else g.links += d + " ";
+        });
+        g.selHalo = circle(S0.x, S0.y, 12 * rs); g.selDot = circle(S0.x, S0.y, 4 * rs);
+      }
+      LAYERS.forEach(function (x) { L[x[0]].setAttribute("d", g[x[0]] || "M 0 0"); });
+      L.edges.setAttribute("opacity", sel ? "0.04" : ch ? "0.05" : "0.17");
+      L.branches.setAttribute("opacity", sel ? "0.12" : ch ? "0.14" : "0.45");
+      L.twigs.setAttribute("opacity", sel ? "0.08" : ch ? "0.09" : "0.3");
+      L.dots.setAttribute("opacity", sel ? "0.4" : "0.85");
+      L.edgesHi.setAttribute("opacity", f(Math.max(0.18, 0.4 / Math.sqrt(z))));
+      L.links.setAttribute("opacity", "0.85");
+      svg.setAttribute("aria-label", level === "record" ? by[center].title + " and its " + deg(center) + " linked records, zoomed in"
+        : level === "type" ? "Zoomed in on " + T[st.focus].label.toLowerCase() : "Web of " + recs.length + " records by type, and the links between them");
+
+      /* labels: types, then the chosen record and its strongest links, without overlaps */
+      labels.textContent = "";
+      var boxes = [];
+      function hit(b) { return boxes.some(function (q) { return b.x < q.x + q.w && b.x + b.w > q.x && b.y < q.y + q.h && b.y + b.h > q.y; }); }
+      if (!o.compact) types.forEach(function (t) {
+        if (!inView(t, 30)) return;
+        var tr = tree[t.id], crit = tr.ids.filter(function (id) { return by[id].attention === "critical"; }).length,
+          warn = tr.ids.filter(function (id) { return by[id].attention === "warning"; }).length;
+        var px = X(t.x) / 100 * FW, py = Y(t.y) / 100 * FH, wpx = 60 + t.label.length * 8 + (crit || warn ? 90 : 20);
+        boxes.push({ x: px - wpx / 2, y: py - 40, w: wpx, h: 32 });
+        var lit = !sel && ch === t.id;
+        label(t.label, t.icon, X(t.x), Y(t.y), { cls: "atl-web__lab--type" + (lit ? " is-lit" : "") + (st.focus === t.id ? " is-focus" : ""),
+          sub: String(tr.ids.length) + (level === "record" ? "" : crit ? " · " + crit + " critical" : warn ? " · " + warn + " attention" : ""),
+          aria: (st.focus === t.id && level === "all" ? "Zoom in on " : "Light the links of ") + t.label, pressed: st.focus === t.id,
+          pick: function () { clickType(t.id); },
+          enter: function () { if (!st.sel) { st.hover = t.id; paint(); } }, leave: function () { if (st.hover === t.id) { st.hover = null; paint(); } } });
+      });
+      var done = {};
+      function put(id, opt) {
+        if (done[id]) return; done[id] = 1;
+        var p = P(id); if (!inView(p, 0)) return;
+        var r = by[id], px = X(p.x) / 100 * FW, py = Y(p.y) / 100 * FH, isC = id === center && level === "record";
+        var left = opt.side === "left", wpx = 34 + r.title.length * ((isC ? 14 : 12) * 0.56);
+        var b = { x: left ? px - wpx - 8 : px + 6, y: py - 13, w: wpx, h: 26 };
+        if (opt.optional && hit(b)) return;
+        boxes.push(b);
+        label(r.title, (T[r.type] || {}).icon || "records", X(p.x), Y(p.y), { cls: "atl-web__lab--rec" + (left ? " is-left" : "") + (id === sel ? " is-sel" : "") + (isC ? " is-center" : "") + (r.attention ? " is-" + r.attention : ""),
+          aria: (id === sel ? (isC ? "Selected: " : "Zoom in on ") : "Light the links of ") + r.title, pressed: id === sel,
+          pick: function () { clickRecord(id); } });
+      }
+      if (level === "record" && center) { var cp = P(center); put(center, {}); ringL.forEach(function (n) { put(n.id, { side: P(n.id).x < cp.x - 4 ? "left" : "right" }); }); }
+      if (sel) { put(sel, {}); adj[sel].slice().sort(function (a, b) { return score(b.id) - score(a.id); }).slice(0, 10).forEach(function (n) { put(n.id, { optional: true }); }); }
+      if (level === "type" && st.focus) tree[st.focus].ids.slice().sort(function (a, b) { return score(b) - score(a); }).slice(0, 16).forEach(function (id) { put(id, { optional: true }); });
+
+      if (o.compact) return;
+      crumbs.textContent = "";
+      var cr = [["Library", "records", level === "all", function () { moveTo({ level: "all", focus: null, sel: null, center: null }); }]];
+      var tf = level === "record" ? by[center].type : st.focus;
+      if (level !== "all" && tf) cr.push([T[tf].label, T[tf].icon, level === "type", function () { moveTo({ level: "type", focus: tf, sel: null, center: null }); }]);
+      if (level === "record" && center) cr.push([by[center].title, T[by[center].type].icon, true, function () { set({ sel: center }); }]);
+      cr.forEach(function (c, i) {
+        if (i) crumbs.appendChild(h("span", { class: "atl-web__sep", "aria-hidden": "true" }, "›"));
+        crumbs.appendChild(h("button", { type: "button", class: "atl-web__crumb", "aria-current": c[2] ? "page" : null, onclick: function (e) { e.stopPropagation(); c[3](); } }, N.icon(c[1]), h("span", null, c[0])));
+      });
+      outBtn.hidden = level === "all";
+      el.classList.toggle("is-all", level === "all");
+      hint.textContent = sel && !(level === "record" && sel === center) ? "Links for " + by[sel].title + " are lit. Choose it again to zoom in on it."
+        : level === "record" ? "Choose a linked record to light its links. Choose it again to move there."
+        : level === "type" ? "Choose a record to light its links. Choose it again to zoom in on it."
+        : st.focus ? "Choose " + T[st.focus].label + " again to zoom in." : "Choose a type to light its links. Choose it again to zoom in.";
+    }
+    if (o.start && by[o.start]) { st = { level: "record", focus: by[o.start].type, sel: o.start, center: o.start, hover: null }; moveTo({}, true); }
+    else paint();
+    return { el: el, go: go, light: function (id) { if (by[id]) set({ sel: id, focus: by[id].type }); }, focusType: function (t) { if (T[t]) clickType(t); },
+      zoomOut: zoomOut, state: function () { return { level: st.level, focus: st.focus, sel: st.sel, center: st.center }; },
+      record: function (id) { return by[id]; }, neighbours: function (id) { var seen = {}; return (adj[id] || []).filter(function (n) { if (seen[n.id]) return false; seen[n.id] = 1; return true; }).map(function (n) { return by[n.id]; }); },
+      degree: deg, score: score, types: types, records: recs };
+  };
+
   /* ---- Toast: one at a time, five seconds, optional Undo ---- */
   var toastEl = null, toastTimer = null;
   N.toast = function (message, onUndo) {
@@ -876,8 +1200,8 @@
       stale ? N.badge("May be out of date", "warn") : null);
   };
 
-  /* ---- Navigation: the same three pages everywhere. Links only ever open another dashboard. ---- */
-  var NAV = [["daily-brief", "Today"], ["commitments", "Work"], ["control-center", "Guide"]];
+  /* ---- Navigation: the same four pages everywhere. Links only ever open another dashboard. ---- */
+  var NAV = [["daily-brief", "Today"], ["commitments", "Work"], ["control-center", "Guide"], ["records", "Records"]];
   N.navLinks = function () {
     var order = NAV.map(function (x) { return x[0]; });
     return N.list(N.meta.nav).filter(function (n) { return n && n.url && /^https:\/\//.test(n.url); })

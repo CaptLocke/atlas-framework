@@ -6,14 +6,14 @@ skill: atlas-dashboards
 > **Contracts govern.** `system/dashboards/README.md` and each `<name>.contract.md` define placeholders, theme tokens, truncation, and titles; where this file differs, they win.
 # Rendering and publishing detail
 
-## The three dashboards (and who refreshes them)
+## The four dashboards (and who refreshes them)
 Each contract's `republished_by` lists the jobs that republish it; any chat may also republish a dashboard after changing what it shows. This table copies those lists; when they differ, the contract wins.
 | Dashboard | Shows | `republished_by` |
 |---|---|---|
 | `daily-brief` (Today) | Today's brief (from `user/work/briefs/`), then this week: the day strip with meeting load and free hours, and upcoming milestones | daily-brief (and the chat catch-up) |
 | `commitments` (Work) | Commitments (I owe, then Waiting on), projects with health and next step, ranked goals, decisions and risks, and the people with something open | daily-brief, triage, weekly-review, monthly, quarterly |
 | `control-center` (Guide) | Health, what's waiting on the user, automations, what Atlas filed in the last 14 days, About you, and the guide content (`system/guide/`) | daily-brief, monthly, quarterly, update-check |
-| `project-page` | One project in depth, made on request | triage, weekly-review (while listed) |
+| `records` (Records) | Every record and how they link, as a web you can zoom into (data from `system/tools/graph.py`) | triage, weekly-review |
 
 ## Building data
 - **Today's week data** comes from `atlas-brief` §D; this skill only embeds it.
@@ -49,8 +49,6 @@ Map `user/profile/design-system.md` to the `--brand-*` tokens in `system/dashboa
 dashboards:
   commitments: { url: "https://…", last_published: 2026-10-12 }
   deals-board: { url: "https://…", last_published: 2026-10-20 }   # user dashboard (extension name)
-project_pages:
-  projects/orion-migration: "https://…"
-  projects/enterprise-launch: { url: "https://…", live: true }   # a live project page (reference/live.md)
+  records: { url: "https://…", last_published: 2026-10-12, live: true }
 ```
 Update `last_published` on every successful (re)publish. Commit with the job or chat change set.

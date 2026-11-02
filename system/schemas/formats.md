@@ -264,7 +264,7 @@ source: "[[sources/2026-10-12-journal]]"
 | Performance review pack | `user/work/reports/YYYY-Qn-performance.md` |
 | Accomplishments | Appended to the relevant goal's `accomplishments` field and `user/work/accomplishments.md` (running list; line format in `.claude/skills/atlas-review/reference/weekly.md`) |
 | Deliverable working files | `user/work/deliverables/<YYYY-MM-DD-slug>/` (markdown/data used to build it; the finished binary goes to the deliverables folder per `.claude/skills/atlas-write/reference/deliverables.md`) |
-| Project page data | rendered on request; no file |
+| Records page data | built by `system/tools/graph.py` at each refresh; no file |
 | Deliverable template | `user/work/templates/<slug>.md` (below) |
 
 Each output has frontmatter `type: <brief|prep|review|status|report|performance>`, `date`, and `sources`, plus as relevant: `generated` (timestamp), `window_start`/`window_end`, `period`, `kind: catch-up`, `audience`, `subject`. Section structure: Daily Brief and catch-up brief per `.claude/skills/atlas-brief/reference/`; reviews and reports per `.claude/skills/atlas-review/reference/`; prep notes per `.claude/skills/atlas-prep/reference/templates.md`.

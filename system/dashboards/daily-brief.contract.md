@@ -3,7 +3,7 @@ type: dashboard-contract
 name: daily-brief
 template: daily-brief.html
 republished_by: [daily-brief]
-size_budget_kb: 280
+size_budget_kb: 340
 stale_after_hours: 36
 ---
 # Dashboard: daily-brief (the Today page)
