@@ -26,6 +26,8 @@ insights:
   brief_max: 3
   engagement: adaptive           # adaptive | fixed
   suppressed_kinds: []           # insight kinds the user turned off
+focus:                           # Today's open windows (system/schemas/settings.md)
+  shortest_window: 30            # minutes: 15 | 30 | 45 | 60; a shorter gap between meetings isn't offered for priorities
 follow_ups:                      # channel for follow-ups on overdue waiting_on items: email | message
   internal: email
   external: email

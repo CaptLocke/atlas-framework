@@ -961,6 +961,15 @@ def check_rhythms(c, path, data, template):
                 rep.error(path, "meetings.%s must be include or skip (got %r)" % (k, v))
     elif meetings is not None:
         rep.error(path, "meetings must be a mapping (all_day, tentative, not_responded)")
+    focus = data.get("focus")
+    if isinstance(focus, dict):
+        for k, v in focus.items():
+            if k != "shortest_window":
+                rep.warn(path, "focus: unknown key %r (known: shortest_window)" % k)
+            elif v not in (15, 30, 45, 60):
+                rep.error(path, "focus.shortest_window must be 15, 30, 45 or 60 minutes (got %r)" % (v,))
+    elif focus is not None:
+        rep.error(path, "focus must be a mapping (shortest_window)")
     away = data.get("away")
     if away is not None:
         if not isinstance(away, dict):

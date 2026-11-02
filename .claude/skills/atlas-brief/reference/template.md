@@ -20,6 +20,7 @@ sources: ["[[events/2026-10-13-acme-msa-call]]", "[[commitments/maya-pricing-fee
 - **9:30 Acme MSA call** with Dana Ruiz. Two open items both ways. Prep: [prep note](../prep/2026-10-13-acme-msa-call.md) · [[events/2026-10-13-acme-msa-call]]
 - **11:00 1:1 with Jordan.** Bring the pricing feedback. Prep: [prep note](../prep/2026-10-13-jordan-1-1.md)
 - 14:00 Design review (no prep needed). Back-to-back with 14:30 hiring sync.
+- 3.5 h open; all 3 due today are placed.
 
 ## Due soon / slipping
 - **Tomorrow: pricing feedback to Jordan.** Next step: finish section 3 before the 1:1. [[commitments/maya-pricing-feedback]]
@@ -36,9 +37,9 @@ sources: ["[[events/2026-10-13-acme-msa-call]]", "[[commitments/maya-pricing-fee
 - From your Evening Thoughts: 1 commitment (call Priya Thursday) [[commitments/maya-call-priya-thursday]], 1 idea (partner tier) [[ideas/partner-tier]]. [[sources/2026-10-12-journal]]
 
 ## Top priorities
-1. Pricing feedback to Jordan: due tomorrow and tied to your Q4 revenue goal. [[goals/2026-q4-enterprise-revenue]]
-2. Unblock the Acme MSA: Dana's review gates your Q4 revenue goal. [[projects/acme-expansion]]
-3. Hiring plan: Finance locks budgets Friday. [[goals/2026-q4-team-growth]]
+1. Pricing feedback to Jordan (11:30 window): due tomorrow and tied to your Q4 revenue goal. [[goals/2026-q4-enterprise-revenue]]
+2. Unblock the Acme MSA (11:30 window): Dana's review gates your Q4 revenue goal. [[projects/acme-expansion]]
+3. Hiring plan (won't fit today: send a date at 4:15): Finance locks budgets Friday. [[goals/2026-q4-team-growth]]
 
 ## Insights
 - Three customers hit the same import bug this month; it relates to your retention goal. [[risks/onboarding-import-failures]]

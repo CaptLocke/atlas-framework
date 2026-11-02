@@ -39,6 +39,18 @@
 .tl-block[aria-pressed="true"] .tl-due { background: var(--night-raised); color: var(--warn-on-night); }
 .tl-tag { flex: none; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; color: var(--muted); white-space: nowrap; }
 .tl-block[aria-pressed="true"] .tl-tag { color: var(--accent-on-night); }
+.tl-block--win { border: 1px dashed var(--accent); background: var(--accent-soft); color: var(--ink); }
+.tl-block--win > .atl-icon { color: var(--accent-text); }
+.tl-block--win .tl-tag { color: var(--accent-text); }
+.tl-block--win[aria-pressed="true"] { background: var(--accent-soft); border-style: solid; color: var(--ink); box-shadow: inset 0 0 0 1px var(--accent); }
+.tl-block--win[aria-pressed="true"] .tl-block__time { color: var(--muted); }
+.tl-block--win[aria-pressed="true"] .tl-tag { color: var(--accent-text); }
+.tl-rank { flex: none; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--ink); color: var(--on-ink); font-size: 12px; font-weight: 600; }
+.tl-rank--one { background: var(--accent); color: #ffffff; }
+.brief__group--fit h3 { color: var(--accent-text); }
+.brief__group--fit .mini { background: var(--accent-soft); }
+.brief__group--fit .mini__when { color: var(--accent-text); }
+.brief--win { border-color: var(--accent); }
 .tl-quiet { padding: var(--space-7) var(--space-8); border-radius: var(--radius-card); background: var(--sunken); color: var(--ink-2); }
 
 /* ---- The brief for the chosen block ---- */
@@ -84,6 +96,14 @@
 .prio-title { display: flex; align-items: flex-start; gap: 8px; font-size: 16px; font-weight: 500; color: var(--night-text); }
 .prio-title .atl-icon { margin-top: 3px; width: 14px; height: 14px; color: var(--night-muted); }
 .prio-why { font-size: 13px; line-height: 1.45; color: var(--night-muted); }
+.prio-title > span:not(.slot) { flex: 1 1 auto; min-width: 0; }
+.prio-pick { display: block; width: 100%; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.prio-pick:hover .prio-title > span:not(.slot) { text-decoration: underline; text-underline-offset: 0.2em; }
+.slot { flex: none; display: inline-flex; align-items: center; gap: 6px; margin-left: 8px; padding: 4px 10px; border-radius: var(--radius-pill); background: var(--night-raised); color: var(--night-text); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.slot .atl-icon { width: 11px; height: 11px; color: var(--night-muted); }
+.slot--warn { background: rgba(233, 194, 122, 0.14); color: var(--warn-on-night); }
+.slot--warn .atl-icon { color: var(--warn-on-night); }
+@media (max-width: 40rem) { .prio-title { flex-wrap: wrap; } .slot { margin-left: 22px; } }
 
 /* ---- Overdue: age bar and people, oldest first ---- */
 .od { padding: var(--space-8); display: flex; flex-direction: column; gap: var(--space-4); }
@@ -168,6 +188,8 @@
       return hh * 60 + mm;
     } catch (e) { return d.getHours() * 60 + d.getMinutes(); }
   }
+  function hhmm(m) { var hh = Math.floor(m / 60) % 24, mm = m % 60; return (hh % 12 || 12) + ":" + (mm < 10 ? "0" : "") + mm; }
+  function hm(t) { var x = /^(\d\d):(\d\d)$/.exec(t || ""); return x ? +x[1] * 60 + +x[2] : null; }
   function clock(m) { var hh = Math.floor(m / 60) % 24, mm = m % 60, h12 = hh % 12 || 12; return h12 + (mm ? ":" + (mm < 10 ? "0" : "") + mm : ""); }
   function ampm(m) { var hh = Math.floor(m / 60) % 24; return clock(m) + (hh < 12 ? " am" : " pm"); }
   function overdue(c) { return c.status === "slipped" || (!!c.due && N.daysFromToday(c.due) < 0); }
@@ -215,6 +237,13 @@
       return { owe: due.filter(function (c) { return ids[idOf(c.counterparty)]; }), out: waiting.filter(function (c) { return ids[idOf(c.counterparty)]; }) };
     }
 
+    /* Open windows (atlas-brief §E): gaps between meetings, with what Atlas placed there */
+    var dd = d.day && d.day.work_day !== false ? d.day : null;
+    var wins = dd ? L(dd.windows).map(function (w) { return { win: true, id: "win:" + w.start, s: hm(w.start), en: hm(w.end), w: w }; })
+      .filter(function (x) { return x.s != null && x.en != null && (nowMin == null || x.en > nowMin); }) : [];
+    var winOf = {};
+    wins.forEach(function (x) { L(x.w.items).forEach(function (it) { winOf[it.id] = x.id; }); });
+
     var briefHolder = h("div");
     function prepText(p) {
       p = p || {};
@@ -229,8 +258,24 @@
           h("span", { class: "mini__sub" }, [owe ? "For " + N.name(c.counterparty) : N.name(c.counterparty), c.priority ? N.label(c.priority) : null].filter(Boolean).join(" · "))),
         when ? h("span", { class: "mini__when" }, n === 0 && !overdue(c) ? "Due today" : when) : null);
     }
+    function sizeText(it) { return it.sized === false ? "size unknown" : it.minutes >= 60 ? hrs(it.minutes / 60) : it.minutes + " min"; }
+    function paintWindow(x) {
+      var w = x.w, its = L(w.items), used = its.reduce(function (n, it) { return n + (it.minutes || 0); }, 0);
+      briefHolder.appendChild(h("section", { class: "atl-card brief brief--win", id: "brief", "aria-live": "polite", "aria-label": "Open window at " + clock(x.s) },
+        h("p", { class: "brief__kicker" }, h("span", null, "Open window · " + (x.en - x.s) + " min"), h("span", null, clock(x.s) + "–" + clock(x.en))),
+        h("h2", { class: "atl-card__title" }, its.length ? "Open · " + its[0].title : "Open"),
+        its.length ? h("div", { class: "brief__group brief__group--fit" }, h("h3", null, "Fits here · about " + used + " min"),
+          its.map(function (it) {
+            return h("div", { class: "mini" }, N.icon("commitment"), h("span", { class: "mini__text" }, h("span", { class: "mini__title" }, it.title),
+              h("span", { class: "mini__sub" }, it.rank ? "#" + it.rank + " priority" : "Due today")), h("span", { class: "mini__when" }, sizeText(it)));
+          })) : h("p", { class: "brief__meta" }, "Nothing placed here: time for whatever comes up."),
+        w.left ? h("dl", { class: "brief__facts" }, h("dt", null, "Left over"), h("dd", null, w.left + " min")) : null,
+        its.length ? h("div", { class: "atl-actions" }, N.prompt("Help me get " + its[0].title + " done in the " + hhmm(x.s) + " window")) : null));
+    }
     function paintBrief() {
       briefHolder.textContent = "";
+      var x = wins.filter(function (y) { return y.id === picked; })[0];
+      if (x) { paintWindow(x); return; }
       var m = ahead.concat(earlier).filter(function (x) { return x.e.id === picked; })[0] || current || next || ahead[0] || earlier[earlier.length - 1];
       if (!m) return;
       var e = m.e, len = m.en - m.s, k;
@@ -252,10 +297,16 @@
             prep.status === "ready" ? N.request("Open the prep note", N.withId("Show me the prep note for " + N.quote(e.title), e.id), "secondary") : null)));
     }
 
-    var tl = null;
-    if (ahead.length) {
-      var start = Math.floor(Math.min(ahead[0].s, nowMin != null ? nowMin : 1440) / 60) * 60;
-      var end = Math.ceil(Math.max.apply(null, ahead.map(function (m) { return m.en; })) / 60) * 60;
+    var tl = null, btns = [];
+    function pick(id) {
+      picked = id;
+      btns.forEach(function (x) { x.b.setAttribute("aria-pressed", String(x.id === picked)); });
+      paintBrief();
+    }
+    if (ahead.length || wins.length) {
+      var spans = ahead.concat(wins);
+      var start = Math.floor(Math.min.apply(null, spans.map(function (m) { return m.s; }).concat(nowMin != null ? [nowMin] : [])) / 60) * 60;
+      var end = Math.ceil(Math.max.apply(null, spans.map(function (m) { return m.en; })) / 60) * 60;
       tl = h("div", { class: "tl", style: "height:" + Math.round((end - start) * S + 8) + "px" });
       for (var t = start; t <= end; t += 60) tl.appendChild(h("div", { class: "tl-tick", style: "top:" + Math.round((t - start) * S) + "px", "aria-hidden": "true" }, h("span", null, ampm(t)), h("i")));
       /* a strand down the hours, drawn the same way each refresh */
@@ -282,14 +333,27 @@
         lanes[lane] = m.en; m.lane = lane; group.push(m); groupEnd = Math.max(groupEnd, m.en);
       });
       flush();
-      var btns = [];
+      wins.forEach(function (x) {
+        var hgt = Math.max(30, (x.en - x.s) * S - 4), its = L(x.w.items);
+        var btn = h("button", { type: "button", class: "tl-block tl-block--win" + (hgt < 46 ? " tl-block--short" : ""), "aria-pressed": "false",
+          "aria-label": "Open window, " + clock(x.s) + " to " + clock(x.en) + (its.length ? ", " + its.length + " placed here" : ""),
+          style: "top:" + Math.round((x.s - start) * S + 2) + "px;height:" + Math.round(hgt) + "px;left:var(--tl-gutter);width:calc(100% - var(--tl-gutter))",
+          onclick: function () { pick(x.id); } },
+          N.icon("focus"),
+          h("span", { class: "tl-block__text" }, h("span", { class: "tl-block__title" }, its.length ? "Open · " + its[0].title : "Open"),
+            h("span", { class: "tl-block__time" }, clock(x.s) + "–" + clock(x.en) + " · " + (x.en - x.s) + " min")),
+          its.filter(function (it) { return it.rank; }).map(function (it) { return h("span", { class: "tl-rank" + (it.rank === 1 ? " tl-rank--one" : ""), "aria-hidden": "true" }, String(it.rank)); }),
+          h("span", { class: "tl-tag" }, "OPEN"));
+        btns.push({ b: btn, id: x.id });
+        tl.appendChild(btn);
+      });
       ahead.forEach(function (m) {
         var e = m.e, len = m.en - m.s, hgt = Math.max(30, len * S - 4), o = owedFor(e), nd = o.owe.length + o.out.length;
         var prep = e.prep || {};
         var btn = h("button", { type: "button", class: "tl-block" + (hgt < 46 ? " tl-block--short" : ""), "aria-pressed": "false",
           "aria-label": e.title + ", " + clock(m.s) + " to " + clock(m.en) + (nd ? ", " + nd + " open items with these people" : ""),
           style: "top:" + Math.round((m.s - start) * S + 2) + "px;height:" + Math.round(hgt) + "px;left:calc(var(--tl-gutter) + (100% - var(--tl-gutter)) * " + m.lane + " / " + m.n + ");width:calc((100% - var(--tl-gutter)) / " + m.n + " - " + (m.n > 1 ? 4 : 0) + "px)",
-          onclick: function () { picked = e.id; btns.forEach(function (x) { x.b.setAttribute("aria-pressed", String(x.id === picked)); }); paintBrief(); } },
+          onclick: function () { pick(e.id); } },
           N.icon("event"),
           h("span", { class: "tl-block__text" }, h("span", { class: "tl-block__title" }, e.title),
             h("span", { class: "tl-block__time" }, clock(m.s) + "–" + clock(m.en) + " · " + len + " min" + (prep.status ? " · " + N.label(prep.status) : ""))),
@@ -298,21 +362,24 @@
         btns.push({ b: btn, id: e.id });
         tl.appendChild(btn);
       });
-      var sel = (ahead.concat(earlier).filter(function (x) { return x.e.id === picked; })[0] || current || next || ahead[0]).e.id;
+      var keep = wins.filter(function (x) { return x.id === picked; })[0] || ahead.concat(earlier).filter(function (x) { return x.e.id === picked; })[0];
+      var first0 = current || next || ahead[0];
+      var sel = keep ? (keep.win ? keep.id : keep.e.id) : first0 ? first0.e.id : wins[0].id;
       picked = sel;
       btns.forEach(function (x) { x.b.setAttribute("aria-pressed", String(x.id === sel)); });
     }
     var hoursIn = meetings.reduce(function (n, m) { return n + (m.en - m.s); }, 0) / 60;
     left.appendChild(h("section", { class: "day-sec", id: "schedule", "aria-labelledby": "schedule-h" },
       h("div", { class: "kicker-row" }, h("h2", { class: "overline", id: "schedule-h" }, "Your day"),
-        h("span", { class: "meta" }, meetings.length ? meetings.length + (meetings.length === 1 ? " meeting · " : " meetings · ") + hrs(hoursIn) : "No meetings")),
+        h("span", { class: "meta" }, dd ? hrs((dd.open_minutes || 0) / 60) + " open" + (dd.due_today ? " · " + (dd.due_today_placed === dd.due_today ? (dd.due_today === 1 ? "the one" : "all " + dd.due_today) + " due today " + (dd.due_today === 1 ? "is" : "are") + " placed" : dd.due_today_placed + " of " + dd.due_today + " due today placed") : "")
+          : meetings.length ? meetings.length + (meetings.length === 1 ? " meeting · " : " meetings · ") + hrs(hoursIn) : "No meetings")),
       allDay.length ? h("div", { class: "allday" }, allDay.map(function (e) {
         return N.badge((e.kind === "deadline" ? "Deadline · " : e.kind === "milestone" ? "Milestone · " : "All day · ") + e.title, e.kind === "deadline" ? "bad" : e.kind === "milestone" ? "info" : null);
       })) : null,
       earlier.length ? h("div", { class: "earlier" }, earlier.map(function (m) {
         return h("p", null, N.icon("done"), h("span", null, h("b", null, "Earlier · " + m.e.title), " · " + clock(m.s) + " to " + clock(m.en)));
       })) : null,
-      tl || h("p", { class: "tl-quiet" }, meetings.length ? "No more meetings today." : "No meetings today. Your priorities have the day."),
+      tl || h("p", { class: "tl-quiet" }, d.day && d.day.work_day === false ? "Not a work day." : meetings.length ? "No more meetings today." : "No meetings today. Your priorities have the day."),
       N.more("today")));
     left.appendChild(briefHolder);
     paintBrief();
@@ -357,8 +424,13 @@
     right.appendChild(h("section", { class: "atl-night prio-card", id: "priorities", "aria-labelledby": "prio-h" },
       h("div", { class: "kicker-row" }, h("h2", { class: "overline", id: "prio-h" }, "Top priorities"), h("span", { class: "meta" }, "Ranked against your goals")),
       pr.length ? h("ol", { class: "prio" }, pr.map(function (p, i) {
+        var sl = p.slot || {}, w = winOf[idOf(p.ref)];
+        var pill = sl.kind === "window" ? h("span", { class: "slot" }, N.icon("clock"), hhmm(hm(sl.start)) + " window" + (sl.sized === false ? " · size unknown" : ""))
+          : sl.kind === "wont_fit" ? h("span", { class: "slot slot--warn" }, N.icon("alert"), "Won't fit" + (sl.date_at ? " · date at " + hhmm(hm(sl.date_at)) : "")) : null;
+        var titleEl = h("p", { class: "prio-title" }, N.icon(/^projects\//.test(idOf(p.ref) || "") ? "project" : "commitment"), h("span", null, p.text), pill);
         return h("li", null, h("span", { class: "prio-n", "aria-hidden": "true" }, String(i + 1)),
-          h("p", { class: "prio-title" }, N.icon(/^projects\//.test(idOf(p.ref) || "") ? "project" : "commitment"), p.text),
+          w ? h("button", { type: "button", class: "prio-pick", onclick: function () { pick(w); var bh = document.getElementById("brief"); if (bh && bh.scrollIntoView) bh.scrollIntoView({ block: "nearest" }); },
+            "aria-label": p.text + ": show its window" }, titleEl) : titleEl,
           p.why ? h("p", { class: "prio-why" }, N.rich(p.why)) : null);
       })) : h("p", { class: "prio-why" }, "No priorities set for today.")));
 
