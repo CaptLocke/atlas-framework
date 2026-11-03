@@ -977,7 +977,8 @@
   /* ---- List card: "Title · N", the first rows, and "All N" to open the rest in place. Open, the card
      spans the full width and gains filter chips with counts, a sort, and pages of 10.
      opts: {id, title, count (defaults to items), note, items: [{el, data}], show (rows before "All", 4),
-     noun ("I owe"), filters: [{key, label, test(data)}], sorts: [{key, label, cmp(a, b)}], empty, tools, night} ---- */
+     noun ("I owe"), filters: [{key, label, test(data)}], sorts: [{key, label, cmp(a, b)}], empty, tools, night,
+     after (a node under the list, such as a prompt)} ---- */
   N.listCard = function (o) {
     var items = N.list(o.items), show = o.show || 4, open = false, filter = null, sort = null, page = 0, PAGE = 10;
     var total = o.count != null ? o.count : items.length;
@@ -990,7 +991,8 @@
       h("div", { class: "atl-listcard__head" },
         h("h2", { class: "atl-listcard__title", id: hid }, o.title, total ? h("span", { class: "sec-count" }, String(total)) : null),
         o.tools || null, o.note ? h("p", { class: "atl-listcard__note" }, o.note) : null),
-      chips, sortEl, items.length ? list : N.empty(o.empty || "Nothing here right now."), foot);
+      chips, sortEl, items.length ? list : N.empty(o.empty || "Nothing here right now."), foot,
+      o.after ? h("div", { class: "atl-listcard__after" }, o.after) : null);
     function rows() {
       var r = items.filter(function (it) { return !filter || filter.test(it.data); });
       if (sort) r = r.slice().sort(function (a, b) { return sort.cmp(a.data, b.data); });

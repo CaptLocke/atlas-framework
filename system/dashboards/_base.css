@@ -457,6 +457,8 @@ button.atl-row__main { cursor: pointer; }
 .atl-list--bare { border: 0; border-radius: 0; border-top: 1px solid var(--line-soft); }
 .atl-listcard > .empty { border: 0; border-radius: 0; }
 .atl-listcard__foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: var(--space-4) var(--space-8) var(--space-7); border-top: 1px solid var(--line-soft); }
+.atl-listcard__after { padding: var(--space-4) var(--space-8) var(--space-7); border-top: 1px solid var(--line-soft); }   /* a prompt or note under the list */
+.atl-listcard__foot:not([hidden]) + .atl-listcard__after { border-top: 0; padding-top: 0; }
 .atl-listcard__page { font-size: 13px; color: var(--muted); }
 .atl-listcard--open { grid-column: 1 / -1; }
 .atl-chipbtn { min-height: 40px; display: inline-flex; align-items: center; gap: 8px; padding: 0 14px; border: 1px solid var(--line-strong); border-radius: var(--radius-pill); background: var(--surface); color: var(--ink); font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; }
@@ -467,7 +469,7 @@ button.atl-row__main { cursor: pointer; }
 .atl-chipbtn--quiet { border-color: transparent; background: transparent; }
 @media (max-width: 40rem) {
   .atl-listcard { border-radius: var(--radius-card-sm); }
-  .atl-listcard__head, .atl-listcard__chips, .atl-listcard__sort, .atl-listcard__foot { padding-left: var(--space-6); padding-right: var(--space-6); }
+  .atl-listcard__head, .atl-listcard__chips, .atl-listcard__sort, .atl-listcard__foot, .atl-listcard__after { padding-left: var(--space-6); padding-right: var(--space-6); }
 }
 .atl-avatar { flex: none; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--ink); color: var(--on-ink); font-size: 11px; font-weight: 600; letter-spacing: 0.02em; }
 .atl-avatar--out { background: var(--surface); color: var(--ink); border: 1px solid var(--line-strong); }

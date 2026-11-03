@@ -494,7 +494,7 @@
         var it = wb[k].sort(function (a, b) { return (overdue(b) ? late(b) : -99) - (overdue(a) ? late(a) : -99) || String(a.due || "9").localeCompare(String(b.due || "9")); });
         return { who: it[0].counterparty, items: it };
       }).sort(function (a, b) { return b.items.filter(overdue).length - a.items.filter(overdue).length || b.items.length - a.items.length; });
-      var wcard = N.listCard({ id: "waiting", title: "Waiting on", count: waiting.length + (T.waiting_on || 0), noun: "people", show: 4,
+      right.appendChild(N.listCard({ id: "waiting", title: "Waiting on", after: N.prompt("Which of these should I chase or let go?"), count: waiting.length + (T.waiting_on || 0), noun: "people", show: 4,
         note: wgroups.length + (wgroups.length === 1 ? " person" : " people") + " · one nudge each",
         items: wgroups.map(function (g) {
           var lateN = g.items.filter(overdue).length, todayN = g.items.filter(function (c) { return !overdue(c) && N.daysFromToday(c.due) === 0; }).length;
@@ -510,9 +510,7 @@
                     : h("span", { class: n === 0 ? "soon" : "" }, c.due ? N.due(c.due) : "No date"));
               })),
               h("div", { class: "atl-actions" }, N.request("Nudge " + first(g.who), N.withId("Draft one follow-up to " + N.name(g.who) + " covering " + g.items.map(function (c) { return N.quote(c.title); }).join(", "), top.id), "secondary", false, { kind: "nudge", target: top.id, quoted: top.title })))) };
-        }) });
-      wcard.appendChild(h("div", null, N.prompt("Which of these should I chase or let go?")));
-      right.appendChild(wcard);
+        }) }));
     }
 
     right.appendChild(h("p", { class: "guide-link" }, N.icon("automation"), h("span", null, "How Atlas is running, and what it knows."), N.pageLink("control-center", "Guide")));
