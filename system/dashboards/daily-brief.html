@@ -41,7 +41,7 @@
 .tl-block[aria-pressed="true"] .tl-tag { color: var(--accent-on-night); }
 .tl-block--win { border: 1px dashed var(--accent); background: var(--accent-soft); color: var(--ink); }
 .tl-block--win > .atl-icon { color: var(--accent); }
-.tl-block--win .tl-rank, .tl-block--win .tl-rank--one { background: var(--accent); color: #16171a; }   /* ember dots in a window; ink numerals pass AA on ember in both themes */
+.tl-block--win .tl-rank { background: var(--accent); color: #16171a; }   /* one ember dot: how many priorities the window holds; ink numerals pass AA on ember in both themes */
 .tl-block--win .tl-tag { color: var(--accent-text); }
 .tl-block--win[aria-pressed="true"] { background: var(--accent-soft); border-style: solid; color: var(--ink); box-shadow: inset 0 0 0 1px var(--accent); }
 .tl-block--win[aria-pressed="true"] .tl-block__time { color: var(--muted); }
@@ -270,7 +270,7 @@
         its.length ? h("div", { class: "brief__group brief__group--fit" }, h("h3", null, "Fits here · about " + used + " min"),
           its.map(function (it) {
             return h("div", { class: "mini" }, N.icon("commitment"), h("span", { class: "mini__text" }, h("span", { class: "mini__title" }, it.title),
-              h("span", { class: "mini__sub" }, it.rank ? "#" + it.rank + " priority" : "Due today")), h("span", { class: "mini__when" }, sizeText(it)));
+              h("span", { class: "mini__sub" }, it.rank ? "#" + it.rank + " priority" : "Due today")), h("span", { class: "mini__when" }, (it.at ? hhmm(hm(it.at)) + " · " : "") + sizeText(it)));
           })) : h("p", { class: "brief__meta" }, "Nothing placed here: time for whatever comes up."),
         w.left ? h("dl", { class: "brief__facts" }, h("dt", null, "Left over"), h("dd", null, w.left + " min")) : null,
         its.length ? h("div", { class: "atl-actions" }, N.prompt("Help me get " + its[0].title + " done in the " + hhmm(x.s) + " window")) : null));
@@ -345,7 +345,7 @@
           N.icon("focus"),
           h("span", { class: "tl-block__text" }, h("span", { class: "tl-block__title" }, its.length ? "Open · " + its[0].title : "Open"),
             h("span", { class: "tl-block__time" }, clock(x.s) + "–" + clock(x.en) + " · " + (x.en - x.s) + " min")),
-          its.filter(function (it) { return it.rank; }).map(function (it) { return h("span", { class: "tl-rank" + (it.rank === 1 ? " tl-rank--one" : ""), "aria-hidden": "true" }, String(it.rank)); }),
+          (function (n) { return n ? h("span", { class: "tl-rank", "aria-hidden": "true", title: n + (n === 1 ? " priority" : " priorities") + " placed here" }, String(n)) : null; })(its.filter(function (it) { return it.rank; }).length),
           h("span", { class: "tl-tag" }, "OPEN"));
         btns.push({ b: btn, id: x.id });
         tl.appendChild(btn);
