@@ -119,7 +119,8 @@
 .od__legend { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 13px; color: var(--ink-2); }
 .od__legend span { display: inline-flex; align-items: center; gap: 7px; }
 .od__legend i { width: 9px; height: 9px; border-radius: 3px; }
-.age1 { background: #e9a9b4; } .age2 { background: #c2566a; } .age3 { background: var(--bad); }
+.age0 { background: var(--warn-mark); } .age1 { background: #e9a9b4; } .age2 { background: #c2566a; } .age3 { background: var(--bad); }
+.od__kicker--today { color: var(--warn); }
 :root[data-theme="dark"] .age3 { background: #a83a4c; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .age3 { background: #a83a4c; } }
 .people { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
@@ -443,58 +444,46 @@
           p.why ? h("p", { class: "prio-why" }, N.rich(p.why)) : null);
       })) : h("p", { class: "prio-why" }, "No priorities set for today.")));
 
-    /* ================= Overdue, by person, oldest first ================= */
-    var od = due.filter(overdue).map(function (c) { return { c: c, owe: true }; })
-      .concat(waiting.filter(overdue).map(function (c) { return { c: c, owe: false }; }));
-    var counts = d.counts || {};
-    if (od.length) {
-      var oweN = od.filter(function (x) { return x.owe; }).length, outN = od.length - oweN;
-      var total = typeof counts.overdue === "number" ? Math.max(counts.overdue, od.length) : od.length;
-      var ages = [od.filter(function (x) { return late(x.c) === 1; }).length, od.filter(function (x) { var n = late(x.c); return n >= 2 && n <= 6; }).length, od.filter(function (x) { return late(x.c) >= 7; }).length];
+    /* ================= Due from you: what you owe, overdue or due today, by person, oldest first ================= */
+    function dueToday(c) { return !overdue(c) && !!c.due && N.daysFromToday(c.due) === 0; }
+    var mine = due.filter(function (c) { return overdue(c) || dueToday(c); });
+    if (mine.length) {
+      var lateN = mine.filter(overdue).length, todayN = mine.length - lateN;
+      var lateness = function (c) { return overdue(c) ? late(c) : 0; };   /* 0 = due today */
+      var ages = [todayN, mine.filter(function (c) { return overdue(c) && late(c) === 1; }).length,
+        mine.filter(function (c) { var n = overdue(c) ? late(c) : 0; return n >= 2 && n <= 6; }).length,
+        mine.filter(function (c) { return overdue(c) && late(c) >= 7; }).length];
       var byP = {}, order = [];
-      od.forEach(function (x) { var k = idOf(x.c.counterparty) || N.name(x.c.counterparty) || "?"; if (!byP[k]) { byP[k] = []; order.push(k); } byP[k].push(x); });
-      var groups = order.map(function (k) { var it = byP[k].sort(function (a, b) { return late(b.c) - late(a.c); }); return { who: it[0].c.counterparty, items: it, oldest: late(it[0].c) }; })
+      mine.forEach(function (c) { var k = idOf(c.counterparty) || N.name(c.counterparty) || "?"; if (!byP[k]) { byP[k] = []; order.push(k); } byP[k].push(c); });
+      var groups = order.map(function (k) { var it = byP[k].sort(function (a, b) { return lateness(b) - lateness(a); }); return { who: it[0].counterparty, items: it, oldest: lateness(it[0]) }; })
         .sort(function (a, b) { return b.oldest - a.oldest || b.items.length - a.items.length; });
       var allPeople = false, plist = h("ul", { class: "people" }), more = h("div");
       var paintPeople = function () {
         plist.textContent = ""; more.textContent = "";
         (allPeople ? groups : groups.slice(0, 5)).forEach(function (g) {
-          var theirs = !g.items[0].owe, oldest = g.items[0].c;
-          plist.appendChild(h("li", { class: "person" }, N.avatar(N.name(g.who), theirs),
-            h("p", { class: "person__name" }, N.name(g.who) || "Someone", h("span", null, " · " + g.items.length + " · " + (theirs ? "they owe you" : "you owe"))),
-            h("ul", { class: "person__items" }, g.items.map(function (x) {
-              var n = late(x.c);
-              return h("li", null, N.icon("commitment"), h("span", null, x.c.title), h("span", { class: "late" + (n < 7 ? " late--soft" : "") }, lateText(n)),
-                x.owe ? N.request("Mark done", N.withId("Mark " + N.quote(x.c.title) + " as done", x.c.id), "ghost", true, { kind: "mark_done", target: x.c.id, quoted: x.c.title }) : null);
-            })),
-            theirs ? h("div", { class: "atl-actions" }, N.request("Nudge " + first(g.who), N.withId("Draft one follow-up to " + N.name(g.who) + " covering " + g.items.map(function (x) { return N.quote(x.c.title); }).join(", "), oldest.id), "secondary", false, { kind: "nudge", target: oldest.id, quoted: oldest.title })) : null));
+          var who = N.name(g.who);
+          plist.appendChild(h("li", { class: "person" }, N.avatar(who || "?", false),
+            h("p", { class: "person__name" }, who ? "For " + who : "No one named", h("span", null, " · " + g.items.length)),
+            h("ul", { class: "person__items" }, g.items.map(function (c) {
+              var n = lateness(c);
+              return h("li", null, N.icon("commitment"), h("span", null, c.title),
+                n ? h("span", { class: "late" + (n < 7 ? " late--soft" : "") }, lateText(n)) : h("span", { class: "soon" }, "Due today"),
+                N.request("Mark done", N.withId("Mark " + N.quote(c.title) + " as done", c.id), "ghost", true, { kind: "mark_done", target: c.id, quoted: c.title }));
+            }))));
         });
         if (groups.length > 5) more.appendChild(N.button({ label: allPeople ? "Show fewer" : "All " + groups.length + " people", icon: allPeople ? "collapse" : "expand",
           onClick: function () { allPeople = !allPeople; paintPeople(); } }));
       };
       paintPeople();
-      right.appendChild(h("section", { class: "atl-card od", id: "overdue", "aria-labelledby": "od-h" },
-        h("div", { class: "kicker-row" }, h("h2", { class: "od__kicker", id: "od-h" }, N.icon("alert"), total + " OVERDUE"),
-          h("span", { class: "meta" }, oweN + " you owe · " + outN + " they owe you")),
-        h("div", { class: "od__bar", role: "img", "aria-label": "Overdue by age: " + ages[0] + " one day, " + ages[1] + " two to six days, " + ages[2] + " seven days or more" },
-          ages.map(function (n, i) { return n ? h("i", { class: "age" + (i + 1), style: "flex:" + n }) : null; })),
-        h("p", { class: "od__legend", "aria-hidden": "true" }, [["1 day", 0], ["2–6 days", 1], ["7+ days", 2]].map(function (a) { return h("span", null, h("i", { class: "age" + (a[1] + 1) }), h("b", null, String(ages[a[1]])), " " + a[0]); })),
+      right.appendChild(h("section", { class: "atl-card od", id: "due", "aria-labelledby": "od-h" },
+        h("div", { class: "kicker-row" }, h("h2", { class: "od__kicker" + (lateN ? "" : " od__kicker--today"), id: "od-h" }, N.icon(lateN ? "alert" : "clock"), mine.length + " DUE FROM YOU"),
+          h("span", { class: "meta" }, lateN + " overdue · " + todayN + " due today")),
+        h("div", { class: "od__bar", role: "img", "aria-label": "By age: " + ages[0] + " due today, " + ages[1] + " one day late, " + ages[2] + " two to six days late, " + ages[3] + " seven days or more" },
+          ages.map(function (n, i) { return n ? h("i", { class: "age" + i, style: "flex:" + n }) : null; })),
+        h("p", { class: "od__legend", "aria-hidden": "true" }, [["due today", 0], ["1 day", 1], ["2–6 days", 2], ["7+ days", 3]].map(function (a) { return h("span", null, h("i", { class: "age" + a[1] }), h("b", null, String(ages[a[1]])), " " + a[0]); })),
         h("p", { class: "overline" }, "By person · oldest first"), plist, more,
-        h("div", null, N.prompt("Which overdue items can I drop?"))));
-    }
-
-    /* ================= Due soon (what you owe, not yet late) ================= */
-    var soon = due.filter(function (c) { return !overdue(c); });
-    if (soon.length || T.due) {
-      right.appendChild(N.listCard({ id: "due", title: "Due soon", count: soon.length + (T.due || 0), noun: "due soon",
-        items: soon.map(function (c) {
-          var n = c.due ? N.daysFromToday(c.due) : null;
-          return { data: c, el: N.row({ title: c.title, tone: n != null && n <= 1 ? "warn" : null,
-            meta: [c.counterparty ? "For " + N.name(c.counterparty) : null, c.priority ? N.label(c.priority) + " priority" : null],
-            badge: N.badge(c.due ? N.due(c.due) : "No date", n != null && n <= 1 ? "warn" : null),
-            action: N.request("Mark done", N.withId("Mark " + N.quote(c.title) + " as done", c.id), "secondary", true, { kind: "mark_done", target: c.id, quoted: c.title }),
-            detail: c.next_step ? function () { return N.detail({ blocks: [{ heading: "Next step", nodes: N.para(c.next_step) }] }); } : null }) };
-        }) }));
+        T.due ? h("p", { class: "meta" }, "More due soon on the Work page.") : null,
+        h("div", null, N.prompt("Which of these can I drop or move?"))));
     }
 
     /* ================= Waiting on, by person, one nudge each ================= */
