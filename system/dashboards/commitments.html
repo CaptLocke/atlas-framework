@@ -43,6 +43,7 @@
 .hero__block p { font-size: 15px; line-height: 1.55; color: var(--night-text); max-width: 64ch; }
 .hero .atl-actions { margin-top: auto; padding-top: var(--space-2); }
 .hero .atl-web { margin: var(--space-2) calc(-1 * var(--space-5)) 0; }
+@media (max-width: 40rem) { .hero .atl-web { display: none; } }   /* too small to use on a phone; Linked records lists the same */
 .measure { display: flex; flex-direction: column; gap: 8px; }
 .measure p { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; font-size: 14px; color: var(--night-muted); }
 .measure b { color: var(--night-text); font-weight: 600; }

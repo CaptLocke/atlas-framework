@@ -139,10 +139,10 @@
 /* ---- Below the columns: while away, worth knowing, this week, coming up ---- */
 .notes { margin: 0; padding-left: 18px; display: grid; gap: 6px; max-width: var(--measure); }
 .week-wrap { overflow-x: auto; padding: 2px; }
-.week { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, minmax(110px, 1fr)); gap: var(--space-3); min-width: 790px; }
+.week { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); }   /* columns set by the script: work days share the width */
 .wday { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-card-sm); padding: 16px; display: grid; gap: 10px; align-content: start; min-width: 0; }
 .wday[data-today="1"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
-.wday[data-off="1"] { background: transparent; border-style: dashed; color: var(--muted); }
+.wday-off { border: 1px dashed var(--line-strong); border-radius: var(--radius-sm); min-height: 100%; }   /* days off, folded into one thin empty tile */
 .wday-name { font-size: 12px; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--muted); }
 .wday-num { font-size: 32px; line-height: 1; font-weight: 200; letter-spacing: -0.03em; color: var(--ink); }
 .load { height: 6px; background: var(--sunken); border-radius: var(--radius-pill); overflow: hidden; }
@@ -537,22 +537,39 @@
     /* ================= This week ================= */
     var wk = d.week || {}, days = L(wk.days), cap = wk.work_hours_per_day || 10;
     if (days.length) {
-      var strip = h("ul", { class: "week", "aria-label": "The next seven days" }, days.map(function (dd) {
-        var off = dd.work_day === false, mh = dd.meeting_hours || 0, n = N.daysFromToday(dd.date);
+      /* Work days get a tile each; a run of days off (a weekend) folds into one thin, empty tile */
+      var runs = [];
+      days.forEach(function (dd) {
+        var last = runs[runs.length - 1];
+        if (dd.work_day === false && last && last.off) last.days.push(dd);
+        else runs.push({ off: dd.work_day === false, days: [dd] });
+      });
+      var cols = runs.map(function (r) { return r.off ? "20px" : "minmax(110px, 1fr)"; });
+      var workTiles = runs.filter(function (r) { return !r.off; }).length;
+      var strip = h("ul", { class: "week", "aria-label": "The next seven days",
+          style: "grid-template-columns:" + cols.join(" ") + ";min-width:" + (workTiles * 122 + (runs.length - workTiles) * 32) + "px" }, runs.map(function (r) {
+        if (r.off) {
+          var said = r.days.map(function (dd) {
+            var due = L(dd.due).map(function (x) { return x.title; });
+            return N.longDate(dd.date) + ", not a work day" + (due.length ? ", due: " + due.join("; ") : "");
+          });
+          return h("li", { class: "wday-off", "aria-label": said.join(". ") + "." });
+        }
+        var dd = r.days[0];
+        var mh = dd.meeting_hours || 0, n = N.daysFromToday(dd.date);
         var its = L(dd.due), more = T["week." + dd.date] || 0;
         var dueWords = its.map(function (x) {
           return (x.kind === "milestone" ? "milestone: " : x.kind === "deadline" ? "deadline: " : x.direction === "waiting_on" ? "from " + N.name(x.counterparty) + ": " : "you owe: ") + x.title;
         });
         var label = (n === 0 ? "Today, " : "") + N.longDate(dd.date) + ". " +
-          (off ? "Not a work day" : (dd.meetings != null ? dd.meetings + (dd.meetings === 1 ? " meeting, " : " meetings, ") : "") + hrs(mh) + " in meetings, " + hrs(dd.free_hours) + " free") +
+          (dd.meetings != null ? dd.meetings + (dd.meetings === 1 ? " meeting, " : " meetings, ") : "") + hrs(mh) + " in meetings, " + hrs(dd.free_hours) + " free" +
           (dueWords.length ? ". Due: " + dueWords.join("; ") : "") + (more ? "; and " + more + " more" : "") + ".";
-        return h("li", { class: "wday", "aria-label": label, "data-today": n === 0 ? "1" : null, "data-off": off ? "1" : null,
-            "data-heavy": !off && mh / cap > 0.6 ? "1" : null },
+        return h("li", { class: "wday", "aria-label": label, "data-today": n === 0 ? "1" : null,
+            "data-heavy": mh / cap > 0.6 ? "1" : null },
           h("span", { class: "wday-name", "aria-hidden": "true" }, n === 0 ? "Today" : N.dayName(dd.date).slice(0, 3)),
           h("span", { class: "wday-num", "aria-hidden": "true" }, N.date(dd.date).replace(/^\D+/, "")),
-          off ? h("span", { class: "wday-hrs", "aria-hidden": "true" }, "Day off")
-            : [h("span", { class: "load", "aria-hidden": "true" }, h("i", { style: "width:" + Math.min(100, Math.round(mh / cap * 100)) + "%" })),
-              h("span", { class: "wday-hrs", "aria-hidden": "true" }, h("b", null, hrs(mh)), " meetings", h("br"), h("b", null, hrs(dd.free_hours)), " free")],
+          h("span", { class: "load", "aria-hidden": "true" }, h("i", { style: "width:" + Math.min(100, Math.round(mh / cap * 100)) + "%" })),
+          h("span", { class: "wday-hrs", "aria-hidden": "true" }, h("b", null, hrs(mh)), " meetings", h("br"), h("b", null, hrs(dd.free_hours)), " free"),
           its.length || more ? h("ul", { class: "pins", "aria-hidden": "true" }, its.map(function (x) {
               var tone = x.kind === "milestone" ? "star" : (x.kind === "deadline" || x.direction === "i_owe") ? "owe" : null;
               return h("li", { class: "pin", "data-tone": tone }, x.title);
