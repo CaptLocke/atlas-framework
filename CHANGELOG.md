@@ -11,8 +11,8 @@ Each release's "What's new" section is shown to users in the Guide and their nex
 
 ### What's new
 - Your pages have a new look, Constellation: a calmer, lighter design with one dark card for what matters most, a single typeface, and phone and dark-mode layouts. Your brand colours from your design system still apply.
-- **Today** shows your day to scale: meetings, the time between them, and a line for now. Atlas places your top priorities in the open windows ("11:30 window"), says what won't fit and suggests sending a new date. Choose a meeting or window to see its brief: who's in it, what you owe them and what they owe you.
-- Overdue items are grouped by person, oldest first, and Waiting on gives each person one nudge.
+- **Today** shows your day to scale: meetings, the time between them, and a line for now. Atlas places your top priorities in the gaps between meetings, marked **Focus** ("11:30 focus"); a gap with nothing placed is **Free**. It says what won't fit and suggests sending a new date. Each meeting and focus block shows how many commitments it carries; choose one to see them.
+- **Due from you** replaces Overdue and Due soon, on Today and in your brief: what you owe that's overdue or due today, grouped by person, oldest first, with what's due tomorrow as one bold line in the brief. What others owe you is in Waiting on, which gives each person one nudge.
 - **Work** opens on an Overview: every number takes you to its list, already filtered. Risks have their own tab, every list can be filtered, sorted and paged, and each project and goal opens with a summary and a web of what it links to.
 - **Guide** has Settings you can change on the page: working hours, your shortest focus window, insights per brief, which meetings show, follow-up channels, and more. Changes that move your routines wait for your next chat.
 - **Records** is a new page: everything Atlas keeps and how it connects, as a web you can zoom into. Search by name, or start from what needs attention.

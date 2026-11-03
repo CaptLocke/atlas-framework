@@ -13,7 +13,7 @@ stale_after_hours: 36
 
 The page keeps the slug `daily-brief`, so its `url` and `last_published` carry over; its title is **Today**. It is the page view of the written **Daily Brief**, `user/work/briefs/YYYY-MM-DD.md`; the brief file and this page are built in the same step and must agree on everything they both show. The week strip and Coming up come from the same run's planning data (`atlas-brief` §D) and have no counterpart in the brief file.
 
-Also republished by any chat that runs the morning catch-up (kernel §2.3); what it brings in shows up in the page's own sections (a new commitment under Due and slipping, a moved meeting under Schedule), not as a separate list. After away mode it renders the catch-up brief (`brief.kind: "catch-up"`, title "Catch-up Brief"), which adds a "While you were away" section.
+Also republished by any chat that runs the morning catch-up (kernel §2.3); what it brings in shows up in the page's own sections (a new commitment under Due from you, a moved meeting under Schedule), not as a separate list. After away mode it renders the catch-up brief (`brief.kind: "catch-up"`, title "Catch-up Brief"), which adds a "While you were away" section.
 
 ## Data (JSON shape embedded in the page)
 Envelope: `meta` as in `system/dashboards/README.md`; `meta.title` = `"Today"`; `meta.as_of` = the brief's date (tomorrow when built with `target: tomorrow`).
@@ -95,7 +95,7 @@ Envelope: `meta` as in `system/dashboards/README.md`; `meta.title` = `"Today"`; 
 |---|---|
 | `brief.*`, `priorities`, `while_away` (catch-up briefs only) | The brief file `user/work/briefs/<as_of>.md` (or `-catch-up.md`) written by `atlas-brief` in the same run; `priorities[].ref` and `[[…]]` mentions are the record IDs cited there |
 | `today[]` | Event records (`user/knowledge/events/`) with `start` on `as_of`, `status: scheduled`, and shown by the meeting filter (`rhythms.yaml: meetings`, rule in `system/schemas/settings.md`; deadline and milestone events always show): `id, title, kind, start, end, all_day, location, attendees` (→ person refs), `project` (first `links.projects` entry); `prep.path` = event `prep`; `prep.summary` = first line of the prep note's suggested agenda; `prep.todo` as in `atlas-brief` §D step 4 |
-| `due[]` | Commitments, `direction: i_owe`, `status: open|slipped`, `due` ≤ `as_of` + `rhythms.yaml: triggers.deadline_approaching.days` (default 3): `id, title, direction, status, due, priority, counterparty, next_step` |
+| `due[]` | The brief's Due from you (`atlas-brief` §A step 4.2): commitments, `direction: i_owe`, `status: open|slipped`, slipped or `due` ≤ `as_of` + 1 day (tomorrow's are the brief's Tomorrow line; the page shows only overdue and due today): `id, title, direction, status, due, priority, counterparty, next_step` |
 | `waiting_on[]` | The brief's Waiting on items (`atlas-brief` §A step 4.3): commitments, `direction: waiting_on`, `status: open|slipped`, that are overdue or due within 7 days, plus any waiting 7+ days with no `due`; `since` = `created`. Here `counterparty` is the person who owes it (the record's `owner`), so the page can say "From Dana" |
 | `counts` | Open commitments in both directions (`commitments/`): `overdue` = slipped or past `due`; `due_today` = `due` on the target date, not slipped |
 | `insights[]` | `user/inbox/insights.md`, status `new`, highest `score` first, max `rhythms.yaml: insights.brief_max` (default 3): heading ID, Insight, Why it matters, Suggested action, Links |
