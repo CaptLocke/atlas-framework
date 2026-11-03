@@ -272,7 +272,7 @@
       var word = its.length ? "Focus" : "Free";
       briefHolder.appendChild(h("section", { class: "atl-card brief" + (its.length ? " brief--focus" : ""), id: "brief", "aria-live": "polite", "aria-label": word + " time at " + clock(x.s) },
         h("p", { class: "brief__kicker" }, h("span", null, word + " time · " + (x.en - x.s) + " min"), h("span", null, clock(x.s) + "–" + clock(x.en))),
-        h("h2", { class: "atl-card__title" }, its.length ? "Focus · " + its[0].title : "Free"),
+        h("h2", { class: "atl-card__title" }, word),
         its.length ? h("div", { class: "brief__group brief__group--fit" }, h("h3", null, "Fits here · about " + used + " min"),
           its.map(function (it) {
             return h("div", { class: "mini" }, N.icon("commitment"), h("span", { class: "mini__text" }, h("span", { class: "mini__title" }, it.title),
@@ -349,7 +349,7 @@
           style: "top:" + Math.round((x.s - start) * S + 2) + "px;height:" + Math.round(hgt) + "px;left:var(--tl-gutter);width:calc(100% - var(--tl-gutter))",
           onclick: function () { pick(x.id); } },
           N.icon(its.length ? "focus" : "clock"),
-          h("span", { class: "tl-block__text" }, h("span", { class: "tl-block__title" }, its.length ? "Focus · " + its[0].title : "Free"),
+          h("span", { class: "tl-block__text" }, h("span", { class: "tl-block__title" }, its.length ? "Focus" : "Free"),
             h("span", { class: "tl-block__time" }, clock(x.s) + "–" + clock(x.en) + " · " + (x.en - x.s) + " min")),
           its.length ? countPill(its.length, "placed here") : null);
         btns.push({ b: btn, id: x.id });
