@@ -162,7 +162,8 @@
 .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; }
 .legend .lg-meet { background: var(--ink); }
 .legend .lg-owe { background: var(--bad-bg); border: 1px solid var(--bad); }
-.legend .lg-star { background: var(--info-bg); border: 1px solid var(--info); }
+.legend .lg-ms .atl-icon { width: 11px; height: 11px; color: var(--info); }
+.pin[data-tone="star"] .atl-icon { width: 10px; height: 10px; margin-right: 4px; vertical-align: -1px; }
 .week-free { font-size: 14px; color: var(--ink-2); }
 .week-free b { color: var(--ink); font-weight: 600; }
 .guide-link { display: flex; align-items: center; gap: 12px; padding: var(--space-5) var(--space-7); border: 1px solid var(--line); border-radius: var(--radius-card-sm); background: var(--surface); font-size: 14px; color: var(--ink-2); }
@@ -382,7 +383,7 @@
         h("span", { class: "meta" }, dd ? hrs((dd.open_minutes || 0) / 60) + " free" + (dd.due_today ? " · " + (dd.due_today_placed === dd.due_today ? (dd.due_today === 1 ? "the one" : "all " + dd.due_today) + " due today " + (dd.due_today === 1 ? "is" : "are") + " placed" : dd.due_today_placed + " of " + dd.due_today + " due today placed") : "")
           : meetings.length ? meetings.length + (meetings.length === 1 ? " meeting · " : " meetings · ") + hrs(hoursIn) : "No meetings")),
       allDay.length ? h("div", { class: "allday" }, allDay.map(function (e) {
-        return N.badge((e.kind === "deadline" ? "Deadline · " : e.kind === "milestone" ? "Milestone · " : "All day · ") + e.title, e.kind === "deadline" ? "bad" : e.kind === "milestone" ? "info" : null);
+        return N.badge((e.kind === "deadline" ? "Deadline · " : e.kind === "milestone" ? "Milestone · " : "All day · ") + e.title, e.kind === "deadline" ? "bad" : e.kind === "milestone" ? "info" : null, e.kind === "milestone" ? "milestone" : null);
       })) : null,
       earlier.length ? h("div", { class: "earlier" }, earlier.map(function (m) {
         return h("p", null, N.icon("done"), h("span", null, h("b", null, "Earlier · " + m.e.title), " · " + clock(m.s) + " to " + clock(m.en)));
@@ -578,7 +579,7 @@
           h("span", { class: "wday-hrs", "aria-hidden": "true" }, h("b", null, hrs(mh)), " meetings", h("br"), h("b", null, hrs(dd.free_hours)), " free"),
           its.length || more ? h("ul", { class: "pins", "aria-hidden": "true" }, its.map(function (x) {
               var tone = x.kind === "milestone" ? "star" : (x.kind === "deadline" || x.direction === "i_owe") ? "owe" : null;
-              return h("li", { class: "pin", "data-tone": tone }, x.title);
+              return h("li", { class: "pin", "data-tone": tone }, tone === "star" ? N.icon("milestone") : null, x.title);
             }), more ? h("li", { class: "pin" }, "+" + more + " more") : null) : null);
       }));
       var free = typeof wk.free_hours === "number" ? wk.free_hours : days.reduce(function (s, x) { return s + (x.free_hours || 0); }, 0);
@@ -587,7 +588,7 @@
           h("p", { class: "legend", "aria-hidden": "true" },
             h("span", null, h("i", { class: "lg-meet" }), "meetings, against a " + cap + "-hour day"),
             h("span", null, h("i", { class: "lg-owe" }), "due from you"),
-            h("span", null, h("i", { class: "lg-star" }), "milestone")),
+            h("span", { class: "lg-ms" }, N.icon("milestone"), "milestone")),
           h("p", { class: "week-free" }, "About ", h("b", null, hrs(free)), " free for focused work across the week, in gaps of an hour or more.")] }));
     }
 
@@ -599,7 +600,7 @@
           var dl = m.kind === "deadline";
           return N.row({ title: m.title, tone: dl ? "bad" : "info",
             meta: [N.weekday(m.date) + ", " + N.rel(m.date), m.project ? N.name(m.project) : null, m.note ? N.rich(m.note) : null],
-            badge: N.badge(dl ? "Deadline" : "Milestone", dl ? "bad" : "info") });
+            badge: N.badge(dl ? "Deadline" : "Milestone", dl ? "bad" : "info", dl ? null : "milestone") });
         }), "No milestones or deadlines in the next two months.") }));
     }
 
