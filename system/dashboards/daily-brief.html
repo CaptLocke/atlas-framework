@@ -35,25 +35,27 @@
 .tl-block__time { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tl-block[aria-pressed="true"] .tl-block__time { color: var(--night-muted); }
 .tl-block--short .tl-block__time { display: none; }
-.tl-due { flex: none; padding: 3px 9px; border-radius: var(--radius-pill); background: var(--warn-bg); color: var(--warn); font-size: 11px; font-weight: 600; white-space: nowrap; }
-.tl-block[aria-pressed="true"] .tl-due { background: var(--night-raised); color: var(--warn-on-night); }
+/* How many commitments a block carries: placed in a focus window, or open with a meeting's people */
+.tl-count { flex: none; display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: var(--radius-pill); background: var(--neutral-bg); color: var(--ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.tl-count .atl-icon { width: 11px; height: 11px; }
+.tl-block[aria-pressed="true"] .tl-count { background: var(--night-raised); color: var(--night-text); }
 .tl-tag { flex: none; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; color: var(--muted); white-space: nowrap; }
 .tl-block[aria-pressed="true"] .tl-tag { color: var(--accent-on-night); }
+/* Focus: an open window Atlas placed commitments in, in ember. Free: an open window with nothing placed, neutral. */
 .tl-block--win { border: 1px dashed var(--accent); background: var(--accent-soft); color: var(--ink); }
 .tl-block--win > .atl-icon { color: var(--accent); }
-.tl-block--win .tl-rank { background: var(--accent); color: #16171a; }   /* one ember dot: how many priorities the window holds; ink numerals pass AA on ember in both themes */
-.tl-block--win .tl-tag { color: var(--accent-text); }
+.tl-block--win .tl-count { background: var(--accent); color: #16171a; }   /* ink on ember passes AA in both themes */
 .tl-block--win[aria-pressed="true"] { background: var(--accent-soft); border-style: solid; color: var(--ink); box-shadow: inset 0 0 0 1px var(--accent); }
 .tl-block--win[aria-pressed="true"] .tl-block__time { color: var(--muted); }
-.tl-block--win[aria-pressed="true"] .tl-tag { color: var(--accent-text); }
-.tl-rank { flex: none; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--ink); color: var(--on-ink); font-size: 12px; font-weight: 600; }
-.tl-rank--one { background: var(--accent-text); color: #ffffff; }   /* ember's text tone: white on it passes AA at 12px */
-:root[data-theme="dark"] .tl-rank--one { color: #16171a; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tl-rank--one { color: #16171a; } }
+.tl-block--win[aria-pressed="true"] .tl-count { background: var(--accent); color: #16171a; }
+.tl-block--free { border: 1px dashed var(--line-strong); background: transparent; color: var(--ink-2); }
+.tl-block--free > .atl-icon { color: var(--muted); }
+.tl-block--free[aria-pressed="true"] { background: var(--sunken); border-style: solid; border-color: var(--ink); color: var(--ink); }
+.tl-block--free[aria-pressed="true"] .tl-block__time { color: var(--muted); }
 .brief__group--fit h3 { color: var(--accent-text); }
 .brief__group--fit .mini { background: var(--accent-soft); }
 .brief__group--fit .mini__when { color: var(--accent-text); }
-.brief--win { border-color: var(--accent); }
+.brief--focus { border-color: var(--accent); }
 .tl-quiet { padding: var(--space-7) var(--space-8); border-radius: var(--radius-card); background: var(--sunken); color: var(--ink-2); }
 
 /* ---- The brief for the chosen block ---- */
@@ -261,12 +263,16 @@
           h("span", { class: "mini__sub" }, [owe ? "For " + N.name(c.counterparty) : N.name(c.counterparty), c.priority ? N.label(c.priority) : null].filter(Boolean).join(" · "))),
         when ? h("span", { class: "mini__when" }, n === 0 && !overdue(c) ? "Due today" : when) : null);
     }
+    function countPill(n, why) {
+      return h("span", { class: "tl-count", "aria-hidden": "true", title: n + (n === 1 ? " commitment " : " commitments ") + why }, N.icon("commitment"), String(n));
+    }
     function sizeText(it) { return it.sized === false ? "size unknown" : it.minutes >= 60 ? hrs(it.minutes / 60) : it.minutes + " min"; }
     function paintWindow(x) {
       var w = x.w, its = L(w.items), used = its.reduce(function (n, it) { return n + (it.minutes || 0); }, 0);
-      briefHolder.appendChild(h("section", { class: "atl-card brief brief--win", id: "brief", "aria-live": "polite", "aria-label": "Free time at " + clock(x.s) },
-        h("p", { class: "brief__kicker" }, h("span", null, "Free time · " + (x.en - x.s) + " min"), h("span", null, clock(x.s) + "–" + clock(x.en))),
-        h("h2", { class: "atl-card__title" }, its.length ? "Free · " + its[0].title : "Free"),
+      var word = its.length ? "Focus" : "Free";
+      briefHolder.appendChild(h("section", { class: "atl-card brief" + (its.length ? " brief--focus" : ""), id: "brief", "aria-live": "polite", "aria-label": word + " time at " + clock(x.s) },
+        h("p", { class: "brief__kicker" }, h("span", null, word + " time · " + (x.en - x.s) + " min"), h("span", null, clock(x.s) + "–" + clock(x.en))),
+        h("h2", { class: "atl-card__title" }, its.length ? "Focus · " + its[0].title : "Free"),
         its.length ? h("div", { class: "brief__group brief__group--fit" }, h("h3", null, "Fits here · about " + used + " min"),
           its.map(function (it) {
             return h("div", { class: "mini" }, N.icon("commitment"), h("span", { class: "mini__text" }, h("span", { class: "mini__title" }, it.title),
@@ -338,15 +344,14 @@
       flush();
       wins.forEach(function (x) {
         var hgt = Math.max(30, (x.en - x.s) * S - 4), its = L(x.w.items);
-        var btn = h("button", { type: "button", class: "tl-block tl-block--win" + (hgt < 46 ? " tl-block--short" : ""), "aria-pressed": "false",
-          "aria-label": "Free time, " + clock(x.s) + " to " + clock(x.en) + (its.length ? ", " + its.length + " placed here" : ""),
+        var btn = h("button", { type: "button", class: "tl-block " + (its.length ? "tl-block--win" : "tl-block--free") + (hgt < 46 ? " tl-block--short" : ""), "aria-pressed": "false",
+          "aria-label": (its.length ? "Focus time, " : "Free time, ") + clock(x.s) + " to " + clock(x.en) + (its.length ? ", " + its.length + (its.length === 1 ? " commitment" : " commitments") + " placed here" : ""),
           style: "top:" + Math.round((x.s - start) * S + 2) + "px;height:" + Math.round(hgt) + "px;left:var(--tl-gutter);width:calc(100% - var(--tl-gutter))",
           onclick: function () { pick(x.id); } },
-          N.icon("focus"),
-          h("span", { class: "tl-block__text" }, h("span", { class: "tl-block__title" }, its.length ? "Free · " + its[0].title : "Free"),
+          N.icon(its.length ? "focus" : "clock"),
+          h("span", { class: "tl-block__text" }, h("span", { class: "tl-block__title" }, its.length ? "Focus · " + its[0].title : "Free"),
             h("span", { class: "tl-block__time" }, clock(x.s) + "–" + clock(x.en) + " · " + (x.en - x.s) + " min")),
-          (function (n) { return n ? h("span", { class: "tl-rank", "aria-hidden": "true", title: n + (n === 1 ? " priority" : " priorities") + " placed here" }, String(n)) : null; })(its.filter(function (it) { return it.rank; }).length),
-          h("span", { class: "tl-tag" }, "FREE"));
+          its.length ? countPill(its.length, "placed here") : null);
         btns.push({ b: btn, id: x.id });
         tl.appendChild(btn);
       });
@@ -360,7 +365,7 @@
           N.icon("event"),
           h("span", { class: "tl-block__text" }, h("span", { class: "tl-block__title" }, e.title),
             h("span", { class: "tl-block__time" }, clock(m.s) + "–" + clock(m.en) + " · " + len + " min" + (prep.status ? " · " + N.label(prep.status) : ""))),
-          nd ? h("span", { class: "tl-due" }, nd + " open") : null,
+          nd ? countPill(nd, "open with these people") : null,
           m === current ? h("span", { class: "tl-tag" }, "NOW") : m === next && nowMin != null ? h("span", { class: "tl-tag" }, "UP NEXT") : null);
         btns.push({ b: btn, id: e.id });
         tl.appendChild(btn);
@@ -428,7 +433,7 @@
       h("div", { class: "kicker-row" }, h("h2", { class: "overline", id: "prio-h" }, "Top priorities"), h("span", { class: "meta" }, "Ranked against your goals")),
       pr.length ? h("ol", { class: "prio" }, pr.map(function (p, i) {
         var sl = p.slot || {}, w = winOf[idOf(p.ref)];
-        var pill = sl.kind === "window" ? h("span", { class: "slot" }, N.icon("clock"), hhmm(hm(sl.start)) + " window" + (sl.sized === false ? " · size unknown" : ""))
+        var pill = sl.kind === "window" ? h("span", { class: "slot" }, N.icon("focus"), hhmm(hm(sl.start)) + " focus" + (sl.sized === false ? " · size unknown" : ""))
           : sl.kind === "wont_fit" ? h("span", { class: "slot slot--warn" }, N.icon("alert"), "Won't fit" + (sl.date_at ? " · date at " + hhmm(hm(sl.date_at)) : "")) : null;
         var titleEl = h("p", { class: "prio-title" }, N.icon(/^projects\//.test(idOf(p.ref) || "") ? "project" : "commitment"), h("span", null, p.text), pill);
         return h("li", null, h("span", { class: "prio-n", "aria-hidden": "true" }, String(i + 1)),
