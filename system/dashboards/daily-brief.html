@@ -264,9 +264,9 @@
     function sizeText(it) { return it.sized === false ? "size unknown" : it.minutes >= 60 ? hrs(it.minutes / 60) : it.minutes + " min"; }
     function paintWindow(x) {
       var w = x.w, its = L(w.items), used = its.reduce(function (n, it) { return n + (it.minutes || 0); }, 0);
-      briefHolder.appendChild(h("section", { class: "atl-card brief brief--win", id: "brief", "aria-live": "polite", "aria-label": "Open window at " + clock(x.s) },
-        h("p", { class: "brief__kicker" }, h("span", null, "Open window · " + (x.en - x.s) + " min"), h("span", null, clock(x.s) + "–" + clock(x.en))),
-        h("h2", { class: "atl-card__title" }, its.length ? "Open · " + its[0].title : "Open"),
+      briefHolder.appendChild(h("section", { class: "atl-card brief brief--win", id: "brief", "aria-live": "polite", "aria-label": "Free time at " + clock(x.s) },
+        h("p", { class: "brief__kicker" }, h("span", null, "Free time · " + (x.en - x.s) + " min"), h("span", null, clock(x.s) + "–" + clock(x.en))),
+        h("h2", { class: "atl-card__title" }, its.length ? "Free · " + its[0].title : "Free"),
         its.length ? h("div", { class: "brief__group brief__group--fit" }, h("h3", null, "Fits here · about " + used + " min"),
           its.map(function (it) {
             return h("div", { class: "mini" }, N.icon("commitment"), h("span", { class: "mini__text" }, h("span", { class: "mini__title" }, it.title),
@@ -339,14 +339,14 @@
       wins.forEach(function (x) {
         var hgt = Math.max(30, (x.en - x.s) * S - 4), its = L(x.w.items);
         var btn = h("button", { type: "button", class: "tl-block tl-block--win" + (hgt < 46 ? " tl-block--short" : ""), "aria-pressed": "false",
-          "aria-label": "Open window, " + clock(x.s) + " to " + clock(x.en) + (its.length ? ", " + its.length + " placed here" : ""),
+          "aria-label": "Free time, " + clock(x.s) + " to " + clock(x.en) + (its.length ? ", " + its.length + " placed here" : ""),
           style: "top:" + Math.round((x.s - start) * S + 2) + "px;height:" + Math.round(hgt) + "px;left:var(--tl-gutter);width:calc(100% - var(--tl-gutter))",
           onclick: function () { pick(x.id); } },
           N.icon("focus"),
-          h("span", { class: "tl-block__text" }, h("span", { class: "tl-block__title" }, its.length ? "Open · " + its[0].title : "Open"),
+          h("span", { class: "tl-block__text" }, h("span", { class: "tl-block__title" }, its.length ? "Free · " + its[0].title : "Free"),
             h("span", { class: "tl-block__time" }, clock(x.s) + "–" + clock(x.en) + " · " + (x.en - x.s) + " min")),
           (function (n) { return n ? h("span", { class: "tl-rank", "aria-hidden": "true", title: n + (n === 1 ? " priority" : " priorities") + " placed here" }, String(n)) : null; })(its.filter(function (it) { return it.rank; }).length),
-          h("span", { class: "tl-tag" }, "OPEN"));
+          h("span", { class: "tl-tag" }, "FREE"));
         btns.push({ b: btn, id: x.id });
         tl.appendChild(btn);
       });
@@ -374,7 +374,7 @@
     var hoursIn = meetings.reduce(function (n, m) { return n + (m.en - m.s); }, 0) / 60;
     left.appendChild(h("section", { class: "day-sec", id: "schedule", "aria-labelledby": "schedule-h" },
       h("div", { class: "kicker-row" }, h("h2", { class: "overline", id: "schedule-h" }, "Your day"),
-        h("span", { class: "meta" }, dd ? hrs((dd.open_minutes || 0) / 60) + " open" + (dd.due_today ? " · " + (dd.due_today_placed === dd.due_today ? (dd.due_today === 1 ? "the one" : "all " + dd.due_today) + " due today " + (dd.due_today === 1 ? "is" : "are") + " placed" : dd.due_today_placed + " of " + dd.due_today + " due today placed") : "")
+        h("span", { class: "meta" }, dd ? hrs((dd.open_minutes || 0) / 60) + " free" + (dd.due_today ? " · " + (dd.due_today_placed === dd.due_today ? (dd.due_today === 1 ? "the one" : "all " + dd.due_today) + " due today " + (dd.due_today === 1 ? "is" : "are") + " placed" : dd.due_today_placed + " of " + dd.due_today + " due today placed") : "")
           : meetings.length ? meetings.length + (meetings.length === 1 ? " meeting · " : " meetings · ") + hrs(hoursIn) : "No meetings")),
       allDay.length ? h("div", { class: "allday" }, allDay.map(function (e) {
         return N.badge((e.kind === "deadline" ? "Deadline · " : e.kind === "milestone" ? "Milestone · " : "All day · ") + e.title, e.kind === "deadline" ? "bad" : e.kind === "milestone" ? "info" : null);
