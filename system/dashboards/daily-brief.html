@@ -44,10 +44,10 @@
 /* Focus: an open window Atlas placed commitments in, in ember. Free: an open window with nothing placed, neutral. */
 .tl-block--win { border: 1px dashed var(--accent); background: var(--accent-soft); color: var(--ink); }
 .tl-block--win > .atl-icon { color: var(--accent); }
-.tl-block--win .tl-count { background: var(--accent); color: #16171a; }   /* ink on ember passes AA in both themes */
+.tl-block--win .tl-count { background: var(--accent); color: var(--on-accent); }   /* ink or white, whichever reads on this accent (_base.js) */
 .tl-block--win[aria-pressed="true"] { background: var(--accent-soft); border-style: solid; color: var(--ink); box-shadow: inset 0 0 0 1px var(--accent); }
 .tl-block--win[aria-pressed="true"] .tl-block__time { color: var(--muted); }
-.tl-block--win[aria-pressed="true"] .tl-count { background: var(--accent); color: #16171a; }
+.tl-block--win[aria-pressed="true"] .tl-count { background: var(--accent); color: var(--on-accent); }
 .tl-block--free { border: 1px dashed var(--line-strong); background: transparent; color: var(--ink-2); }
 .tl-block--free > .atl-icon { color: var(--muted); }
 .tl-block--free[aria-pressed="true"] { background: var(--sunken); border-style: solid; border-color: var(--ink); color: var(--ink); }
@@ -146,7 +146,8 @@
 .week { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); }   /* columns set by the script: work days share the width */
 .wday { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-card-sm); padding: 16px; display: grid; gap: 10px; align-content: start; min-width: 0; }
 .wday[data-today="1"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
-.wday-off { border: 1px dashed var(--line-strong); border-radius: var(--radius-sm); min-height: 100%; }   /* days off, folded into one thin empty tile */
+.wday-off { border: 1px dashed var(--line-strong); border-radius: var(--radius-sm); min-height: 100%; display: flex; justify-content: center; padding-top: 14px; }   /* days off, folded into one thin tile */
+.wday-off__n { width: 16px; height: 16px; border-radius: 50%; background: var(--bad-bg); color: var(--bad); font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }   /* something falls due on those days */
 .wday-name { font-size: 12px; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--muted); }
 .wday-num { font-size: 32px; line-height: 1; font-weight: 200; letter-spacing: -0.03em; color: var(--ink); }
 .load { height: 6px; background: var(--sunken); border-radius: var(--radius-pill); overflow: hidden; }
@@ -281,7 +282,7 @@
               h("span", { class: "mini__sub" }, it.rank ? "#" + it.rank + " priority" : "Due today")), h("span", { class: "mini__when" }, (it.at ? hhmm(hm(it.at)) + " · " : "") + sizeText(it)));
           })) : h("p", { class: "brief__meta" }, "Nothing placed here: time for whatever comes up."),
         w.left ? h("dl", { class: "brief__facts" }, h("dt", null, "Left over"), h("dd", null, w.left + " min")) : null,
-        its.length ? h("div", { class: "atl-actions" }, N.prompt("Help me get " + its[0].title + " done in the " + hhmm(x.s) + " window")) : null));
+        its.length ? h("div", { class: "atl-actions" }, N.prompt("Help me get " + its[0].title + " done in the " + hhmm(x.s) + " focus time")) : null));
     }
     function paintBrief() {
       briefHolder.textContent = "";
@@ -361,7 +362,7 @@
         var e = m.e, len = m.en - m.s, hgt = Math.max(30, len * S - 4), o = owedFor(e), nd = o.owe.length + o.out.length;
         var prep = e.prep || {};
         var btn = h("button", { type: "button", class: "tl-block" + (hgt < 46 ? " tl-block--short" : ""), "aria-pressed": "false",
-          "aria-label": e.title + ", " + clock(m.s) + " to " + clock(m.en) + (nd ? ", " + nd + " open items with these people" : ""),
+          "aria-label": e.title + ", " + clock(m.s) + " to " + clock(m.en) + (nd ? ", " + nd + (nd === 1 ? " open commitment" : " open commitments") + " with these people" : ""),
           style: "top:" + Math.round((m.s - start) * S + 2) + "px;height:" + Math.round(hgt) + "px;left:calc(var(--tl-gutter) + (100% - var(--tl-gutter)) * " + m.lane + " / " + m.n + ");width:calc((100% - var(--tl-gutter)) / " + m.n + " - " + (m.n > 1 ? 4 : 0) + "px)",
           onclick: function () { pick(e.id); } },
           N.icon("event"),
@@ -381,7 +382,7 @@
     var hoursIn = meetings.reduce(function (n, m) { return n + (m.en - m.s); }, 0) / 60;
     left.appendChild(h("section", { class: "day-sec", id: "schedule", "aria-labelledby": "schedule-h" },
       h("div", { class: "kicker-row" }, h("h2", { class: "overline", id: "schedule-h" }, "Your day"),
-        h("span", { class: "meta" }, dd ? hrs((dd.open_minutes || 0) / 60) + " free" + (dd.due_today ? " · " + (dd.due_today_placed === dd.due_today ? (dd.due_today === 1 ? "the one" : "all " + dd.due_today) + " due today " + (dd.due_today === 1 ? "is" : "are") + " placed" : dd.due_today_placed + " of " + dd.due_today + " due today placed") : "")
+        h("span", { class: "meta" }, dd ? hrs((dd.open_minutes || 0) / 60) + " between meetings" + (dd.due_today ? " · " + (dd.due_today_placed === dd.due_today ? (dd.due_today === 1 ? "the one" : "all " + dd.due_today) + " due today " + (dd.due_today === 1 ? "is" : "are") + " placed" : dd.due_today_placed + " of " + dd.due_today + " due today placed") : "")
           : meetings.length ? meetings.length + (meetings.length === 1 ? " meeting · " : " meetings · ") + hrs(hoursIn) : "No meetings")),
       allDay.length ? h("div", { class: "allday" }, allDay.map(function (e) {
         return N.badge((e.kind === "deadline" ? "Deadline · " : e.kind === "milestone" ? "Milestone · " : "All day · ") + e.title, e.kind === "deadline" ? "bad" : e.kind === "milestone" ? "info" : null, e.kind === "milestone" ? "milestone" : null);
@@ -447,7 +448,7 @@
     /* ================= Due from you: what you owe, overdue or due today, by person, oldest first ================= */
     function dueToday(c) { return !overdue(c) && !!c.due && N.daysFromToday(c.due) === 0; }
     var mine = due.filter(function (c) { return overdue(c) || dueToday(c); });
-    if (mine.length) {
+    if (mine.length || T.due) {
       var lateN = mine.filter(overdue).length, todayN = mine.length - lateN;
       var lateness = function (c) { return overdue(c) ? late(c) : 0; };   /* 0 = due today */
       var ages = [todayN, mine.filter(function (c) { return overdue(c) && late(c) === 1; }).length,
@@ -476,13 +477,13 @@
       };
       paintPeople();
       right.appendChild(h("section", { class: "atl-card od", id: "due", "aria-labelledby": "od-h" },
-        h("div", { class: "kicker-row" }, h("h2", { class: "od__kicker" + (lateN ? "" : " od__kicker--today"), id: "od-h" }, N.icon(lateN ? "alert" : "clock"), mine.length + " DUE FROM YOU"),
+        h("div", { class: "kicker-row" }, h("h2", { class: "od__kicker" + (lateN ? "" : " od__kicker--today"), id: "od-h" }, N.icon(lateN ? "alert" : "clock"), (mine.length + (T.due || 0)) + " DUE FROM YOU"),
           h("span", { class: "meta" }, lateN + " overdue · " + todayN + " due today")),
         h("div", { class: "od__bar", role: "img", "aria-label": "By age: " + ages[0] + " due today, " + ages[1] + " one day late, " + ages[2] + " two to six days late, " + ages[3] + " seven days or more" },
           ages.map(function (n, i) { return n ? h("i", { class: "age" + i, style: "flex:" + n }) : null; })),
         h("p", { class: "od__legend", "aria-hidden": "true" }, [["due today", 0], ["1 day", 1], ["2–6 days", 2], ["7+ days", 3]].map(function (a) { return h("span", null, h("i", { class: "age" + a[1] }), h("b", null, String(ages[a[1]])), " " + a[0]); })),
         h("p", { class: "overline" }, "By person · oldest first"), plist, more,
-        T.due ? h("p", { class: "meta" }, "More due soon on the Work page.") : null,
+        T.due ? h("p", { class: "meta" }, "+" + T.due + " more on the Work page") : null,
         h("div", null, N.prompt("Which of these can I drop or move?"))));
     }
 
@@ -533,52 +534,58 @@
     /* ================= This week ================= */
     var wk = d.week || {}, days = L(wk.days), cap = wk.work_hours_per_day || 10;
     if (days.length) {
-      /* Work days get a tile each; a run of days off (a weekend) folds into one thin, empty tile */
+      /* Work days get a tile each; a run of days off (a weekend) folds into one thin tile, empty unless
+         something falls due on it. Today keeps its own tile even on a day off. */
+      function dueWord(x) {
+        return (x.kind === "milestone" ? "milestone: " : x.kind === "deadline" ? "deadline: " : x.direction === "waiting_on" ? "from " + N.name(x.counterparty) + ": " : "you owe: ") + x.title;
+      }
       var runs = [];
       days.forEach(function (dd) {
-        var last = runs[runs.length - 1];
-        if (dd.work_day === false && last && last.off) last.days.push(dd);
-        else runs.push({ off: dd.work_day === false, days: [dd] });
+        var last = runs[runs.length - 1], fold = dd.work_day === false && N.daysFromToday(dd.date) !== 0;
+        if (fold && last && last.off) last.days.push(dd);
+        else runs.push({ off: fold, days: [dd] });
       });
       var cols = runs.map(function (r) { return r.off ? "20px" : "minmax(110px, 1fr)"; });
       var workTiles = runs.filter(function (r) { return !r.off; }).length;
       var strip = h("ul", { class: "week", "aria-label": "The next seven days",
           style: "grid-template-columns:" + cols.join(" ") + ";min-width:" + (workTiles * 122 + (runs.length - workTiles) * 32) + "px" }, runs.map(function (r) {
         if (r.off) {
+          var nDue = 0;
           var said = r.days.map(function (dd) {
-            var due = L(dd.due).map(function (x) { return x.title; });
-            return N.longDate(dd.date) + ", not a work day" + (due.length ? ", due: " + due.join("; ") : "");
+            var due = L(dd.due).map(dueWord), more = T["week." + dd.date] || 0;
+            nDue += due.length + more;
+            return N.longDate(dd.date) + ", not a work day" + (due.length ? ". Due: " + due.join("; ") : "") + (more ? "; and " + more + " more" : "");
           });
-          return h("li", { class: "wday-off", "aria-label": said.join(". ") + "." });
+          return h("li", { class: "wday-off", "aria-label": said.join(". ") + "." },
+            nDue ? h("span", { class: "wday-off__n", "aria-hidden": "true", title: nDue + " due" }, String(nDue)) : null);
         }
         var dd = r.days[0];
         var mh = dd.meeting_hours || 0, n = N.daysFromToday(dd.date);
         var its = L(dd.due), more = T["week." + dd.date] || 0;
-        var dueWords = its.map(function (x) {
-          return (x.kind === "milestone" ? "milestone: " : x.kind === "deadline" ? "deadline: " : x.direction === "waiting_on" ? "from " + N.name(x.counterparty) + ": " : "you owe: ") + x.title;
-        });
+        var dueWords = its.map(dueWord), off = dd.work_day === false;
         var label = (n === 0 ? "Today, " : "") + N.longDate(dd.date) + ". " +
-          (dd.meetings != null ? dd.meetings + (dd.meetings === 1 ? " meeting, " : " meetings, ") : "") + hrs(mh) + " in meetings, " + hrs(dd.free_hours) + " free" +
+          (off ? "Not a work day" : (dd.meetings != null ? dd.meetings + (dd.meetings === 1 ? " meeting, " : " meetings, ") : "") + hrs(mh) + " in meetings, " + hrs(dd.free_hours) + " open") +
           (dueWords.length ? ". Due: " + dueWords.join("; ") : "") + (more ? "; and " + more + " more" : "") + ".";
         return h("li", { class: "wday", "aria-label": label, "data-today": n === 0 ? "1" : null,
-            "data-heavy": mh / cap > 0.6 ? "1" : null },
+            "data-heavy": !off && mh / cap > 0.6 ? "1" : null },
           h("span", { class: "wday-name", "aria-hidden": "true" }, n === 0 ? "Today" : N.dayName(dd.date).slice(0, 3)),
           h("span", { class: "wday-num", "aria-hidden": "true" }, N.date(dd.date).replace(/^\D+/, "")),
-          h("span", { class: "load", "aria-hidden": "true" }, h("i", { style: "width:" + Math.min(100, Math.round(mh / cap * 100)) + "%" })),
-          h("span", { class: "wday-hrs", "aria-hidden": "true" }, h("b", null, hrs(mh)), " meetings", h("br"), h("b", null, hrs(dd.free_hours)), " free"),
+          off ? h("span", { class: "wday-hrs", "aria-hidden": "true" }, "Day off")
+            : [h("span", { class: "load", "aria-hidden": "true" }, h("i", { style: "width:" + Math.min(100, Math.round(mh / cap * 100)) + "%" })),
+              h("span", { class: "wday-hrs", "aria-hidden": "true" }, h("b", null, hrs(mh)), " meetings", h("br"), h("b", null, hrs(dd.free_hours)), " open")],
           its.length || more ? h("ul", { class: "pins", "aria-hidden": "true" }, its.map(function (x) {
               var tone = x.kind === "milestone" ? "star" : (x.kind === "deadline" || x.direction === "i_owe") ? "owe" : null;
               return h("li", { class: "pin", "data-tone": tone }, tone === "star" ? N.icon("milestone") : null, x.title);
             }), more ? h("li", { class: "pin" }, "+" + more + " more") : null) : null);
       }));
       var free = typeof wk.free_hours === "number" ? wk.free_hours : days.reduce(function (s, x) { return s + (x.free_hours || 0); }, 0);
-      main.appendChild(N.section({ id: "week", title: "This week", note: "Meeting load, free time and what's due each day.",
+      main.appendChild(N.section({ id: "week", title: "This week", note: "Meeting load, open time and what's due each day.",
         body: [h("div", { class: "week-wrap", tabindex: "0", role: "region", "aria-label": "This week, scrolls sideways" }, strip),
           h("p", { class: "legend", "aria-hidden": "true" },
             h("span", null, h("i", { class: "lg-meet" }), "meetings, against a " + cap + "-hour day"),
             h("span", null, h("i", { class: "lg-owe" }), "due from you"),
             h("span", { class: "lg-ms" }, N.icon("milestone"), "milestone")),
-          h("p", { class: "week-free" }, "About ", h("b", null, hrs(free)), " free for focused work across the week, in gaps of an hour or more.")] }));
+          h("p", { class: "week-free" }, "About ", h("b", null, hrs(free)), " open for focused work across the week, in gaps of an hour or more.")] }));
     }
 
     /* ================= Coming up ================= */

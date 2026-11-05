@@ -209,7 +209,7 @@ paused: []                              # e.g. [{ job: weekly-review, until: 202
 **Focus window (`focus`).** Atlas places Top priorities, then anything else owed and due that day, into the day's open windows: gaps inside `work_hours` between meetings and holds, at least `shortest_window` minutes long (`system/tools/placement.py`). A missing block means 30. The rule and the sizes are `atlas-brief` §Placement. Changing it is `behavior_settings`.
 
 **Meeting filter (`meetings`).** A missing block or key means `include`, so older files behave as before. An event is **shown** unless one of these applies:
-- `all_day: skip` and the event is all-day, **except** deadline and milestone events (`kind: deadline | milestone`), which always show under Due.
+- `all_day: skip` and the event is all-day, **except** deadline and milestone events (`kind: deadline | milestone`), which always show (the brief's Due from you, Today's Your day pills).
 - `tentative: skip` and the event record's `response` is `tentative`.
 - `not_responded: skip` and `response` is `not_responded`.
 

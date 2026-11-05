@@ -1248,7 +1248,23 @@
   function applyTheme(t) {
     if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
     else document.documentElement.removeAttribute("data-theme");
+    onAccent();
   }
+  /* Text on a filled accent (count pills): ink or white, whichever reads better on this theme's accent,
+     so a user's brand highlight stays legible. Sets --on-accent. */
+  function onAccent() { try { pickOnAccent(); } catch (e) { /* keep the default ink */ } }
+  function pickOnAccent() {
+    var root = document.documentElement, probe = document.createElement("i");
+    probe.style.color = "var(--accent)"; probe.style.display = "none"; root.appendChild(probe);
+    var m = /rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(getComputedStyle(probe).color || "");
+    root.removeChild(probe);
+    if (!m) return;
+    var lum = function (c) { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
+    var L = 0.2126 * lum(+m[1]) + 0.7152 * lum(+m[2]) + 0.0722 * lum(+m[3]);
+    /* ink #16171a has luminance ~0.0085: compare its contrast with white's */
+    root.style.setProperty("--on-accent", (L + 0.05) / 0.0585 >= 1.05 / (L + 0.05) ? "#16171a" : "#ffffff");
+  }
+  if (window.matchMedia) { try { window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", onAccent); } catch (e) {} }
   function isDark() {
     var t = document.documentElement.getAttribute("data-theme");
     if (t) return t === "dark";

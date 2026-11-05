@@ -79,7 +79,7 @@ On Sundays, checks for a new version of Atlas and applies it (small updates auto
 Besides schedules, Atlas watches for these moments every time it runs, including whenever you chat. All are on by default; turn any off ("Stop creating project records automatically").
 - **A new project comes up:** Atlas creates it and asks the few questions that matter (owner, goal, target date).
 - **A new important person appears:** Atlas adds them and links them; it asks how you know them if that's unclear.
-- **A deadline is getting close (3 days by default):** it appears in your brief, then moves to the top the day before.
+- **A deadline is getting close (3 days by default):** it shows in Today's meeting briefs with the people it's for, and the day before it's due your brief warns you in bold.
 - **A 1:1 or key meeting is within 24 hours:** a prep note is made.
 - **A commitment becomes overdue:** it's flagged; if you're waiting on someone, a polite follow-up draft is prepared for your approval.
 - **Something you owe needs time your calendar doesn't have:** Atlas offers to block focus time for it (a private hold, only after you say yes).

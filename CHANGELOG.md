@@ -15,10 +15,10 @@ Each release's "What's new" section is shown to users in the Guide and their nex
 - **Due from you** replaces Overdue and Due soon, on Today and in your brief: what you owe that's overdue or due today, grouped by person, oldest first, with what's due tomorrow as one bold line in the brief. What others owe you is in Waiting on, which gives each person one nudge.
 - **Work** opens on an Overview: every number takes you to its list, already filtered. Risks have their own tab, every list can be filtered, sorted and paged, and each project and goal opens with a summary and a web of what it links to.
 - **Guide** has Settings you can change on the page: working hours, your shortest focus window, insights per brief, which meetings show, follow-up channels, and more. Changes that move your routines wait for your next chat.
-- **Records** is a new page: everything Atlas keeps and how it connects, as a web you can zoom into. Search by name, or start from what needs attention.
+- **Records** is a new page: everything Atlas keeps and how it connects, as a web you can zoom into on a computer or tablet. Search by name, or start from what needs attention; on a phone, search and the library carry the page.
 - Every button you press shows "Waiting for Atlas" with Undo. Undo works before Atlas acts and for 14 days after, except for an approval Atlas has acted on, a nudge (the draft stays in your drafts), or a Yes that applied a change: those say so.
 - A draft on Today says Approve, never Send: Atlas sends only from a chat, after you confirm.
-- Project pages are gone: Records zoomed to a project, or Work's Projects tab, shows what they did. A project's history and sources are a question for chat.
+- Project pages are gone: Records zoomed to a project (its library card on a phone), or Work's Projects tab, shows what they did. A project's history and sources are a question for chat.
 - You can choose your shortest focus window: say "make my shortest focus window 45 minutes", or change it on Guide.
 - Every line in your brief links each record it names, so a line saying two projects are at risk links both projects.
 

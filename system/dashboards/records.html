@@ -60,7 +60,10 @@
 .lib__group h4 .atl-icon { width: 12px; height: 12px; }
 @media (max-width: 40rem) { .lib { padding: var(--space-7); } }
 /* Phones: the web is too small to use, so it's left out; choosing a record still fills the library card */
-@media (max-width: 40rem) { main > .atl-web { display: none; } }
+@media (max-width: 40rem) { main > .atl-web, .lib__zoom, .lib__wide { display: none; } }
+.lib__back, .lib__narrow { display: none; }
+@media (max-width: 40rem) { .lib__back { display: block; margin: 0; } .lib__narrow { display: inline; } }
+.lib__back .atl-btn { color: var(--night-text); padding-left: 0; }
 </style>
 <style id="atlas-theme">{{ATLAS_THEME_CSS}}</style>
 </head>
@@ -101,13 +104,16 @@
     function paintLib() {
       lib.textContent = "";
       var s = web.state();
+      /* Phones have no web, so its trail and Zoom out live here instead */
+      if (s.sel || s.focus) lib.appendChild(h("p", { class: "lib__back" }, N.button({ label: s.level === "record" && s.center ? "Back to " + T[web.record(s.center).type].label.toLowerCase() : "Back to your library",
+        icon: "back", variant: "ghost", onClick: function () { web.restore(s.level === "record" && s.center ? { level: "type", focus: web.record(s.center).type } : { level: "all" }); } })));
       if (s.sel) {
         var r = web.record(s.sel), ns = web.neighbours(s.sel), centered = s.level === "record" && s.center === s.sel, groups = {};
         ns.forEach(function (n) { (groups[n.type] = groups[n.type] || []).push(n); });
         N.add(lib, [h("p", { class: "lib__kicker" }, N.icon(T[r.type].icon), T[r.type].one, r.attention ? N.badge(r.status_word, r.attention === "critical" ? "bad" : "warn") : null),
           h("h2", { class: "lib__title" }, name(r)),
           h("p", { class: "lib__sub" }, ns.length + (ns.length === 1 ? " linked record" : " linked records") + (r.updated ? " · updated " + N.date(r.updated) : "")),
-          h("div", { class: "atl-actions" }, centered ? null : N.button({ label: "Zoom in", icon: "expand", variant: "primary", onClick: function () { web.go(r.id); } }),
+          h("div", { class: "atl-actions" }, centered ? null : h("span", { class: "lib__zoom" }, N.button({ label: "Zoom in", icon: "expand", variant: "primary", onClick: function () { web.go(r.id); } })),
             N.prompt("What's the latest on " + name(r) + "?"), r.type === "project" ? N.prompt("What's blocking " + name(r) + "?") : null),
           ns.length ? h("div", { class: "lib__cols" }, h("div", { class: "lib__col" }, N.webTypes.filter(function (t) { return groups[t.id]; }).map(function (t) {
             return h("div", { class: "lib__group" }, h("h4", null, N.icon(t.icon), t.label + " · " + groups[t.id].length),
@@ -121,7 +127,7 @@
         var con = recs.slice().sort(function (a, b) { return web.degree(b.id) - web.degree(a.id); }).slice(0, 5);
         N.add(lib, [h("p", { class: "lib__kicker" }, N.icon("records"), "Your library"),
           h("h2", { class: "lib__title" }, recs.length.toLocaleString() + " records, " + links.length.toLocaleString() + " links"),
-          h("p", { class: "lib__sub" }, "Choose a type in the web to light its links, or start from one of these."),
+          h("p", { class: "lib__sub" }, h("span", { class: "lib__wide" }, "Choose a type in the web to light its links, or start from one of these."), h("span", { class: "lib__narrow" }, "Search, or start from one of these.")),
           h("div", { class: "lib__cols" },
             h("div", { class: "lib__col" }, h("h3", { class: "crit" }, "Needs attention"), att.length ? att.map(function (r) { return rowFor(r); }) : h("p", { class: "lib__sub" }, "Nothing critical.")),
             h("div", { class: "lib__col" }, h("h3", null, "Most connected"), con.map(function (r) { return rowFor(r, web.degree(r.id) + " links"); })))]);
