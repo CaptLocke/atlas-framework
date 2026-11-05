@@ -7,7 +7,7 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
-## Unreleased
+## 3.1.1 (2026-11-05)
 
 ### What's new
 - On Today, the now line no longer covers the meeting it crosses, and This week's Today tile shows what's overdue as well as what's due today. A day with nothing due says so.
