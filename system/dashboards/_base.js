@@ -106,8 +106,33 @@
   N.weekday = function (s) { return fmt(s, { weekday: "short", month: "short", day: "numeric" }); };
   N.dayName = function (s) { return fmt(s, { weekday: "long" }); };
   N.longDate = function (s) { return fmt(s, { weekday: "long", year: "numeric", month: "long", day: "numeric" }); };
-  N.time = function (s) { return dateOnly(s) ? "" : fmt(s, { hour: "numeric", minute: "2-digit" }); };
-  N.dateTime = function (s) { return dateOnly(s) ? N.date(s) : fmt(s, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); };
+  /* Times are always 12-hour with AM or PM, whatever the locale: "9:00 AM", "9:00–10:30 AM", "11:30 AM–12:30 PM". */
+  N.hm = function (t) { var x = /^(\d\d):(\d\d)$/.exec(t || ""); return x ? +x[1] * 60 + +x[2] : null; };   /* "HH:MM" to minutes */
+  N.mins = function (s) {   /* minutes since midnight in the user's time zone */
+    var d = s instanceof Date ? s : new Date(s);
+    if (isNaN(d.getTime())) return null;
+    try {
+      var p = new Intl.DateTimeFormat("en-GB", { timeZone: N.meta.timezone || undefined, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(d);
+      var hh = 0, mm = 0;
+      p.forEach(function (x) { if (x.type === "hour") hh = +x.value; if (x.type === "minute") mm = +x.value; });
+      return hh * 60 + mm;
+    } catch (e) { return d.getHours() * 60 + d.getMinutes(); }
+  };
+  function half(m) { return Math.floor(m / 60) % 24 < 12 ? "AM" : "PM"; }
+  N.clock = function (m, bare) {   /* minutes to "9:00 AM"; bare leaves off AM or PM */
+    if (m == null) return "";
+    if (typeof m === "string") m = N.hm(m);
+    if (m == null) return "";
+    var hh = Math.floor(m / 60) % 24, mm = m % 60;
+    return (hh % 12 || 12) + ":" + (mm < 10 ? "0" : "") + mm + (bare ? "" : " " + half(m));
+  };
+  N.clockRange = function (a, b) {
+    if (typeof a === "string") a = N.hm(a);
+    if (typeof b === "string") b = N.hm(b);
+    return half(a) === half(b) ? N.clock(a, true) + "–" + N.clock(b) : N.clock(a) + "–" + N.clock(b);
+  };
+  N.time = function (s) { return !s || dateOnly(s) ? "" : N.clock(N.mins(s)); };
+  N.dateTime = function (s) { return dateOnly(s) ? N.date(s) : [N.date(s), N.time(s)].filter(Boolean).join(", "); };
   N.dayKey = function (s) {
     if (!s) return null;
     if (dateOnly(s)) return s;
@@ -402,7 +427,8 @@
      pulls its linked records in around it, with a dashed thread back to where each lives. The trail and
      Zoom out step back up. Ported from the design canvas; drawn the same way each time (seeded).
      opts: {records: [{id, type, title, attention, status_word}], links: [[i, j]], start (an id to open
-     zoomed on), compact (no type labels or trail: a hero's web), onChange(state)}
+     zoomed on), compact (no type labels or trail: a hero's web), height (the frame's height against its
+     1400 width, 640 by default; the types keep their places, spread to fit), onChange(state)}
      Returns {el, go(id), light(id), focusType(type), zoomOut(), state()} ---- */
   var WEB_TYPES = [
     { id: "person", label: "People", one: "Person", icon: "person", x: 468, y: 300 },
@@ -419,8 +445,9 @@
   ];
   N.webTypes = WEB_TYPES;
   N.web = function (o) {
-    var W = 1400, H = 640, AR = W / H, FW = 1328, FH = FW / AR;
-    var T = {}; WEB_TYPES.forEach(function (t) { T[t.id] = t; });
+    var W = 1400, H = o.height || 640, AR = W / H, FW = 1328, FH = FW / AR;
+    var TYPES = WEB_TYPES.map(function (t) { var c = {}; for (var k in t) c[k] = t[k]; c.y = t.y * H / 640; return c; });   /* this web's own copy, fitted to its frame */
+    var T = {}; TYPES.forEach(function (t) { T[t.id] = t; });
     var recs = N.list(o.records).filter(function (r) { return r && T[r.type]; });
     var by = {}, adj = {};
     recs.forEach(function (r) { by[r.id] = r; adj[r.id] = []; });
@@ -430,7 +457,7 @@
       if (!a || !b || !by[a.id] || !by[b.id] || a.id === b.id) return;
       E.push([a.id, b.id]); adj[a.id].push({ id: b.id, i: i }); adj[b.id].push({ id: a.id, i: i });
     });
-    var types = WEB_TYPES.filter(function (t) { return recs.some(function (r) { return r.type === t.id; }); });
+    var types = TYPES.filter(function (t) { return recs.some(function (r) { return r.type === t.id; }); });
     function rnd(i) { var x = Math.sin(i * 12.9898 + 78.233) * 43758.5453; return x - Math.floor(x); }
     function f(n) { return n.toFixed(1); }
     function deg(id) { return adj[id].length; }
@@ -586,7 +613,7 @@
     var crumbs = h("nav", { class: "atl-web__trail", "aria-label": "Zoom level" });
     var outBtn = h("button", { type: "button", class: "atl-web__out", onclick: function (e) { e.stopPropagation(); zoomOut(); } }, N.icon("collapse"), h("span", null, "Zoom out"));
     var hint = h("p", { class: "atl-web__hint", "aria-live": "polite" });
-    var el = h("div", { class: "atl-web atl-night" + (o.compact ? " atl-web--compact" : "") }, h("div", { class: "atl-web__stage" }, svg, labels), o.compact ? null : crumbs, o.compact ? null : outBtn, o.compact ? null : hint);
+    var el = h("div", { class: "atl-web atl-night" + (o.compact ? " atl-web--compact" : "") }, h("div", { class: "atl-web__stage", style: H !== 640 ? "aspect-ratio:" + W + " / " + H : null }, svg, labels), o.compact ? null : crumbs, o.compact ? null : outBtn, o.compact ? null : hint);
 
     function circle(x, y, r) { return "M " + f(x - r) + " " + f(y) + " a " + f(r) + " " + f(r) + " 0 1 0 " + f(2 * r) + " 0 a " + f(r) + " " + f(r) + " 0 1 0 " + f(-2 * r) + " 0 "; }
     function fiber(A, B, seed, count, spread) {
@@ -1387,7 +1414,7 @@
   N.footer = function () {
     return h("footer", { class: "foot" },
       h("p", null, N.meta.atlas_version ? "Atlas " + N.meta.atlas_version : "Atlas"),
-      h("p", null, "To change anything here, ask Atlas in chat."));
+      h("p", null, "To change anything on this page, ask Atlas in chat."));
   };
 
   /* ---- Render a page ----

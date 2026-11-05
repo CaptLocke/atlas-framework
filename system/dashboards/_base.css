@@ -275,7 +275,7 @@ a.atl-nav__item:hover { background: var(--sunken-hover); }
 .page-head .atl-strands { inset: 0 calc(-1 * var(--gutter)); width: calc(100% + 2 * var(--gutter)); }
 .page-title { font-size: clamp(52px, 7vw, 92px); line-height: 0.95; font-weight: 200; letter-spacing: -0.045em; }
 .date-line, .kicker { order: -1; font-family: var(--font-sans); font-size: 13px; line-height: 1.3; font-weight: 500; letter-spacing: 0.24em; text-transform: uppercase; color: var(--muted); }
-.lead { max-width: var(--lede); font-size: clamp(19px, 2.2vw, 23px); line-height: 1.55; font-weight: 300; color: var(--ink-2); }
+.lead { max-width: none; font-size: clamp(19px, 2.2vw, 23px); line-height: 1.55; font-weight: 300; color: var(--ink-2); }
 .lead b, .lead strong { color: var(--ink); font-weight: 500; }
 .atl-stats { list-style: none; margin: var(--space-4) 0 0; padding: 0; display: grid; gap: var(--space-7); grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); }
 .atl-stats > li { min-width: 0; display: flex; }
@@ -399,7 +399,7 @@ main { display: flex; flex-direction: column; gap: var(--space-10); }
 }
 
 /* ---- SettingControl: segmented control and toggle ---- */
-.atl-seg { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; border-radius: var(--radius-pill); background: var(--sunken); font-family: var(--font-sans); }
+.atl-seg { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; border-radius: 24px; background: var(--sunken); font-family: var(--font-sans); }   /* a pill on one row; a rounded box when its options wrap */
 .atl-seg__btn { min-height: 40px; padding: 0 16px; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--muted); font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap; }
 .atl-seg__btn--on { background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: var(--shadow-knob); }
 .atl-toggle { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; padding: 0; border: 0; background: none; color: var(--ink); font-size: 14px; font-weight: 500; cursor: pointer; text-align: left; }
@@ -548,7 +548,7 @@ button.atl-row__main { cursor: pointer; }
 .atl-web__sep { color: #62646a; }
 .atl-web__out { position: absolute; right: 20px; top: 20px; display: inline-flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 14px; border: 1px solid #4a4c52; border-radius: var(--radius-pill); background: rgba(22, 23, 26, 0.85); color: #f3f3f1; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; }
 .atl-web__out .atl-icon { width: 13px; height: 13px; }
-.atl-web__hint { position: absolute; left: 24px; bottom: 16px; font-size: 13px; color: #a3a6ad; pointer-events: none; }
+.atl-web__hint { position: absolute; left: 24px; bottom: 14px; font-size: 11px; color: #a3a6ad; pointer-events: none; }
 .atl-web > .atl-web__trail, .atl-web > .atl-web__out, .atl-web > .atl-web__hint { position: absolute; z-index: 2; }
 .atl-web--compact { border-radius: var(--radius-card); }
 .atl-web--compact .atl-web__lab--rec { font-size: 10px; }

@@ -13,7 +13,8 @@
 .panel-note { font-size: 14px; color: var(--muted); }
 
 /* ---- Overview: one card per kind; every number opens its list, already filtered ---- */
-.ov { display: grid; gap: var(--space-7); grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); }
+.ov { display: grid; gap: var(--space-7); grid-template-columns: repeat(auto-fit, minmax(max(300px, calc((100% - 2 * var(--space-7)) / 3)), 1fr)); }   /* at most three a row */
+@media (max-width: 40rem) { .ov { grid-template-columns: minmax(0, 1fr); } }
 .ov-card { display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-8); border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface); }
 .ov-kind { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: var(--ink-2); }
 .ov-num { display: inline-flex; align-items: baseline; gap: 12px; padding: 4px 8px; margin: -4px -8px; border: 0; border-radius: var(--radius-md); background: none; color: inherit; font-family: inherit; text-align: left; cursor: pointer; }
@@ -319,8 +320,10 @@
     paintGoal();
 
     /* ================= Decisions ================= */
+    /* Undecided first: proposed, then anything with no decision date, then the rest, newest first. */
+    function undecided(x) { return x.status === "proposed" ? 0 : !x.decided_on && x.status !== "reversed" && x.status !== "superseded" ? 1 : 2; }
     var decs = decisions.slice().sort(function (a, b) {
-      var pa = a.status === "proposed" ? 0 : 1, pb = b.status === "proposed" ? 0 : 1;
+      var pa = undecided(a), pb = undecided(b);
       if (pa !== pb) return pa - pb;
       return cmp(b.decided_on || "", a.decided_on || "") || cmp(title(a), title(b));
     });
@@ -360,7 +363,7 @@
       return ia - ib || exposure(b) - exposure(a) || cmp(b.updated || "", a.updated || "") || cmp(title(a), title(b));
     });
     cards.risks = N.listCard({ id: "risks-list", title: "Risks and issues", count: N.total("risks", rs.length), noun: "risks", show: 8,
-      note: "An issue is a risk that's happening now.",
+      note: "An issue happening right now or a risk that needs to be addressed.",
       items: rs.map(function (r) {
         var issue = r.status === "active", e = exposure(r);
         return { data: r, el: N.row({
@@ -413,7 +416,7 @@
       }));
     }
     cards.people = N.listCard({ id: "people-list", title: "People", count: N.total("people", people.length), noun: "people", show: 8,
-      note: "Who you have something open with, are meeting in the next 7 days, or haven't heard from.",
+      note: "Who you have an open commitment with, are meeting with in the next week, or haven't heard from recently.",
       items: people.map(function (o) {
         var p = o.p, late = anyLate(o.mine.concat(o.theirs)), meet = meetingText(p.next_meeting);
         return { data: o, el: N.row({
@@ -476,7 +479,7 @@
       ovCard("decision", "Decisions", num(proposed, "need action", "warn", function () { open("decisions", "decisions", "proposed"); }),
         [num(decs.filter(revisitSoon).length, "revisit soon", null, function () { open("decisions", "decisions", "revisit"); }),
           num(N.total("decisions", decs.length), "total", null, function () { open("decisions", "decisions", null); })],
-        decs.filter(function (x) { return x.status !== "proposed"; })[0] ? "Newest: " + decs.filter(function (x) { return x.status !== "proposed"; })[0].title
+        decs.filter(function (x) { return undecided(x) === 2; })[0] ? "Newest: " + decs.filter(function (x) { return undecided(x) === 2; })[0].title
           : decs[0] ? "To decide: " + decs[0].title : "No decisions in the last 30 days."),
       ovCard("risk", "Risks", num(issues.length, "critical", "bad", function () { open("risks", "risks", "issue"); }),
         [num(edge.length, "on edge", null, function () { open("risks", "risks", "edge"); }),
