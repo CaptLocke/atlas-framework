@@ -7,7 +7,7 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
-## 3.0.0 (2026-11-01)
+## 3.0.0 (2026-11-04)
 
 ### What's new
 - Your pages have a new look, Constellation: a calmer, lighter design with one dark card for what matters most, a single typeface, and phone and dark-mode layouts. Your brand colours from your design system still apply.
