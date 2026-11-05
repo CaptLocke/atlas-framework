@@ -116,7 +116,7 @@
       var hh = 0, mm = 0;
       p.forEach(function (x) { if (x.type === "hour") hh = +x.value; if (x.type === "minute") mm = +x.value; });
       return hh * 60 + mm;
-    } catch (e) { return d.getHours() * 60 + d.getMinutes(); }
+    } catch (e) { return null; }
   };
   function half(m) { return Math.floor(m / 60) % 24 < 12 ? "AM" : "PM"; }
   N.clock = function (m, bare) {   /* minutes to "9:00 AM"; bare leaves off AM or PM */

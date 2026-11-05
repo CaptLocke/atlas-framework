@@ -7,6 +7,16 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
+## 3.1.0 (2026-11-05)
+
+### What's new
+- Times on your pages are 12-hour with AM or PM, the same on every page.
+- Today is easier to scan: its cards share one title style, Worth knowing is a card under Needs you, and the link to how Atlas is running is at the bottom. A long commitment wraps beside its icon, and Due from you no longer colours its heading.
+- On Work, decisions not decided yet come first, including any without a decision date, and the Overview shows at most three cards a row.
+- Guide shows when Atlas last updated and your last health check as a note at the bottom of the page. Settings with many options wrap neatly, and what Atlas may read is no longer listed there: ask in chat.
+- The web on Records is taller, so there's more room to explore.
+- Each page ends with "To change anything on this page, ask Atlas in chat."
+
 ## 3.0.0 (2026-11-04)
 
 ### What's new

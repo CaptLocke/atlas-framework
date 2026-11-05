@@ -13,18 +13,18 @@ How much runs, and how often, depends on your **automation profile**. Atlas sugg
 
 ## Lean profile (suggested for Claude Pro)
 One main run each evening, so everything is ready the next morning.
-- **Every evening, around 8:07 pm:** bring in the day's information, triage commitments, look for insights, draft email replies and follow-ups (weekdays), prepare for tomorrow's meetings, run the monthly or quarterly check-in if one is due, and write tomorrow's Daily Brief.
-- **Fridays, around 2:07 pm:** weekly review and status-update drafts.
-- **Sundays, around 3:07 am:** tidy-up and check for Atlas updates.
+- **Every evening, around 8:07 PM:** bring in the day's information, triage commitments, look for insights, draft email replies and follow-ups (weekdays), prepare for tomorrow's meetings, run the monthly or quarterly check-in if one is due, and write tomorrow's Daily Brief.
+- **Fridays, around 2:07 PM:** weekly review and status-update drafts.
+- **Sundays, around 3:07 AM:** tidy-up and check for Atlas updates.
 - **First chat of each day:** if nothing's been brought in for more than 3 hours, Atlas quickly checks your email and calendar and updates your brief with anything new.
 
 ## Standard profile (suggested for Claude Max 5x)
 A full morning run plus refreshes through the working day.
-- **Every morning, around 5:07 am:** bring in information, triage, insights, email drafts (weekdays), meeting prep for today, monthly or quarterly check-in if due, and today's Daily Brief.
-- **Weekdays at about 10:07 am, 1:07 pm and 4:07 pm:** bring in new information and quickly catch any new commitments.
-- **Every evening, around 8:07 pm:** bring in information, triage, email drafts (weekdays), and prep for tomorrow's meetings.
-- **Fridays, around 2:07 pm:** weekly review and status-update drafts.
-- **Sundays, around 3:07 am:** tidy-up and update check.
+- **Every morning, around 5:07 AM:** bring in information, triage, insights, email drafts (weekdays), meeting prep for today, monthly or quarterly check-in if due, and today's Daily Brief.
+- **Weekdays at about 10:07 AM, 1:07 PM and 4:07 PM:** bring in new information and quickly catch any new commitments.
+- **Every evening, around 8:07 PM:** bring in information, triage, email drafts (weekdays), and prep for tomorrow's meetings.
+- **Fridays, around 2:07 PM:** weekly review and status-update drafts.
+- **Sundays, around 3:07 AM:** tidy-up and update check.
 
 ## Full profile (suggested for Claude Max 20x)
 Close to real time during your working hours.
@@ -32,12 +32,12 @@ Close to real time during your working hours.
 - **Every 4 hours outside work hours:** bring in new information.
 - **Every 3 hours during work hours:** look for insights.
 - **Every 2 hours during work hours:** triage commitments and draft replies and follow-ups.
-- **Daily at about 6:07 am and 11:07 am:** meeting prep.
-- **Daily at about 6:37 am:** monthly or quarterly check-in if due, then the Daily Brief.
-- **Fridays, around 2:07 pm:** weekly review and status-update drafts.
-- **Daily at about 3:07 am:** tidy-up (update check on Sundays).
+- **Daily at about 6:07 AM and 11:07 AM:** meeting prep.
+- **Daily at about 6:37 AM:** monthly or quarterly check-in if due, then the Daily Brief.
+- **Fridays, around 2:07 PM:** weekly review and status-update drafts.
+- **Daily at about 3:07 AM:** tidy-up (update check on Sundays).
 
-Work hours default to 8:00 am to 6:00 pm on weekdays. Change them any time: "My work hours are 7 to 4."
+Work hours default to 8:00 AM to 6:00 PM on weekdays. Change them any time: "My work hours are 7 to 4."
 
 ## Bringing in information
 Reads what's new since last time from your connected email, calendar, meeting transcripts, chat, files, and your Atlas Drop folder, plus any Morning or Evening Thoughts. Skips noise, applies your data rules, and files what matters as connected records with their sources. Instructions hidden inside emails or documents are treated as information, never followed, and flagged to you if they look suspicious.
