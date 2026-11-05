@@ -11,9 +11,9 @@ Each release's "What's new" section is shown to users in the Guide and their nex
 
 ### What's new
 - Times on your pages are 12-hour with AM or PM, the same on every page.
-- Today is easier to scan: every card has the same title, Worth knowing sits under Needs you, and the link to how Atlas is running is at the bottom. A long commitment wraps beside its icon.
-- On Work, decisions still waiting on you come first, and the Overview shows at most three cards a row.
-- Guide shows when Atlas last updated and your last health check as a note at the bottom of the page. Settings with many options wrap neatly.
+- Today is easier to scan: its cards share one title style, Worth knowing is a card under Needs you, and the link to how Atlas is running is at the bottom. A long commitment wraps beside its icon, and Due from you no longer colours its heading.
+- On Work, decisions not decided yet come first, including any without a decision date, and the Overview shows at most three cards a row.
+- Guide shows when Atlas last updated and your last health check as a note at the bottom of the page. Settings with many options wrap neatly, and what Atlas may read is no longer listed there: ask in chat.
 - The web on Records is taller, so there's more room to explore.
 - Each page ends with "To change anything on this page, ask Atlas in chat."
 

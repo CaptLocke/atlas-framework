@@ -16,9 +16,10 @@
 .earlier b { color: var(--ink); font-weight: 600; }
 .earlier .atl-icon { color: var(--muted); width: 15px; height: 15px; }
 .tl { position: relative; --tl-gutter: 88px; }
-@media (max-width: 40rem) { .tl { --tl-gutter: 52px; } .tl-tick span { flex-basis: 40px; font-size: 11px; } .tl-strand { left: 34px; width: 16px; } .tl-now { left: 40px; } .tl-block { padding: 0 10px; gap: 8px; } .tl-block > .atl-icon, .tl-tag { display: none; } }
+@media (max-width: 40rem) { .tl { --tl-gutter: 52px; } .tl-strand { left: 34px; width: 16px; } .tl-now { left: 40px; } .tl-block { padding: 0 10px; gap: 8px; } .tl-block > .atl-icon, .tl-tag { display: none; } }
 .tl-tick { position: absolute; left: 0; right: 0; display: flex; align-items: center; gap: 10px; pointer-events: none; }
 .tl-tick span { flex: 0 0 52px; font-size: 12px; color: var(--muted); transform: translateY(-50%); }
+@media (max-width: 40rem) { .tl-tick span { flex-basis: 40px; font-size: 11px; } }
 .tl-tick i { flex: 1 1 auto; height: 1px; background: var(--line); }
 .tl-strand { position: absolute; left: 50px; top: 0; width: 28px; height: 100%; pointer-events: none; overflow: visible; }
 .tl-strand path { fill: none; stroke: var(--strand); vector-effect: non-scaling-stroke; }

@@ -187,7 +187,6 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
     }
     var sysLine = [
       sys.updated_on ? "Your last Atlas update: " + N.date(sys.updated_on) : null,
-      up.available && up.latest_version ? "Atlas " + up.latest_version + " is available" : null,
       sys.last_user_check ? "Your last health check: " + N.date(sys.last_user_check) : null,
       impText ? "Notes import " + impText : null
     ].filter(Boolean).join(". ");
@@ -222,7 +221,7 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
         h("span", { class: "health__text" }, N.rich(st.headline) || (issues.length ? "" : "Everything Atlas checks is working."))),
       issues.length ? N.listBox(issueRows) : null, N.more("known_issues"),
       h("div", { class: "status-cards" }, autoCard, connCard),
-      up.available && up.notes ? h("p", { class: "small" }, N.rich(up.notes)) : null,
+      up.available && up.latest_version ? h("p", { class: "small" }, "Atlas " + up.latest_version + " is available. ", up.notes ? N.rich(up.notes) : null) : null,
       jobs.length ? fold("Each step of the automations", jobs.length, N.listBox(jobs.map(function (j) {
         var w = RUN[j.last_status] || RUN.never_run;
         return N.row({ title: j.title || j.name, tone: w[1] === "neutral" ? null : w[1],
