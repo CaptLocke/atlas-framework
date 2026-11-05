@@ -283,8 +283,8 @@ def artifact_id(url):
 
 
 def page_urls(data):
-    """Every page URL in a parsed dashboards.yaml: any 'url' value, and project_pages entries
-    given as a plain link (system/schemas/settings.md)."""
+    """Every page URL in a parsed dashboards.yaml: any 'url' value, and any value that is an artifact
+    link (system/schemas/settings.md)."""
     found = set()
 
     def walk(node, key=None):

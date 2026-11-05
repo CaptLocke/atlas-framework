@@ -18,13 +18,14 @@ sources: ["[[events/2026-10-13-acme-msa-call]]", "[[commitments/maya-pricing-fee
 
 ## Today
 - **9:30 Acme MSA call** with Dana Ruiz. Two open items both ways. Prep: [prep note](../prep/2026-10-13-acme-msa-call.md) · [[events/2026-10-13-acme-msa-call]]
-- **11:00 1:1 with Jordan.** Bring the pricing feedback. Prep: [prep note](../prep/2026-10-13-jordan-1-1.md)
+- **11:00 1:1 with Jordan.** Bring the pricing feedback. Prep: [prep note](../prep/2026-10-13-jordan-1-1.md) · [[events/2026-10-13-jordan-1-1]]
 - 14:00 Design review (no prep needed). Back-to-back with 14:30 hiring sync.
+- 3.5 h between meetings; all 3 due today are placed.
 
-## Due soon / slipping
-- **Tomorrow: pricing feedback to Jordan.** Next step: finish section 3 before the 1:1. [[commitments/maya-pricing-feedback]]
-- Thu 10/15: Q4 hiring plan to Finance. [[commitments/maya-hiring-plan-finance]]
-- Slipped 2 days: SOC report to Acme. Next step: ask Security for the PDF. [[commitments/maya-soc-report-acme]]
+## Due from you
+- 2 days late: SOC report to Acme. Next step: ask Security for the PDF. [[commitments/maya-soc-report-acme]]
+- Due today: launch checklist to Jordan. Next step: share the doc link. [[commitments/maya-launch-checklist-jordan]]
+- **Tomorrow:** pricing feedback to Jordan. Next step: finish section 3 before the 1:1. [[commitments/maya-pricing-feedback]]
 
 ## Waiting on
 - Dana Ruiz: MSA redlines, 6 days (due 10/09). Follow-up draft ready. [[commitments/dana-msa-redlines]]
@@ -36,21 +37,21 @@ sources: ["[[events/2026-10-13-acme-msa-call]]", "[[commitments/maya-pricing-fee
 - From your Evening Thoughts: 1 commitment (call Priya Thursday) [[commitments/maya-call-priya-thursday]], 1 idea (partner tier) [[ideas/partner-tier]]. [[sources/2026-10-12-journal]]
 
 ## Top priorities
-1. Pricing feedback to Jordan: due tomorrow and tied to your Q4 revenue goal. [[goals/2026-q4-enterprise-revenue]]
-2. Unblock the Acme MSA: Dana's review gates your Q4 revenue goal. [[projects/acme-expansion]]
-3. Hiring plan: Finance locks budgets Friday. [[goals/2026-q4-team-growth]]
+1. Pricing feedback to Jordan (11:30 focus): due tomorrow and tied to your Q4 revenue goal. [[commitments/maya-pricing-feedback]] [[goals/2026-q4-enterprise-revenue]]
+2. Unblock the Acme MSA (11:30 focus): Dana's review gates your Q4 revenue goal. [[projects/acme-expansion]] [[commitments/dana-msa-redlines]]
+3. Hiring plan (won't fit today: send a date at 4:15): Finance locks budgets Friday. [[commitments/maya-hiring-plan-finance]] [[goals/2026-q4-team-growth]]
 
 ## Insights
 - Three customers hit the same import bug this month; it relates to your retention goal. [[risks/onboarding-import-failures]]
 - Jordan hasn't had a status update from you in 3 weeks. [[people/jordan-lee]]
 
 ## Drafts ready to review
-- Reply to Dana Ruiz, "MSA redlines: quick check-in" (follow-up, 6 days overdue). In your Outlook drafts.
-- Weekly status to Jordan. [status draft](../status/2026-10-09-jordan-lee.md)
+- Reply to Dana Ruiz, "MSA redlines: quick check-in" (follow-up, 6 days overdue). In your Outlook drafts. [[commitments/dana-msa-redlines]]
+- Weekly status to Jordan. [status draft](../status/2026-10-09-jordan-lee.md) · [[people/jordan-lee]]
 - Still unsent: reply to Lee Park, "Audit timeline", 5 days in your Gmail drafts; the 10/9 date in it has passed, so update or delete it. [[sources/2026-10-07-lee-audit-timeline]]
 
 ## Awaiting your approval
-- A-2026-10-12-01: send the follow-up to Dana. Expires 10/26.
+- A-2026-10-12-01: send the follow-up to Dana. Expires 10/26. [[people/dana-ruiz]]
 
 ## Questions from Atlas
 - **Looks done (2):** SOC report to Acme (email with attachment, 10/12) [[commitments/maya-soc-report-acme]] · launch checklist to Jordan (shared in Slack, 10/13) [[commitments/maya-launch-checklist-jordan]]. Say which are done, or all.

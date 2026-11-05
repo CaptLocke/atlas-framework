@@ -10,7 +10,7 @@ Covers recordings, transcripts, and vendor summaries from meeting tools and note
 ## What Atlas ingests and why
 - **Transcripts of meetings the user attended**, so meetings turn into decisions, commitments, risks, and questions automatically (information capture, triage, connected knowledge).
 - **Vendor summaries and action items** (`read_summary`) as a fast first pass; always check them against the transcript when available. Vendor action items are suggestions, not commitments, until they meet Atlas's commitment test.
-- **Outcomes** for the matching event record (what was decided, what changed), feeding the Daily Brief, Weekly Review, and project pages.
+- **Outcomes** for the matching event record (what was decided, what changed), feeding the Daily Brief, Weekly Review, and the Records page.
 - Scope from `sources.yaml` (e.g. "all recorded meetings I attended").
 
 ## What to skip (noise)

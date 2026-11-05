@@ -207,5 +207,5 @@ Three always-current pages you can open any time: **Today** (what needs you toda
 
 **Try:**
 - "Open my Work page."
-- "Make a project page for the enterprise launch."
+- "Show me everything linked to the enterprise launch." (Records, zoomed in on it)
 - "Add a dashboard of all open customer requests."

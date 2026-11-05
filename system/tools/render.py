@@ -43,9 +43,8 @@ def safe_css(css):
     return (css or "").replace("<", "")
 
 
-FONTS = (  # (family, file, weight range): the Atlas design system's two faces, Latin subset (OFL; licences beside them)
-    ("Newsreader", "newsreader-latin.woff2", "400 600"),
-    ("Inter", "inter-latin.woff2", "400 600"),
+FONTS = (  # (family, file, weight range): Constellation's one face, variable 200-600, Latin subset (OFL; licence beside it)
+    ("Manrope", "manrope-latin.woff2", "200 600"),
 )
 
 

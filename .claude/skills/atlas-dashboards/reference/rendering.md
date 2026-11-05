@@ -6,18 +6,19 @@ skill: atlas-dashboards
 > **Contracts govern.** `system/dashboards/README.md` and each `<name>.contract.md` define placeholders, theme tokens, truncation, and titles; where this file differs, they win.
 # Rendering and publishing detail
 
-## The three dashboards (and who refreshes them)
+## The four dashboards (and who refreshes them)
 Each contract's `republished_by` lists the jobs that republish it; any chat may also republish a dashboard after changing what it shows. This table copies those lists; when they differ, the contract wins.
 | Dashboard | Shows | `republished_by` |
 |---|---|---|
 | `daily-brief` (Today) | Today's brief (from `user/work/briefs/`), then this week: the day strip with meeting load and free hours, and upcoming milestones | daily-brief (and the chat catch-up) |
 | `commitments` (Work) | Commitments (I owe, then Waiting on), projects with health and next step, ranked goals, decisions and risks, and the people with something open | daily-brief, triage, weekly-review, monthly, quarterly |
 | `control-center` (Guide) | Health, what's waiting on the user, automations, what Atlas filed in the last 14 days, About you, and the guide content (`system/guide/`) | daily-brief, monthly, quarterly, update-check |
-| `project-page` | One project in depth, made on request | triage, weekly-review (while listed) |
+| `records` (Records) | Every record and how they link, as a web you can zoom into (data from `system/tools/graph.py`) | triage, weekly-review |
 
 ## Building data
 - **Today's week data** comes from `atlas-brief` §D; this skill only embeds it.
 - **Work** carries no per-person lists: the page works out what each person owes and is owed from `commitments`. People are limited to current activity (something open, a meeting in the next 7 days, or gone quiet); decisions to the last 30 days plus any still proposed; risks to open ones. `commitments.contract.md` has the rest.
+- **Guide's settings** are read from `rhythms.yaml` and `routines.yaml` as `control-center.contract.md` lists them; `brief_ready` is the local time of the routine whose jobs include `daily-brief` with `target: tomorrow` (else the one with `target: today`), and `weekend_briefs` whether its schedule runs on Saturday and Sunday and its `daily-brief` entry has no `when: weekdays`.
 - **Guide's Recently filed** comes from the activity log (`user/logs/activity/`) for the last 14 days, imports left out. For each line's commit, `git show --name-status --format= <sha> -- user/knowledge/` (leaving out `_index/` and `sources/`) gives the records: added files are `new`, modified ones `updated`. `from` is the title of the record's first source; `what` is the main field that changed. Beliefs for About you are marked `featured` (preferences first, then communication style, then proposed; at most 5), and the guide content goes in the same page's data (`control-center.contract.md`).
 
 - Read only the contract's listed sources, index-first (`_index/*.md`, `hot.md`), opening records only for fields the contract needs.
@@ -30,7 +31,7 @@ Each contract's `republished_by` lists the jobs that republish it; any chat may 
 Map `user/profile/design-system.md` to the `--brand-*` tokens in `system/dashboards/README.md` §Theming contract (accent, highlight, text on accent, heading and body fonts, optional background, surface, and text), for light and dark. Rules:
 - Use only colors listed in the design system; if dark-mode colors are missing, derive them by keeping hue and adjusting lightness, and keep text contrast at WCAG AA (4.5:1) in both modes.
 - Fonts must have web-safe fallbacks; never load fonts or scripts from external URLs.
-- No company logo: pages show only the built-in Atlas mark, drawn in the highlight color. With no design system, the theme block stays empty and the default Atlas palette applies.
+- No company logo: pages show only the built-in Atlas mark and wordmark, in ink. With no design system, the theme block stays empty and Constellation's default palette applies.
 
 ## Size budget
 - Budget = contract `size_budget_kb` for the whole HTML file.
@@ -49,8 +50,6 @@ Map `user/profile/design-system.md` to the `--brand-*` tokens in `system/dashboa
 dashboards:
   commitments: { url: "https://…", last_published: 2026-10-12 }
   deals-board: { url: "https://…", last_published: 2026-10-20 }   # user dashboard (extension name)
-project_pages:
-  projects/orion-migration: "https://…"
-  projects/enterprise-launch: { url: "https://…", live: true }   # a live project page (reference/live.md)
+  records: { url: "https://…", last_published: 2026-10-12, live: true }
 ```
 Update `last_published` on every successful (re)publish. Commit with the job or chat change set.

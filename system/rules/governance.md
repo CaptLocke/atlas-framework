@@ -92,7 +92,7 @@ Removing processed files from `user/inbox/drop/`, regenerating files in `user/kn
 
 ## Routines and approvals
 - Outbound communication from routines is always a **draft** in the user's tool, plus an entry in `approvals.md` when sending is the natural next step.
-- `propose`-level actions in routines are queued, never taken.
+- `propose`-level actions in routines are queued, never taken, except presses on a live page that are the user's yes to that exact change: Confirm or Correct on a belief, a setting Guide's Settings marks as applied at the next run (anything needing a follow-up a routine can't do, such as re-timing routines, waits for a chat), and Undo of either. Governance files never change from a page (`atlas-dashboards` `reference/live.md` §5).
 - Approvals expire after 14 days, not counting days while away mode is on (`atlas-away`).
 
 ## Data rules (N11)

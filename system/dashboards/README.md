@@ -11,17 +11,17 @@ The `atlas-dashboards` skill owns rendering and publishing. This folder holds wh
 ## The dashboards
 | Dashboard | Template | Contract | Republished by | Page budget |
 |---|---|---|---|---|
-| Today | `daily-brief.html` | `daily-brief.contract.md` | `daily-brief` job; chat catch-up | 280 KB |
+| Today | `daily-brief.html` | `daily-brief.contract.md` | `daily-brief` job; chat catch-up | 340 KB |
 | Work | `commitments.html` | `commitments.contract.md` | `daily-brief`, `triage`, `weekly-review`, `monthly`, `quarterly` | 550 KB |
 | Guide | `control-center.html` | `control-center.contract.md` | `daily-brief`, `monthly`, `quarterly`, `update-check` (after an update is applied) | 450 KB |
-| Project page (on request) | `project-page.html` | `project-page.contract.md` | created in chat; then `triage`, `weekly-review` while listed | 400 KB |
+| Records | `records.html` | `records.contract.md` | `triage`, `weekly-review` (data from `system/tools/graph.py`) | 900 KB |
 
-Any chat may also republish any dashboard after changing the records it shows (`dashboards_refresh: auto`). `atlas-setup` publishes all three for the first time. A dashboard added by an update is published at the user's next chat (`atlas-dashboards`, Publish).
+Any chat may also republish any dashboard after changing the records it shows (`dashboards_refresh: auto`). `atlas-setup` publishes all four for the first time. Project pages were retired in 3.0.0 (migration 0003). A dashboard added by an update is published at the user's next chat (`atlas-dashboards`, Publish).
 
 Shared files:
-- `_base.css`: the Atlas design system: tokens (light and dark), type, and the `atl-*` components. Templates hold `{{ATLAS_BASE_CSS}}` inside `<style id="atlas-base">`; `system/tools/render.py` fills it with this file when it builds a page.
-- `fonts/`: Newsreader (display) and Inter (everything you read or click), Latin subsets, with their SIL Open Font Licences. `render.py` embeds them in the base CSS as `data:` URIs, about 140 KB a page, since a page loads nothing from outside.
-- `_base.js`: runtime helpers (DOM builder, dates, record references) and the components: app header, stat tiles, tabs, segmented control, rows that expand in place, cards, buttons, the toast, find on the page, and request buttons. Templates hold `{{ATLAS_BASE_JS}}` inside `<script id="atlas-base-js">`, filled the same way.
+- `_base.css`: the Constellation design system: tokens (light and dark), type, and the `atl-*` components. Templates hold `{{ATLAS_BASE_CSS}}` inside `<style id="atlas-base">`; `system/tools/render.py` fills it with this file when it builds a page.
+- `fonts/`: Manrope, the one family (variable, weights 200 to 600, Latin subset), with its SIL Open Font Licence. `render.py` embeds it in the base CSS as a `data:` URI, about 30 KB a page, since a page loads nothing from outside.
+- `_base.js`: runtime helpers (DOM builder, dates, record references), the 36 Constellation icons, and the components: app header, stat tiles, the tab bar, segmented control and toggle, rows that expand in place, light and night cards, buttons, prompt chips, strands, the toast, find on the page, and request buttons. Templates hold `{{ATLAS_BASE_JS}}` inside `<script id="atlas-base-js">`, filled the same way.
 - These are the only copies, so every page always uses the current base. Published pages stay self-contained: the base is inside each page, not loaded from anywhere.
 
 ## Template anatomy
@@ -37,16 +37,16 @@ Shared files:
 ```
 Each template contains each placeholder **exactly once**. No other text is substituted.
 
-**Page anatomy.** Every page opens the same way (`N.page` in `_base.js`): the sticky **app header** (the Atlas mark and wordmark, the pages as tabs with the current one as an ink pill, the refresh marker, and the dark-theme toggle); the **title**; a **date line** (the day for Today, the project's summary on a project page, and a fixed line saying what the page is for everywhere else; no "As of" dates); the **lead** (`meta.headline`); then the page's counts as **stat tiles**. Every tile goes somewhere: on Work and Today some are filters (chosen again, they clear), the rest open their section. What each lead says:
+**Page anatomy.** Every page opens the same way (`N.page` in `_base.js`): the sticky, frosted **app header** (the Atlas mark and ATLAS wordmark, the pages as a pill bar with the current one in ink, the refresh marker, and the dark-theme toggle); a **date line** as the kicker above the title; the **title** (the day for Today, and a fixed line saying what the page is for everywhere else; no "As of" dates); the **lead** (`meta.headline`); then, on Work and Guide, the page's counts as **stat tiles** (Today has none: its counts head its own cards). Every tile goes somewhere: on Work they open a tab with its list filtered (chosen again, they clear), on Guide they open their section. Guide's head is a night **title band** holding the tiles. Below the head, lists sit in **list cards** (`N.listCard`): "Title · N", the first few rows, and "All N" to open the rest in place with filter chips and their counts, a sort, and pages of 10. What each lead says:
 
 | Dashboard | Date line | The lead says |
 |---|---|---|
 | Today | The day's date (catch-up: the away dates) | The shape of the day and the one or two things that matter most (the brief's own headline) |
 | Work | "Where everything you're responsible for stands." | What's slipping or most overdue, in either direction, and which projects need attention |
 | Guide | "How Atlas is running, and what it knows about you." | Whether Atlas is running well, and the one thing that needs the user if any |
-| Project page | The project's summary | The project's health and the reason for it |
+| Records | "Everything Atlas keeps, and how it connects." | What's most connected or most in need of a look |
 
-**Links.** A link on a dashboard only ever opens another dashboard, or a section of the page it's on: the header's page tabs, the name of another dashboard where a page's own wording mentions one (`N.pageLink`), and on Work, the card of a project that has its own project page. A link can open another page at a named tab or section with a plain `#token` (Work's tabs: `#commitments`, `#projects`, `#goals`, `#decisions`, `#people`); it can't carry a filter, since a published page receives only a plain token.
+**Links.** A link on a dashboard only ever opens another dashboard, or a section of the page it's on: the header's page tabs, the name of another dashboard where a page's own wording mentions one (`N.pageLink`). A link can open another page at a named tab or section with a plain `#token` (Work's tabs: `#overview`, `#commitments`, `#projects`, `#goals`, `#decisions`, `#risks`, `#people`; Guide's sections: `#status`, `#approvals`, `#activity`, `#knows`, `#how`); it can't carry a filter, since a published page receives only a plain token.
 
 **Rows expand in place.** A list row (`N.row`) shows a status dot, title, meta line, one badge (status is always a word plus a color) and its one primary action. Choosing the row opens its details underneath: what Atlas noticed, the next step, **facts** (the fields the row doesn't show plus any `details` the data carries), the item's `body`, linked records by name, the created and updated dates, and secondary actions.
 
@@ -73,7 +73,7 @@ When a page is over budget, its contract's truncation runs these steps first: cu
 4. **Escape for embedding** (done by `system/tools/render.py`, which also does steps 5–6; never substitute by hand). In the serialized JSON replace `<` with `\u003c`, `>` with `\u003e`, `&` with `\u0026`, and U+2028/U+2029 with `\u2028`/`\u2029`. The result is still valid JSON and can never close the script element.
 5. **Theme.** Build the theme CSS (below); the render script removes every `<` from it.
 6. Replace `{{ATLAS_DATA}}` with the escaped JSON and `{{ATLAS_THEME_CSS}}` with the theme CSS (or an empty string). Nothing else in the template changes.
-7. Publish: first time in chat (setup), then republish to the URL stored in `user/settings/dashboards.yaml` and set `last_published`. Project pages store their URL under `project_pages`.
+7. Publish: first time in chat (setup), then republish to the URL stored in `user/settings/dashboards.yaml` and set `last_published`.
 
 
 ## Common envelope: `meta`
@@ -100,7 +100,7 @@ Every dashboard's JSON has a `meta` object:
 |---|---|---|
 | `dashboard` | yes | The dashboard name (equals the contract `name`). |
 | `schema_version` | yes | `1` for this release. Bump in the contract when the shape changes incompatibly. |
-| `title` | no | Page title; defaults to the dashboard name. Project pages use the project title. |
+| `title` | no | Page title; defaults to the dashboard name. |
 | `headline` | yes | One plain sentence (at most about 25 words) saying what matters most on this page right now, written fresh from this render's data (see Page anatomy). Never a list of the stat tiles' numbers. |
 | `generated_at` | yes | Render time, ISO 8601 with offset in the user's time zone. Shown at the top of every page as the refresh marker ("Refreshed Tue, Oct 13, 6:04 AM"). |
 | `generated_by` | no | `chat` or `routine:<name>` (as in the commit `Atlas-Actor`). Kept for troubleshooting; not shown on the page. |
@@ -127,14 +127,14 @@ The theme comes from `user/profile/design-system.md` (`system/schemas/profile.md
 
 | Property | From the design system | Fallback |
 |---|---|---|
-| `--brand-accent` / `--brand-accent-dark` | Primary color, for links and the focus ring (the design system's `info`) | `#2f4a7d` / `#8fb0ea` |
+| `--brand-accent` / `--brand-accent-dark` | Primary color, for links and the info status (the design system's `info`) | `#33507a` / `#9db5d6` |
 | `--brand-accent-ink` / `--brand-accent-ink-dark` | Kept for older themes; the design system doesn't use it | none |
-| `--brand-highlight` / `--brand-highlight-dark` | The brand color: the Atlas mark, rank numerals, the current tab's underline (the design system's `accent`) | `#8a4430` / `#e08a66` (clay) |
-| `--brand-font-heading` | Display family (titles, headings, large numbers) | Newsreader, embedded |
-| `--brand-font-body` | Text family (everything you read or click) | Inter, embedded |
-| `--brand-bg`, `--brand-surface`, `--brand-ink` (+ `-dark`) | Optional background, surface, and text colors | warm paper: `#f4f0e8` / `#fcfaf6` / `#1f1b16` (dark `#171410` / `#221e19` / `#f2ede3`) |
+| `--brand-highlight` / `--brand-highlight-dark` | The brand color, used as the one focus on a screen: the focus ring, the now line, the #1 priority (Constellation's `ember`) | `#e8622c` / `#f0a07e` |
+| `--brand-font-heading` | Display family (titles, headings, large numbers) | Manrope, embedded |
+| `--brand-font-body` | Text family (everything you read or click) | Manrope, embedded |
+| `--brand-bg`, `--brand-surface`, `--brand-ink` (+ `-dark`) | Optional background, surface, and text colors | paper: `#f3f3f1` / `#ffffff` / `#16171a` (dark `#111214` / `#1b1c20` / `#f3f3f1`) |
 
-Rules: only `--brand-*` declarations; colors as hex; font names as CSS family lists that work without downloading fonts (no `@import`, no `url()`). Keep text contrast at WCAG AA (4.5:1) against the surface in both light and dark; if a brand color fails, darken it (light) or lighten it (dark) rather than using it as is. An empty theme block gives the Atlas design system's palette; the status colors (`bad`, `warn`, `good`) and the other non-brand tokens (`--ink-2`, `--muted`, `--line`, `--sunken`, `--accent-soft`) always come from it.
+Rules: only `--brand-*` declarations; colors as hex; font names as CSS family lists that work without downloading fonts (no `@import`, no `url()`). Keep text contrast at WCAG AA (4.5:1) against the surface in both light and dark; if a brand color fails, darken it (light) or lighten it (dark) rather than using it as is. An empty theme block gives Constellation's palette; the status colors (`bad`, `warn`, `good`), the night cards and the other non-brand tokens (`--ink-2`, `--muted`, `--line`, `--sunken`, `--accent-soft`) always come from it.
 
 Pages support light and dark (`prefers-color-scheme`), a viewer-chosen theme (`<html data-theme="light|dark">`, set by the header's toggle), phone widths down to 320 px with 16 px gutters and no horizontal scroll, keyboard focus states, and printing (filters hidden, black on white).
 
@@ -151,7 +151,7 @@ Atlas's guard holds routines to this: they reach only the pages linked in `user/
 If a republish fails (artifact deleted, permission lost), the job records a known issue (`health.yaml`) and the next chat offers to publish a fresh page and update `dashboards.yaml`.
 
 ## Live pages
-A **live page** (Today, Work, Guide and project pages; not user dashboards) keeps its data in its own artifact database, not in its HTML: one document per top-level key of its contract data in `sections`, written by Atlas, and the page re-renders when one changes. A button that changes something (Mark done, Move the date, Approve, Decline, an answer, Confirm or Correct a belief, Nudge, Not useful) writes a row to `requests` instead of copying text, and the page shows that row's state on the item; a button that starts a conversation (Ask Atlas, Decide, Change it and the like) still copies a request for chat, because a page can't open a chat. Atlas works the queue at the start of every routine run and every chat. Only the owner can write either collection. The data is built exactly as for an embedded page, in the contract's shape, so the contract, the data rules and the size trimming are unchanged; `system/tools/sections.py` cuts it into sections, and a section must fit one database write (900 KB).
+A **live page** (Today, Work, Guide and Records; not user dashboards) keeps its data in its own artifact database, not in its HTML: one document per top-level key of its contract data in `sections`, written by Atlas, and the page re-renders when one changes. A button that changes something (Mark done, Move the date, Approve, Decline, an answer, Confirm or Correct a belief, Nudge, Not useful) writes a row to `requests` instead of copying text, and the page shows that row's state on the item; a button that starts a conversation (Ask Atlas, Decide, Change it and the like) still copies a request for chat, because a page can't open a chat. Atlas works the queue at the start of every routine run and every chat. A press shows at once as **Waiting for Atlas** with **Undo**: before Atlas acts, Undo deletes the row; once applied, it queues an `undo` that Atlas reverses from the row's `before`, for 14 days (not an acted-on approval, a nudge's draft, or a Yes that applied a change). Guide's **Settings** write `set_setting` rows the same way. Only the owner can write either collection. The data is built exactly as for an embedded page, in the contract's shape, so the contract, the data rules and the size trimming are unchanged; `system/tools/sections.py` cuts it into sections, and a section must fit one database write (900 KB).
 
 A page becomes live in a chat, once, because adding the database is a capability change routines can't make; until then it stays an embedded page, and `_base.js` renders whichever it is. A live page embeds only `{"meta": {"live": true, ...}}`, the fields that don't change between refreshes, so a refresh writes sections and publishes nothing. When its database can't be reached, the page says so in plain words and hides its buttons; there is no embedded fallback, since an embedded copy would bring back the cost of building the data at every refresh. Procedure: `atlas-dashboards`, `reference/live.md`.
 

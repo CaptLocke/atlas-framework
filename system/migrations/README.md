@@ -49,3 +49,4 @@ User-initiated rollback ("go back to the previous version") restores the owned p
 |---|---|---|---|---|
 | [0001](0001-baseline.md) | 0 → 1 | yes | no | Baseline: establishes the v1 data layout |
 | [0002](0002-dashboard-keys.md) | 1 → 2 | no | only if a user dashboard extends a retired page | New Dashboards: eight retired dashboard keys removed, their links kept for the user (2.0.0) |
+| [0003](0003-records-page.md) | 2 → 3 | no | no | Records page added, project pages retired: `project_pages` removed, its links kept for the user (3.0.0) |

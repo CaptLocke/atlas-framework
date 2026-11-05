@@ -39,8 +39,7 @@ Republished by `daily-brief` every run; by `triage` when this run changed its da
     { "id": "projects/enterprise-launch", "title": "Enterprise launch", "status": "active", "health": "at_risk",
       "scale": "initiative", "owner": { "id": "people/maya-chen", "title": "Maya Chen" },
       "goal": { "id": "goals/2026-q4-enterprise-revenue", "title": "Launch the enterprise tier" },
-      "target": "2026-11-30", "summary": "…", "insight": "…", "next_step": "…",
-      "page_url": "https://claude.ai/artifact/…" }
+      "target": "2026-11-30", "summary": "…", "insight": "…", "next_step": "…" }
   ],
   "period": { "label": "2026-Q4", "start": "2026-10-01", "end": "2026-12-31" },
   "goals": [
@@ -98,7 +97,6 @@ Republished by `daily-brief` every run; by `triage` when this run changed its da
 |---|---|
 | `commitments[]` | `user/knowledge/commitments/*.md` with `status: open|slipped`, not archived/superseded: `id, title, direction, status, due, priority, owner, counterparty, insight, next_step`; `project` = first `links.projects` entry (or `null`) |
 | `projects[]` | `user/knowledge/projects/*.md` with `status: active|proposed|paused`: `id, title, status, health, scale, owner, goal, target, insight, next_step`; optional `summary` |
-| `projects[].page_url` | `user/settings/dashboards.yaml: project_pages[<project ID>]` (the entry, or its `url` once the page is live) when the project has its own project page (`https://` only), else `null` |
 | `period` | The current quarter (or the period most active goals share), from the goals' `period` |
 | `goals[]` | `user/knowledge/goals/*.md` with `status: active|draft`: `id, title, status, period, rank, summary, metric, target, current, owner` |
 | `goals[].current_as_of` | The date in the goal's `current` text or its latest `## Updates` line that changed `current` |
@@ -123,12 +121,15 @@ The page computes this from the data, so the builder sets no flag. Under "Needs 
 
 ## Rendering notes
 - **Head:** title "Work"; date line "Where everything you're responsible for stands."; lead (`meta.headline`): what's slipping or blocked most, in either direction, and the project or goal it threatens.
-- **Stat tiles, all filters** (chosen again, they clear; choosing a tab clears them): you owe, waiting on others, overdue (labelled with the split, "2 you owe, 1 waiting", so neither direction is missed), and projects need attention. Each switches to its tab.
-- **Tabs** under the head, sticky while scrolling, each with its count; the counts follow the filter, the tiles and find. The Commitments count is marked when anything is overdue, the Projects count when a project needs attention. The filter remembers the viewer's last choice in browser storage when available.
-- **Rows expand in place** (`system/dashboards/README.md` §Rows expand in place): commitments, decisions, risks and people; projects and goals are cards. Each commitment's row is grouped under an overline (Overdue, High priority, Medium priority, Low priority, No priority set) and carries one action: "Mark done" for I owe, "Nudge <name>" for Waiting on. Every item that expands may carry the row details data (`details`, `body`, `body_truncated`, `links`, `created`, `updated`; same section).
-- **Project pages:** a project with `page_url` has its title and an "Open project page" button linked to it, opening in a new tab.
+- **Stat tiles** (night cards): you owe, waiting on others, overdue (labelled with the split, "2 you owe, 1 waiting", so neither direction is missed), and projects need attention. Each opens its tab with its list filtered.
+- **Tabs** under the head, sticky while scrolling: Overview, Commitments, Projects, Goals, Decisions, Risks, People, each with its count, marked when something in it needs attention.
+- **Overview:** one card per kind, each with a key number, two smaller numbers and one line naming the item that matters most. Every number opens its tab with its list filtered: overdue, you owe, waiting on others; projects that need attention, not assessed, all; goals off track or at risk, not assessed, all; decisions needing action, to revisit soon, all; risks critical (issues), on edge (high exposure), all; people gone quiet, owing you, all.
+- **Lists are list cards** (`system/dashboards/README.md` §Page anatomy) with their own filter chips and sort: I owe beside Waiting on (Overdue, Due in 7 days, High priority, No date), projects, goals, decisions, risks and people. Commitments keep their overline groups while unsorted.
+- **Projects and Goals** open with a **hero**: a night card with the chosen record's summary, facts, what Atlas noticed, next step (or the measure and evidence for a goal) and prompts to copy, beside a card of its linked records drawn from what the page carries (a project's commitments, decisions, risks and goal; a goal's projects and evidence). "View" on a row puts that record in the hero; a live refresh keeps the choice.
+- **Rows expand in place** (`system/dashboards/README.md` §Rows expand in place): commitments, decisions, risks and people; projects and goals are rows that open in the hero. Each commitment's row is grouped under an overline (Overdue, High priority, Medium priority, Low priority, No priority set) and carries one action: "Mark done" for I owe, "Nudge <name>" for Waiting on. Every item that expands may carry the row details data (`details`, `body`, `body_truncated`, `links`, `created`, `updated`; same section).
+- **One project in depth** is Records zoomed to it; project pages were retired in 3.0.0. The heroes' webs (`N.web`, compact) draw the chosen record and the linked records this page carries. Phones (up to 40rem) leave the webs out, as too small to use; the Linked records card beside each hero lists the same records.
 - **Sort** (the page applies these, so data order doesn't matter):
-  - Commitments: I owe, then Waiting on; within each, overdue first, then priority (high → low, none last), then `due` ascending (`null` last), then title. Priority leads because triage's rubric already counts urgency (`atlas-triage/reference/signals.md` §Priority rubric); Today's Due soon is the date-ordered view. A person's card lists what's owed either way by `due` (none last).
+  - Commitments: I owe, then Waiting on; within each, overdue first, then priority (high → low, none last), then `due` ascending (`null` last), then title. Priority leads because triage's rubric already counts urgency (`atlas-triage/reference/signals.md` §Priority rubric); Today's Due from you is the date-ordered view of what's overdue or due today. A person's card lists what's owed either way by `due` (none last).
   - Projects: active by health (off track, at risk, not assessed, on track), then proposed, then paused; then `target` ascending (`null` last).
   - Goals: active before draft; ranked by `rank`, then unranked by assessment (off track, at risk, not assessed, on track); then title.
   - Decisions: `proposed` first, then `decided_on` newest first. Risks: issues first, then exposure descending, then `updated` newest first.

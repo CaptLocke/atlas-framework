@@ -39,11 +39,11 @@ SKILLS = ["atlas-recall", "atlas-capture", "atlas-brief", "atlas-triage", "atlas
           "atlas-connectors", "atlas-report-issue"]
 JOBS = ["ingest", "triage", "intelligence", "email-drafts", "meeting-prep", "daily-brief", "weekly-review",
         "status-updates", "monthly", "quarterly", "maintenance", "update-check"]
-DASHBOARDS = ["daily-brief", "commitments", "control-center"]     # Today, Work, Guide
-# Retired in 2.0.0; migration 0002 removes their dashboards.yaml keys.
-RETIRED_DASHBOARDS = ["projects", "goals", "week-ahead", "people", "decisions-risks", "about-you", "atlas-guide",
-                      "records"]
-ON_DEMAND_DASHBOARDS = ["project-page"]
+DASHBOARDS = ["daily-brief", "commitments", "control-center", "records"]     # Today, Work, Guide, Records
+# Retired in 2.0.0; migration 0002 removes their dashboards.yaml keys. (2.0.0's `records` page is gone;
+# 3.0.0's Records reuses the slug.)
+RETIRED_DASHBOARDS = ["projects", "goals", "week-ahead", "people", "decisions-risks", "about-you", "atlas-guide"]
+ON_DEMAND_DASHBOARDS = []
 JOB_SECTIONS = ["Purpose", "Runs when", "Away and paused", "Readiness check", "Inputs", "Steps",
                 "Outputs", "Early exit", "Guardrails", "Run report"]
 SKILL_SECTIONS = ["Purpose", "When to use", "Inputs", "Procedure", "Outputs", "Guardrails", "Done when"]
@@ -961,6 +961,15 @@ def check_rhythms(c, path, data, template):
                 rep.error(path, "meetings.%s must be include or skip (got %r)" % (k, v))
     elif meetings is not None:
         rep.error(path, "meetings must be a mapping (all_day, tentative, not_responded)")
+    focus = data.get("focus")
+    if isinstance(focus, dict):
+        for k, v in focus.items():
+            if k != "shortest_window":
+                rep.warn(path, "focus: unknown key %r (known: shortest_window)" % k)
+            elif v not in (15, 30, 45, 60):
+                rep.error(path, "focus.shortest_window must be 15, 30, 45 or 60 minutes (got %r)" % (v,))
+    elif focus is not None:
+        rep.error(path, "focus must be a mapping (shortest_window)")
     away = data.get("away")
     if away is not None:
         if not isinstance(away, dict):
@@ -1088,15 +1097,8 @@ def check_dashboards_settings(c, path, data, template):
         for k in DASHBOARDS:
             if k not in ds:
                 rep.warn(path, "dashboards: %s is missing" % k)
-    pp = (data or {}).get("project_pages")
-    if pp is not None and not isinstance(pp, dict):
-        rep.error(path, "project_pages must be a mapping of project ID to url")
-    elif pp:
-        for k, v in pp.items():   # a plain link, or { url, live: true } once the page is live
-            if isinstance(v, dict) and ("url" not in v or not isinstance(v.get("live", False), bool)):
-                rep.error(path, "project_pages.%s must be a url, or { url, live } for a live page" % k)
-            elif not isinstance(v, (dict, str)) and v is not None:
-                rep.error(path, "project_pages.%s must be a url, or { url, live } for a live page" % k)
+    if (data or {}).get("project_pages") is not None:
+        rep.warn(path, "project_pages was retired in 3.0.0 (migration 0003 removes it; projects are on Records and Work)")
 
 
 def check_atlas(c, path, data, template):

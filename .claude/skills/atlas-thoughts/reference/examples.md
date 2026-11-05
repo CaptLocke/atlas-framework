@@ -28,7 +28,7 @@ pricing page at some point. feeling kind of underwater this week honestly
 ## Evening dump fold-in
 Evening, 21:40, Lean profile (tomorrow's brief already built at 20:30):
 "tomorrow first thing finish the hiring plan for sam, he needs it before finance locks budgets"
-→ `i_owe` commitment due tomorrow; `atlas-brief` updates tomorrow's brief: adds it to Due soon (bold, due tomorrow), re-ranks Top priorities, adds "From your Evening Thoughts: 1 commitment" under What changed; republishes.
+→ `i_owe` commitment due tomorrow; `atlas-brief` updates tomorrow's brief: adds it as the bold Tomorrow line under Due from you, re-ranks Top priorities, adds "From your Evening Thoughts: 1 commitment" under What changed; republishes.
 
 ## Second dump the same morning
 Saved under the same `## Morning Thoughts` heading after a line `— 10:42 —`; only the new text is extracted.

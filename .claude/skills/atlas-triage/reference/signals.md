@@ -55,7 +55,7 @@ The brief's Top priorities (3, up to 5) come from this rule, so the same records
 - Aging if: past due; or >5 business days with no movement; or due within 2 days with no sign of progress.
 - Use person cadence and history for the channel: "Dana usually replies within a day to calls; email has gone unanswered twice".
 
-**I owe, with no date:** it never slips and never reaches Due soon, so it needs its own check.
+**I owe, with no date:** it never slips and never reaches Due from you, so it needs its own check.
 - **Movement** is an Updates line recording progress or contact, from a source or the user (a draft started, a message about it, the user's word), or the user keeping it undated (below). Triage's own changes to `priority`, `effort`, `insight` or `next_step` are not movement.
 - Aging if: no `due`, and more than 10 business days since the latest movement, else since `created`. Days while away mode is on don't count.
 - Ask once: a `questions.md` entry (kind `commitment`) with `- **Links:** [[commitments/<slug>]]`, only if no open entry links it and none was answered or dismissed since the latest movement: "You told Jordan you'd do the survey analysis on 10/02 and there's no date. When will you do it, or should I drop it?"

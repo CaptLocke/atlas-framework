@@ -7,6 +7,24 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
+## 3.0.0 (2026-11-04)
+
+### What's new
+- Your pages have a new look, Constellation: a calmer, lighter design with one dark card for what matters most, a single typeface, and phone and dark-mode layouts. Your brand colours from your design system still apply.
+- **Today** shows your day to scale: meetings, the time between them, and a line for now. Atlas places your top priorities in the gaps between meetings, marked **Focus** ("11:30 focus"); a gap with nothing placed is **Free**. It says what won't fit and suggests sending a new date. Each meeting and focus block shows how many commitments it carries; choose one to see them.
+- **Due from you** replaces Overdue and Due soon, on Today and in your brief: what you owe that's overdue or due today, grouped by person, oldest first, with what's due tomorrow as one bold line in the brief. What others owe you is in Waiting on, which gives each person one nudge.
+- **Work** opens on an Overview: every number takes you to its list, already filtered. Risks have their own tab, every list can be filtered, sorted and paged, and each project and goal opens with a summary and a web of what it links to.
+- **Guide** has Settings you can change on the page: working hours, your shortest focus window, insights per brief, which meetings show, follow-up channels, and more. Changes that move your routines wait for your next chat.
+- **Records** is a new page: everything Atlas keeps and how it connects, as a web you can zoom into on a computer or tablet. Search by name, or start from what needs attention; on a phone, search and the library carry the page.
+- Every button you press shows "Waiting for Atlas" with Undo. Undo works before Atlas acts and for 14 days after, except for an approval Atlas has acted on, a nudge (the draft stays in your drafts), or a Yes that applied a change: those say so.
+- A draft on Today says Approve, never Send: Atlas sends only from a chat, after you confirm.
+- Project pages are gone: Records zoomed to a project (its library card on a phone), or Work's Projects tab, shows what they did. A project's history and sources are a question for chat.
+- You can choose your shortest focus window: say "make my shortest focus window 45 minutes", or change it on Guide.
+- Every line in your brief links each record it names, so a line saying two projects are at risk links both projects.
+
+### Action needed
+- If you made project pages, delete them in Claude when you like: they no longer update, so they'll go out of date. Ask Atlas "which old project pages can I delete?" for the links.
+
 ## 2.6.1 (2026-11-01)
 
 ### What's new

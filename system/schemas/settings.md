@@ -188,6 +188,8 @@ insights:
   brief_max: 3
   engagement: adaptive                  # adaptive | fixed
   suppressed_kinds: []                  # insight kinds the user turned off, e.g. [idea] ("stop suggesting ideas in the brief")
+focus:                                  # optional, missing = 30
+  shortest_window: 30                   # 15 | 30 | 45 | 60 minutes: the shortest gap between meetings Today offers for priorities
 follow_ups:                             # the channel for follow-ups on overdue waiting_on items; optional, missing = email
   internal: email                       # email | message: people whose email domain is in atlas.yaml company.email_domains
   external: email                       # email | message: everyone else
@@ -204,8 +206,10 @@ paused: []                              # e.g. [{ job: weekly-review, until: 202
 
 **Follow-up channel (`follow_ups`).** `message` drafts in the messaging tool tagged `draft`; with none mapped, a follow-up falls back to a mail draft and says so. Each user sets their own ("follow up with colleagues on Slack"); changing it is `behavior_settings`. Procedure: `.claude/skills/atlas-write/reference/email-drafts.md` §Follow-ups.
 
+**Focus window (`focus`).** Atlas places Top priorities, then anything else owed and due that day, into the day's open windows: gaps inside `work_hours` between meetings and holds, at least `shortest_window` minutes long (`system/tools/placement.py`). A missing block means 30. The rule and the sizes are `atlas-brief` §Placement. Changing it is `behavior_settings`.
+
 **Meeting filter (`meetings`).** A missing block or key means `include`, so older files behave as before. An event is **shown** unless one of these applies:
-- `all_day: skip` and the event is all-day, **except** deadline and milestone events (`kind: deadline | milestone`), which always show under Due.
+- `all_day: skip` and the event is all-day, **except** deadline and milestone events (`kind: deadline | milestone`), which always show (the brief's Due from you, Today's Your day pills).
 - `tentative: skip` and the event record's `response` is `tentative`.
 - `not_responded: skip` and `response` is `not_responded`.
 
@@ -241,7 +245,7 @@ dashboards:
   daily-brief: { url: null, last_published: null }      # Today; live: true once switched over (atlas-dashboards reference/live.md)
   commitments: { url: null, last_published: null }      # Work; the same
   control-center: { url: null, last_published: null }   # Guide; the same
-project_pages: {}                       # project ID → url, created on request; { url, live: true } once switched over
+  records: { url: null, last_published: null }          # Records; live from its first publish
 # User dashboards from extensions are additional keys named after the extension.
 ```
 `last_published` dates are bookkeeping written under `dashboards_refresh` (auto), so routines update them. `live: true` marks a page that reads its data from its own database; it's set in the chat that switches the page over, and the guard refuses a routine edit that changes it. The URLs change only in a chat: they decide which pages a routine may write to, so the guard refuses a routine edit that changes one, and a page that needs a new link waits for the next chat (`system/dashboards/README.md`). Choosing which dashboards exist is `behavior_settings`.
