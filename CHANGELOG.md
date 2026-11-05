@@ -10,11 +10,11 @@ Each release's "What's new" section is shown to users in the Guide and their nex
 ## 3.1.1 (2026-11-05)
 
 ### What's new
-- On Today, the now line no longer covers the meeting it crosses, and This week's Today tile shows what's overdue as well as what's due today. A day with nothing due says so.
-- On Guide, settings with several options lay them out in an even grid that fits the options, instead of a wide box with gaps.
-- On a phone, a meeting on Today shows its prep status instead of cutting it off.
+- On Today, the now line runs behind your meetings and no longer carries a label over them, and This week's Today tile shows what's overdue as well as what's due today. A work day with nothing due says so.
+- Choices with several options, on Guide's settings and Records' sort, lay out in an even grid that fits them, instead of a wide box with gaps.
+- On Today, 30-minute meetings show their time and prep status again. On a phone, meetings and open time leave out their length so the prep status fits.
 - The Guide's features page lists all four pages, including Records, and no longer offers project pages.
-- If Atlas can't check a commit for passwords or keys, it now stops the commit and says so, instead of saving it unchecked.
+- When an automation can't read a commit's changes to check them for passwords or keys, it now stops the commit and says why, instead of saving it unchecked.
 
 ## 3.1.0 (2026-11-05)
 

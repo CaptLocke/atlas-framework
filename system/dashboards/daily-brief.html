@@ -23,7 +23,7 @@
 .tl-tick i { flex: 1 1 auto; height: 1px; background: var(--line); }
 .tl-strand { position: absolute; left: 50px; top: 0; width: 28px; height: 100%; pointer-events: none; overflow: visible; }
 .tl-strand path { fill: none; stroke: var(--strand); vector-effect: non-scaling-stroke; }
-.tl-now { position: absolute; left: 56px; right: 0; z-index: 3; display: flex; align-items: center; gap: 8px; pointer-events: none; }
+.tl-now { position: absolute; left: 56px; right: 0; z-index: 1; display: flex; align-items: center; gap: 8px; pointer-events: none; }
 .tl-now i { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
 .tl-now b { flex: 1 1 auto; height: 1px; background: var(--accent); }
 .tl-block { position: absolute; z-index: 2; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 0 16px; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); color: var(--ink); font-family: inherit; text-align: left; cursor: pointer; transition: border-color 160ms ease, background 160ms ease; }
@@ -333,7 +333,7 @@
       flush();
       wins.forEach(function (x) {
         var hgt = Math.max(30, (x.en - x.s) * S - 4), its = L(x.w.items);
-        var btn = h("button", { type: "button", class: "tl-block " + (its.length ? "tl-block--win" : "tl-block--free") + (hgt < 46 ? " tl-block--short" : ""), "aria-pressed": "false",
+        var btn = h("button", { type: "button", class: "tl-block " + (its.length ? "tl-block--win" : "tl-block--free") + (hgt < 40 ? " tl-block--short" : ""), "aria-pressed": "false",
           "aria-label": (its.length ? "Focus time, " : "Free time, ") + span(x.s, x.en) + (its.length ? ", " + its.length + (its.length === 1 ? " commitment" : " commitments") + " placed here" : ""),
           style: "top:" + Math.round((x.s - start) * S + 2) + "px;height:" + Math.round(hgt) + "px;left:var(--tl-gutter);width:calc(100% - var(--tl-gutter))",
           onclick: function () { pick(x.id); } },
@@ -347,7 +347,7 @@
       ahead.forEach(function (m) {
         var e = m.e, len = m.en - m.s, hgt = Math.max(30, len * S - 4), o = owedFor(e), nd = o.owe.length + o.out.length;
         var prep = e.prep || {};
-        var btn = h("button", { type: "button", class: "tl-block" + (hgt < 46 ? " tl-block--short" : ""), "aria-pressed": "false",
+        var btn = h("button", { type: "button", class: "tl-block" + (hgt < 40 ? " tl-block--short" : ""), "aria-pressed": "false",
           "aria-label": e.title + ", " + span(m.s, m.en) + (nd ? ", " + nd + (nd === 1 ? " open commitment" : " open commitments") + " with these people" : ""),
           style: "top:" + Math.round((m.s - start) * S + 2) + "px;height:" + Math.round(hgt) + "px;left:calc(var(--tl-gutter) + (100% - var(--tl-gutter)) * " + m.lane + " / " + m.n + ");width:calc((100% - var(--tl-gutter)) / " + m.n + " - " + (m.n > 1 ? 4 : 0) + "px)",
           onclick: function () { pick(e.id); } },
@@ -548,7 +548,9 @@
         /* Today's tile also carries what's overdue, as Due from you does: it is due now, and no later day shows it */
         if (n === 0) {
           var seen = {}; its.forEach(function (x) { if (x.id) seen[x.id] = 1; });
-          its = L(d.due).filter(function (x) { return x.due && x.due < dd.date && !seen[x.id]; }).map(function (x) { return { id: x.id, title: x.title, direction: "i_owe", overdue: true }; }).concat(its);
+          its = L(d.due).filter(function (x) { return overdue(x) && !seen[x.id]; }).map(function (x) { return { id: x.id, title: x.title, direction: "i_owe", overdue: true }; }).concat(its);
+          more += T.due || 0;
+          if (its.length > 5) { more += its.length - 5; its = its.slice(0, 5); }
         }
         var dueWords = its.map(dueWord), off = dd.work_day === false;
         var label = (n === 0 ? "Today, " : "") + N.longDate(dd.date) + ". " +

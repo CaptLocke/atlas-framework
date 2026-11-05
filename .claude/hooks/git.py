@@ -47,7 +47,8 @@ What it enforces (system/rules/governance.md, system/rules/sync.md):
   allowed with a warning. Routines may not commit as `Atlas-Actor: chat`.
 - N10: before a commit, scans added lines of the staged diff (plus unstaged
   and untracked files when the same command runs `git add` or `commit -a`)
-  for secret patterns and blocks if any are found.
+  for secret patterns and blocks if any are found, or if git can't show those
+  changes (the scan fails closed; untracked files it can't read are skipped).
 """
 import os
 import re
@@ -698,19 +699,26 @@ def scan_diff(diff, findings):
         scan_text("\n".join(lines), path, findings)
 
 
+class Unscannable(Exception):
+    """git couldn't show the changes to scan: the commit is refused, not let through (ATL-52)."""
+
+
+def diff_or_raise(args, cwd):
+    try:
+        r = atlas.timed_run(["git"] + args, 20, cwd=cwd, capture_output=True, text=True, errors="replace")
+    except (OSError, subprocess.SubprocessError) as e:
+        raise Unscannable(type(e).__name__)
+    if r.returncode != 0:
+        lines = (r.stderr or "").strip().splitlines()
+        raise Unscannable(lines[-1][:200] if lines else "exit %d" % r.returncode)
+    return r.stdout
+
+
 def scan_for_secrets(cwd, include_worktree):
-    """Findings, or None when git couldn't show the changes to scan: an unchecked commit is
-    refused, not let through (ATL-52)."""
     findings = []
-    rc, diff = git(["diff", "--cached", "--no-color", "--no-ext-diff", "-U0"], cwd, timeout=20)
-    if rc != 0:
-        return None
-    scan_diff(diff, findings)
+    scan_diff(diff_or_raise(["diff", "--cached", "--no-color", "--no-ext-diff", "-U0"], cwd), findings)
     if include_worktree:
-        rc, diff = git(["diff", "--no-color", "--no-ext-diff", "-U0"], cwd, timeout=20)
-        if rc != 0:
-            return None
-        scan_diff(diff, findings)
+        scan_diff(diff_or_raise(["diff", "--no-color", "--no-ext-diff", "-U0"], cwd), findings)
         rc, out = git(["ls-files", "--others", "--exclude-standard", "-z"], cwd, timeout=20)
         if rc == 0:
             for rel in [p for p in out.split("\0") if p][:2000]:
@@ -842,10 +850,12 @@ def main(payload, proj, ctx):
                 atlas.STATE.locked = True
                 atlas.block("%s (N5). If a system file needs fixing, record it for atlas-health, which "
                            "restores system files from the release." % owned_why)
-            found = scan_for_secrets(cwd, include_wt)
-            if found is None:
-                atlas.block("couldn't check this commit for secrets (N10): git couldn't show its changes. "
-                            "Try the commit again; if it keeps failing, run atlas-health.")
+            try:
+                found = scan_for_secrets(cwd, include_wt)
+            except Unscannable as e:
+                atlas.block("couldn't check this commit for secrets (N10): git couldn't show its changes "
+                            "(%s). Fix what git reports, or stage only the files to commit and commit "
+                            "without -a, then try again." % e)
             if found:
                 atlas.STATE.locked = True
                 atlas.block("possible secrets in this commit (N10): %s. Remove them from the files "

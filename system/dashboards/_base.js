@@ -1179,8 +1179,11 @@
      box as wide as its grid, so no row trails into blank space. Re-fits when its container resizes. ---- */
   N.fitSeg = function (el) {
     var btns = [].slice.call(el.children), n = btns.length;
+    var ro = null;
     function fit() {
-      var box = el.parentNode; if (!box || n < 3) return;
+      var box = el.parentNode;
+      if (!box || !el.isConnected) { if (ro && !box) { ro.disconnect(); ro = null; } return; }
+      if (n < 3) return;
       var cs = getComputedStyle(box), room = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
       el.classList.remove("atl-seg--grid"); el.style.gridTemplateColumns = "";
       var gap = 4, pad = 8, widest = 0, all = pad - gap;
@@ -1195,7 +1198,8 @@
     function watch() {
       if (!el.parentNode) { setTimeout(watch, 50); return; }
       fit();
-      if (window.ResizeObserver) new ResizeObserver(function () { fit(); }).observe(el.parentNode);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);   /* widths change once the page font loads */
+      if (window.ResizeObserver) { ro = new ResizeObserver(function () { fit(); }); ro.observe(el.parentNode); }
       else window.addEventListener("resize", fit);
     }
     setTimeout(watch, 0);
