@@ -4,7 +4,7 @@ version: 1.0.0
 ---
 # Dashboards
 
-Dashboards are browsable pages Atlas keeps up to date. Each one is a **published Claude artifact**: a private, self-contained HTML page built from a template in this folder with the data embedded at render time. Dashboards are views only; every change happens in chat, where Atlas updates the underlying records and republishes.
+Dashboards are browsable pages Atlas keeps up to date. Each one is a **published Claude artifact**: a private, self-contained HTML page built from a template in this folder with the data embedded at render time. Records change only through Atlas: on a page published before live pages, a button copies a request for chat; on a live page (§Live pages) it queues the request, which Atlas applies at its next run or chat, then republishes.
 
 The `atlas-dashboards` skill owns rendering and publishing. This folder holds what it renders from: one **template** (`<name>.html`) and one **data contract** (`<name>.contract.md`) per dashboard.
 

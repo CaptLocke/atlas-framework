@@ -7,6 +7,15 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
+## 3.1.1 (2026-11-05)
+
+### What's new
+- On Today, the now line runs behind your meetings and no longer carries a label over them, and This week's Today tile shows what's overdue as well as what's due today. A work day with nothing due says so.
+- Choices with several options, on Guide's settings and Records' sort, lay out in an even grid that fits them, instead of a wide box with gaps.
+- On Today, 30-minute meetings show their time and prep status again. On a phone, meetings and open time leave out their length so the prep status fits.
+- The Guide's features page lists all four pages, including Records, and no longer offers project pages.
+- When an automation can't read a commit's changes to check them for passwords or keys, it now stops the commit and says why, instead of saving it unchecked.
+
 ## 3.1.0 (2026-11-05)
 
 ### What's new

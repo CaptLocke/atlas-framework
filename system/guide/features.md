@@ -203,7 +203,7 @@ Tell Atlas something's wrong in one sentence. It gathers the details Atlas's mak
 - "Something's broken with my calendar sync. Can you report it?"
 
 ## Dashboards
-Three always-current pages you can open any time: **Today** (what needs you today, and what's coming this week), **Work** (your commitments in both directions, projects, goals, decisions and risks, and the people you have something open with), and this **Guide** (how Atlas is running, what it filed lately, what it knows about you, and how to use it). Ask for a page for any project. To look anything else up, just ask in chat.
+Four always-current pages you can open any time: **Today** (what needs you today, and what's coming this week), **Work** (your commitments in both directions, projects, goals, decisions and risks, and the people you have something open with), **Records** (everything Atlas keeps and how it connects, as a web you can zoom into), and this **Guide** (how Atlas is running, your settings, what it knows about you, and how to use it). For one project, open Records zoomed in on it, or Work's Projects tab. To look anything else up, just ask in chat.
 
 **Try:**
 - "Open my Work page."

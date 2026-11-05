@@ -16,17 +16,16 @@
 .earlier b { color: var(--ink); font-weight: 600; }
 .earlier .atl-icon { color: var(--muted); width: 15px; height: 15px; }
 .tl { position: relative; --tl-gutter: 88px; }
-@media (max-width: 40rem) { .tl { --tl-gutter: 52px; } .tl-strand { left: 34px; width: 16px; } .tl-now { left: 40px; } .tl-block { padding: 0 10px; gap: 8px; } .tl-block > .atl-icon, .tl-tag { display: none; } }
+@media (max-width: 40rem) { .tl { --tl-gutter: 52px; } .tl-strand { left: 34px; width: 16px; } .tl-now { left: 40px; } .tl-block { padding: 0 10px; gap: 8px; } .tl-block > .atl-icon, .tl-tag, .tl-dur { display: none; } }
 .tl-tick { position: absolute; left: 0; right: 0; display: flex; align-items: center; gap: 10px; pointer-events: none; }
 .tl-tick span { flex: 0 0 52px; font-size: 12px; color: var(--muted); transform: translateY(-50%); }
 @media (max-width: 40rem) { .tl-tick span { flex-basis: 40px; font-size: 11px; } }
 .tl-tick i { flex: 1 1 auto; height: 1px; background: var(--line); }
 .tl-strand { position: absolute; left: 50px; top: 0; width: 28px; height: 100%; pointer-events: none; overflow: visible; }
 .tl-strand path { fill: none; stroke: var(--strand); vector-effect: non-scaling-stroke; }
-.tl-now { position: absolute; left: 56px; right: 0; z-index: 3; display: flex; align-items: center; gap: 8px; pointer-events: none; }
+.tl-now { position: absolute; left: 56px; right: 0; z-index: 1; display: flex; align-items: center; gap: 8px; pointer-events: none; }
 .tl-now i { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
 .tl-now b { flex: 1 1 auto; height: 1px; background: var(--accent); }
-.tl-now span { font-size: 11px; font-weight: 600; letter-spacing: 0.2em; color: var(--accent-text); }
 .tl-block { position: absolute; z-index: 2; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 0 16px; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); color: var(--ink); font-family: inherit; text-align: left; cursor: pointer; transition: border-color 160ms ease, background 160ms ease; }
 .tl-block:hover { border-color: var(--ink); }
 .tl-block[aria-pressed="true"] { background: var(--night); border-color: var(--night); color: var(--night-text); }
@@ -165,6 +164,7 @@
 .legend .lg-owe { background: var(--bad-bg); border: 1px solid var(--bad); }
 .legend .lg-ms .atl-icon { width: 11px; height: 11px; color: var(--info); }
 .pin[data-tone="star"] .atl-icon { width: 10px; height: 10px; margin-right: 4px; vertical-align: -1px; }
+.wday-none { margin-top: 4px; font-size: 13px; color: var(--muted); }
 .week-free { font-size: 14px; color: var(--ink-2); }
 .week-free b { color: var(--ink); font-weight: 600; }
 .guide-link { display: flex; align-items: center; gap: 12px; padding: var(--space-5) var(--space-7); border: 1px solid var(--line); border-radius: var(--radius-card-sm); background: var(--surface); font-size: 14px; color: var(--ink-2); }
@@ -320,7 +320,7 @@
       });
       tl.appendChild(svg);
       if (nowMin != null && nowMin >= start && nowMin <= end) {
-        tl.appendChild(h("div", { class: "tl-now", style: "top:" + Math.round((nowMin - start) * S - 5) + "px" }, h("i"), h("b"), h("span", null, "NOW · " + clock(nowMin))));
+        tl.appendChild(h("div", { class: "tl-now", style: "top:" + Math.round((nowMin - start) * S - 5) + "px", role: "img", "aria-label": "Now, " + clock(nowMin) }, h("i"), h("b")));
       }
       /* overlapping meetings share the width, side by side */
       var lanes = [], groupEnd = -1, group = [];
@@ -333,13 +333,13 @@
       flush();
       wins.forEach(function (x) {
         var hgt = Math.max(30, (x.en - x.s) * S - 4), its = L(x.w.items);
-        var btn = h("button", { type: "button", class: "tl-block " + (its.length ? "tl-block--win" : "tl-block--free") + (hgt < 46 ? " tl-block--short" : ""), "aria-pressed": "false",
+        var btn = h("button", { type: "button", class: "tl-block " + (its.length ? "tl-block--win" : "tl-block--free") + (hgt < 40 ? " tl-block--short" : ""), "aria-pressed": "false",
           "aria-label": (its.length ? "Focus time, " : "Free time, ") + span(x.s, x.en) + (its.length ? ", " + its.length + (its.length === 1 ? " commitment" : " commitments") + " placed here" : ""),
           style: "top:" + Math.round((x.s - start) * S + 2) + "px;height:" + Math.round(hgt) + "px;left:var(--tl-gutter);width:calc(100% - var(--tl-gutter))",
           onclick: function () { pick(x.id); } },
           N.icon(its.length ? "focus" : "clock"),
           h("span", { class: "tl-block__text" }, h("span", { class: "tl-block__title" }, its.length ? "Focus" : "Free"),
-            h("span", { class: "tl-block__time" }, span(x.s, x.en) + " · " + (x.en - x.s) + " min")),
+            h("span", { class: "tl-block__time" }, span(x.s, x.en), h("span", { class: "tl-dur" }, " · " + (x.en - x.s) + " min"))),
           its.length ? countPill(its.length, "placed here") : null);
         btns.push({ b: btn, id: x.id });
         tl.appendChild(btn);
@@ -347,13 +347,13 @@
       ahead.forEach(function (m) {
         var e = m.e, len = m.en - m.s, hgt = Math.max(30, len * S - 4), o = owedFor(e), nd = o.owe.length + o.out.length;
         var prep = e.prep || {};
-        var btn = h("button", { type: "button", class: "tl-block" + (hgt < 46 ? " tl-block--short" : ""), "aria-pressed": "false",
+        var btn = h("button", { type: "button", class: "tl-block" + (hgt < 40 ? " tl-block--short" : ""), "aria-pressed": "false",
           "aria-label": e.title + ", " + span(m.s, m.en) + (nd ? ", " + nd + (nd === 1 ? " open commitment" : " open commitments") + " with these people" : ""),
           style: "top:" + Math.round((m.s - start) * S + 2) + "px;height:" + Math.round(hgt) + "px;left:calc(var(--tl-gutter) + (100% - var(--tl-gutter)) * " + m.lane + " / " + m.n + ");width:calc((100% - var(--tl-gutter)) / " + m.n + " - " + (m.n > 1 ? 4 : 0) + "px)",
           onclick: function () { pick(e.id); } },
           N.icon("event"),
           h("span", { class: "tl-block__text" }, h("span", { class: "tl-block__title" }, e.title),
-            h("span", { class: "tl-block__time" }, span(m.s, m.en) + " · " + len + " min" + (prep.status ? " · " + N.label(prep.status) : ""))),
+            h("span", { class: "tl-block__time" }, span(m.s, m.en), h("span", { class: "tl-dur" }, " · " + len + " min"), prep.status ? " · " + N.label(prep.status) : null)),
           nd ? countPill(nd, "open with these people") : null,
           m === current ? h("span", { class: "tl-tag" }, "NOW") : m === next && nowMin != null ? h("span", { class: "tl-tag" }, "UP NEXT") : null);
         btns.push({ b: btn, id: e.id });
@@ -520,7 +520,7 @@
       /* Work days get a tile each; a run of days off (a weekend) folds into one thin tile, empty unless
          something falls due on it. Today keeps its own tile even on a day off. */
       function dueWord(x) {
-        return (x.kind === "milestone" ? "milestone: " : x.kind === "deadline" ? "deadline: " : x.direction === "waiting_on" ? "from " + N.name(x.counterparty) + ": " : "you owe: ") + x.title;
+        return (x.kind === "milestone" ? "milestone: " : x.kind === "deadline" ? "deadline: " : x.direction === "waiting_on" ? "from " + N.name(x.counterparty) + ": " : x.overdue ? "overdue, you owe: " : "you owe: ") + x.title;
       }
       var runs = [];
       days.forEach(function (dd) {
@@ -545,6 +545,13 @@
         var dd = r.days[0];
         var mh = dd.meeting_hours || 0, n = N.daysFromToday(dd.date);
         var its = L(dd.due), more = T["week." + dd.date] || 0;
+        /* Today's tile also carries what's overdue, as Due from you does: it is due now, and no later day shows it */
+        if (n === 0) {
+          var seen = {}; its.forEach(function (x) { if (x.id) seen[x.id] = 1; });
+          its = L(d.due).filter(function (x) { return overdue(x) && !seen[x.id]; }).map(function (x) { return { id: x.id, title: x.title, direction: "i_owe", overdue: true }; }).concat(its);
+          more += T.due || 0;
+          if (its.length > 5) { more += its.length - 5; its = its.slice(0, 5); }
+        }
         var dueWords = its.map(dueWord), off = dd.work_day === false;
         var label = (n === 0 ? "Today, " : "") + N.longDate(dd.date) + ". " +
           (off ? "Not a work day" : (dd.meetings != null ? dd.meetings + (dd.meetings === 1 ? " meeting, " : " meetings, ") : "") + hrs(mh) + " in meetings, " + hrs(dd.free_hours) + " open") +
@@ -558,8 +565,9 @@
               h("span", { class: "wday-hrs", "aria-hidden": "true" }, h("b", null, hrs(mh)), " meetings", h("br"), h("b", null, hrs(dd.free_hours)), " open")],
           its.length || more ? h("ul", { class: "pins", "aria-hidden": "true" }, its.map(function (x) {
               var tone = x.kind === "milestone" ? "star" : (x.kind === "deadline" || x.direction === "i_owe") ? "owe" : null;
-              return h("li", { class: "pin", "data-tone": tone }, tone === "star" ? N.icon("milestone") : null, x.title);
-            }), more ? h("li", { class: "pin" }, "+" + more + " more") : null) : null);
+              return h("li", { class: "pin", "data-tone": tone }, tone === "star" ? N.icon("milestone") : null, x.overdue ? h("b", null, "Overdue: ") : null, x.title);
+            }), more ? h("li", { class: "pin" }, "+" + more + " more") : null)
+            : off ? null : h("span", { class: "wday-none", "aria-hidden": "true" }, "Nothing due"));
       }));
       var free = typeof wk.free_hours === "number" ? wk.free_hours : days.reduce(function (s, x) { return s + (x.free_hours || 0); }, 0);
       main.appendChild(N.section({ id: "week", title: "This week", note: "Meeting load, open time and what's due each day.",

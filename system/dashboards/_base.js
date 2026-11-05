@@ -357,7 +357,7 @@
             save(x.value);
           } }, x.label);
       });
-      control = h("div", { class: "atl-seg", role: "group", "aria-label": o.label }, btns);
+      control = N.fitSeg(h("div", { class: "atl-seg", role: "group", "aria-label": o.label }, btns));
     }
     if (row && pend != null) add(status, [N.badge(row.state === "waiting_chat" || o.tier === "chat" ? "Waiting for a chat" : REQUEST_STATE.queued, "neutral", "pending"), N.undoControl(row)]);
     else if (row && row.state === "applied") add(status, [N.undoControl(row)]);
@@ -1174,6 +1174,38 @@
       } };
   };
 
+  /* ---- Segmented control layout: one pill when the options fit on a line; otherwise an even grid,
+     every option as wide as the widest, rows as full as they can be (4 → 2 + 2, 5 → 3 + 2), and the
+     box as wide as its grid, so no row trails into blank space. Re-fits when its container resizes. ---- */
+  N.fitSeg = function (el) {
+    var btns = [].slice.call(el.children), n = btns.length;
+    var ro = null;
+    function fit() {
+      var box = el.parentNode;
+      if (!box || !el.isConnected) { if (ro && !box) { ro.disconnect(); ro = null; } return; }
+      if (n < 3) return;
+      var cs = getComputedStyle(box), room = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      el.classList.remove("atl-seg--grid"); el.style.gridTemplateColumns = "";
+      var gap = 4, pad = 8, widest = 0, all = pad - gap;
+      btns.forEach(function (b) { var w = b.getBoundingClientRect().width; widest = Math.max(widest, w); all += w + gap; });
+      if (!room || all <= room + 0.5) return;
+      widest -= 8;   /* .atl-seg--grid trims each option's side padding from 16px to 12px */
+      var cols = Math.max(1, Math.floor((room - pad + gap) / (widest + gap)));
+      var rows = Math.ceil(n / cols); cols = Math.ceil(n / rows);
+      el.classList.add("atl-seg--grid");
+      el.style.gridTemplateColumns = "repeat(" + cols + ", " + Math.ceil(widest) + "px)";
+    }
+    function watch() {
+      if (!el.parentNode) { setTimeout(watch, 50); return; }
+      fit();
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);   /* widths change once the page font loads */
+      if (window.ResizeObserver) { ro = new ResizeObserver(function () { fit(); }); ro.observe(el.parentNode); }
+      else window.addEventListener("resize", fit);
+    }
+    setTimeout(watch, 0);
+    return el;
+  };
+
   /* ---- Segmented control: two to four options; remembers the choice per page. ---- */
   N.segmented = function (name, options, initial, onChange) {
     var key = (N.meta.dashboard || "page") + ":" + name;
@@ -1191,7 +1223,7 @@
           onChange(current);
         } }, o.label);
     });
-    var group = h("div", { class: "atl-seg", role: "group", "aria-label": name }, buttons);
+    var group = N.fitSeg(h("div", { class: "atl-seg", role: "group", "aria-label": name }, buttons));
     setTimeout(function () { onChange(current); }, 0);
     return group;
   };
