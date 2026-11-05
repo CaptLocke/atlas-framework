@@ -27,6 +27,7 @@
   .part { scroll-margin-top: 16px; }
 }
 .small { font-size: 13px; color: var(--muted); }
+.guide-foot { margin-top: var(--space-10); }   /* last update and health check, under everything */
 
 /* ---- Status: health, automations beside connections ---- */
 .health { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: var(--space-5) var(--space-7); border: 1px solid var(--line); border-radius: var(--radius-card-sm); background: var(--surface); }
@@ -185,8 +186,8 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
       else impText = "in progress, " + notes(done) + from + " so far";
     }
     var sysLine = [
-      sys.installed_version ? "Atlas " + sys.installed_version + (up.available && up.latest_version ? ", update to " + up.latest_version + " available" : ", up to date") +
-        (up.last_checked ? " (checked " + N.date(up.last_checked) + ")" : "") : null,
+      sys.updated_on ? "Your last Atlas update: " + N.date(sys.updated_on) : null,
+      up.available && up.latest_version ? "Atlas " + up.latest_version + " is available" : null,
       sys.last_user_check ? "Your last health check: " + N.date(sys.last_user_check) : null,
       impText ? "Notes import " + impText : null
     ].filter(Boolean).join(". ");
@@ -222,7 +223,6 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
       issues.length ? N.listBox(issueRows) : null, N.more("known_issues"),
       h("div", { class: "status-cards" }, autoCard, connCard),
       up.available && up.notes ? h("p", { class: "small" }, N.rich(up.notes)) : null,
-      sysLine ? h("p", { class: "small" }, sysLine + ".") : null,
       jobs.length ? fold("Each step of the automations", jobs.length, N.listBox(jobs.map(function (j) {
         var w = RUN[j.last_status] || RUN.never_run;
         return N.row({ title: j.title || j.name, tone: w[1] === "neutral" ? null : w[1],
@@ -299,8 +299,8 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
         var vals = list.slice(); if (cur && vals.indexOf(cur) === -1) vals.unshift(cur);
         return vals.map(function (v) { return { value: v, label: fmt(v) }; });
       }
-      function hhmm(t) { var m = /^(\d\d):(\d\d)$/.exec(t || ""); if (!m) return t; var hh = +m[1], h12 = hh % 12 || 12; return h12 + ":" + m[2] + (hh < 12 ? " am" : " pm"); }
-      function range(v) { var p = String(v || "").split("-"); return p.length === 2 ? hhmm(p[0]).replace(/ [ap]m$/, "") + "–" + hhmm(p[1]).replace(/ [ap]m$/, "") : v; }
+      function hhmm(t) { return N.hm(t) == null ? t : N.clock(t); }
+      function range(v) { var p = String(v || "").split("-"); return p.length === 2 && N.hm(p[0]) != null && N.hm(p[1]) != null ? N.clockRange(p[0], p[1]) : v; }
       var mo = sv.moments || {}, mt = sv.meetings || {}, fu = sv.follow_ups || {};
       var card = function (title, kids) { return N.card({ title: title, body: h("div", { class: "settings__list" }, kids) }); };
       parts.appendChild(part("settings", "Settings", "Changes apply at Atlas's next run or chat. Those that change your routines wait for a chat.", [
@@ -328,8 +328,7 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
               options: [{ value: "lean", label: "Lean" }, { value: "standard", label: "Standard" }, { value: "full", label: "Full" }], value: sv.profile || "lean" }),
             N.setting({ key: "rhythms.follow_ups.internal", label: "Follow-ups to colleagues", tier: "chat", options: [{ value: "email", label: "Email" }, { value: "message", label: "Message" }], value: fu.internal || "email" }),
             N.setting({ key: "rhythms.follow_ups.external", label: "Follow-ups to everyone else", tier: "chat", options: [{ value: "email", label: "Email" }, { value: "message", label: "Message" }], value: fu.external || "email" }),
-            N.setting({ key: "rhythms.moments.weekly_review", label: "Weekly review", tier: "now", options: [{ value: "on", label: "On" }, { value: "off", label: "Off" }], value: ON(mo.weekly_review) }),
-            N.setting({ key: "rules", label: "What Atlas may read, and its connections", tier: "locked", lockedText: "Change these in chat: they decide what Atlas can see." })])),
+            N.setting({ key: "rhythms.moments.weekly_review", label: "Weekly review", tier: "now", options: [{ value: "on", label: "On" }, { value: "off", label: "Off" }], value: ON(mo.weekly_review) })])),
         N.live ? null : h("p", { class: "small" }, "On this page, a change copies a request for your Atlas chat. Once the page is live, changes save straight to Atlas.")]));
     }
 
@@ -453,6 +452,8 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
       h("nav", { class: "side", "aria-label": "Sections of this page" }, SIDE.map(function (x) {
         return h("a", { href: "#" + x[0] }, N.icon(x[2]), x[1], x[3] ? h("b", null, String(x[3])) : null);
       })), parts));
+    /* The footnote: when Atlas was last updated and last checked over */
+    if (sysLine) main.appendChild(h("p", { class: "small guide-foot" }, sysLine + "."));
 
     /* ================= The title band ================= */
     var lastRun = L(d.runs).concat(routines.map(function (r) { return r.last_run && { started: r.last_run.finished || r.last_run.started }; }).filter(Boolean))

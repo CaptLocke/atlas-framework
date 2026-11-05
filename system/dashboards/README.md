@@ -117,7 +117,7 @@ Every dashboard's JSON has a `meta` object:
 ## Data rules for every contract
 - **Plain text only.** Every string is plain text; never HTML or Markdown. Mentions of records may appear inline as `[[type/slug]]`; the page drops a mention in brackets (a citation) and shows any other mention as the record's readable name. Templates render all text with `textContent`, so content can never inject markup or script (N7).
 - **References** are `{ "id": "<type>/<slug>", "title": "<record title>" }`. Every item that maps to a record carries its `id` (for search and troubleshooting). Pages never show record IDs, inbox entry numbers, or file paths; the user asks Atlas about a record by its name.
-- **Dates** are `YYYY-MM-DD` (calendar days) or ISO 8601 datetimes with offset. The page formats them.
+- **Dates** are `YYYY-MM-DD` (calendar days) or ISO 8601 datetimes with offset. The page formats them, and shows every time 12-hour with AM or PM whatever `meta.locale` ("9:00 AM", "9:00–10:30 AM"). Any time Atlas writes into text (a headline, a note, a schedule) is written the same way.
 - **Never include** `notes_private`, phone numbers, email addresses, secrets, or content whose data-rule handling is `ignore` or `pointer`. Use `summary` text for `summary` handling. Excluded records (`data-rules.yaml: exclusions`) never appear. Archived and superseded records are left out unless the contract says otherwise.
 - **Absent vs empty:** use `null` for unknown single values and `[]` for empty lists. Pages handle both.
 - **Insights** on Work and Today come from `user/inbox/insights.md` (status `new` or `seen`) and from record `insight` fields; each carries its reasoning.

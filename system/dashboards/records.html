@@ -81,7 +81,7 @@
     var T = {}; N.webTypes.forEach(function (t) { T[t.id] = t; });
     var lib = h("section", { class: "atl-night lib", "aria-live": "polite", "aria-label": "Your library" });
     var sort = "attention", limit = 12;
-    var web = N.web({ records: recs, links: links, onChange: function () { keep = web ? web.state() : keep; sort = "attention"; limit = 12; paintLib(); } });
+    var web = N.web({ records: recs, links: links, height: 820, onChange: function () { keep = web ? web.state() : keep; sort = "attention"; limit = 12; paintLib(); } });
     function name(r) { return me && r.title === me && r.type === "person" ? "You" : r.title; }
     function rowFor(r, meta) {
       return h("button", { type: "button", class: "lrow" + (r.attention ? " is-" + r.attention : ""), onclick: function () { web.go(r.id); web.el.scrollIntoView && web.el.scrollIntoView({ block: "nearest" }); } },
