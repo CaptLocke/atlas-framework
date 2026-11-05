@@ -399,7 +399,9 @@ main { display: flex; flex-direction: column; gap: var(--space-10); }
 }
 
 /* ---- SettingControl: segmented control and toggle ---- */
-.atl-seg { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; border-radius: 24px; background: var(--sunken); font-family: var(--font-sans); }   /* a pill on one row; a rounded box when its options wrap */
+.atl-seg { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; border-radius: 24px; background: var(--sunken); font-family: var(--font-sans); }   /* a pill on one row */
+.atl-seg--grid { display: inline-grid; border-radius: 22px; max-width: 100%; }   /* N.fitSeg: an even grid when the options need more than one row */
+.atl-seg--grid .atl-seg__btn { padding: 0 12px; }
 .atl-seg__btn { min-height: 40px; padding: 0 16px; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--muted); font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap; }
 .atl-seg__btn--on { background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: var(--shadow-knob); }
 .atl-toggle { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; padding: 0; border: 0; background: none; color: var(--ink); font-size: 14px; font-weight: 500; cursor: pointer; text-align: left; }
