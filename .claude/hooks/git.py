@@ -699,14 +699,18 @@ def scan_diff(diff, findings):
 
 
 def scan_for_secrets(cwd, include_worktree):
+    """Findings, or None when git couldn't show the changes to scan: an unchecked commit is
+    refused, not let through (ATL-52)."""
     findings = []
     rc, diff = git(["diff", "--cached", "--no-color", "--no-ext-diff", "-U0"], cwd, timeout=20)
-    if rc == 0:
-        scan_diff(diff, findings)
+    if rc != 0:
+        return None
+    scan_diff(diff, findings)
     if include_worktree:
         rc, diff = git(["diff", "--no-color", "--no-ext-diff", "-U0"], cwd, timeout=20)
-        if rc == 0:
-            scan_diff(diff, findings)
+        if rc != 0:
+            return None
+        scan_diff(diff, findings)
         rc, out = git(["ls-files", "--others", "--exclude-standard", "-z"], cwd, timeout=20)
         if rc == 0:
             for rel in [p for p in out.split("\0") if p][:2000]:
@@ -839,6 +843,9 @@ def main(payload, proj, ctx):
                 atlas.block("%s (N5). If a system file needs fixing, record it for atlas-health, which "
                            "restores system files from the release." % owned_why)
             found = scan_for_secrets(cwd, include_wt)
+            if found is None:
+                atlas.block("couldn't check this commit for secrets (N10): git couldn't show its changes. "
+                            "Try the commit again; if it keeps failing, run atlas-health.")
             if found:
                 atlas.STATE.locked = True
                 atlas.block("possible secrets in this commit (N10): %s. Remove them from the files "

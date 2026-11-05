@@ -12,6 +12,9 @@ Each release's "What's new" section is shown to users in the Guide and their nex
 ### What's new
 - On Today, the now line no longer covers the meeting it crosses, and This week's Today tile shows what's overdue as well as what's due today. A day with nothing due says so.
 - On Guide, settings with several options lay them out in an even grid that fits the options, instead of a wide box with gaps.
+- On a phone, a meeting on Today shows its prep status instead of cutting it off.
+- The Guide's features page lists all four pages, including Records, and no longer offers project pages.
+- If Atlas can't check a commit for passwords or keys, it now stops the commit and says so, instead of saving it unchecked.
 
 ## 3.1.0 (2026-11-05)
 

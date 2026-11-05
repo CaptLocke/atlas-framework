@@ -9,14 +9,16 @@ stale_after_hours: 36
 # Dashboard: Work (`commitments`)
 
 ## Purpose
-**Where does my work stand?** One page, titled **Work**, that replaces the Commitments, Projects, Goals, Decisions & Risks and People pages. It keeps the `commitments` slug, so its URL and `last_published` survive. Five tabs, in this order, each with a live count (a plain `#token` opens one: `#commitments`, `#projects`, `#goals`, `#decisions`, `#people`):
-1. **Commitments:** I owe beside Waiting on (stacked on a phone).
-2. **Projects:** cards, each with owner, target, insight and its one next step.
-3. **Goals:** by rank, with a progress bar, the assessment, and evidence for and against.
-4. **Decisions & risks:** recent decisions with their reasons, beside open risks and issues.
-5. **People:** only people with something open either way, a meeting in the next 7 days, or who've gone quiet. A line below says anyone else is a chat question.
+**Where does my work stand?** One page, titled **Work**, that replaces the Commitments, Projects, Goals, Decisions & Risks and People pages. It keeps the `commitments` slug, so its URL and `last_published` survive. Seven tabs, in this order, each with a live count (a plain `#token` opens one: `#overview`, `#commitments`, `#projects`, `#goals`, `#decisions`, `#risks`, `#people`):
+1. **Overview:** one card per kind, whose numbers open their lists filtered.
+2. **Commitments:** I owe beside Waiting on (stacked on a phone).
+3. **Projects:** a summary of the chosen project, then all projects, each with owner, target, insight and its one next step.
+4. **Goals:** by rank, with a progress bar, the assessment, and evidence for and against.
+5. **Decisions:** recent decisions with their reasons, undecided first.
+6. **Risks:** open risks and issues, issues first.
+7. **People:** only people with something open either way, a meeting in the next 7 days, or who've gone quiet. A line below says anyone else is a chat question.
 
-One filter applies to every tab: **Everything / Needs attention** (below), with find on the page beside it. Finished items aren't shown (done commitments, resolved risks, achieved or missed goals); history and anyone not listed are chat questions. Sizes stay bounded by current activity, not history.
+Each list has its own filter chips and sort (Rendering notes); what counts as needing attention is defined under Needs attention. Finished items aren't shown (done commitments, resolved risks, achieved or missed goals); history and anyone not listed are chat questions. Sizes stay bounded by current activity, not history.
 
 Republished by `daily-brief` every run; by `triage` when this run changed its data and the routine does not run `daily-brief` later (the brief republishes it then; `system/jobs/triage.md` step 7); by `weekly-review` (project health, risks, decisions, people gone quiet); by `monthly` (goal progress); and by `quarterly` (goal reset). That is the union of the five pages it replaces.
 
