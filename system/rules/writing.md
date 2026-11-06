@@ -29,7 +29,7 @@ Documents, decks, sheets, and dashboards follow `user/profile/design-system.md` 
 ## Quality bar
 - Finished, not rough: correct, specific, complete, in the right voice and format, ready to use with minimal edits.
 - Lead with what matters to the reader. Match length to the user's preferences.
-- Numbers: consistent units, dates in the user's locale and time zone.
+- Numbers: consistent units, dates in the user's locale and time zone, times 12-hour with AM or PM ("9:30 AM", "9:00–10:30 AM") in anything the user reads; logs and settings keep 24-hour.
 - Never fabricate quotes, figures, or commitments.
 
 ## Finished files

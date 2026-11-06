@@ -10,7 +10,7 @@ date: 2026-10-13
 event: "[[events/2026-10-13-acme-msa-call]]"
 sources: ["[[people/dana-ruiz]]", "[[commitments/dana-msa-redlines]]", "..."]
 ---
-# Acme MSA call · Tue 10/13 9:30 (30 min)
+# Acme MSA call · Tue 10/13 9:30 AM (30 min)
 **Goal:** get the redlines committed by Friday and agree on the DPA path.
 
 **Who**
@@ -41,7 +41,7 @@ sources: ["[[people/dana-ruiz]]", "[[commitments/dana-msa-redlines]]", "..."]
 
 ## 1:1
 ```markdown
-# 1:1 with Jordan Lee · Tue 10/13 11:00
+# 1:1 with Jordan Lee · Tue 10/13 11:00 AM
 **60-second status:** Orion back on track (launch 11/03); Acme MSA waiting on redlines; hiring plan to Finance Thursday.
 **You owe Jordan:** pricing feedback (due tomorrow) ([[commitments/maya-pricing-feedback]])
 **Jordan owes you:** headcount answer for the apprenticeship idea (asked 10/02) ([[questions/apprenticeship-headcount]])

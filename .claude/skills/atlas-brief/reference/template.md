@@ -17,9 +17,9 @@ sources: ["[[events/2026-10-13-acme-msa-call]]", "[[commitments/maya-pricing-fee
 - **Update your Atlas Project's instructions** (Atlas was updated to 1.1.0). The text to copy is on the Guide page, or ask me in chat.
 
 ## Today
-- **9:30 Acme MSA call** with Dana Ruiz. Two open items both ways. Prep: [prep note](../prep/2026-10-13-acme-msa-call.md) · [[events/2026-10-13-acme-msa-call]]
-- **11:00 1:1 with Jordan.** Bring the pricing feedback. Prep: [prep note](../prep/2026-10-13-jordan-1-1.md) · [[events/2026-10-13-jordan-1-1]]
-- 14:00 Design review (no prep needed). Back-to-back with 14:30 hiring sync.
+- **9:30 AM Acme MSA call** with Dana Ruiz. Two open items both ways. Prep: [prep note](../prep/2026-10-13-acme-msa-call.md) · [[events/2026-10-13-acme-msa-call]]
+- **11:00 AM 1:1 with Jordan.** Bring the pricing feedback. Prep: [prep note](../prep/2026-10-13-jordan-1-1.md) · [[events/2026-10-13-jordan-1-1]]
+- 2:00 PM Design review (no prep needed). Back-to-back with the 2:30 PM hiring sync.
 - 3.5 h between meetings; all 3 due today are placed.
 
 ## Due from you
@@ -37,9 +37,9 @@ sources: ["[[events/2026-10-13-acme-msa-call]]", "[[commitments/maya-pricing-fee
 - From your Evening Thoughts: 1 commitment (call Priya Thursday) [[commitments/maya-call-priya-thursday]], 1 idea (partner tier) [[ideas/partner-tier]]. [[sources/2026-10-12-journal]]
 
 ## Top priorities
-1. Pricing feedback to Jordan (11:30 focus): due tomorrow and tied to your Q4 revenue goal. [[commitments/maya-pricing-feedback]] [[goals/2026-q4-enterprise-revenue]]
-2. Unblock the Acme MSA (11:30 focus): Dana's review gates your Q4 revenue goal. [[projects/acme-expansion]] [[commitments/dana-msa-redlines]]
-3. Hiring plan (won't fit today: send a date at 4:15): Finance locks budgets Friday. [[commitments/maya-hiring-plan-finance]] [[goals/2026-q4-team-growth]]
+1. Pricing feedback to Jordan (11:30 AM focus): due tomorrow and tied to your Q4 revenue goal. [[commitments/maya-pricing-feedback]] [[goals/2026-q4-enterprise-revenue]]
+2. Unblock the Acme MSA (11:30 AM focus): Dana's review gates your Q4 revenue goal. [[projects/acme-expansion]] [[commitments/dana-msa-redlines]]
+3. Hiring plan (won't fit today: send a date at 4:15 PM): Finance locks budgets Friday. [[commitments/maya-hiring-plan-finance]] [[goals/2026-q4-team-growth]]
 
 ## Insights
 - Three customers hit the same import bug this month; it relates to your retention goal. [[risks/onboarding-import-failures]]
@@ -67,7 +67,7 @@ sources: ["[[events/2026-10-13-acme-msa-call]]", "[[commitments/maya-pricing-fee
 ```markdown
 ## Since last night
 - Dana replied: redlines coming by noon today. Waiting-on updated. [[commitments/dana-msa-redlines]]
-- The design review moved to 15:00. [[events/2026-10-13-design-review]]
+- The design review moved to 3:00 PM. [[events/2026-10-13-design-review]]
 ```
 
 ## Writing tips
