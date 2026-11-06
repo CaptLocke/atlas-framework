@@ -66,7 +66,7 @@ The brief's Top priorities (3, up to 5) come from this rule, so the same records
 | Record | insight | next_step |
 |---|---|---|
 | `waiting_on` Dana: MSA redlines (6 days late) | Dana hasn't replied in 6 days; she answered faster by phone last time. | Call Dana before Thursday's steering meeting. |
-| `i_owe` pricing feedback to Jordan (due tomorrow) | Due tomorrow; Jordan needs it for Friday's exec review. | Finish section 3 tonight; send before the 11:00 1:1. |
+| `i_owe` pricing feedback to Jordan (due tomorrow) | Due tomorrow; Jordan needs it for Friday's exec review. | Finish section 3 tonight; send before the 11:00 AM 1:1. |
 | `i_owe` SOC report to Acme (slipped 2 days) | Blocked on Security; Acme's renewal decision depends on it. | Ask Sam in Security for the PDF today. |
 | Project Orion launch (at_risk) | Two supplier commitments slipped and the launch is 3 weeks out. | Confirm supplier dates at Wednesday's ops sync. |
 | `i_owe` survey analysis (no due date) | No date agreed; Jordan mentioned it twice this month. | Propose a date to Jordan: suggest Fri 10/23. |

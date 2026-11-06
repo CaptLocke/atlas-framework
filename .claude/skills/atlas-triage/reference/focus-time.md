@@ -28,18 +28,18 @@ Skip it when:
 
 ## 3. The proposal
 - **Pick a slot.** Choose the gap that leaves a buffer before the due time: prefer the earliest gap that fits whole, starting at least 30 minutes after the previous meeting. On the due date, don't use the last two hours before the due time unless that's the only option.
-- **In chat:** "Pricing feedback for Jordan is due Thursday and your calendar is nearly full. Block Wed 9:00–11:00 to write it?" On yes, go to §4.
+- **In chat:** "Pricing feedback for Jordan is due Thursday and your calendar is nearly full. Block Wed 9:00–11:00 AM to write it?" On yes, go to §4.
 - **In a routine:** add one `approvals.md` entry:
 ```markdown
 ## A-2026-10-13-02 · pending
-- **Action:** own_calendar_manage: create focus block "Focus: pricing feedback for Jordan", Wed Oct 14 9:00–11:00
+- **Action:** own_calendar_manage: create focus block "Focus: pricing feedback for Jordan", Wed Oct 14 9:00–11:00 AM
 - **Why:** Due Thu Oct 15 ([[commitments/send-pricing-feedback]]); about 2 hours of work and only 2.5 free hours before then
 - **Prepared:** calendar hold, no attendees, on your calendar only
 - **Requested by:** routine:nightly-cycle · 2026-10-13
 - **Status history:** pending 2026-10-13
 ```
   The brief lists it under "Needs you" with the slot. An entry whose slot has already passed is marked `expired` the next time triage runs; triage may then propose a new slot once.
-- **No slot fits:** don't propose an overlapping block. Add one line to the brief's Due section instead: "No free 2-hour slot before Thursday. The Wednesday 2:00 vendor sync (tentative) is the easiest to move." Prefer, in order, meetings the user hasn't accepted, recurring meetings they organize, and large meetings where they're optional.
+- **No slot fits:** don't propose an overlapping block. Add one line to the brief's Due section instead: "No free 2-hour slot before Thursday. The Wednesday 2:00 PM vendor sync (tentative) is the easiest to move." Prefer, in order, meetings the user hasn't accepted, recurring meetings they organize, and large meetings where they're optional.
 
 ## 4. Creating the block (chat only, after the user's yes)
 `calendar.create_event` on the user's own calendar, **with no attendees** (`own_calendar_manage`, propose; the yes is the confirmation):
@@ -51,5 +51,5 @@ Then append to the commitment `- <date>: focus block created for <slot> (event i
 Adding attendees, or moving or cancelling someone else's meeting, is never part of this. Those are `send_communication` and need the user to do it or approve it explicitly.
 
 ## 5. Afterwards
-- **Done early:** if the commitment is done before the block, mention it in the brief ("Your Wed 9:00 focus block is free now"). Deleting the event is the user's call, or `destructive` with approval.
+- **Done early:** if the commitment is done before the block, mention it in the brief ("Your Wed 9:00 AM focus block is free now"). Deleting the event is the user's call, or `destructive` with approval.
 - **Due date moves:** if the due date moves, the trigger key changes, so Atlas re-evaluates. An existing block that still fits stays.
