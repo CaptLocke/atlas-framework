@@ -10,8 +10,7 @@ Each release's "What's new" section is shown to users in the Guide and their nex
 ## 3.1.2 (2026-11-06)
 
 ### What's new
-- Times Atlas writes in your brief, meeting prep and suggestions are 12-hour with AM or PM, matching your pages.
-- Atlas's own notes are corrected: setup lists all four pages it publishes, and on the Full automation plan triage says re-ranking at weekends waits for Monday.
+- Times Atlas writes for you, in your brief, meeting prep, suggestions and journal, are 12-hour with AM or PM, matching your pages. Drafts for other people keep your usual format.
 
 ## 3.1.1 (2026-11-05)
 

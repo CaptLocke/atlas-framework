@@ -31,4 +31,4 @@ Evening, 21:40, Lean profile (tomorrow's brief already built at 20:30):
 → `i_owe` commitment due tomorrow; `atlas-brief` updates tomorrow's brief: adds it as the bold Tomorrow line under Due from you, re-ranks Top priorities, adds "From your Evening Thoughts: 1 commitment" under What changed; republishes.
 
 ## Second dump the same morning
-Saved under the same `## Morning Thoughts` heading after a line `— 10:42 —`; only the new text is extracted.
+Saved under the same `## Morning Thoughts` heading after a line `— 10:42 AM —`; only the new text is extracted.
