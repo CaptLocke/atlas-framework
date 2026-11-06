@@ -39,7 +39,7 @@ Score each open commitment, then map: high (top ~20%), medium, low.
 5. **Effort hint:** quick wins (<30 min) due soon can be raised to clear them.
 Never rank purely by due date.
 
-- **Between full passes.** Light mode bands a new commitment against the current set and moves nothing else, so `high` can run past ~20% until the next full pass rebalances it (within a day in every profile).
+- **Between full passes.** Light mode bands a new commitment against the current set and moves nothing else, so `high` can run past ~20% until the next full pass rebalances it: within a day on Lean and Standard; on Full, whose full passes (`triage-drafts`) run on weekdays only, from Friday evening to Monday morning at weekends.
 - **Learned rules sit outside the band.** A `## Triage rules` priority line (`reference/learning.md` §3) applies after the rubric and stands even when it takes `high` past ~20%.
 
 ## Top priorities

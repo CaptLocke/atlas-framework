@@ -2,7 +2,7 @@
 .atlas-tmp/
 # Marks the maintainer's own copy of the upstream repo (hooks bypass only with it). Never committed.
 .atlas-maintainer
-# Maintainer files and tests, copied in from the maintainer's private repo when needed. Never committed.
+# Reserved for maintainer files; users' copies never hold tests or maintainer docs. Never committed.
 system/tests/
 docs/maintainers/
 # OS and editor clutter
