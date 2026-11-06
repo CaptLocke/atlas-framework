@@ -7,6 +7,11 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
+## Unreleased
+
+### What's new
+- Your monthly report says how Atlas is doing against clear bars: how many work days you opened your brief and acted on it, any commitment it caught late or didn't warn you about, and any correction you had to make twice. To count the days, your Today page notes the date each day you open it, and nothing else.
+
 ## 3.1.2 (2026-11-06)
 
 ### What's new

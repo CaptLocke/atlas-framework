@@ -1576,6 +1576,18 @@
     refocus(st.focus);
   }
 
+  /* The day's view, for a page that counts them (Today: defaults.views). One row per day in "views",
+     keyed by the date in the user's time zone (meta.timezone, from the sections), so opening the page again the same day writes the same
+     row. It holds no content and nothing about the viewer beyond the date: the monthly review counts
+     the days (atlas-review reference/indicators.md). A failed write is silent; the page doesn't depend on it. */
+  N.viewKey = function (now) { return N.dayKey((now || new Date()).toISOString()); };
+  N.recordView = function (db, now) {
+    var day = N.viewKey(now);
+    if (!db || !day) return null;
+    try { var p = db.collection("views").doc(day).set({ date: day }); if (p && p.catch) p.catch(function () {}); return day; }
+    catch (e) { return null; }
+  };
+
   N.page = function (defaults, build) {
     var data = N.load();
     if (!(data && data.meta && data.meta.live)) { paint(defaults, build, data); return; }
@@ -1587,7 +1599,7 @@
     if (!runtime || typeof runtime.use !== "function") { unavailable(); return; }
     runtime.use("db").then(function (db) {
       if (!db) { unavailable(); return; }
-      var sections = null, requests = {}, timer = null;
+      var sections = null, requests = {}, timer = null, viewed = null;
       function render() {
         clearTimeout(timer);
         timer = setTimeout(function () {
@@ -1600,6 +1612,8 @@
           var st = uiState();
           paint(defaults, build, d);
           restoreUi(st);
+          /* once per load, and only once the brief is on screen, with the user's time zone known */
+          if (defaults && defaults.views && !viewed) viewed = N.recordView(db);
         }, 120);
       }
       db.collection("sections").onSnapshot(function (snap) {

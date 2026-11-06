@@ -44,7 +44,7 @@ What it enforces (system/rules/governance.md):
   content can't steer a routine into writing to someone else's page (N9).
   Artifact may read and republish those pages, nothing else; ArtifactData may
   read and write their rows, but only update or delete requests (the user's
-  words); ArtifactComments is a visible post and ArtifactCheck a preview, both
+  words) and only read views (the days the user opened Today); ArtifactComments is a visible post and ArtifactCheck a preview, both
   blocked.
 """
 import os
@@ -550,6 +550,16 @@ def _request_write_problem(w, single):
             "rewrites a request.")
 
 
+def _view_write_problem(w, single):
+    """Why this ArtifactData call (or batch entry) can't touch a page's views, or None."""
+    op = (w.get("action") if single else w.get("op")) or ""
+    coll = str(w.get("collection") or "").strip("/")
+    if coll.split("/")[0] != "views" or op in ("get", "list", "query", "profiles"):
+        return None
+    return ("A page's views record the days the user opened it, so Atlas only reads them; a row it wrote "
+            "would count a day the user never looked.")
+
+
 def handle_artifact(payload, proj, ctx):
     """Routines use artifacts only on Atlas's own pages (system/dashboards/README.md)."""
     if ctx == "chat":
@@ -588,7 +598,7 @@ def handle_artifact(payload, proj, ctx):
                         "(/tmp), not %s: anything else could put records or other files on a page."
                         % (tool_name, source))
     for w in writes:
-        why = _request_write_problem(w, ti.get("action") != "batch")
+        why = _request_write_problem(w, ti.get("action") != "batch") or _view_write_problem(w, ti.get("action") != "batch")
         if why:
             atlas.block(why)
     url = ti.get("url")
