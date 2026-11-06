@@ -192,7 +192,7 @@
   function first(r) { return String(N.name(r) || "").split(" ")[0]; }
   function idOf(r) { return r && (typeof r === "string" ? r : r.id); }
 
-  N.page({ title: "Today" }, function (d, main) {
+  N.page({ title: "Today", views: true }, function (d, main) {
     var b = d.brief || {};
     var catchUp = b.kind === "catch-up";
     var day = b.date || N.meta.as_of;

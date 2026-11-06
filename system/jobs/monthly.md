@@ -23,7 +23,8 @@ Period check above. If `maintenance` hasn't succeeded in the last 8 days, run it
 
 ## Inputs
 - Previous month's records changes, goals (active), commitments, decisions, run reports (`user/logs/runs/<P−1>/`), activity log (`user/logs/activity/<P−1>.md`).
-- `user/inbox/` (approvals, insights engagement, questions), `user/.state/health.yaml`, `user/profile/`, `user/settings/`, `user/extensions/registry.yaml`.
+- `user/inbox/` (approvals, insights engagement, questions), `user/.state/health.yaml`, `user/.state/triggers.yaml`, `user/profile/`, `user/settings/`, `user/extensions/registry.yaml`.
+- Today's `views` rows, read only, for the days the brief was opened (`atlas-dashboards` `reference/live.md` §1).
 
 ## Steps
 1. **Goal Progress** (`atlas-review`, monthly mode): progress on each active goal with evidence for and against, and what needs attention. Update goal `current` where evidence supports it (`records_write`).

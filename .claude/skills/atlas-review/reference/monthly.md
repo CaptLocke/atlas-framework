@@ -53,7 +53,7 @@ Suggestions (each a one-line proposal with reason): turn off or reduce something
 Run the learning pass (`.claude/skills/atlas-triage/reference/learning.md` §2) over the last 60 days. Report rules confirmed this month, proposals queued (max 3, as `questions.md` entries), and `feedback` counts by signal against last month, in one short table. If nothing reached a pattern: "Nothing new learned this month."
 
 ## Success indicators
-Compute per `reference/indicators.md`; write `health.yaml: indicators` for the month; show a small table with last month's values for comparison and a one-line reading ("Corrections are down from 6 to 3.").
+Compute per `reference/indicators.md`; write `health.yaml: indicators` for the month; show a small table with last month's values for comparison and a one-line reading ("Corrections are down from 6 to 3."). Then the success measures, one line each, saying which bar each field meets (`reference/indicators.md` §Reading them): "Brief: read 18 of 21 work days (working)."
 
 ## Needs you
 The combined list (max ~7) from all sections, each also present as a `questions.md` or `approvals.md` entry so it can be handled in any chat.

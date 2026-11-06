@@ -85,7 +85,7 @@ smoke_test: { last_run: 2026-10-01, results: { repo_push: pass, connectors: pass
 routine_availability:              # evidence from routine runs; applied to connectors.yaml in the next chat (N6)
   outlook: { available: true, observed: 2026-10-12, run: nightly-cycle-20261012-2007 }
 insight_engagement: { period: 2026-09, by_kind: { risk: { acted: 3, dismissed: 1, expired: 0 }, pattern: { acted: 1, dismissed: 4, expired: 2 } } }   # written by monthly
-indicators: { period: 2026-09, time_to_first_brief_hours: 14, cited_answer_share: 0.82, auto_commitments: 41, manual_commitments: 6, automation_success_rate: 0.97, user_action_issues: 1, corrections: 3, active_weeks: 4 }
+indicators: { period: 2026-09, time_to_first_brief_hours: 14, cited_answer_share: 0.82, auto_commitments: 41, manual_commitments: 6, automation_success_rate: 0.97, user_action_issues: 1, corrections: 3, active_weeks: 4, work_days: 21, brief_days: 18, brief_acted_days: 11, late_captures: 0, slips: { unwarned: 0, wrong_close: 0, user: 2 }, hand_fixes: 0, repeat_corrections: 0 }
 ```
 
 ## 2. Transient (`.atlas-tmp/`, git-ignored)
