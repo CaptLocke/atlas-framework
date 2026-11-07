@@ -1,6 +1,6 @@
 ---
 name: atlas-triage
-description: "Review open commitments: catch missed ones, close finished ones, mark slipped ones, rank priorities, set next steps. Use for the triage job and \"what do I owe\", \"what am I waiting on\", \"what's slipping\", \"prioritize my week\", \"mark the Acme deck done\"."
+description: "Review open commitments: catch missed ones, close finished ones, mark slipped ones, ask about stale and never-the-user's ones, rank priorities, set next steps. Use for the triage job and \"what do I owe\", \"what am I waiting on\", \"what's slipping\", \"prioritize my week\", \"mark the Acme deck done\"."
 ---
 # Triage
 
@@ -24,8 +24,9 @@ Keep the user's commitments honest and their priorities clear: nothing promised 
 ## Procedure
 1. **Away/paused.** If the `triage` job is paused, stop. During away, run steps 2–8 (records stay accurate) but hold trigger actions in step 9 for the catch-up brief.
 2. **Catch missed commitments.** Scan Sources captured in the window for explicit promises with no matching commitment (match by owner + counterparty + deliverable). Create them through `atlas-capture` (its §2 applies in full: the user must be owner or the one promised, `## Triage rules` can exclude it, and vague → `questions.md`, kind `commitment`).
+2a. **Never the user's** (full mode). Open or slipped commitments where the user is neither `owner` nor `counterparty`, left from before 2.6.0: one grouped question, `priority: low` until it's answered, and the answer applied (`reference/signals.md` §Never the user's).
 3. **Dedupe.** Commitments with the same owner, counterparty, and deliverable, and close or equal due dates, are duplicates: merge (`merge_supersede`) keeping the older record; add the newer source; set the other's `superseded_by`. Ambiguous → link with `related` and queue a question.
-4. **Close with evidence.** For each open commitment, look for completion evidence (`reference/signals.md` § Completion): a sent message delivering it, a delivered file, a completed task, a source showing it done, the user's word. Found → `status: done`, `completed_on`, Updates line citing the evidence. Look in every mapped connector category, not only mail (`reference/signals.md` §Completion, Where to look). Likely but uncertain → `questions.md` (kind `commitment`) with an `Evidence:` line naming what was seen: "Did you send Acme the SOC report?" · Evidence: "email with an attachment on 10/12". The brief groups these as Looks done; one per commitment, updated rather than repeated.
+4. **Close with evidence.** For each open commitment, look for completion evidence (`reference/signals.md` § Completion): a sent message delivering it, a delivered file, a completed task, a source showing it done, the user's word. Found → `status: done`, `completed_on`, Updates line citing the evidence. Look in every mapped connector category, not only mail (`reference/signals.md` §Completion, Where to look). Close without asking only when the signal passes §Closing without asking: a sent message with the file or a link to it, or a held meeting that was the deliverable. Likely but uncertain → `questions.md` (kind `commitment`) with an `Evidence:` line naming what was seen: "Did you send Acme the SOC report?" · Evidence: "email with an attachment on 10/12". The brief groups these as Looks done; one per commitment, updated rather than repeated. A commitment Atlas closed that a later source says isn't done (asked for again, "still waiting") → reopen it and log `wrong_close` (same section).
 4a. **Apply triage rules** from `preferences.md ## Triage rules` to closing, dropping, and priority; name the rule where it changes an outcome.
 5. **Drop or move.** If evidence shows it's no longer wanted (cancelled meeting, decision reversed) → `status: dropped` with reason; if a new date was agreed → update `due`, keep "was X, now Y" in Updates.
 6. **Slipped.** Open items past `due` → `status: slipped` (this is the `commitment_overdue` condition; see step 9). A slipped item that gets done → `done`. A slipped item whose `due` is now today or later (a new date agreed, in step 5 or anywhere else) → back to `open`, with an Updates line; it slips again only if the new date passes. For a `waiting_on`, its `pending` follow-up approval, if any, goes to `expired` (status history `expired <date>: re-dated`), and the Updates line says the follow-up draft is stale.
@@ -34,6 +35,7 @@ Keep the user's commitments honest and their priorities clear: nothing promised 
    - Every open or slipped commitment: `insight` (one line: why it matters or may slip, grounded in evidence) and `next_step` (one concrete action with a time). Refresh only when stale or circumstances changed.
    - **Aging waiting-on:** compute days waiting (since created, or since the last follow-up recorded in Updates). Aging = past due, or no movement for more than 5 business days, or due within 2 days with no sign of progress. Say so in `insight` and suggest the follow-up channel in `next_step` (person's `cadence`/habits if known).
    - **Aging I-owe without a date:** no `due` and no movement for more than 10 business days → one question asking for a date or whether to drop it (`reference/signals.md` §Aging, which defines movement and when not to ask again). Say so in `insight`. Not during away.
+   - **Slipped and quiet:** an `i_owe` slipped with no movement for more than 10 business days since the latest movement or its `due` → one question: done, a new date, or drop (same section). Never closed or dropped without the answer.
    - **Playbook runs:** check steps out of order or skipped in practice, and finish runs whose steps are all closed (`reference/playbooks.md` §4–5).
    - Every `active` project: `insight` and `next_step` from its commitments, risks, decisions, questions, and target date; update `health` (`on_track | at_risk | off_track | unknown`) when evidence supports it, with an Updates line.
    - In `mode: light`: only for commitments created or changed in this run.
@@ -54,7 +56,7 @@ Keep the user's commitments honest and their priorities clear: nothing promised 
 
 ## Outputs
 - Commitment and project records (`status`, `priority`, `insight`, `next_step`, `health`, `completed_on`, Updates).
-- New commitments (via `atlas-capture`), questions in `user/inbox/questions.md`, follow-up approvals in `user/inbox/approvals.md` (drafts themselves come from `atlas-write`).
+- New commitments (via `atlas-capture`), questions in `user/inbox/questions.md` (including dates, quiet slipped items and never-the-user's ones), follow-up approvals in `user/inbox/approvals.md` (drafts themselves come from `atlas-write`).
 - Republished Work and Records (`atlas-dashboards`).
 - `user/.state/triggers.yaml` entries; index lines; activity-log line; run-report row.
 - Data Work and the brief read directly from records (no separate file).
@@ -68,6 +70,7 @@ Keep the user's commitments honest and their priorities clear: nothing promised 
 
 ## Done when
 - No open commitment is past due without `status: slipped`, and no slipped one has a `due` of today or later; a reopened `waiting_on` has no `pending` follow-up approval.
+- Every commitment closed without the user's word passed `reference/signals.md` §Closing without asking; every never-the-user's one and every quiet slipped `i_owe` is in exactly one open question, or was answered (full mode).
 - Every open/slipped commitment and every active project has a current `insight` and `next_step` (full mode).
 - Every closed commitment cites its evidence in Updates.
 - Every overdue `waiting_on` (not away) has exactly one pending approvals entry and is handed to the email-drafts procedure for its single follow-up draft (marker `follow-up draft created <date>`); the firing is recorded once in `triggers.yaml`.
