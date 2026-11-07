@@ -46,7 +46,7 @@ Reads what's new since last time from your connected email, calendar, meeting tr
 Reviews every open commitment: catches new ones, closes ones that are clearly done (with evidence), re-prioritizes against your goals, flags anything slipping or aging, and adds a short insight and a suggested next step to each.
 
 ## Insights
-Looks across everything for risks, gaps, patterns, connections, and opportunities, ranks them by what matters to your goals, and explains each one with its sources.
+Looks across everything for risks, gaps, patterns, connections, and opportunities, ranks them by what matters to your goals, and explains each one with its sources. Once a week it also looks at what hasn't moved: goals and risks nobody has touched, the next four weeks for clashes (time off over a deadline, say), decisions whose reason has changed, and things that keep turning up together or tend to come before a slip. It says what it saw and how often, never that one thing caused another.
 
 ## Email drafts
 Drafts replies to emails that need one from you, and polite follow-ups for things you're waiting on that are overdue, in the right voice. They're left as **drafts** in your email for you to review and send. Atlas never sends them.

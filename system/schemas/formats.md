@@ -31,9 +31,10 @@ jobs:
   daily-brief: { last_success: "…", last_status: ok, last_target: "2026-10-13" }
   monthly: { last_success: "…", last_status: ok, period_done: "2026-10" }
   quarterly: { last_success: "…", last_status: ok, period_done: "2026-Q4" }
+  intelligence: { last_success: "…", last_status: ok, last_sweep: "2026-10-12" }
   update-check: { last_success: "…", last_status: ok, last_checked_version: "1.0.0" }
 ```
-`last_status`: `ok | partial | failed | skipped_away | skipped_paused | early_exit`. A job skipped by a routine's `when` modifier leaves `jobs.yaml` unchanged (noted only in the run report). `update-check` also records `last_checked` (timestamp) and `latest_seen_version`.
+`last_status`: `ok | partial | failed | skipped_away | skipped_paused | early_exit`. A job skipped by a routine's `when` modifier leaves `jobs.yaml` unchanged (noted only in the run report). `update-check` also records `last_checked` (timestamp) and `latest_seen_version`. `intelligence` records `last_sweep`, the date of its last weekly sweep (`system/jobs/intelligence.md` §Runs when).
 
 ### triggers.yaml
 ```yaml

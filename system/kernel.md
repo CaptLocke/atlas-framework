@@ -61,7 +61,7 @@ Do these quietly, then answer the user. Never narrate them unless something need
 | Morning/Evening Thoughts | `atlas-thoughts` |
 | Daily Brief, catch-up brief | `atlas-brief` |
 | Commitments, priorities, next steps | `atlas-triage` |
-| Insights, patterns, exploration | `atlas-insights` |
+| Insights, patterns, exploration, decision briefs | `atlas-insights` |
 | Meeting / person / topic prep | `atlas-prep` |
 | Drafts, documents, decks, sheets, emails | `atlas-write` |
 | Status updates | `atlas-status-update` |
