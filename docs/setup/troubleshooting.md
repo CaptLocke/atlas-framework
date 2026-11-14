@@ -34,7 +34,7 @@ Fix this before you go any further. It takes a minute and nothing is lost.
 Claude says it can't find, attach, or access your repository. Work through these in order; most people are fixed by the first, second, or third.
 
 1. **If your Claude account is through work, check the company setting.** Your company's Claude admin must turn on **unified chat and Cowork** in **Organization settings → Capabilities**. Without it, Claude can't open any GitHub repository from a chat, even when everything below is set up correctly. Ask your admin if you can't see Organization settings. (Details: [Step 3, Before you start](03-connect-github.md#before-you-start-is-your-claude-account-through-work).) After it's turned on, start a fresh chat in the Atlas Project.
-2. **Check the address in the Project instructions.** Open the Atlas Project, open its instructions, and check the line `Attach my GitHub repository … with write (push) access …`. It must be exactly your GitHub username, a slash, and the repository name (for example `maya-chen/atlas`), with no spaces and no `https://github.com/` in front.
+2. **Check the address in the Project instructions.** Open the Atlas Project, open its instructions, and check the line `Attach my GitHub repository … with read-only access …`. It must be exactly your GitHub username, a slash, and the repository name (for example `maya-chen/atlas`), with no spaces and no `https://github.com/` in front.
 3. **Check GitHub is connected in Claude.** Settings → **Connectors** → **GitHub** should say **Connected**. If it shows **Connect**, click it and authorize. (Details: [Step 3, Part B](03-connect-github.md#part-b-check-github-is-connected-in-claude-in-the-desktop-app).)
 4. **Check the Claude GitHub App can see your Atlas repository.**
    1. On GitHub, click your profile picture → **Settings** → **Applications** (under "Integrations" in the left-hand list).
@@ -49,9 +49,9 @@ Claude says it can't find, attach, or access your repository. Work through these
 
 ## Atlas can read my Atlas but can't save anything
 
-Atlas says it can't save, or that your repository is attached **read-only**. Atlas checks this at the start of every chat and normally fixes it itself by re-attaching your repository with write access. If it still can't:
+Atlas says it can't save, or that your repository is attached **read-only**. Each chat opens your Atlas read-only, and asks Claude for write access the first time it needs to save something; you approve that once in the chat. If it still can't save:
 
-1. **Check the Project instructions** ask for write access. The first numbered line should end with **with write (push) access and sync it**. If yours doesn't, copy the text from [Step 4](04-create-the-atlas-project.md#add-the-instructions) again (or ask Atlas for it) and paste it in place of the old one.
+1. **Check the Project instructions** are current. The second numbered line should read **Only request write (push) access when necessary**. If yours doesn't, copy the text from [Step 4](04-create-the-atlas-project.md#add-the-instructions) again (or ask Atlas for it) and paste it in place of the old one.
 2. **Check the Claude GitHub App can write to your Atlas.** On GitHub, click your profile picture → **Settings** → **Applications** → next to **Claude**, click **Configure**. If GitHub shows a banner asking you to **accept new permissions**, accept it. Make sure your Atlas is listed under **Repository access**.
 3. **Start a fresh chat** in the Atlas Project and say **`Start Atlas`**.
 
