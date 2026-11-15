@@ -17,7 +17,7 @@ You'll get an acknowledgement within **7 days**. Fixes ship as a signed release;
 
 - The safety hooks in `.claude/hooks/` and the rules they enforce (`system/rules/governance.md`)
 - The update flow: release signatures (`system/tools/release_check.py`), `atlas-update`, rollback
-- Dashboards: templates, the render script (`system/tools/render.py`), and the page security policy
+- Dashboards: templates and the render script (`system/tools/render.py`). Published pages run under claude.ai's own page policy, which Atlas doesn't set; a way around it is a report for Anthropic
 - Anything that lets content (an email, a document, a web page) make Atlas send, share, delete, or change its own rules
 - Issue reports leaking personal or work details (`atlas-report-issue`, `system/tools/redact_check.py`)
 
