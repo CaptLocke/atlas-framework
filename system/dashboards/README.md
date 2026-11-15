@@ -142,7 +142,7 @@ Pages support light and dark (`prefers-color-scheme`), a viewer-chosen theme (`<
 Routines republish unattended only when an artifact is **private, page-only, and has no connector grants** (a live page's own database is the one capability, added in a chat): anything else can change what the page reads or who can see it, so it needs the user in a chat. So every template:
 - is a single self-contained file: inline CSS and JS, no external scripts, stylesheets, fonts, or images;
 - makes no network or connector calls and asks Claude nothing at view time;
-- reads all data from the embedded JSON, or, on a live page, from its own database through the viewer's runtime; nothing is fetched over the network. Templates carry no security policy of their own: published, a page sits inside claude.ai's own page, where a policy tag would be ignored, and claude.ai's frame policy is what stops it reaching anywhere but its own host;
+- reads all data from the embedded JSON, or, on a live page, from its own database through the viewer's runtime; nothing is fetched over the network. Templates carry no security policy of their own: published, a page sits inside claude.ai's own page, where a policy tag would be ignored, and claude.ai's frame policy is what limits it: requests and images go only to its own host, though scripts from public CDNs and Google Fonts are allowed, so the real guard is templates loading nothing from outside plus `render.py`'s escaping;
 - uses browser storage only for conveniences (remembered filter, theme), wrapped in `try/catch`, and works without it;
 - is never shared or made public by a routine (`share_expose` is locked; publishing publicly needs approval in chat).
 

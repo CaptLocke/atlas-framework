@@ -394,7 +394,7 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
         aboutCard, fold("Everything else Atlas knows about you", restCount > 0 ? restCount + " more" : null, foldBody, "memory")]));
 
     /* ================= How Atlas works: the guide, and how to read these pages ================= */
-    var g = d.guide || {}, news = L(g.whats_new), secs = L(g.sections);
+    var g = d.guide || {}, news = L(g.whats_new).filter(function (r) { return L(r.items).length; }), secs = L(g.sections);
     function paras(list) { return L(list).map(function (p) { return h("p", null, N.rich(p)); }); }
     var entryEls = [];
     function entry(it) {

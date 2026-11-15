@@ -7,6 +7,11 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
+## 3.2.1 (2026-11-15)
+
+### Under the hood
+- Dashboard templates no longer carry a security policy tag that published pages ignored; nothing changes for your pages.
+
 ## 3.2.0 (2026-11-14)
 
 ### What's new
