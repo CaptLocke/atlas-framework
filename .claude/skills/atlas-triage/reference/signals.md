@@ -39,7 +39,7 @@ A wrong close hides something the user still owes until someone chases them; a q
 | A meeting about it, a file shared with no message | No: ask | It may not have covered it; sharing isn't sending |
 | A `due` long past and nothing since | Never | Absence isn't evidence; §Aging asks instead |
 
-Each close without the user's word is shown once in the next brief (`atlas-brief` §A step 4.4), so a wrong one is seen. When a later source says otherwise (condition 3) about a commitment Atlas closed, reopen it (`open`, or `slipped` if past `due`), with an Updates line citing that source, and log `wrong_close` (`reference/learning.md` §1), which the monthly review counts.
+Each close without the user's word is shown once in the next brief (`atlas-brief` §A step 4.4), so a wrong one is seen. When a later source says otherwise (condition 3) about a commitment Atlas closed, reopen it (`open`, or `slipped` if past `due`), with an Updates line citing that source, and log `wrong_close` marked `(by triage)` (`reference/learning.md` §1), which the monthly review counts under `slips` only, not as a user correction.
 
 ## Priority rubric
 Score each open commitment, then map: high (top ~20%), medium, low.
@@ -85,7 +85,7 @@ The brief's Top priorities (3, up to 5) come from this rule, so the same records
 
 ## Never the user's
 Since 2.6.0 nothing new is filed unless the user is one side (`system/rules/knowledge.md` §Commitments), but ones filed before stay. A commitment is **never the user's** when the user's own person record (`relationship: self`) is neither its `owner` nor its `counterparty`.
-- **Ask once, grouped:** one `questions.md` entry (kind `commitment`) listing every open or slipped one, with `- **Links:**` naming each: "These 2 are between other people, not you: Dana's contract playbook for Jordan, Jordan's approval of Dana's contractor request. Drop them, or keep any?" Asked only when one isn't already linked by an open entry or kept (below). Not during away.
+- **Ask once, grouped:** one `questions.md` entry (kind `commitment`) listing every open or slipped one, with `- **Links:**` naming each: "These 2 are between other people, not you: Dana's contract playbook for Jordan, Jordan's approval of Dana's contractor request. Drop them, or keep any?" Asked only when one isn't already linked by an open entry or kept (below). Not during away. It has no `Proposed change`: which to drop is the user's answer, so a page press on it waits for a chat.
 - **Until answered:** `priority: low`, `insight` saying it's between other people; no date question, no follow-up and no `commitment_overdue` approval (the worth-chasing check already needs the user as counterparty).
 - **The answer:** drop → `dropped` with the reason "between other people (user, <date>)", and one Updates line on its project or person record keeps the promise as context; keep → `kept as the user's <date> (user)` in Updates, and it is never asked about again. Answers to this question log no feedback (`reference/learning.md` §1): the rule that filed them has already changed.
 

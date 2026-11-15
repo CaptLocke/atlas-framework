@@ -33,7 +33,7 @@ A **Project** is a workspace in Claude. You'll make one called "Atlas" and give 
    1. Attach my GitHub repository YOUR-USERNAME/YOUR-REPO with read-only access and sync it.
    2. Only request write (push) access when necessary.
    3. Follow the CLAUDE.md file in that repository.
-   Never ask me to commit, push, or merge.
+   Never ask me to run git commands (commit, push, merge).
    If I say "Start Atlas", do all of this again from the beginning.
    ```
 

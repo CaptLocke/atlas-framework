@@ -12,6 +12,6 @@ This Project is my Atlas (Atlas bootstrap 3). At the start of every conversation
 1. Attach my GitHub repository YOUR-USERNAME/YOUR-REPO with read-only access and sync it.
 2. Only request write (push) access when necessary.
 3. Follow the CLAUDE.md file in that repository.
-Never ask me to commit, push, or merge.
+Never ask me to run git commands (commit, push, merge).
 If I say "Start Atlas", do all of this again from the beginning.
 ```
