@@ -10,7 +10,7 @@ Each release's "What's new" section is shown to users in the Guide and their nex
 ## 3.2.1 (2026-11-15)
 
 ### Under the hood
-- Dashboard templates no longer carry their own security policy tag. Published pages already run under claude.ai's own page policy, so nothing changes for your pages.
+- Dashboard templates no longer carry a security policy tag that published pages ignored; nothing changes for your pages.
 
 ## 3.2.0 (2026-11-14)
 
