@@ -13,6 +13,8 @@ Each release's "What's new" section is shown to users in the Guide and their nex
 - Chats no longer ask you to approve push access every time. Each chat opens your Atlas read-only and asks for write access only when it's about to save something. To get this, paste the new Project instructions: your next Daily Brief shows the text to copy.
 - Your monthly report says how Atlas is doing against clear bars: how many work days you opened your brief and acted on it, any commitment it caught late or didn't warn you about, and any correction you had to make twice. To count the days, your Today page notes the date each day you open it, and nothing else.
 - Once a week, insights also look at what hasn't moved: goals with no recent work, risks with no plan or owner, the next four weeks for clashes like time off over a deadline, and decisions whose reason no longer holds. They also point out records that belong together but aren't linked, and things that keep turning up together or tend to come before a slip, with how often, never as a cause.
+- Atlas closes a commitment without asking when you sent them a link to the work, or held the walkthrough you promised, and your brief lists what it closed so you can say if one isn't done. Something you owe that has sat overdue for two weeks with nothing happening gets one question: done, a new date, or drop it.
+- Commitments filed before 2.6.0 between other people, not you, come up once as a single question asking whether to drop them.
 - Ask "help me decide…" for a decision brief: the evidence for each option, similar decisions you made before and how they went, who it affects, and a short pre-mortem. The decision stays yours.
 
 ## 3.1.2 (2026-11-06)

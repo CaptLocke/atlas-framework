@@ -5,25 +5,41 @@ Fictional examples (user Maya Chen; manager Jordan Lee; Acme counsel Dana Ruiz).
 ## Completion evidence
 | Strong (close it) | Weak (ask instead) |
 |---|---|
-| Sent email to the counterparty containing the promised file or answer | Sent email to the counterparty about the topic, no attachment |
-| Counterparty replies "got it, thanks" to the deliverable | Meeting with the counterparty happened (may or may not have covered it) |
+| Sent email to the counterparty containing the promised file or answer, or a link to it | Sent email to the counterparty about the topic, no attachment or link |
+| Counterparty replies "got it, thanks" to the deliverable | Meeting with the counterparty about it happened (may or may not have covered it) |
 | Task in the task tool marked complete and it maps to this commitment | Deliverable file created in `user/work/deliverables/` but no send evidence |
 | The user says it's done (in chat or journal) | Someone else says "I think Maya sent it" |
-| A `deliverable` Source linked to the commitment and the user confirmed delivery | Calendar event titled like the deliverable |
+| A `deliverable` Source linked to the commitment and the user confirmed delivery | Calendar event titled like the deliverable, when the deliverable is a thing, not the meeting |
+| A held meeting with the counterparty that was itself the deliverable ("walk Jordan through the mockups") | |
 
 For `waiting_on`: the counterparty's message delivering it, or a Source showing the thing exists (e.g. the signed MSA arrived).
 
 **Where to look.** Every category mapped in `connectors.yaml`, not only mail. Read since the commitment was created, on the counterparty and the deliverable:
 | Category | Strong | Weak |
 |---|---|---|
-| mail | Sent to the counterparty with the file or answer; their "got it" | Sent about the topic, nothing attached |
-| messaging | The user's message to the counterparty (DM or channel) delivering it; their "thanks, got it" | A message about the topic; a thumbs-up reaction |
+| mail | Sent to the counterparty with the file, a link to it, or the answer; their "got it" | Sent about the topic, nothing attached or linked |
+| messaging | The user's message to the counterparty (DM or channel) delivering it or linking it; their "thanks, got it" | A message about the topic; a thumbs-up reaction |
 | tasks | The mapped task marked complete | The task moved to review or a done-like column |
-| files | — | The deliverable shared with the counterparty, or edited after its last mention |
-| calendar | — | A held event that was the deliverable (a review, a walkthrough) |
+| files | — | The deliverable shared with the counterparty with no message, or edited after its last mention |
+| calendar | A `held` event with the counterparty that was the deliverable itself (a walkthrough, demo, review or session the user promised to run), on or after `created`, that the user organized or accepted | An event about the deliverable; one still `scheduled`, `cancelled`, or declined |
 | meetings | The transcript has the counterparty confirming it | It came up in a meeting with them |
 
 A `waiting_on` reads the same table the other way round: the owner's message, task or file delivering it to the user.
+
+### Closing without asking
+A wrong close hides something the user still owes until someone chases them; a question costs one line in the brief. So a signal closes without asking only when all three hold, and is a Looks done question otherwise:
+1. **It reached them.** The thing reached the counterparty (for `waiting_on`, the user), or the meeting was the thing.
+2. **It's this commitment.** Same counterparty and deliverable, on or after `created`.
+3. **Nothing since says otherwise:** the counterparty asking for it again, "still waiting on…", the meeting moved.
+
+| Signal | Closes? | Why |
+|---|---|---|
+| A sent message to them with the file, a link to it, or the answer | Yes | A link delivers it as an attachment does |
+| A held meeting that was the deliverable | Yes | Holding it was the promise; a cancelled, declined or still `scheduled` one doesn't count |
+| A meeting about it, a file shared with no message | No: ask | It may not have covered it; sharing isn't sending |
+| A `due` long past and nothing since | Never | Absence isn't evidence; §Aging asks instead |
+
+Each close without the user's word is shown once in the next brief (`atlas-brief` §A step 4.4), so a wrong one is seen. When a later source says otherwise (condition 3) about a commitment Atlas closed, reopen it (`open`, or `slipped` if past `due`), with an Updates line citing that source, and log `wrong_close` (`reference/learning.md` §1), which the monthly review counts.
 
 ## Priority rubric
 Score each open commitment, then map: high (top ~20%), medium, low.
@@ -61,6 +77,17 @@ The brief's Top priorities (3, up to 5) come from this rule, so the same records
 - Ask once: a `questions.md` entry (kind `commitment`) with `- **Links:** [[commitments/<slug>]]`, only if no open entry links it and none was answered or dismissed since the latest movement: "You told Jordan you'd do the survey analysis on 10/02 and there's no date. When will you do it, or should I drop it?"
 - The answer: a date sets `due` (the user's word); "drop it" drops it; "keep it undated", or a dismissal, adds the Updates line `kept undated <date> (user)`, which is movement, so the clock restarts.
 - During away, nothing is asked; the check runs again after the return.
+
+**I owe, slipped and quiet:** a slipped item can sit overdue for weeks with nothing happening, and the brief's Due from you shows it every day.
+- Aging if: `slipped`, and more than 10 business days since the latest movement, else since `due` (being filed from history isn't movement). Away days don't count.
+- Ask once, under the same rule as above: "You owe Dana the reseller terms comments, due 9/25, and nothing's happened since. Is it done, is there a new date, or should I drop it?"
+- The answer: done closes it (the user's word); a date sets `due` and reopens it (step 6); "drop it" drops it; "still on", or a dismissal, adds `kept overdue <date> (user)`, which is movement.
+
+## Never the user's
+Since 2.6.0 nothing new is filed unless the user is one side (`system/rules/knowledge.md` §Commitments), but ones filed before stay. A commitment is **never the user's** when the user's own person record (`relationship: self`) is neither its `owner` nor its `counterparty`.
+- **Ask once, grouped:** one `questions.md` entry (kind `commitment`) listing every open or slipped one, with `- **Links:**` naming each: "These 2 are between other people, not you: Dana's contract playbook for Jordan, Jordan's approval of Dana's contractor request. Drop them, or keep any?" Asked only when one isn't already linked by an open entry or kept (below). Not during away.
+- **Until answered:** `priority: low`, `insight` saying it's between other people; no date question, no follow-up and no `commitment_overdue` approval (the worth-chasing check already needs the user as counterparty).
+- **The answer:** drop → `dropped` with the reason "between other people (user, <date>)", and one Updates line on its project or person record keeps the promise as context; keep → `kept as the user's <date> (user)` in Updates, and it is never asked about again. Answers to this question log no feedback (`reference/learning.md` §1): the rule that filed them has already changed.
 
 ## Insight and next-step examples
 | Record | insight | next_step |

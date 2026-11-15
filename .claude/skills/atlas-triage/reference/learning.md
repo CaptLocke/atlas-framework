@@ -13,7 +13,7 @@ Whenever one of these happens, write one activity-log line (`system/schemas/form
 |---|---|---|
 | `not_a_commitment` | The user drops a commitment Atlas created because it was never a promise, or answers a vague-commitment question "no" | `atlas-triage`, `atlas-memory` |
 | `missed_commitment` | The user adds a commitment from a source Atlas had already filed | `atlas-capture` |
-| `wrong_close` | The user reopens something Atlas closed or marked done | `atlas-triage`, `atlas-memory` |
+| `wrong_close` | The user reopens something Atlas closed or marked done, or triage reopens one on a later source (`signals.md` §Closing without asking) | `atlas-triage`, `atlas-memory` |
 | `priority_up` / `priority_down` | The user changes a priority Atlas set, or says something matters more or less | `atlas-triage` |
 | `noise` | The user says to stop filing or flagging something ("ignore these vendor newsletters", "that's not worth tracking") | any skill |
 | `insight_useful` / `insight_noise` | The user says an insight helped, or that it was wrong or not useful (not "not now") | `atlas-insights` |
