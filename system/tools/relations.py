@@ -26,10 +26,14 @@ Three lists, each the top N (default 10) by score:
   of the sources that touch the rarer one.
 - `follows`: a topic, organization or person whose sources in the last 180 days are often
   followed, within 14 days, by an outcome on the same work: a commitment slipping (`slipped`, or `done`
-  after its `due` date; on the due date), a risk turning `active`, a project or goal going `off_track`, or a decision
-  `reversed` (on its `updated` date). "The same work" means the source touches the outcome
+  after its `due` date; on the due date), a risk turning `active`, a project going `off_track`, or a decision
+  `reversed` (all three dated by `updated`, which any later edit also moves). "The same work" means the source touches the outcome
   or a project or goal it links to. Kept when at least 3 distinct outcomes followed and at
   least half the entity's sources were followed by one. This is a sequence, never a cause.
+  Closed records last updated more than 90 days ago aren't read (as in `graph.py`), so a
+  done-late commitment counts here only while it is that recent.
+
+Sources flagged `suspicious` are left out entirely, including where a record cites them.
 """
 import argparse
 import json
@@ -63,7 +67,7 @@ def _ids(value):
 def load(root, today):
     """(records {id: info}, sources {id: date}, touches {source id: set of record ids})."""
     tmap = index.types(root)
-    recs, sources, touches = {}, {}, {}
+    recs, sources, touches, flagged = {}, {}, {}, set()
     src_folder = (tmap.get("source") or ("sources", set()))[0]
     d = os.path.join(root, "user", "knowledge", src_folder)
     if os.path.isdir(d):
@@ -72,9 +76,12 @@ def load(root, today):
                 continue
             path = os.path.join(d, f)
             fm = index.read_frontmatter(path)
-            if fm is None or "suspicious" in (fm.get("flags") or []):
+            if fm is None:
                 continue
             sid = str(fm.get("id") or "%s/%s" % (src_folder, f[:-3]))
+            if "suspicious" in (fm.get("flags") or []):
+                flagged.add(sid)
+                continue
             day = index.as_date(fm.get("occurred_on")) or index.as_date(fm.get("captured_on"))
             if day:
                 sources[sid] = day
@@ -107,8 +114,8 @@ def load(root, today):
                          "links": (graph.front_links(fm) | graph.body_links(path)) - {rid}}
             for sid in _ids(fm.get("sources")):
                 touches.setdefault(sid, set()).add(rid)
-    for sid in touches:
-        touches[sid] = {r for r in touches[sid] if r in recs and not recs[r]["self"]}
+    touches = {sid: {r for r in rs if r in recs and not recs[r]["self"]}
+               for sid, rs in touches.items() if sid not in flagged}
     return recs, sources, touches
 
 

@@ -1576,13 +1576,17 @@
     refocus(st.focus);
   }
 
-  /* The day's view, for a page that counts them (Today: defaults.views). One row per day in "views",
-     keyed by the date in the user's time zone (meta.timezone, from the sections), so opening the page again the same day writes the same
-     row. It holds no content and nothing about the viewer beyond the date: the monthly review counts
+  /* The day's view, for a page that counts them (Today: defaults.views). One row per brief in "views",
+     keyed by the brief's own date (brief.date), so reading tomorrow's brief the evening before counts for
+     tomorrow; with no brief date, the date in the user's time zone (meta.timezone, from the sections).
+     Opening the page again writes the same row. Atlas reads only the date: the monthly review counts
      the days (atlas-review reference/indicators.md). A failed write is silent; the page doesn't depend on it. */
-  N.viewKey = function (now) { return N.dayKey((now || new Date()).toISOString()); };
-  N.recordView = function (db, now) {
-    var day = N.viewKey(now);
+  N.viewKey = function (now, briefDate) {
+    if (typeof briefDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(briefDate)) return briefDate;
+    return N.dayKey((now || new Date()).toISOString());
+  };
+  N.recordView = function (db, now, briefDate) {
+    var day = N.viewKey(now, briefDate);
     if (!db || !day) return null;
     try { var p = db.collection("views").doc(day).set({ date: day }); if (p && p.catch) p.catch(function () {}); return day; }
     catch (e) { return null; }
@@ -1613,7 +1617,7 @@
           paint(defaults, build, d);
           restoreUi(st);
           /* once per load, and only once the brief is on screen, with the user's time zone known */
-          if (defaults && defaults.views && !viewed) viewed = N.recordView(db);
+          if (defaults && defaults.views && !viewed) viewed = N.recordView(db, null, d.brief && d.brief.date);
         }, 120);
       }
       db.collection("sections").onSnapshot(function (snap) {
