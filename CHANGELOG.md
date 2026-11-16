@@ -10,7 +10,7 @@ Each release's "What's new" section is shown to users in the Guide and their nex
 ## 3.2.2 (2026-11-15)
 
 ### What's new
-- In your Daily Brief, each priority's time is the start of the focus window it's in, the same time your Today page shows for that window.
+- In your Daily Brief, each priority's time is the start of the focus window it's in, the same time that priority shows on your Today page.
 
 ### Under the hood
 - An update that brings nothing new to tell you no longer adds an "Atlas was updated" note to your brief.
