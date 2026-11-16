@@ -11,7 +11,7 @@ generated_from: CHANGELOG.md
 This section is **generated, not written here.** Its content comes from the `### What's new` part of each release in `CHANGELOG.md` at the repository root.
 
 ## How it's produced
-- When `atlas-update` applies a release, it reads the `### What's new` sections of every version newer than the one previously installed and adds them to the next Daily Brief ("Atlas was updated to version 1.1: here's what's new").
+- When `atlas-update` applies a release, it reads the `### What's new` sections of every version newer than the one previously installed and adds them to the next Daily Brief ("Atlas was updated to version 1.1: here's what's new"). A release with no `### What's new` lines adds nothing.
 - `atlas-dashboards` renders this section of the Guide from `CHANGELOG.md`: the installed version (`user/settings/atlas.yaml: installed_version`) first, then earlier releases, newest first. Show the latest three releases expanded and older ones collapsed.
 - Entries are written for users: plain language, one line each, and what they can now say or do. Any new example requests also belong in `features.md` or `requests.md`.
 - If an update asked the user a question (a new setting, for example), the entry says so and points to it.
