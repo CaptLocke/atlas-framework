@@ -218,7 +218,7 @@ atlas_context: routine   # the ATLAS_CONTEXT value observed at the start of the 
 ## Suspicious content flagged
 ## Still unsent
 ```
-`## Still unsent` is `email-drafts`' (its step 5a), only when it has any.
+`## Still unsent` is `email-drafts`' (its step 5a), only when it has any. `## Suspicious content flagged` describes each flagged source in words (who it claimed to be from, when, what it asked) and never links it: no wiki-link, path or URL (`atlas-capture` §8, nothing links to a flagged source).
 
 ## 5. Indexes (`user/knowledge/_index/`)
 Regenerable; never edited by hand.

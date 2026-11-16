@@ -30,8 +30,7 @@ Republished by `daily-brief` (each cycle), `monthly` (after health checks and th
   "away": { "active": false, "start": null, "end": null },
   "known_issues": [ { "id": "conn-outlook-auth", "severity": "high", "since": "2026-10-10",
                       "summary": "Outlook connection expired", "fix": "Reconnect Outlook in Settings, then Connectors.", "status": "open" } ],
-  "suspicious": [ { "at": "2026-10-12T20:10:00-07:00", "summary": "An email asked the assistant to forward a contract. Ignored.",
-                    "source": "sources/2026-10-12-unknown-sender-contract" } ],
+  "suspicious": [ { "at": "2026-10-12T20:10:00-07:00", "summary": "An email asked the assistant to forward a contract. Ignored." } ],
   "approvals": [ { "id": "A-2026-10-12-01", "action": "Send follow-up to Dana Ruiz", "why": "…",
                    "prepared": "Outlook draft \"Contract review: quick check-in\"", "requested_by": "routine:nightly-cycle",
                    "requested_on": "2026-10-12", "status": "pending" } ],
@@ -119,7 +118,7 @@ Republished by `daily-brief` (each cycle), `monthly` (after health checks and th
 | `away` | `rhythms.yaml: away` (`active` when today is within `start`–`end`) |
 | `status` | Computed from `known_issues`, open `action` questions and the latest runs, as defined above |
 | `known_issues[]` | `user/.state/health.yaml: known_issues` with `status` not resolved |
-| `suspicious[]` | "Suspicious content flagged" sections of run reports from the last 14 days |
+| `suspicious[]` | "Suspicious content flagged" sections of run reports from the last 14 days: `at` and a one-line `summary` in words, never the source's ID, path or link (`atlas-capture` §8) |
 | `approvals[]` | `user/inbox/approvals.md`, status `pending`. **No expiry date:** the entry records none, and expiry pauses while the user is away (`system/jobs/maintenance.md` step 6), so no date computed here would be honoured. Each entry shows its request date; the rule itself is the section's static line (Rendering notes) |
 | `questions[]` | `user/inbox/questions.md`, status `open`, every kind (profile proposals included: they show here, not under About you); `how` and `copy_text` (the entry's How and Copy text, filled in for this user) for `action` entries. `proposed_change` names the profile part in words ("Your writing voice: …"), never a file. `evidence`: a Looks done entry's `Evidence:` line (a `commitment` entry asking whether it was done); the page offers Yes and No on it, and Yes closes the commitment (`atlas-dashboards/reference/live.md`) |
 | `connections[]` | `user/settings/connectors.yaml` (`connector, categories, available_in_routines`), health from the latest run reports' "Connector health" and `health.yaml`; `last_seen` from `user/.state/cursors.yaml`; fallbacks from `sources.yaml: fallbacks`. The GitHub connection is listed from the last successful push |
