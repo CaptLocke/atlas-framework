@@ -25,7 +25,7 @@ Skip it when:
 - The user already has a focus or hold event that names the work.
 - An Atlas focus block for this commitment exists (marker below).
 - The commitment's Updates show the user declined a block for this due date.
-- `preferences.md` has a `## Proposal rules` line stopping focus blocks, or the user has turned down the last 3 (`system/rules/governance.md` §Proposals the user keeps turning down; the kind is `own_calendar_manage · focus block`).
+- The kind `own_calendar_manage · focus block` is stopped: a `## Proposal rules` line in `preferences.md`, or the count in `system/rules/governance.md` §Proposals the user keeps turning down, which also says when to ask.
 
 ## 3. The proposal
 - **Pick a slot.** Choose the gap that leaves a buffer before the due time: prefer the earliest gap that fits whole, starting at least 30 minutes after the previous meeting. On the due date, don't use the last two hours before the due time unless that's the only option.
@@ -36,6 +36,7 @@ Skip it when:
 - **Action:** own_calendar_manage: create focus block "Focus: pricing feedback for Jordan", Wed Oct 14 9:00–11:00 AM
 - **Why:** Due Thu Oct 15 ([[commitments/send-pricing-feedback]]); about 2 hours of work and only 2.5 free hours before then
 - **Prepared:** calendar hold, no attendees, on your calendar only
+- **Proposal kind:** own_calendar_manage · focus block
 - **Requested by:** routine:nightly-cycle · 2026-10-13
 - **Expires:** 2026-10-14 09:00
 - **Status history:** pending 2026-10-13
@@ -48,7 +49,7 @@ Skip it when:
 - Title "Focus: <commitment title>"; description "Held by Atlas for [[commitments/<slug>]]", with no other content.
 - Shown as busy, with no reminders beyond the user's defaults.
 
-Then append to the commitment `- <date>: focus block created for <slot> (event id …)` (the marker), and mark the approvals entry `approved`, then `executed`. If the user says no, append `focus block declined for due <date>` so Atlas doesn't ask again for that date, and log `proposal_declined` (`reference/learning.md` §1). A rejected approvals entry for a block is logged the same way.
+Then append to the commitment `- <date>: focus block created for <slot> (event id …)` (the marker), and mark the approvals entry `approved`, then `executed`, logging `proposal_accepted` (kind `own_calendar_manage · focus block`). If the user says no, append `focus block declined for due <date>` so Atlas doesn't ask again for that date, and log `proposal_declined` with the same kind (`reference/learning.md` §1). A rejected approvals entry for a block is logged the same way.
 
 Adding attendees, or moving or cancelling someone else's meeting, is never part of this. Those are `send_communication` and need the user to do it or approve it explicitly.
 

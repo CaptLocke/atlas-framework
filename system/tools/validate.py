@@ -1727,11 +1727,13 @@ def check_template(c, path):
     sched = fm.get("schedule")
     if sched is not None and not (isinstance(sched, str) and sched.strip()):
         rep.error(path, "schedule must be the user's words for when it's due (a string), or absent")
-    for k in ("next_due", "last_drafted"):
+    for k in ("next_due", "drafted_for"):
         if fm.get(k) is not None and not is_date(fm.get(k)):
             rep.error(path, "%s must be a YYYY-MM-DD date" % k)
     if sched and fm.get("status") == "active" and fm.get("next_due") is None:
         rep.error(path, "a scheduled active template needs next_due")
+    if not sched and (fm.get("next_due") is not None or fm.get("drafted_for") is not None):
+        rep.warn(path, "next_due and drafted_for do nothing without schedule")
 
 
 def check_hot(c):

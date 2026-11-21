@@ -13,7 +13,7 @@ Each release's "What's new" section is shown to users in the Guide and their nex
 - Turn down the same kind of suggestion three times, like a focus block, and Atlas stops offering it and asks whether to turn it off for good.
 - When too much is due on one day for the free time you have, your Daily Brief leads with it and suggests what to move.
 - Approve several drafts with one yes: Atlas lists each one with its recipient, then sends exactly those.
-- Put a saved template on a schedule ("draft the board update the first Monday of every month") and each edition is drafted and waiting for you, never sent.
+- Put a saved template on a schedule ("draft the board update the first Monday of every month") and each edition is drafted and waiting for you, never sent. Pausing your status updates doesn't pause these; remove the schedule to stop one.
 - Ask Atlas to keep your brief to one line on days with nothing new.
 - If you keep asking for the same thing by hand, Atlas offers to do it in a scheduled run instead.
 - If you keep correcting something that's in how Atlas works rather than your settings, Atlas offers to draft a report to its maker.

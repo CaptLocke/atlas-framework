@@ -41,6 +41,7 @@ Output:
    "open_minutes": 210, "due_today": 3, "due_today_placed": 3,
    "capacity": [{"date": "2026-10-16", "needed": 780, "free": 120, "items": 13,
                  "move": ["commitments/y", ...]}]}   # overloaded days only, soonest first; [] with no "days"
+   # a bad "days" entry gives "capacity": [] and "capacity_error": "<why>"; windows and slots still come out
 Slots are keyed by the id the input gave: a priority's own id (the project's, for a project line,
 and the commitment it took, too). "start" is the window's start; "at" is where the item begins in it.
 """
@@ -149,7 +150,7 @@ def place(inp):
     if not work_day:
         for it in items:
             out["slots"][it["key"]] = {"kind": "none"}
-        out["capacity"] = capacity(inp.get("days"))
+        add_capacity(out, inp.get("days"))
         return out
 
     # Busy time inside work hours, merged; the gaps between are the windows.
@@ -192,11 +193,20 @@ def place(inp):
                        "items": w["items"], "left": w["left"]} for w in windows]
     out["open_minutes"] = sum(w["end"] - w["start"] for w in windows)
     out["due_today_placed"] = len([i for i in due_ids if i and out["slots"].get(i, {}).get("kind") == "window"])
-    out["capacity"] = capacity(inp.get("days"))
+    add_capacity(out, inp.get("days"))
     return out
 
 
 RANK = {"low": 0, "medium": 1, None: 2, "high": 3}
+
+
+def add_capacity(out, days):
+    """Capacity is optional: a bad "days" entry costs only the capacity, never the slots."""
+    try:
+        out["capacity"] = capacity(days)
+    except (ValueError, TypeError, AttributeError, KeyError) as e:
+        out["capacity"] = []
+        out["capacity_error"] = str(e)
 
 
 def capacity(days):
@@ -207,9 +217,11 @@ def capacity(days):
         if not re.match(r"^\d{4}-\d{2}-\d{2}$", date):
             raise ValueError("days[].date must be YYYY-MM-DD")
         free = d.get("free_minutes")
+        if isinstance(free, float) and free.is_integer():
+            free = int(free)
         if not isinstance(free, int) or isinstance(free, bool) or free < 0:
             raise ValueError("days[].free_minutes must be a whole number of minutes")
-        due = [c for c in d.get("due") or [] if c.get("id")]
+        due = list({c["id"]: c for c in d.get("due") or [] if c.get("id")}.values())
         size = {c["id"]: SIZE.get(c.get("effort"), DEFAULT_SIZE) for c in due}
         needed = sum(size.values())
         if needed <= free:

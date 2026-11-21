@@ -17,7 +17,7 @@ Whenever one of these happens, write one activity-log line (`system/schemas/form
 | `priority_up` / `priority_down` | The user changes a priority Atlas set, or says something matters more or less | `atlas-triage` |
 | `noise` | The user says to stop filing or flagging something ("ignore these vendor newsletters", "that's not worth tracking") | any skill |
 | `insight_useful` / `insight_noise` | The user says an insight helped, or that it was wrong or not useful (not "not now") | `atlas-insights` |
-| `proposal_declined` | The user rejects an approvals entry, or says no in chat to an action Atlas offered; the dimension is the proposal's kind (`system/rules/governance.md` §Proposals the user keeps turning down). Not for an entry that expired | any skill that proposes, `atlas-settings` |
+| `proposal_declined` / `proposal_accepted` | The user rejects or approves an approvals entry, or says no or yes in chat to an action Atlas offered at `propose` or `approve`; the dimension is the proposal's kind, copied from its `Proposal kind:` line (`system/rules/governance.md` §Proposals the user keeps turning down). Not for an entry that expired, or an offer at `auto` | any skill that proposes, `atlas-settings` |
 
 **Dimension** is what the pattern is about, chosen from: a person, an organization, a project or topic (by ID), a sender or channel (`from:*@vendor.com`, `channel:#alerts`), a phrase type ("I'll take a look"), a commitment kind ("intro requests"), or an insight kind plus subject (`quiet_person · vendors`). Example:
 ```
@@ -31,7 +31,7 @@ Silent signals count too, but only where the evidence is clear. The learning pas
 
 ## 2. The learning pass (monthly, and on demand)
 Runs in the monthly automation review (`atlas-review`, `reference/monthly.md` §What Atlas learned). It also runs in chat when the user asks "what have you learned about how I work?".
-1. Gather `feedback` lines from the last 60 days of activity logs, plus the silent signals above. Leave out `proposal_declined`: it's acted on as it happens (`system/rules/governance.md` §Proposals the user keeps turning down), and only counted here for §4.
+1. Gather `feedback` lines from the last 60 days of activity logs, plus the silent signals above. Leave out `proposal_declined` and `proposal_accepted`: they're acted on as they happen (`system/rules/governance.md` §Proposals the user keeps turning down), and only counted here for §4.
 2. Group them by signal and dimension. A **pattern** is ≥ 3 signals with the same signal and dimension in 60 days, none contradicting it, and no open or dismissed proposal for the same rule in that time.
 3. For each pattern, write one proposal in `user/inbox/questions.md` (kind `profile`) with the evidence count and the exact rule line to add. Cap it at 3 proposals a month, strongest first. For example:
 ```markdown
