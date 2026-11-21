@@ -281,6 +281,10 @@ def main(argv=None):
     ap.add_argument("--today", help="with --derive: YYYY-MM-DD (default: today)")
     ap.add_argument("files", nargs="*")
     a = ap.parse_args(argv)
+    if a.today and not a.derive:
+        ap.error("--today only applies with --derive")
+    if a.derive and a.files:
+        ap.error("--derive works on every record; it takes no file arguments")
     if a.derive:
         # Run through normalize.py so routines, which may run only listed tools, can use it.
         sys.path.insert(0, HERE)   # -I leaves the script's folder off the path

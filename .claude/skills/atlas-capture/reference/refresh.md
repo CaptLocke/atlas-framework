@@ -7,7 +7,7 @@ skill: atlas-capture
 Filing appends: every source adds a dated `## Updates` line, and the top of a record stays the first pass. This is how the top is kept current (`system/schemas/_common.md` §Body). `maintenance` runs it (step 1b); a chat may run it for one record ("bring Dana's record up to date").
 
 ## 1. Which records
-- Types: project, person, organization, topic, goal. Not archived, status not closed (`schema.yaml: closed_statuses`), not superseded.
+- Types: project, person, organization, topic, goal. Not archived, status not closed (`schema.yaml: closed_statuses`), not superseded, and never the user's own record (`relationship: self`), which the user's profile describes.
 - **Due** when its `## Updates` has 3 or more lines dated after `refreshed` (after `created` if it was never refreshed).
 - At most **25 a run**, the most lines behind first; the rest wait for the next run. The validator warns at more than 8 (`system/tools/validate.py`).
 
@@ -20,10 +20,10 @@ Read the record, its Updates, and the records it links that are still open. Then
 
 Rules:
 - **Every fact cites its source** the way Updates lines do (`([[sources/...]])`), or the record that holds it (`[[commitments/...]]`). Nothing that isn't in the record, its Updates or a linked record; no researched or inferred lines unless the record already marks them so.
-- **Nothing is lost.** A fact in the old top that no longer holds goes into Updates as a dated "was X, now Y" line before it leaves the top. Updates is never edited.
-- Short: 60 to 150 words for most records; more only for a large project. Write in the user's language, plainly, with no headings unless the schema gives them (the employer's sections, `organization.md` §Employer, are kept as they are).
+- **Nothing is lost.** A fact in the old top that no longer holds goes into Updates as a dated "was X, now Y" line before it leaves the top. A line in the old top with no source (often something the user said) stays as it is, or moves to Updates as a dated line "from the earlier summary" before it leaves. Updates is never edited.
+- Short: 60 to 150 words for most records; more only for a large project. Write in the user's language, plainly. Keep every `##` section already above Updates (a project's scope or success criteria, the employer's sections in `organization.md` §Employer) and refresh only the text before the first of them; add no headings of your own.
 - Refresh `summary` (one sentence) if it no longer says what the record is.
-- Set `refreshed: <today>` and `updated`. A refresh adds no Updates line of its own.
+- Set `refreshed: <today>`; leave `updated` as it is, since a rewrite isn't new activity and the stale and stalled checks read `updated`. The "was X, now Y" and "from the earlier summary" lines above are the only Updates lines a refresh writes.
 - Data rules still apply (N11): nothing a data rule restricts comes back into the top. `notes_private` is never copied into it.
 
 ## 3. Fields that follow from the records

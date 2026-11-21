@@ -36,6 +36,7 @@ If `triage` has not succeeded in the last 24 hours, run `triage` in `light` mode
 ## Outputs
 - `user/work/reviews/YYYY-Www.md` (ISO week).
 - Goal `accomplishments` entries and `user/work/accomplishments.md`.
+- `user/inbox/questions.md` entries for data problems only the user can settle (`atlas-review` `reference/weekly.md` §Data problems).
 - Republished dashboards.
 
 ## Early exit
@@ -46,4 +47,4 @@ A review is always written for an active week. Exit early only if this week's re
 - Suggestions to reconnect with people are suggestions; no messages are drafted here.
 
 ## Run report
-Row: `weekly-review | <status> | review YYYY-Www, <a> accomplishments | <stale notes>`.
+Row: `weekly-review | <status> | review YYYY-Www, <a> accomplishments, <q> questions | <stale inputs, if any>`.

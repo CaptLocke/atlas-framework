@@ -52,6 +52,7 @@ sources: ["[[events/2026-10-13-acme-msa-call]]", "[[commitments/maya-pricing-fee
 
 ## Awaiting your approval
 - A-2026-10-12-01: send the follow-up to Dana. Expires 10/26. [[people/dana-ruiz]]
+- A-2026-10-13-02: block Wed 9:00–11:00 AM for the pricing feedback. Expires Wed 9:00 AM. [[commitments/send-pricing-feedback]]
 
 ## Questions from Atlas
 - **Looks done (2):** SOC report to Acme (email with attachment, 10/12) [[commitments/maya-soc-report-acme]] · launch checklist to Jordan (shared in Slack, 10/13) [[commitments/maya-launch-checklist-jordan]]. Say which are done, or all.

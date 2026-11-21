@@ -39,7 +39,7 @@ Every knowledge record is one markdown file at `user/knowledge/<folder>/<slug>.m
 - 2026-10-12: <what changed and why> ([[sources/2026-10-12-...]])
 ```
 - The **Updates** section is append-only and newest last. Never delete history from it.
-- Keep the top description current; move superseded facts into Updates rather than deleting them. Filing appends to Updates; `maintenance` rewrites the top once Updates have run past it, and sets `refreshed` (`atlas-capture` `reference/refresh.md`).
+- Keep the top description current; move superseded facts into Updates rather than deleting them. Filing appends to Updates; `maintenance` rewrites the top once Updates have run past it, and sets `refreshed` but not `updated` (`atlas-capture` `reference/refresh.md`).
 
 ## Lifecycle
 - **Create** only after checking indexes and aliases for an existing match (`system/rules/knowledge.md`).

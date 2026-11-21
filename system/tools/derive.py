@@ -2,13 +2,17 @@
 """Recompute the person fields that follow from other records.
 
 - last_contact: the newest date the person was seen, from sources that list them in
-  `participants` (`occurred_on`, else `captured_on`) and `held` events that list them in
-  `attendees` (the date of `start`). It only moves forward, and never past today. A
-  source flagged `suspicious` doesn't count.
+  `participants` and `held` events that list them in `attendees`. A source's date is its
+  newest item: the latest of `occurred_on`, `captured_on` and its dated `## Updates` lines
+  (a thread gains a line per new message). An event's is the date of `start`; events the
+  user declined or never answered, all-day events and meetings of more than 8 people don't
+  count. It only moves forward, and never past today. Sources flagged `suspicious` and
+  imported history (`kind: import`) don't count.
 - cadence: filled only when empty, from a recurring 1:1 (`kind: one_on_one`, one `series`)
   with at least 3 occurrences, the latest within the last 45 days or still to come:
   `weekly 1:1`, `every 2 weeks 1:1` or `monthly 1:1`, by the typical gap between them.
-  A cadence already set is the user's or a source's and is never changed.
+  A cadence already set is the user's or a source's and is never changed. Declined
+  occurrences don't count.
 
 Both are derived, so neither adds an Updates line or changes `updated`. Archived records
 are skipped, and so is the user's own record (`relationship: self`). Only these two keys
@@ -19,6 +23,8 @@ they're allowed: `python3 system/tools/normalize.py --derive [--fix]`.
     python3 system/tools/derive.py                 # report what would change
     python3 system/tools/derive.py --fix           # apply it
     python3 system/tools/derive.py --today 2026-11-20 ...   # for tests
+Today defaults to the user's date in `user/settings/atlas.yaml: timezone`, as the
+validator computes it.
 Exit code 0 always, unless a file can't be written (2). Standard library plus the vendored YAML parser.
 """
 import argparse
@@ -36,8 +42,11 @@ from normalize import (YAML_ERRORS, dump_block, record_paths,  # noqa: E402
 
 LINK_RE = re.compile(r"\[\[\s*([a-z]+/[a-z0-9][a-z0-9-]*)\s*\]\]")
 DATE_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})")
+UPDATE_RE = re.compile(r"^- (\d{4}-\d{2}-\d{2})\b", re.M)
 MIN_OCCURRENCES = 3
 ALIVE_DAYS = 45
+MAX_ATTENDEES = 8
+NOT_ATTENDED = ("declined", "not_responded")
 
 
 def ids(value):
@@ -83,6 +92,27 @@ def load(path):
     return text, fm if isinstance(fm, dict) else None
 
 
+def source_date(text, fm, today):
+    """The newest dated item in a source, not after today."""
+    dates = [to_date(fm.get("occurred_on")), to_date(fm.get("captured_on"))]
+    _, _, updates = (text or "").partition("\n## Updates")
+    dates += [to_date(d) for d in UPDATE_RE.findall(updates)]
+    dates = [d for d in dates if d and d <= today]
+    return max(dates) if dates else None
+
+
+def local_today(root):
+    try:
+        with open(os.path.join(root, "user", "settings", "atlas.yaml"), encoding="utf-8") as f:
+            tz = (yaml.safe_load(f) or {}).get("timezone")
+        if tz:
+            from zoneinfo import ZoneInfo
+            return datetime.datetime.now(ZoneInfo(str(tz))).date()
+    except Exception:
+        pass
+    return datetime.date.today()
+
+
 def cadence_for(dates, today):
     """A cadence label from a 1:1 series' occurrence dates, or None."""
     days = sorted(set(dates))
@@ -109,9 +139,9 @@ def derive(root, today):
         rtype, rid = fm.get("type"), fm.get("id")
         if rtype == "person":
             people[rid] = (path, text, fm)
-        elif rtype == "source" and "suspicious" not in (fm.get("flags") or []):
-            d = to_date(fm.get("occurred_on")) or to_date(fm.get("captured_on"))
-            if d and d <= today:
+        elif rtype == "source" and "suspicious" not in (fm.get("flags") or []) and fm.get("kind") != "import":
+            d = source_date(text, fm, today)
+            if d:
                 for pid in ids(fm.get("participants") or []):
                     seen[pid] = max(seen.get(pid, d), d)
         elif rtype == "event" and fm.get("status") != "cancelled":
@@ -119,7 +149,9 @@ def derive(root, today):
             if not d:
                 continue
             attendees = ids(fm.get("attendees") or [])
-            if fm.get("status") == "held" and d <= today:
+            if fm.get("response") in NOT_ATTENDED or fm.get("all_day") is True:
+                continue
+            if fm.get("status") == "held" and d <= today and len(attendees) <= MAX_ATTENDEES:
                 for pid in attendees:
                     seen[pid] = max(seen.get(pid, d), d)
             if fm.get("kind") == "one_on_one" and fm.get("series"):
@@ -173,7 +205,11 @@ def main(argv=None):
     ap.add_argument("--fix", action="store_true", help="write the changes (default: report only)")
     ap.add_argument("--today", help="YYYY-MM-DD (default: today)")
     a = ap.parse_args(argv)
-    today = datetime.date.fromisoformat(a.today) if a.today else datetime.date.today()
+    try:
+        today = datetime.date.fromisoformat(a.today) if a.today else local_today(a.root)
+    except ValueError:
+        print("ERROR --today must be YYYY-MM-DD (got %r)" % a.today)
+        return 2
     rc = 0
     for path, (text, fm, new) in sorted(derive(a.root, today).items()):
         rel = os.path.relpath(path, a.root).replace(os.sep, "/")

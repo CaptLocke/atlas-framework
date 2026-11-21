@@ -25,7 +25,7 @@ Make being away effortless: one sentence turns it on (now or scheduled), it ends
 3. Write `rhythms.yaml: away` = `{ start, end, set_on: <today> }`. A future `start` schedules it; jobs treat away as active when `start ≤ today` and (`end` is null or `today ≤ end`).
 4. If an away block already exists and overlaps, replace it after saying so; if it's in the past, overwrite.
 5. Commit and log (`chat · behavior_settings · away 2026-11-12 → 2026-11-20 · commit <sha>`); republish Guide and Today so they show the away banner (`atlas-dashboards`).
-6. Mention once: Atlas doesn't write out-of-office replies; set one in their email tool if they want one. Pending approvals and new insights don't expire while away (maintenance pauses expiry); the catch-up brief lists whatever is still pending. Offer to handle urgent approvals now.
+6. Mention once: Atlas doesn't write out-of-office replies; set one in their email tool if they want one. Pending approvals and new insights don't expire while away (maintenance pauses expiry by age), except a proposal tied to a time, which expires once that time passes; the catch-up brief lists whatever is still pending. Offer to handle urgent approvals now.
 
 ### End away (early return or "I'm back")
 1. Set `away.end` to yesterday (keep `start`, so the catch-up covers the whole window). This applies to open-ended away too.
