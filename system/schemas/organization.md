@@ -13,7 +13,7 @@ Companies, teams, agencies, institutions, including the user's employer.
 |---|---|---|---|
 | `domain` | text | no | Primary web/email domain; used for dedupe. |
 | `kind` | enum | no | employer, customer, prospect, vendor, partner, regulator, investor, team, other |
-| `relationship_status` | text | no | Free text, e.g. `renewal in Q1`. |
+| `relationship_status` | text | no | Free text, e.g. `renewal in Q1`. Kept current for customers, prospects and partners by the record refresh (`atlas-capture` `reference/refresh.md` §3). |
 | `industry` | text | no | Industry and sub-industry, e.g. `Financial services · payments`. |
 | `website` | text | no | Main website URL. |
 | `size` | text | no | Free text, e.g. `about 2,000 employees`. |

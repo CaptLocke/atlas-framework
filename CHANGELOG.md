@@ -7,6 +7,22 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
+## 3.3.0 (2026-11-21)
+
+### What's new
+- The top of each project, person and organization record stays current: in its regular upkeep Atlas rewrites it from what's happened since, with sources, and keeps the history below it.
+- Meetings list their outcomes from whatever notes you file for them, not only from your meeting tool's transcripts.
+- Each person's last contact is the date you were last in touch, from your email, messages and meetings, and a regular 1:1 on your calendar sets how often you meet.
+- A proposal tied to a time, like a focus block for one evening, expires once that time has passed.
+
+### Under the hood
+- Before Atlas shortens an old message to a summary, it checks that your records already hold what the message said.
+- Scheduled runs follow one set of patterns for counting, reading the time and changing files, so the safety checks refuse fewer of their commands.
+- Run reports and Atlas's activity log record the time each thing was done, read from the clock, and counts taken from what was actually read.
+- The weekly review asks you about duplicates and ended goals instead of leaving notes nothing reads, and no longer counts a record you've already archived.
+- Atlas's own checks warn when a record has fallen behind, and the monthly health check says how current your records are.
+- The monthly report no longer lists a citation measure Atlas had no way to count.
+
 ## 3.2.2 (2026-11-20)
 
 ### What's new

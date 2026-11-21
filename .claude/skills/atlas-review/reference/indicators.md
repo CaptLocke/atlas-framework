@@ -10,7 +10,6 @@ Atlas's success indicators, computed by the monthly automation review from files
 |---|---|---|
 | `period` | The month, `YYYY-MM` | |
 | `time_to_first_brief_hours` | Hours from setup start to the first Daily Brief. Fixed after setup; repeat the value each month | `setup.yaml: started` (date; use the first `setup` commit time if available) → `atlas.yaml: first_brief_delivered` (use the brief file's commit time if available) |
-| `cited_answer_share` | Share of chat answers about the user's work that included at least one citation | Activity-log `recall` lines if `atlas-recall` logs them (`cited`/`uncited`); otherwise a sample: up to 20 chat answers visible from this month's chat-written outputs. If no reliable data, `null` and say "not measured" |
 | `auto_commitments` | Commitments created in the period from connected sources | Commitment records with `created` in period whose sources are connector kinds (`email`, `meeting`, `message`, `doc`, `data`) |
 | `manual_commitments` | Commitments created in the period from the user directly | `created` in period with `provenance: stated` or sources of kind `manual`/`journal` |
 | `automation_success_rate` | Jobs completed without failure ÷ jobs run | Run reports in period: job rows `ok`, `skipped_away`, `skipped_paused`, `early_exit` count as success; `partial` counts as half; `failed` as failure |
@@ -27,7 +26,6 @@ Atlas's success indicators, computed by the monthly automation review from files
 
 ## Reading them
 - Lower `time_to_first_brief_hours` is better (target < 24).
-- `cited_answer_share` should be high (≥ 0.8) when knowledge exists.
 - A rising `auto_commitments` share means capture is working.
 - `automation_success_rate` should be ≥ 0.95; below that, the system health section explains why.
 - `corrections` should fall over time; a rise points at a specific skill or source (name it).

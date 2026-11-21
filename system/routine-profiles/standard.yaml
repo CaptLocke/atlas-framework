@@ -51,7 +51,7 @@ routines:
       - status-updates
   - name: upkeep
     schedule: "7 3 * * 0"           # Sunday 3:07
-    model: strongest                 # mixes fast and strongest jobs
+    model: strongest                 # maintenance and update-check
     routine_id: null
     jobs:
       - maintenance

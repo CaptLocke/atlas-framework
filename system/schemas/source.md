@@ -15,7 +15,7 @@ Where information came from. Every fact in Atlas traces to a source.
 | `origin_uri` | text | no | Permalink, doc URL, thread ID, or path. |
 | `connector` | text | no | Connector that provided it. |
 | `captured_on` | date | yes |  |
-| `occurred_on` | date | no | When the original happened. |
+| `occurred_on` | date | no | When the original happened. For a thread or conversation that grows, the date of its newest message filed: move it forward as messages are added. People's `last_contact` is read from it, never from `captured_on` or Updates dates, which say when Atlas filed it. |
 | `participants` | list of IDs | no |  |
 | `retention` | enum | yes | full, summary, pointer, per data rules |
 | `file_pointer` | text | no | For deliverables and drops: location in the user's cloud drive. |
@@ -39,6 +39,8 @@ Once a source's facts are in records, its full body is rarely needed, but its po
 - `retention: full`, and a body over 2 KB.
 - Not linked from an open commitment, an open question, or a `proposed` decision, which may still need the exact wording.
 - Not `kind: manual | journal` (the user's own words, kept whole), and not excluded by a pinned rule in `preferences.md` ("keep full text of board materials").
+
+**Before:** the records that cite it hold what it said. Maintenance checks first and adds an Updates line where they don't (`atlas-capture` `reference/refresh.md` §4).
 
 **How:**
 1. Note the current commit (`git rev-parse HEAD`) before changing anything.

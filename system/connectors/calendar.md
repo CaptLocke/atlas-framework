@@ -9,7 +9,7 @@ Operation names and risk tags: `system/connectors/README.md`. Write path: `syste
 
 ## What Atlas ingests and why
 - **Meetings the user attends or organizes**, in a rolling window: recent past (to mark meetings `held` or `cancelled` and link transcripts) and near future (for meeting prep, the Daily Brief's "what's on today", the week on the Today page, and the `key_meeting_upcoming` trigger).
-- **Attendees** (who the user spends time with feeds the People section on Work, `last_contact`, cadence, and the `new_key_person` trigger).
+- **Attendees** (who the user spends time with feeds the People section on Work, `last_contact`, cadence, and the `new_key_person` trigger). Both fields are recomputed from events in maintenance (`normalize.py --derive`), so capture records the attendees and `series` faithfully.
 - **Deadlines and milestones** placed on the calendar as all-day events.
 - **The user's working pattern** (work hours, recurring 1:1s) as input to `rhythms.yaml` proposals; never changed directly.
 
@@ -34,7 +34,7 @@ Calendars change in place, so the cursor is a **range**, not a "last seen" point
 - **Source**: one per meeting occurrence (`kind: meeting`) when there is content (agenda, description, attached notes); a bare invite with no content needs only the event record with `origin_uri` in its source. When a transcript arrives (meetings category), it attaches to the same Source.
 - Link the event to people, the organization (external domains), and the project or topic it serves (infer from title and attendees; uncertain → leave unlinked, never guess wildly).
 - Moved events: update `start`/`end` and append a line to Updates. Cancelled: `status: cancelled`, keep the record.
-- Past the end time with no cancellation → `status: held` (triage or meetings ingestion may add `outcomes`).
+- Past the end time with no cancellation → `status: held`. `outcomes` come from whatever source about the meeting is filed (`system/rules/knowledge.md` write path step 6), or from the maintenance refresh.
 - **Meeting filter.** `rhythms.yaml: meetings` (all-day, tentative, not responded) decides what is *shown and prepped*, not what is recorded: file the event either way. The rule is in `system/schemas/settings.md` (Meeting filter).
 
 ## Commitment and decision cues

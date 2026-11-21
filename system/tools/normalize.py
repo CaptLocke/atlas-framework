@@ -18,6 +18,7 @@ Usage (from the repository root):
     python3 system/tools/normalize.py --fix           # apply the fixes
     python3 system/tools/normalize.py --fix FILE...   # only these records (use after writing them)
     python3 system/tools/normalize.py --root DIR ...  # another checkout
+    python3 system/tools/normalize.py --derive [--fix] # people's last_contact and cadence (derive.py)
 Exit code 0 always, unless a file can't be read (2). Standard library plus the vendored YAML parser.
 """
 import argparse
@@ -275,8 +276,21 @@ def main(argv=None):
     ap = argparse.ArgumentParser(allow_abbrev=False, description=__doc__.split("\n")[0])
     ap.add_argument("--root", default=os.path.abspath(os.path.join(HERE, "..", "..")))
     ap.add_argument("--fix", action="store_true", help="write the fixes (default: report only)")
+    ap.add_argument("--derive", action="store_true",
+                    help="recompute people's last_contact and cadence instead (system/tools/derive.py)")
+    ap.add_argument("--today", help="with --derive: YYYY-MM-DD (default: today)")
     ap.add_argument("files", nargs="*")
     a = ap.parse_args(argv)
+    if a.today and not a.derive:
+        ap.error("--today only applies with --derive")
+    if a.derive and a.files:
+        ap.error("--derive works on every record; it takes no file arguments")
+    if a.derive:
+        # Run through normalize.py so routines, which may run only listed tools, can use it.
+        sys.path.insert(0, HERE)   # -I leaves the script's folder off the path
+        import derive  # noqa: E402
+        return derive.main(["--root", a.root] + (["--fix"] if a.fix else []) +
+                           (["--today", a.today] if a.today else []))
     schema = load_schema(a.root)
     paths = [os.path.abspath(p) for p in a.files] or record_paths(a.root)
     total, rc = 0, 0

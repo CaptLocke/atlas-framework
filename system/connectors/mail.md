@@ -33,7 +33,7 @@ When a notification carries real signal (e.g., a document shared with the user f
 - Keep `list_sent` on the same cursor; sent items are part of the thread.
 
 ## From items to Sources and records
-- **One Source per thread** (`kind: email`, `origin_uri` = thread permalink or ID, `participants` = people records). New messages update the same Source (append a dated line under Updates), not a new one.
+- **One Source per thread** (`kind: email`, `origin_uri` = thread permalink or ID, `participants` = people records). New messages update the same Source (append a dated line under Updates, and move `occurred_on` to the newest message's date), not a new one.
 - Typical records: `person` (senders/recipients who matter; dedupe by email), `organization` (by domain), `commitment`, `decision`, `question`, `event` (deadlines mentioned), `project` (new work with a clear outcome; see `new_project` in `system/triggers.md`), `risk`.
 - Large CC lists: create people only for active participants, not every recipient.
 - Attachments: note names in the Source. Read attachment content only if the connector provides it and data rules allow; never copy binaries into the repo.

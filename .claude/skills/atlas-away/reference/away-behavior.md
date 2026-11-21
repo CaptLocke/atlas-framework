@@ -24,7 +24,7 @@ Each job's own spec (`system/jobs/<job>.md`, section "Away and paused") is autho
 | `monthly` / `quarterly` | Wait until return (the period stays "not done", so they run on the first run after away) | They need the user's attention |
 | `update-check` | Patch/minor updates apply as usual; major ones wait for a chat | |
 | Triggers | Evaluated; record creation still happens; user-facing actions are held for the catch-up brief | `system/triggers.md` |
-| Approvals and insights | New ones queue; none are executed; nothing expires while away (maintenance pauses expiry) | The catch-up brief lists everything still pending |
+| Approvals and insights | New ones queue; none are executed; nothing expires by age while away (maintenance pauses it), but an approval past its own `Expires:` time does | The catch-up brief lists everything still pending |
 | Dashboards | Republished by jobs that run, with an "Away until …" banner | |
 | Chats | Work normally; Atlas mentions away once and offers to end it | |
 

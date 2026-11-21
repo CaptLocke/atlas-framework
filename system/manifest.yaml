@@ -1,6 +1,6 @@
 # Atlas system manifest. System-owned; replaced on every update.
 name: Atlas
-version: 3.2.2            # must match system/VERSION
+version: 3.3.0            # must match system/VERSION
 data_version: 3           # user data format version this release expects (see system/migrations/)
 min_plan: pro             # minimum Claude plan
 support_email: atlas.framework.support@gmail.com # issue reports (atlas-report-issue)
@@ -23,7 +23,7 @@ owned_paths:
 
 # Model roles. Routines are configured from these; an update can change them.
 models:
-  fast: claude-sonnet-5-5       # ingest, maintenance
+  fast: claude-sonnet-5-5       # ingest
   strongest: claude-opus-5-5    # judgment and writing
 
 # Automation profiles shipped in system/routine-profiles/

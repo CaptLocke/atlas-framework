@@ -1372,6 +1372,30 @@ def check_record(c, path):
     for target in sorted(set(t.strip() for t in WIKI_RE.findall(body))):
         if not c.record_exists(target):
             rep.warn(path, "body link [[%s]] does not exist" % target)
+    check_staleness(c, path, fm, body, expected)
+
+
+REFRESHED_TYPES = ("project", "person", "organization", "topic", "goal")
+STALE_UPDATES = 8
+UPDATE_LINE_RE = re.compile(r"^- (\d{4}-\d{2}-\d{2})\b", re.M)
+
+
+def check_staleness(c, path, fm, body, rtype):
+    """Warnings for a record that has drifted (ATL-114, ATL-120); maintenance fixes both."""
+    rep = c.rep
+    if fm.get("archived") is True:
+        return
+    closed = (c.load_schema().get("closed_statuses") or {}).get(rtype) or []
+    if fm.get("superseded_by") and fm.get("status") not in closed:
+        rep.warn(path, "superseded by %s but still %s and not archived (maintenance archives it)"
+                 % (fm.get("superseded_by"), fm.get("status")))
+    if rtype in REFRESHED_TYPES and fm.get("status") not in closed:
+        since = str(fm.get("refreshed") or fm.get("created") or "")
+        _, _, updates = body.partition("\n## Updates")
+        n = sum(1 for d in UPDATE_LINE_RE.findall(updates) if d > since)
+        if n > STALE_UPDATES:
+            rep.warn(path, "%d Updates since the top was last refreshed (%s); maintenance refreshes it"
+                     % (n, fm.get("refreshed") and "refreshed %s" % fm["refreshed"] or "never"))
 
 
 LINK_ONLY_RE = re.compile(r"^\[\[[a-z]+/[a-z0-9][a-z0-9-]*\]\]$")
@@ -1547,6 +1571,7 @@ def check_user(c):
             elif not f.startswith("."):
                 rep.warn(os.path.join(fpath, f), "non-markdown file in a knowledge folder")
     check_goal_ranks(c)
+    check_last_contact(c)
     check_hot(c)
     tdir = c.p("user", "work", "templates")
     for f in listdir(tdir):
@@ -1563,6 +1588,21 @@ def check_user(c):
     for f in listdir(os.path.join(idir, "archive")):
         if f.endswith(".md"):
             check_inbox(c, os.path.join(idir, "archive", f))
+
+
+def check_last_contact(c):
+    """Warn where a person's last_contact is older than a source or held meeting naming them (ATL-120)."""
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import derive
+    except ImportError:
+        return
+    today = dt.date.fromisoformat(local_today(c))
+    for path, (_, fm, new) in sorted(derive.derive(c.root, today).items()):
+        if "last_contact" in new:
+            c.rep.warn(path, "last_contact %s is older than the newest source or held meeting naming them (%s); "
+                             "normalize.py --derive --fix sets it" % (fm.get("last_contact") or "(empty)",
+                                                                      new["last_contact"]))
 
 
 INBOX_STATUSES = {

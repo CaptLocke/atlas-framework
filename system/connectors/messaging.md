@@ -29,7 +29,7 @@ Covers chat tools (Slack, Microsoft Teams chat, and similar). Operation names an
 - **Advance only after commit.**
 
 ## From items to Sources and records
-- **One Source per thread or per day per DM/channel conversation** (`kind: message`, `origin_uri` = permalink). Unthreaded chatter in a channel on one day is one Source; a threaded discussion is one Source across days.
+- **One Source per thread or per day per DM/channel conversation** (`kind: message`, `origin_uri` = permalink). Unthreaded chatter in a channel on one day is one Source; a threaded discussion is one Source across days, its `occurred_on` moved to the newest message filed.
 - Typical records: `commitment`, `decision`, `question`, `person` (by email or handle; add handles to `aliases`), `project` and `topic` updates, `risk`, `idea`.
 - Messages are short and rely on context: read the thread before extracting, and resolve "it", "that", "the deck" against the conversation and linked files.
 

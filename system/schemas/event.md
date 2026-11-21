@@ -17,7 +17,7 @@ Meetings, 1:1s, deadlines, milestones, and notable occurrences.
 | `attendees` | list of IDs | no |  |
 | `series` | text | no | Recurring series name/ID. |
 | `location` | text | no |  |
-| `outcomes` | list | no | Short list; details live in linked decisions/commitments. |
+| `outcomes` | list | no | Short list; details live in linked decisions/commitments. Filled by whatever files a source linked to the event, from the decisions and commitments filed from it (`system/rules/knowledge.md` write path step 6). |
 | `prep` | path | no | Prep note in `user/work/prep/`. |
 | `all_day` | boolean | no | `true` for date-only calendar events. Omitted means `false`. |
 | `response` | enum | no | The user's own RSVP, from the calendar: organizer, accepted, tentative, not_responded, declined. Updated on every calendar sync. Used by the meeting filter (`system/schemas/settings.md`, `rhythms.yaml: meetings`). |

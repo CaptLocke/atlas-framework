@@ -29,6 +29,7 @@ Every knowledge record is one markdown file at `user/knowledge/<folder>/<slug>.m
 | `provenance` | no | `stated` (user said it), `observed` (seen in a source), `researched` (web), `inferred` (Claude's conclusion). Default `observed`. If a key field (a person's role or title, an owner, a date) is your inference rather than something a source states, use `inferred` and say in the body what was inferred and from what. |
 | `sensitivity` | no | Data-rule category the content falls under; default `normal`. |
 | `archived` | no | `true` removes the record from default indexes (kept in `_index/archive.md`). Fully reversible. |
+| `refreshed` | no | `YYYY-MM-DD`: when the top of the body was last rewritten from its Updates (`atlas-capture` `reference/refresh.md`). Unset means never. |
 
 ## Body
 ```markdown
@@ -38,7 +39,7 @@ Every knowledge record is one markdown file at `user/knowledge/<folder>/<slug>.m
 - 2026-10-12: <what changed and why> ([[sources/2026-10-12-...]])
 ```
 - The **Updates** section is append-only and newest last. Never delete history from it.
-- Keep the top description current; move superseded facts into Updates rather than deleting them.
+- Keep the top description current; move superseded facts into Updates rather than deleting them. Filing appends to Updates; `maintenance` rewrites the top once Updates have run past it, and sets `refreshed` but not `updated` (`atlas-capture` `reference/refresh.md`).
 
 ## Lifecycle
 - **Create** only after checking indexes and aliases for an existing match (`system/rules/knowledge.md`).

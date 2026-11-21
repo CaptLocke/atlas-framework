@@ -13,7 +13,7 @@ Period: the ISO week (`YYYY-Www`) being reviewed; a Friday run covers Monday to 
 | **Decisions made** | Decisions with `decided_on` in the week; who decided and the one-line why | All; group by project if >5 |
 | **Commitments kept** | Commitments closed `done` in the week, both directions | Count + the notable ones |
 | **Commitments slipped** | `slipped` (or open and past due) at the time of review; `i_owe` first | All `i_owe`; `waiting_on` past due > 3 days |
-| **Stalled projects** | `active` projects with no update in 14+ days, or `health: at_risk|off_track` without a recent update | Each with its `next_step` or a suggested one |
+| **Stalled projects** | `active` projects with no update in 14+ days, or `health: at_risk|off_track` without a recent update. Never an archived or superseded record (`system/rules/retrieval.md`) | Each with its `next_step` or a suggested one |
 | **Aging waiting-on** | Open `waiting_on` older than 7 days or past due | With counterparty, age, and a suggested nudge (offer a draft via `atlas-write`) |
 | **People to reconnect with** | Key people (manager, reports, customers, stakeholders) whose contact has lapsed: days since `last_contact` > 1.5 × their `cadence` interval, or > 30 days with no `cadence` while there are open items either way (the same test as insights and Work's People section) | Max 5 |
 | **Next week** | Meetings that matter (1:1s, external, linked to open items), deadlines, commitments due, events needing prep | From calendar (`calendar.list_range`) and records |
@@ -47,3 +47,9 @@ Follow `user/profile/communication-style.md` for length and format. Sections wit
   Accomplishments without a goal use `-` for the goal field.
 - Dedupe by meaning: if the same accomplishment is already recorded (e.g., from a status update), skip it.
 - An accomplishment is an outcome, not an activity: "Closed the Acme renewal" yes; "Had 12 meetings" no.
+
+## Data problems found while reviewing
+The review never writes notes for later: nothing reads them. What it finds goes where it gets acted on, in the same run:
+- **Something maintenance fixes on its own** (a superseded record still live, a top many Updates behind, a stale `last_contact`) is left to it: the validator already flags each one, and the next `maintenance` acts. Don't mention it in the review.
+- **Something only the user can settle** (two projects that may be one, an `active` goal whose `period` has ended, an owner who has left) becomes one `questions.md` entry each (kind `other`, linking the records), unless an open question already covers it. The review's Summary may mention the count in one line.
+- Before calling two records duplicates, check both: an archived record, or one with `superseded_by`, is already settled and is not a duplicate.

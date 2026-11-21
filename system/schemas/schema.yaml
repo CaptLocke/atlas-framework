@@ -4,7 +4,7 @@
 
 common:
   required: [id, type, title, summary, status, created, updated]
-  optional: [aliases, links, sources, supersedes, superseded_by, provenance, sensitivity, archived]
+  optional: [aliases, links, sources, supersedes, superseded_by, provenance, sensitivity, archived, refreshed]
   enums:
     provenance: [stated, observed, researched, inferred]
     sensitivity: [normal, confidential, pii, phi, financial, legal_privileged, custom]
@@ -120,7 +120,7 @@ closed_statuses:
 #   int   = whole number                        email = lowercase address (in lists: emails)
 # Enum fields (common and per type, above) are lowercase snake_case values from their list.
 field_formats:
-  common: { aliases: list, sources: refs, supersedes: ref, superseded_by: ref, archived: bool, created: date, updated: date }
+  common: { aliases: list, sources: refs, supersedes: ref, superseded_by: ref, archived: bool, created: date, updated: date, refreshed: date }
   person: { emails: emails, org: ref, last_contact: date }
   organization: {}
   project: { owner: ref, goal: ref, start: date, target: date }
