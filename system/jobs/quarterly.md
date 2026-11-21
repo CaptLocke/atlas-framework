@@ -2,6 +2,7 @@
 type: job
 name: quarterly
 model: strongest
+speaks: always
 skills: [atlas-review]
 ---
 # Job: quarterly

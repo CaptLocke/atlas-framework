@@ -285,6 +285,9 @@ kind: doc                      # email | message | doc | deck | sheet
 used_for: The update Maya sends the board in the first week of each month
 audience: ["[[people/jordan-lee]]"]   # optional
 cadence: monthly               # optional: weekly | biweekly | monthly | quarterly | ad hoc
+schedule: "first Monday of each month"   # optional: when an edition is due, in the user's words; drafted unattended (below)
+next_due: 2026-12-07           # with schedule: the next edition's due date, worked out from it
+last_drafted: 2026-11-02       # with schedule: when the last unattended edition was drafted
 examples: ["[[sources/2026-09-03-board-update]]", "[[sources/2026-10-02-board-update]]"]   # past editions it was learned from
 base_file: null                # optional: the user's own file template (library path or drive link) to build on
 updated: 2026-10-12
@@ -301,6 +304,8 @@ updated: 2026-10-12
 - Last edition's open items are carried into "Follow-ups" (the user asked for this on 2026-10-02).
 ```
 Rules: one file per recurring deliverable; only the user's confirmation makes a `draft` template `active`; edits the user makes to an edition are proposed back into the template with the same learning rule as voice (`atlas-write` §6). Templates never store data values, only where to get them.
+
+**On a schedule.** "Draft the board update the first Monday of every month" sets `schedule` to those words and `next_due` to the next such date (`atlas-write` §7 step 5). Each weekly `status-updates` run drafts every `active` template whose `next_due` falls before its next run, sets `last_drafted`, and moves `next_due` to the following date the words give (`system/jobs/status-updates.md`). Removing `schedule` stops it; a `retired` template is never drafted.
 
 ## 8. Extensions registry (`user/extensions/registry.yaml`)
 ```yaml

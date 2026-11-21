@@ -2,6 +2,7 @@
 type: job
 name: intelligence
 model: strongest
+speaks: when_flagged
 skills: [atlas-insights]
 ---
 # Job: intelligence

@@ -2,6 +2,7 @@
 type: job
 name: triage
 model: strongest
+speaks: when_flagged
 skills: [atlas-triage]
 ---
 # Job: triage

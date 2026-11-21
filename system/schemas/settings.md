@@ -190,6 +190,8 @@ insights:
   suppressed_kinds: []                  # insight kinds the user turned off, e.g. [idea] ("stop suggesting ideas in the brief")
 focus:                                  # optional, missing = 30
   shortest_window: 30                   # 15 | 30 | 45 | 60 minutes: the shortest gap between meetings Today offers for priorities
+brief:                                  # optional, not in the settings template; set in a chat (atlas-settings)
+  quiet_days: false                     # true: on a work day with nothing new, the Daily Brief is one line plus the schedule (daily-brief.md). Missing = false
 follow_ups:                             # the channel for follow-ups on overdue waiting_on items; optional, missing = email
   internal: email                       # email | message: people whose email domain is in atlas.yaml company.email_domains
   external: email                       # email | message: everyone else

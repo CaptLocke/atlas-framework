@@ -44,16 +44,16 @@ Per routine and job, from run reports for the month:
 Signals for "used vs ignored":
 - Drafts: drafts later seen as sent (`mail.list_sent` evidence) vs left untouched or deleted by the user.
 - Insights: `acted`/`dismissed`/`expired` counts by kind (`insights.md` and that month's `user/inbox/archive/<YYYY-MM>-insights.md`); trend vs last month.
-- Approvals: approved/rejected/expired (`approvals.md` and the month's archive file).
+- Approvals, **by kind** (`system/rules/governance.md` §Proposals the user keeps turning down): approved/rejected/expired for each, with chat yeses and noes to offered actions counted from the month's `proposal_declined` lines and approval-record log lines (`approvals.md` and the month's archive file). A kind with no yes all month, from 3 or more asks, gets a suggestion to stop it.
 - Prep notes and status drafts: referenced or edited in chat, sent status updates.
 - Briefs: the user's chat activity on brief days (no tracking beyond the repo).
 Suggestions (each a one-line proposal with reason): turn off or reduce something ignored; change a schedule to when the user actually works; switch profile if runs are long/heavy for the plan or if the user wants fresher information; fix a recurring failure. Queue each in `approvals.md` as a `behavior_settings` proposal (or `questions.md` when it's a choice), never applied by this skill.
 
 ## What Atlas learned
-Run the learning pass (`.claude/skills/atlas-triage/reference/learning.md` §2) over the last 60 days. Report rules confirmed this month, proposals queued (max 3, as `questions.md` entries), and `feedback` counts by signal against last month, in one short table. If nothing reached a pattern: "Nothing new learned this month."
+Run the learning pass (`.claude/skills/atlas-triage/reference/learning.md` §2) over the last 60 days. Report rules confirmed this month, proposals queued (max 3, as `questions.md` entries: rules, reports to Atlas's maker and suggested routines, §2 steps 7 and 8 there), and `feedback` counts by signal against last month, in one short table. If nothing reached a pattern: "Nothing new learned this month."
 
 ## Success indicators
-Compute per `reference/indicators.md`; write `health.yaml: indicators` for the month; show a small table with last month's values for comparison and a one-line reading ("Corrections are down from 6 to 3."). Then the success measures, one line each, saying which bar each field meets (`reference/indicators.md` §Reading them): "Brief: read 18 of 21 work days (working)."
+Compute per `reference/indicators.md`; write `health.yaml: indicators` for the month; show a small table with last month's values for comparison and a one-line reading ("Corrections are down from 6 to 3."). Then the success measures, one line each, saying which bar each field meets (`reference/indicators.md` §Reading them): "Brief: read 18 of 21 work days (working)." Follow the brief's line with its worst two weeks (`reference/indicators.md` §Worst two weeks): "Worst two weeks: Oct 6–17, read 5 of 10, acted on 2 (failing)."
 
 ## Needs you
 The combined list (max ~7) from all sections, each also present as a `questions.md` or `approvals.md` entry so it can be handled in any chat.

@@ -52,6 +52,8 @@ Every chat, routine, job, skill, and extension. Extensions cannot override this 
 3. Immediately write `.atlas-tmp/approval.json` (format: `system/schemas/formats.md` §2) quoting the user's confirming words, scoped to that one call, expiring in 2 minutes.
 4. Make the call. The hook consumes the record. One record authorizes one call; repeat for each (e.g. forget = one record for the file deletion and one for the `data-rules.yaml` exclusion, both quoting the same confirmation). The record's `tool` is the exact tool name: the MCP tool for connector actions, `Bash` for shell deletes, `Write`/`Edit` for governance-file writes (with the file path as `target`).
 5. Log the action and the approval in the activity log.
+
+**Several at once.** The user may approve a list in one yes ("send these four drafts"). Show the list first, numbered, each item with its action, recipient or target and its exact content (or the draft it sends, opened for them). The yes covers exactly the items shown, as they were shown: then do steps 3 to 5 for each item in turn, one record per call, each quoting the same confirmation and naming its item (`"user_confirmation": "yes, send all four (2 of 4)"`). Nothing outside the list is acted on. If an item fails, fails Cowork's approval card, or changes after the list was shown, stop at it, say which items went, and ask again for the rest. Locked classes other than `send_communication` are never batched.
 This is a procedural guard: it forces every locked action through an explicit, logged step. Never write an approval record without a real confirmation in the conversation; health checks audit this.
 
 ## Non-negotiables
@@ -94,6 +96,12 @@ Removing processed files from `user/inbox/drop/`, regenerating files in `user/kn
 - Outbound communication from routines is always a **draft** in the user's tool, plus an entry in `approvals.md` when sending is the natural next step.
 - `propose`-level actions in routines are queued, never taken, except presses on a live page that are the user's yes to that exact change: Confirm or Correct on a belief, a setting Guide's Settings marks as applied at the next run (anything needing a follow-up a routine can't do, such as re-timing routines, waits for a chat), and Undo of either. Governance files never change from a page (`atlas-dashboards` `reference/live.md` §5).
 - Approvals expire after 14 days, not counting days while away mode is on (`atlas-away`).
+
+## Proposals the user keeps turning down
+A **kind** of proposal is its autonomy class plus what it does, in two or three words: `own_calendar_manage · focus block`, `send_communication · follow-up`. Every no is a `proposal_declined` feedback line naming the kind (`.claude/skills/atlas-triage/reference/learning.md` §1): an approvals entry the user rejected, or a no in chat to something Atlas offered. An entry that expired unanswered is not a no.
+- **Before proposing** anything at `propose` or `approve`, in a chat or a routine: if the last 30 days hold 3 or more `proposal_declined` lines for that kind and no yes to it since the first of them, don't propose it. Instead, if no question about it is open or answered in that time, add one `questions.md` entry (kind `profile`): "You've turned down the last 3 <kind> proposals. Stop suggesting them?"
+- **On yes**, write the rule under `## Proposal rules` in `user/profile/preferences.md` ("No focus-block proposals"), tagged `[stated · <date>]`, and leave that kind out from then on. **On no**, keep proposing; the count starts again after the answer.
+- A rule there is followed like the other preference rules, and the user can lift it in a chat. It never stops what the user asks for directly.
 
 ## Data rules (N11)
 Apply `user/settings/data-rules.yaml` at the write step (`system/rules/knowledge.md`): never read excluded sources; classify content into categories; store per handling (`ignore | pointer | summary | full`). Default to the more conservative handling when unsure.

@@ -11,6 +11,7 @@ Let the user grow Atlas in plain language. Each extension follows the same outli
 - New: "Create an automation that preps me for every sales call with the account history", "Every Monday at 8, summarize last week's pipeline changes from the CRM", "When a deal moves to negotiation, build a deal brief", "Add a Deals record type with stage and value", "I want a dashboard of open support escalations", "Save how we do month-end close as a playbook and run it on the 1st".
 - Change or remove: "make the pipeline summary run on Tuesdays", "drop the Deals stage 'qualified'", "remove the escalations dashboard".
 - List: "what have I added to Atlas?"
+- A yes to the learning pass's suggested routine (`atlas-triage` `reference/learning.md` §2 step 8): build the job from the request it names, starting at step 3 with its schedule and output as defaults.
 - `atlas-health` (extension compatibility) and `atlas-update` (repair of locally edited system files) hand conflicts here.
 
 ## Inputs

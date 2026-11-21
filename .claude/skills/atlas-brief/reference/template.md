@@ -16,6 +16,9 @@ sources: ["[[events/2026-10-13-acme-msa-call]]", "[[commitments/maya-pricing-fee
 ## Action needed
 - **Update your Atlas Project's instructions** (Atlas was updated to 1.1.0). The text to copy is on the Guide page, or ask me in chat.
 
+## Too much on one day
+- **Friday is overloaded:** 9 due, about 11 hours of work, 2 free hours. Re-date the board deck [[commitments/maya-board-deck]] and the vendor review [[commitments/maya-vendor-review]]? Say new dates, or move them all to next week.
+
 ## Today
 - **9:30 AM Acme MSA call** with Dana Ruiz. Two open items both ways. Prep: [prep note](../prep/2026-10-13-acme-msa-call.md) · [[events/2026-10-13-acme-msa-call]]
 - **11:00 AM 1:1 with Jordan.** Bring the pricing feedback. Prep: [prep note](../prep/2026-10-13-jordan-1-1.md) · [[events/2026-10-13-jordan-1-1]]

@@ -13,6 +13,7 @@ Make reporting a problem one sentence for the user, and make the report useful t
 
 ## When to use
 - "Report an issue: my brief didn't include today's meetings", "send feedback to whoever makes Atlas", "this keeps failing, can you report it?"
+- A yes to the learning pass's offer to report a correction no preference rule can fix (`atlas-triage` `reference/learning.md` §2 step 7): the problem is the pattern it names, in generic words, and the evidence is its count of signals, never the records.
 - Suggested by `atlas-health` or `atlas-update` after a failure Atlas can't fix (repeated job failure, failed update, platform smoke-test failure). Never filed automatically: a routine may only suggest it in the known issue's `fix`.
 
 ## Inputs

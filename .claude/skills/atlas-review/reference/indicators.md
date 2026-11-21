@@ -37,4 +37,10 @@ Atlas's success indicators, computed by the monthly automation review from files
   - `slips.user` isn't Atlas's failure, but a rising count says the priorities are off: name the pattern.
   - Say which bar each field meets, in one line each.
 
+## Worst two weeks
+The success measure judges the brief over any two weeks, so a month's ratio can hide a failing fortnight. Shown in the report, not stored.
+- Take the `work_days` of the period and the 9 before it, in order, and every run of 10 in a row (a run may start in the previous month; one with fewer than 10 `work_days` in reach isn't judged).
+- For each run, count its `brief_days` and `brief_acted_days` by the same definitions as above. The worst run is the one with the fewest `brief_days`, ties broken by fewer `brief_acted_days`, then the earliest.
+- Judge it on the same bars: working at 8 or more, failing below 5, and acted on at least half of those. When the views can't be read for any day in it (`brief_days` would be `null`), say "not known".
+
 Write values as numbers (shares as 0–1 with two decimals). Unknown → `null`, never a guess.

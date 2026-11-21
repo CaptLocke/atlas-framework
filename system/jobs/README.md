@@ -28,6 +28,9 @@ Jobs are **idempotent and incremental**: re-running a job never duplicates work.
 
 Output paths follow `system/schemas/formats.md` §7.
 
+## When a job speaks
+Every job says in its frontmatter how it reaches the user: `speaks: always` hands over an output each time it runs (the brief, a review, a report, a status draft), and `speaks: when_flagged` says something only when there's something worth the user's attention (a commitment caught, an insight, a draft, a failure), through the brief, Today or the inbox, and is otherwise silent. A `when_flagged` job never adds a line to say it found nothing; its run-report row is enough. The brief is `always`, but on a work day with nothing new it can be one line when the user turns on `rhythms.yaml: brief.quiet_days` (`daily-brief.md`). An extension job sets it too (`system/guide/authoring.md`).
+
 ## Model roles
 `fast` and `strongest` are roles, resolved in `system/manifest.yaml: models`. A routine has one model: a routine that contains only fast jobs uses `fast`; a routine that mixes roles uses `strongest`. When an update changes the models, `atlas-update` updates routine model settings (or asks the user if it can't).
 

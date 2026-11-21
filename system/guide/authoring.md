@@ -41,6 +41,7 @@ description: <one sentence: what it does and when to use it, including typical u
 type: job
 name: <job>
 model: fast | strongest
+speaks: always | when_flagged   # system/jobs/README.md §When a job speaks; optional for an extension (unset = when_flagged)
 skills: [atlas-..., ...]
 ---
 # Job: <name>

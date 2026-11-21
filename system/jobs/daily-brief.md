@@ -2,6 +2,7 @@
 type: job
 name: daily-brief
 model: strongest
+speaks: always
 skills: [atlas-brief, atlas-dashboards]
 ---
 # Job: daily-brief
@@ -47,7 +48,7 @@ If `jobs.yaml: daily-brief.last_target` already equals T, refresh the existing b
 - `rhythms.yaml: away` cleared after a catch-up brief; `atlas.yaml: first_brief_delivered` on the first brief.
 
 ## Early exit
-Never skipped for lack of news: an empty day still gets a short brief ("Nothing urgent; here's today"). Exits early only for away, paused, or when `last_target` equals T and nothing changed since that brief was written (`early_exit`).
+Never skipped for lack of news: an empty day still gets a short brief ("Nothing urgent; here's today"). With `rhythms.yaml: brief.quiet_days: true`, a **quiet day** gets one line instead, then Today's events: nothing in Action needed, Too much on one day, Due from you, Waiting on, What changed, Questions or Needs attention, and no insight or approval new since the last brief (`atlas-brief` §A step 4b). The file is still written and Today republished, so the page stays current. Exits early only for away, paused, or when `last_target` equals T and nothing changed since that brief was written (`early_exit`).
 
 ## Guardrails
 - The brief and dashboards are views. Nothing in them is sent or shared; dashboards stay private, page-only, without connector grants (unattended republish).
