@@ -17,7 +17,7 @@ Draft the week's status updates for the user's manager and stakeholders, in the 
 - **Scheduled templates** run on every weekly run, whatever the status day and whether or not status updates are on: an edition due before the next run is drafted on this one, so it's never late and never more than a week early.
 
 ## Away and paused
-During away (run date within away, `system/jobs/README.md`), exit with `skipped_away`. If the moment or the job is paused, exit with `skipped_paused`.
+During away (run date within away, `system/jobs/README.md`), exit with `skipped_away`. If the job is paused, exit with `skipped_paused`. If only the `status_updates` moment is paused or off, skip steps 1–5 and still run step 6: scheduled templates are the user's own request, not part of the moment.
 
 ## Readiness check
 For status updates (steps 1–5); scheduled templates (step 6) need only an `active` template with `schedule` and `next_due`.

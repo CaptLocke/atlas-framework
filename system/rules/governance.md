@@ -54,6 +54,7 @@ Every chat, routine, job, skill, and extension. Extensions cannot override this 
 5. Log the action and the approval in the activity log.
 
 **Several at once.** The user may approve a list in one yes ("send these four drafts"). Show the list first, numbered, each item with its action, recipient or target and its exact content (or the draft it sends, opened for them). The yes covers exactly the items shown, as they were shown: then do steps 3 to 5 for each item in turn, one record per call, each quoting the same confirmation and naming its item (`"user_confirmation": "yes, send all four (2 of 4)"`). Nothing outside the list is acted on. If an item fails, fails Cowork's approval card, or changes after the list was shown, stop at it, say which items went, and ask again for the rest. Locked classes other than `send_communication` are never batched.
+
 This is a procedural guard: it forces every locked action through an explicit, logged step. Never write an approval record without a real confirmation in the conversation; health checks audit this.
 
 ## Non-negotiables
