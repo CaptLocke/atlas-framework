@@ -8,8 +8,9 @@ Atlas is for individual knowledge workers: operators, product and project manage
 
 - **Remembers for you.** People, projects, decisions, commitments, ideas, and where each fact came from, all connected.
 - **Finds what matters automatically.** Ask a question or start a task; Atlas brings the relevant knowledge with it and cites its sources.
-- **Works while you're away.** Every evening (or more often, depending on your Claude plan) Atlas brings in new email, meetings, and messages, triages your commitments, drafts replies, prepares tomorrow's meetings, and writes your morning brief.
-- **Keeps you oriented.** A daily brief, a weekly review, and a set of always-current dashboards.
+- **Thinks ahead.** Atlas flags goals and risks that nothing is moving, clashes in the next four weeks, and decisions whose reasons no longer hold. Ask "help me decide…" for a decision brief.
+- **Works while you're away.** Every evening (or more often, depending on your Claude plan) Atlas brings in new email, meetings, and messages, triages your commitments, drafts replies, prepares tomorrow's meetings, and writes your morning brief. It closes the commitments it sees you finish.
+- **Keeps you oriented.** A daily brief, a weekly review, a monthly report, and four always-current pages: **Today**, **Work**, **Guide**, and **Records**. Press a button such as Mark done on a page, and Atlas does it at its next run or chat.
 - **Sounds like you.** Drafts follow your own voice and your company's style and branding.
 - **Stays under your control.** You decide how much Atlas does on its own. Atlas never sends, shares, or deletes anything without your approval, and logs everything it does.
 

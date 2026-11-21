@@ -65,7 +65,7 @@ This is the part where you may need to follow a few clicks. If Claude can't crea
 
 ## Step 11. Your dashboards
 
-Atlas creates your dashboards, three always-up-to-date pages: **Today** (your day and your week), **Work** (everything you're responsible for), and the **Guide** (how Atlas is running, and a handy reference for everything it can do).
+Atlas creates your dashboards, four always-up-to-date pages: **Today** (your day and your week), **Work** (everything you're responsible for), the **Guide** (how Atlas is running, and a handy reference for everything it can do), and **Records** (everything Atlas keeps and how it connects).
 
 ## Step 12. Your first brief
 
