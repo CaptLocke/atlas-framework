@@ -5,9 +5,10 @@
 
 Standard library only. The data is serialized as compact JSON with <, >, &,
 U+2028 and U+2029 escaped, so text from emails or documents can never close the
-<script> element it sits in; the theme CSS loses every "<", so it can never
-close its <style> element, and anything that would load from outside
-(@import, a url() that isn't data:, image-set()). The template must contain exactly one
+<script> element it sits in; the theme CSS loses every "<"
+and backslash, so it can never close its <style> element, and anything
+that would load from outside (@import, a url() that isn't data:,
+image-set(), image(), src()). The template must contain exactly one
 {{ATLAS_DATA}} and one {{ATLAS_THEME_CSS}}, and at most one each of
 {{ATLAS_BASE_CSS}} and {{ATLAS_BASE_JS}}, which are filled with the shared
 system/dashboards/_base.css and _base.js (always Atlas's own copies, whatever
@@ -40,23 +41,24 @@ def safe_json(data):
 
 
 IMPORT_RE = re.compile(r"@import\b[^;]*;?", re.I)
-URL_RE = re.compile(r"url\(\s*(?!\s|[\"']?\s*data:)[^)]*\)", re.I)
-IMAGE_SET_RE = re.compile(r"(?:-webkit-)?image-set\(", re.I)
+URL_RE = re.compile(r"url\((?!\s*[\"']?\s*data:)", re.I)
+STRING_URL_RE = re.compile(r"(?<![\w-])(?:-webkit-)?(?:image-set|image|src)\(", re.I)
 
 
 def safe_css(css):
     """Theme CSS holds only declarations and loads nothing from outside.
 
     Without "<" it can never close the style element. Without backslashes no
-    CSS escape can spell a function name; @import rules go, any url() that
-    isn't a data: URI becomes none, and image-set() (which takes bare strings)
-    is left unusable, so the theme can't fetch anything (a page loads nothing
-    from outside, system/dashboards/README.md).
+    CSS escape can spell a function name. @import rules go, and every url()
+    that isn't a data: URI, and every image-set(), image() and src() (which
+    take bare strings), is renamed none(), so it's invalid even when left
+    unclosed at the end of the theme. The theme can't fetch anything (a page
+    loads nothing from outside, system/dashboards/README.md).
     """
     css = (css or "").replace("<", "").replace("\\", "")
     css = IMPORT_RE.sub("", css)
-    css = URL_RE.sub("none", css)
-    return IMAGE_SET_RE.sub("none(", css)
+    css = URL_RE.sub("none(", css)
+    return STRING_URL_RE.sub("none(", css)
 
 
 FONTS = (  # (family, file, weight range): Constellation's one face, variable 200-600, Latin subset (OFL; licence beside it)
