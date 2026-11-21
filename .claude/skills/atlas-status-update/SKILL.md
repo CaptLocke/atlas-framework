@@ -4,6 +4,10 @@ description: "Draft status updates for the user's manager or stakeholders from w
 ---
 # Status updates
 
+## Must hold
+- An update is a draft. Sending or posting it is `send_communication` and sharing a doc is `share_expose`: chat only, on the user's yes (N1, N2; `atlas-write` §4).
+- Every statement comes from a record. Nothing protected by data rules (N11), marked not to share with this audience in `preferences.md`, or in `notes_private` goes in.
+
 ## Purpose
 Remove the weekly status-writing chore: an accurate, audience-shaped update is waiting for review, built from records rather than memory.
 
@@ -27,7 +31,7 @@ Remove the weekly status-writing chore: an accurate, audience-shaped update is w
    3. **Select:** what changed, what was decided, what's at risk, what the user needs from them, what's next. Drop items the audience doesn't care about. Never include items protected by data rules beyond what the rule allows, `notes_private`, or anything the user marked not to share with this person (`preferences.md`).
    4. **Voice:** manager and internal stakeholders → personal; customers, partners, external or official groups → house; unclear → personal (`system/rules/writing.md`). Match the audience's preferred length and format (bullets vs prose, numbers-first) from their record and past updates.
    5. **Write** using the template: one-line headline (overall state), highlights, decisions, risks/issues with mitigation, asks (explicit, with dates), next period. Keep to what fits in one screen. No citations or record IDs in the update text.
-   6. **Check:** every statement traces to a record; numbers and dates correct; no promises the user hasn't made; tone fits.
+   6. **Check:** every statement traces to a record; numbers and dates correct; no promises the user hasn't made; tone fits the voice guide (`atlas-write` §2 step 4). Anything fails: go back to step 3 (a fact) or 5 (the wording), fix it, and check again, at most three rounds; then save it and say what still falls short.
    7. **Save** `user/work/status/YYYY-MM-DD-<audience-slug>.md` with frontmatter `type: status`, `date`, `audience`, `period_start`, `period_end`, `voice`, `sources` (records used), and the update body; append a `## Sources (for you)` list after the body, outside what would be sent.
    8. **Email draft (optional):** if the audience has an email, a mail connector with `mail.create_draft` exists, and `drafts_create` is `auto` (unless the audience's record or `preferences.md` names another channel), create a draft via `atlas-write` (`mail.create_draft`); add an `approvals.md` entry (`send_communication`) in routines. Otherwise the file is the draft (e.g. for Slack or a doc), and the brief says where it is.
 3. **Commit and log**; run-report row (audiences drafted, skipped, drafts created). The brief lists them under "Drafts ready to review".

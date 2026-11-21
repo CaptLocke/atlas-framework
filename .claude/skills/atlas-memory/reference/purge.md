@@ -62,7 +62,14 @@ git gc --prune=now
 git log --all --oneline -- <each target path>      # must print nothing
 git grep -I -n "<distinctive phrase>" $(git rev-list --all) | head   # must print nothing
 ```
-If anything remains, fix the target list and repeat 5–7 (the lock must still be valid).
+If anything remains, fix the target list and repeat 5–7 (the lock must still be valid). Before pushing, tick this for yourself (the user sees the outcome, not the list):
+```
+- [ ] git log --all prints nothing for every target path
+- [ ] No distinctive phrase is found in any commit
+- [ ] The lock is still valid and its targets match what the user confirmed in §2
+- [ ] Cleaned copies of mixed files are in .atlas-tmp/purge-keep/
+```
+A path or phrase still found: fix the target list and repeat 5–7. Any other box unticked: nothing is pushed yet, so follow §If something fails midway, then start again from §4 (from §2 if the lock has expired).
 
 ## 8. Push
 ```bash

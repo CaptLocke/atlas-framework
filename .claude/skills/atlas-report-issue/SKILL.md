@@ -4,6 +4,10 @@ description: "Draft a privacy-safe problem report to Atlas's maker, for the user
 ---
 # Report an issue
 
+## Must hold
+- The user sees the full report before it goes anywhere, and the user sends it; Atlas sends only on an explicit ask, through the approval record, in chat, never from a routine (N1).
+- Nothing about the user, their employer or their work goes in: run `redact_check.py` until only flags you kept on purpose remain (step 3).
+
 ## Purpose
 Make reporting a problem one sentence for the user, and make the report useful to the maintainer while containing nothing private. The user always sees exactly what will be sent, and only the user sends it.
 

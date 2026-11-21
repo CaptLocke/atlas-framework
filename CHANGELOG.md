@@ -7,15 +7,17 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
-## 3.2.2 (2026-11-15)
+## 3.2.2 (2026-11-20)
 
 ### What's new
 - In your Daily Brief, each priority's time is the start of the focus window it's in, the same time that priority shows on your Today page.
+- Drafts Atlas writes for you are checked against your writing voice, revised and checked again before you see them.
 
 ### Under the hood
 - An update that brings nothing new to tell you no longer adds an "Atlas was updated" note to your brief.
 - Run reports describe a suspicious message in words and never link to it.
 - A page theme from your design system can no longer load anything from outside Atlas.
+- Atlas keeps its rules for sending, updating and erasing in view in long chats, and checks each one before it goes ahead.
 
 ## 3.2.1 (2026-11-15)
 
