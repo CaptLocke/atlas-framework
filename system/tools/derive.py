@@ -2,9 +2,11 @@
 """Recompute the person fields that follow from other records.
 
 - last_contact: the newest date the person was seen, from sources that list them in
-  `participants` and `held` events that list them in `attendees`. A source's date is its
-  newest item: the latest of `occurred_on`, `captured_on` and its dated `## Updates` lines
-  (a thread gains a line per new message). An event's is the date of `start`; events the
+  `participants` and `held` events that list them in `attendees`. A source's date is
+  `occurred_on`, which a thread moves to its newest message as messages are filed
+  (`system/schemas/source.md`), else `captured_on`. Filing dates (`captured_on` beside an
+  `occurred_on`, `## Updates` lines) are when Atlas read it, not contact. An event's is the
+  date of `start`; events the
   user declined or never answered, all-day events and meetings of more than 8 people don't
   count. It only moves forward, and never past today. Sources flagged `suspicious` and
   imported history (`kind: import`) don't count.
@@ -42,7 +44,6 @@ from normalize import (YAML_ERRORS, dump_block, record_paths,  # noqa: E402
 
 LINK_RE = re.compile(r"\[\[\s*([a-z]+/[a-z0-9][a-z0-9-]*)\s*\]\]")
 DATE_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})")
-UPDATE_RE = re.compile(r"^- (\d{4}-\d{2}-\d{2})\b", re.M)
 MIN_OCCURRENCES = 3
 ALIVE_DAYS = 45
 MAX_ATTENDEES = 8
@@ -92,13 +93,10 @@ def load(path):
     return text, fm if isinstance(fm, dict) else None
 
 
-def source_date(text, fm, today):
-    """The newest dated item in a source, not after today."""
-    dates = [to_date(fm.get("occurred_on")), to_date(fm.get("captured_on"))]
-    _, _, updates = (text or "").partition("\n## Updates")
-    dates += [to_date(d) for d in UPDATE_RE.findall(updates)]
-    dates = [d for d in dates if d and d <= today]
-    return max(dates) if dates else None
+def source_date(fm, today):
+    """When the source's newest item happened, not after today."""
+    d = to_date(fm.get("occurred_on")) or to_date(fm.get("captured_on"))
+    return d if d and d <= today else None
 
 
 def local_today(root):
@@ -140,7 +138,7 @@ def derive(root, today):
         if rtype == "person":
             people[rid] = (path, text, fm)
         elif rtype == "source" and "suspicious" not in (fm.get("flags") or []) and fm.get("kind") != "import":
-            d = source_date(text, fm, today)
+            d = source_date(fm, today)
             if d:
                 for pid in ids(fm.get("participants") or []):
                     seen[pid] = max(seen.get(pid, d), d)

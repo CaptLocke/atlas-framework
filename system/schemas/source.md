@@ -15,7 +15,7 @@ Where information came from. Every fact in Atlas traces to a source.
 | `origin_uri` | text | no | Permalink, doc URL, thread ID, or path. |
 | `connector` | text | no | Connector that provided it. |
 | `captured_on` | date | yes |  |
-| `occurred_on` | date | no | When the original happened. |
+| `occurred_on` | date | no | When the original happened. For a thread or conversation that grows, the date of its newest message filed: move it forward as messages are added. People's `last_contact` is read from it, never from `captured_on` or Updates dates, which say when Atlas filed it. |
 | `participants` | list of IDs | no |  |
 | `retention` | enum | yes | full, summary, pointer, per data rules |
 | `file_pointer` | text | no | For deliverables and drops: location in the user's cloud drive. |
