@@ -11,11 +11,13 @@ Each release's "What's new" section is shown to users in the Guide and their nex
 
 ### What's new
 - In your Daily Brief, each priority's time is the start of the focus window it's in, the same time that priority shows on your Today page.
+- Drafts Atlas writes for you are checked against your writing voice, revised and checked again before you see them.
 
 ### Under the hood
 - An update that brings nothing new to tell you no longer adds an "Atlas was updated" note to your brief.
 - Run reports describe a suspicious message in words and never link to it.
 - A page theme from your design system can no longer load anything from outside Atlas.
+- Atlas keeps its rules for sending, updating and erasing in view in long chats, and checks each one off before it goes ahead.
 
 ## 3.2.1 (2026-11-15)
 
