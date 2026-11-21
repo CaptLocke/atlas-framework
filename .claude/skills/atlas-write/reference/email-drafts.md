@@ -22,7 +22,7 @@ Candidates: `waiting_on` commitments with `status: slipped` (marked by `atlas-tr
 5. No draft tool for either channel: put the text in the approvals entry's `Prepared:` line instead and still write the marker. `Prepared:` always names where the draft is ("Slack draft to Priya", "Gmail draft …"), so the user can send it there themselves; approving it in chat sends it through that channel's send tool, by the approval-record procedure. A message draft can't be sent from Atlas as the draft itself: first read the thread or DM for the user's own message since the draft; already sent → mark the approval `executed` ("sent by you in Slack"), no second send; otherwise send it and tell the user to delete the Slack draft.
 
 ## Draft quality
-- Voice per `system/rules/writing.md`; reply in the thread's language and register.
+- Voice per `system/rules/writing.md`; reply in the thread's language and register. Check, revise and check again as in `atlas-write` §2 step 4.
 - Answer the actual ask first; propose concrete times or options; keep commitments realistic (never promise dates the user hasn't agreed to; use "[confirm date]").
 - No citations, IDs, or Atlas jargon in the draft body.
 

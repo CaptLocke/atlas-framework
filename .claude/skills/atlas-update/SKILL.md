@@ -5,9 +5,9 @@ description: "Check for and safely install Atlas releases, roll back, or repair 
 # Updates
 
 ## Must hold
-- Owned paths change only by git checkout from a signed release tag under the update lock; `user/` changes only through migrations (N5).
+- Owned paths change only under the update lock: by checkout from a verified release tag (§B), or from this repo's own history for a rollback or repair (§C, §D). `user/` changes only through migrations and the version and inbox writes of §B steps 8–9 (N5).
 - An unsigned or wrongly signed release is never installed (§B step 4), and every update has a rollback point and undoes itself on failure (N13).
-- Pushed history is never rewritten (N8).
+- Pushed history is never rewritten; step 10 drops only unpushed update commits (N8).
 
 ## Purpose
 Deliver new versions without ever risking the user's data. Only the paths in `system/manifest.yaml: owned_paths` are replaced; `user/` changes only through migrations; every update has a rollback point and restores itself on failure (N5, N13). The user hears one plain sentence about what's new.
@@ -41,9 +41,9 @@ In a chat, first tell the user in one line that the update takes a few minutes a
 4. **Fetch** the release tag from `manifest.upstream` into `refs/atlas-upstream/v<version>` (the only place hooks accept a release from), then **verify its signature** with `system/tools/release_check.py` (`reference/procedure.md`, Verify the signature). An unsigned or wrongly signed release is never installed: stop, release the lock, and record a high known issue `update-signature-failed`.
 5. **Replace owned paths only:** make every path in the **release's** `owned_paths` match the release exactly: files added, changed, and removed. Never touch anything under `user/`. Commit (`atlas(update): Atlas <from> → <to>: system files`, `Atlas-Actor: update`). Don't push anything from this update before step 9: until then, a failure is undone in one step (step 10).
 6. **Migrations:** compare `atlas.yaml: data_version` with the new `manifest.data_version`. Run each pending `system/migrations/NNNN-*.md` with `from_data_version` ≥ the user's, in order, following its Transformation and Validation sections; after each, set `atlas.yaml: data_version` to its `to_data_version` and commit (`Atlas-Records:` lists changed paths). If user data_version is already ≥ the manifest's (after a rollback with additive migrations), run nothing.
-7. **Validate:** `python3 system/tools/validate.py --all` (schemas, links, settings, registry, extensions). Any error caused by the update is a failure (step 10). Before step 9 pushes anything, copy and tick:
+7. **Validate:** `python3 system/tools/validate.py --all` (schemas, links, settings, registry, extensions). Any error caused by the update is a failure (step 10). Then, before step 8, tick this for yourself (don't show it to the user; in a routine, an unticked box goes in the run report):
    ```
-   - [ ] release_check.py verify exited 0 for this tag (step 4)
+   - [ ] release_check.py verify exited 0 for this tag (step 4); for a repair from installed_from_commit, the source is that commit
    - [ ] Only owned paths and migrated user files changed since base_commit
    - [ ] validate.py --all passes (this step)
    - [ ] .atlas-tmp/update.lock is still valid
