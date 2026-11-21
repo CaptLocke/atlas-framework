@@ -27,4 +27,4 @@ proposed, active, paused, done, cancelled
 Typically links to: goals, people, organizations, commitments, decisions, risks, questions, events, topics.
 
 ## Capture guidance
-Create when work with a clear outcome is discussed and no record exists (`new project` trigger). Keep the top of the body as a current-state summary: what, why, where it stands. `insight` and `next_step` are refreshed by triage.
+Create when work with a clear outcome is discussed and no record exists (`new project` trigger). Keep the top of the body as a current-state summary: what, why, where it stands. `insight` and `next_step` are refreshed by triage; the top itself by maintenance (`atlas-capture` `reference/refresh.md`).

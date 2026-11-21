@@ -21,6 +21,8 @@ For every input (chat statement, journal entry, connector item, file):
    - New record: create with all required fields, `provenance`, `sources`, and links.
    - Existing record: update fields, set `updated`, append a dated line to `## Updates` citing the source. If a fact changes, keep the old value in Updates ("was X, now Y").
    - Replacement: new record with `supersedes`; old record gets `superseded_by` (content kept).
+   - **A source about a meeting** (notes, a transcript, a summary, from any connector or the Drop folder): link it to the meeting's event, set the event `held`, and add each decision and commitment filed from it to the event's `outcomes`, one short line each with its link.
+   - **People seen in the source:** `last_contact` becomes the source's own date (`occurred_on`, else `captured_on`) if that is later; it never moves back.
 7. **Link both ways where it helps.** At minimum, the new or changed record links to its related records. Add reciprocal links on people, projects, and topics so they act as hubs.
 8. **Normalize.** Write field values in their declared formats (`system/schemas/schema.yaml: field_formats`): references as `"[[folder/slug]]"`, lists as lists, emails lowercase, dates `YYYY-MM-DD`, enum values lowercase snake_case. Then run `python3 system/tools/normalize.py --fix <the records you wrote>`; it fixes anything mechanical you missed and leaves everything else alone.
 9. **Index.** Run `python3 -I system/tools/index.py` (`formats.md` §5); never edit index files by hand.

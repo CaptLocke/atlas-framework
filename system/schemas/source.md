@@ -40,6 +40,8 @@ Once a source's facts are in records, its full body is rarely needed, but its po
 - Not linked from an open commitment, an open question, or a `proposed` decision, which may still need the exact wording.
 - Not `kind: manual | journal` (the user's own words, kept whole), and not excluded by a pinned rule in `preferences.md` ("keep full text of board materials").
 
+**Before:** the records that cite it hold what it said. Maintenance checks first and adds an Updates line where they don't (`atlas-capture` `reference/refresh.md` §4).
+
 **How:**
 1. Note the current commit (`git rev-parse HEAD`) before changing anything.
 2. Replace the body with a short summary (the frontmatter `summary`, plus up to 5 key facts in one line each, and nothing a data rule restricts). Add an **Extracted into** list of the records that cite it, and one last line: `Full text: commit <sha> (git show <sha>:user/knowledge/sources/<slug>.md), or open the original: <origin_uri>`.

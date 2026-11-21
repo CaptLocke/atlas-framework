@@ -14,6 +14,7 @@ Operationalize the write path in `system/rules/knowledge.md`: turn any input int
 - **Import:** notes brought in once from another product, service, or framework, during setup or from a chat ("bring in my notes from Notion"): `reference/import.md`.
 - **Jobs:** `ingest` (connector items, Atlas Drop folder, unprocessed journal sections); `triage` (missed commitments); `atlas-thoughts` (brain dumps); `atlas-write` (deliverable pointers); `atlas-insights` (risk/question/idea records).
 - **Kernel §2 step 3:** quick catch-up ingest (mode below).
+- **Refresh:** `maintenance` keeps records' tops current, and a chat may ask for one ("bring Dana's record up to date"): `reference/refresh.md`.
 
 ## Inputs
 - The input itself plus its context (who said it, when, where).
@@ -35,8 +36,8 @@ Follow `system/rules/knowledge.md` § Write path in order. How to apply each ste
    - `full`: store normally.
 4. **Source.** One Source per thread, meeting, document, drop, journal day, chat statement batch, or deliverable (`system/schemas/source.md`). Slug `YYYY-MM-DD-<short-title>`. Chat statements: `kind: manual`, `provenance: stated` on derived records.
 5. **Resolve.** For each thing found: `people-map.md` and type indexes by title, aliases, emails, domains; then text search. Strong match → update. Plausible but uncertain → link to the existing record, add a note, and queue an ambiguous-merge question (`questions.md`, kind `other`). Never create a second record for the same email or domain.
-6. **Write.** New records with all required fields, `provenance`, `sources`, links. Existing records: update fields, `updated`, append a dated `## Updates` line citing the source; changed facts keep the old value ("was X, now Y"). When a source sets out what a project is for (scope, success criteria, timeline), the project's own body summarizes each of them, not only the source. Replacement → supersede.
-7. **Link** both ways on hubs (people, projects, topics, organizations); a `dormant` topic you link becomes `active` again. Update `last_contact` on people seen in a source.
+6. **Write.** New records with all required fields, `provenance`, `sources`, links. Existing records: update fields, `updated`, append a dated `## Updates` line citing the source; changed facts keep the old value ("was X, now Y"). When a source sets out what a project is for (scope, success criteria, timeline), the project's own body summarizes each of them, not only the source. A source about a meeting fills that event's `outcomes` from the decisions and commitments it produced, whichever connector it came from (`system/rules/knowledge.md` step 6). Replacement → supersede. The rest of a record's top is kept current by the refresh (`reference/refresh.md`), not at filing.
+7. **Link** both ways on hubs (people, projects, topics, organizations); a `dormant` topic you link becomes `active` again. Update `last_contact` on people seen in a source: the source's own date (`occurred_on`, else `captured_on`), only if later than what's there.
 8. **Index.** Run `python3 -I system/tools/index.py` once after this filing (`formats.md` §5); it rebuilds `_index/<type>.md`, `hot.md` and `people-map.md` from the records.
 9. **Triggers.** Evaluate `new_project` and `new_key_person` (`system/triggers.md`) for records you just created or matched (never for imported history, `reference/import.md` §10); check `user/.state/triggers.yaml` first; act; record the firing. Away mode: create the records, hold the questions for the catch-up brief.
 10. **Log and commit** (`system/rules/sync.md`): one commit per input batch with `Atlas-Records`; one activity-log line per change set.

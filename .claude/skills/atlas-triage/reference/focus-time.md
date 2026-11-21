@@ -36,9 +36,10 @@ Skip it when:
 - **Why:** Due Thu Oct 15 ([[commitments/send-pricing-feedback]]); about 2 hours of work and only 2.5 free hours before then
 - **Prepared:** calendar hold, no attendees, on your calendar only
 - **Requested by:** routine:nightly-cycle · 2026-10-13
+- **Expires:** 2026-10-14 09:00
 - **Status history:** pending 2026-10-13
 ```
-  The brief lists it under "Needs you" with the slot. An entry whose slot has already passed is marked `expired` the next time triage runs; triage may then propose a new slot once.
+  The brief lists it under "Needs you" with the slot. `Expires:` is the slot's start (`system/schemas/formats.md` §3): once it has passed, triage or maintenance marks it `expired`; triage may then propose a new slot once.
 - **No slot fits:** don't propose an overlapping block. Add one line to the brief's Due section instead: "No free 2-hour slot before Thursday. The Wednesday 2:00 PM vendor sync (tentative) is the easiest to move." Prefer, in order, meetings the user hasn't accepted, recurring meetings they organize, and large meetings where they're optional.
 
 ## 4. Creating the block (chat only, after the user's yes)

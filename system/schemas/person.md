@@ -15,8 +15,8 @@ Anyone the user works with or about, including the user themself (`relationship:
 | `org` | ID | no | `[[organizations/...]]` |
 | `role` | text | no | Job title or function. |
 | `relationship` | enum | no | self, manager, report, peer, stakeholder, board, customer, prospect, vendor, partner, external, other. Definitions and how to choose: §Relationships. |
-| `last_contact` | date | no | Most recent interaction seen in any source. |
-| `cadence` | text | no | Expected contact rhythm, e.g. `weekly 1:1`, `monthly`. |
+| `last_contact` | date | no | Most recent interaction seen in any source: the source's own date (`occurred_on`, else `captured_on`), or a held meeting's. Only moves forward. `normalize.py --derive` recomputes it in maintenance. |
+| `cadence` | text | no | Expected contact rhythm, e.g. `weekly 1:1`, `monthly`. When empty, `normalize.py --derive` fills it from a recurring 1:1 series (`weekly 1:1`, `every 2 weeks 1:1`, `monthly 1:1`); a value already set is never changed. |
 | `phone` | text | no | Only if the user's data rules allow PII. |
 | `location` | text | no | City/time zone if useful. |
 | `notes_private` | text | no | Never shown on dashboards. |

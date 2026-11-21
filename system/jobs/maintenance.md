@@ -1,18 +1,18 @@
 ---
 type: job
 name: maintenance
-model: fast
-skills: [atlas-health]
+model: strongest
+skills: [atlas-health, atlas-capture]
 ---
 # Job: maintenance
 
 ## Purpose
-Keep knowledge tidy with no user effort and confirm every automation runs in its routine environment: rebuild all indexes, repair links, merge obvious duplicates, sweep the journal and inbox for leftovers, and expire old approvals and insights.
+Keep knowledge tidy and current with no user effort and confirm every automation runs in its routine environment: keep the top of each record current, recompute the fields that follow from other records, rebuild all indexes, repair links, merge obvious duplicates, sweep the journal and inbox for leftovers, and expire old approvals and insights.
 
 ## Runs when
 - Lean and Standard: `upkeep` (Sunday 3:07), first job. Full: `upkeep` (daily 3:07), first job.
 - Also run (index rebuild only) by `monthly` when stale.
-- Modifiers: `when`. `mode: light` = expiry and sweeps only, no full index rebuild.
+- Modifiers: `when`. `mode: light` = expiry and sweeps only, no refresh and no full index rebuild.
 
 ## Away and paused
 Runs normally during away, except that expiry is paused (step 6). Paused per `system/jobs/README.md`.
@@ -21,23 +21,25 @@ Runs normally during away, except that expiry is paused (step 6). Paused per `sy
 None beyond sync. Maintenance does not read connectors.
 
 ## Inputs
-- All non-archived records in `user/knowledge/` (frontmatter first; bodies only when repairing).
+- All non-archived records in `user/knowledge/` (frontmatter first; bodies when refreshing or repairing).
 - `user/inbox/` (approvals, insights, questions, `drop/`), `user/journal/`, `user/.state/cursors.yaml` (`journal`).
 
 ## Steps
-1. **Normalize, then validate.** Run `python3 system/tools/normalize.py --fix` (every record: references, lists, emails, dates, booleans, enum spelling), commit the fixes on their own (`Atlas-Reason: normalize field formats`), then run `system/tools/validate.py --user` and use its findings as the work list.
+1. **Normalize, derive, then validate.** Run `python3 system/tools/normalize.py --fix` (every record: references, lists, emails, dates, booleans, enum spelling), then `python3 system/tools/normalize.py --derive --fix` (people's `last_contact` from the newest source or held meeting naming them, and an empty `cadence` from a recurring 1:1). Commit them on their own (`Atlas-Reason: normalize field formats`), then run `system/tools/validate.py --user` and use its findings as the work list.
 1a. **Routine environment check** (`atlas-health`, the "Routine environment" row of `reference/system-health.md`): read the run reports from the last 8 days in `user/logs/runs/` (this run included) and find any routine run whose `atlas_context` isn't `routine` (missing field counts). For each routine affected, add or update the high-severity known issue `routine-env-missing` in `user/.state/health.yaml` naming the routine; close an open one when that routine's runs since the issue opened all show `routine`.
-1b. **Compact sources** whose facts are already in records (`system/schemas/source.md` §Compaction): long bodies of processed sources older than 30 days become a summary plus the way back to the full text. Commit on its own (`Atlas-Reason: compact sources`). Report the count and the bytes saved.
+1b. **Refresh records** (`atlas-capture`, `reference/refresh.md`): rewrite the top of each project, person, organization, topic and goal whose Updates have run 3 or more lines past it, at most 25 a run, stalest first; set customer, prospect and partner organizations' `relationship_status`, and held events' empty `outcomes`, from their linked records. Commit on its own (`Atlas-Reason: refresh records`). Report the count and how many wait for the next run. Skip in `mode: light`.
+1c. **Compact sources** (`system/schemas/source.md` §Compaction): long bodies of processed sources older than 30 days become a summary plus the way back to the full text, once the records that cite them hold what they said (`refresh.md` §4). Commit on its own (`Atlas-Reason: compact sources`). Report the count and the bytes saved.
 2. **Index rebuild** (`atlas-health`, maintenance mode): run `python3 -I system/tools/index.py`, which regenerates every `user/knowledge/_index/` file from the records (`system/schemas/formats.md` §5), including registered user types' folders, `hot.md`, `people-map.md`, and `archive.md`.
 3. **Link repair:** fix links that point to a superseded record (point to the successor), to a renamed alias, or to a missing path when the intended target is unambiguous. Ambiguous broken links become a `questions.md` entry.
-4. **Obvious dedupes** (`merge_supersede`): the same tests as `system/rules/knowledge.md` §Dedupe (people: same email, or same full name and same organization; organizations: same domain), plus identical commitments from the same source. Follow the merge procedure in `system/rules/knowledge.md`. Anything less than obvious becomes a question, never a merge.
+4. **Obvious dedupes** (`merge_supersede`): the same tests as `system/rules/knowledge.md` §Dedupe (people: same email, or same full name and same organization; organizations: same domain), plus identical commitments from the same source. Follow the merge procedure in `system/rules/knowledge.md`. Anything less than obvious becomes a question, never a merge. **Superseded but live:** a record with `superseded_by` whose status isn't closed and that isn't archived (the validator warns) gets `archived: true` (`archive`), with an Updates line naming its successor.
 5. **Journal sweep:** journal days with sections not in `processed` are left for the next `ingest` (check that the `journal` cursor will not skip them; move it back if it would). **Inbox sweep:** files lingering in `user/inbox/drop/` and open questions answered in a later chat are noted for ingest or closed.
-6. **Expiry:** approvals `pending` for more than 14 days → `expired`; insights `new` for more than 30 days → `expired`. Add a dated status-history line; never delete entries. On live pages (`dashboards.yaml: live: true`), delete request rows `applied` or `refused` more than 14 days ago (`atlas-dashboards`, `reference/live.md` §5; housekeeping). Away pauses the clock: while away is active (`system/jobs/README.md`), expire nothing; afterwards, extend each item's limit by the number of away days that fell after it was created (count from `away.start` to `away.end`, or to today for an open-ended away). If away has already been cleared, use the away period recorded in the catch-up brief (`user/work/briefs/*-catch-up.md`).
+6. **Expiry:** approvals `pending` or `approved` past their `Expires:` time, and approvals `pending` for more than 14 days → `expired` (`system/schemas/formats.md` §3); insights `new` for more than 30 days → `expired`. Add a dated status-history line; never delete entries. On live pages (`dashboards.yaml: live: true`), delete request rows `applied` or `refused` more than 14 days ago (`atlas-dashboards`, `reference/live.md` §5; housekeeping). Away pauses the age limits, not `Expires:`: while away is active (`system/jobs/README.md`), expire nothing by age; afterwards, extend each item's limit by the number of away days that fell after it was created (count from `away.start` to `away.end`, or to today for an open-ended away). If away has already been cleared, use the away period recorded in the catch-up brief (`user/work/briefs/*-catch-up.md`).
 6a. **Inbox archive:** move entries resolved more than 14 days ago to `user/inbox/archive/YYYY-MM-<name>.md` and recompute `counts` in every inbox file, adding the block where it's missing (`system/schemas/formats.md` §3). Runs during away too (it only moves resolved entries).
 7. Commit (one commit for indexes, one for record fixes, one for inbox).
 8. **Republish** (`atlas-dashboards`, `dashboards_refresh`) every dashboard whose contract lists `maintenance` in `republished_by`, from the freshly rebuilt indexes. Skip it in `mode: light`.
 
 ## Outputs
+- Refreshed records (`refreshed` set); people's `last_contact` and `cadence`.
 - Regenerated `user/knowledge/_index/*.md`; repaired and merged records with Updates lines.
 - `user/inbox/approvals.md` and `insights.md` status changes; questions for ambiguous cases.
 - Resolved inbox entries moved to `user/inbox/archive/`; `counts` blocks current.
@@ -52,4 +54,4 @@ Never fully skipped on its scheduled run (the index rebuild is the safety net). 
 - Indexes are regenerable; records are not. If a record looks corrupt, leave it and raise a known issue.
 
 ## Run report
-Row: `maintenance | <status> | <i> indexes, <l> links fixed, <d> merged, <e> expired | validator: <pass/fail count>; routine env: <ok or routines without the marker>`.
+Row: `maintenance | <status> | <r> refreshed (<w> waiting), <i> indexes, <l> links fixed, <d> merged, <e> expired | validator: <pass/fail count>; routine env: <ok or routines without the marker>`.

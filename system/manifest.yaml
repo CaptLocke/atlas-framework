@@ -23,7 +23,7 @@ owned_paths:
 
 # Model roles. Routines are configured from these; an update can change them.
 models:
-  fast: claude-sonnet-5-5       # ingest, maintenance
+  fast: claude-sonnet-5-5       # ingest
   strongest: claude-opus-5-5    # judgment and writing
 
 # Automation profiles shipped in system/routine-profiles/
