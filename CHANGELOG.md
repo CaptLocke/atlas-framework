@@ -15,6 +15,7 @@ Each release's "What's new" section is shown to users in the Guide and their nex
 ### Under the hood
 - An update that brings nothing new to tell you no longer adds an "Atlas was updated" note to your brief.
 - Run reports describe a suspicious message in words and never link to it.
+- A page theme from your design system can no longer load anything from outside Atlas.
 
 ## 3.2.1 (2026-11-15)
 

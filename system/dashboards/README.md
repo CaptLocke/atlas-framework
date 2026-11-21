@@ -71,7 +71,7 @@ When a page is over budget, its contract's truncation runs these steps first: cu
 2. Fill the common `meta` envelope (below).
 3. **Check size.** `size_budget_kb` is the size of the **whole rendered page** (about 220 KB before data: the template, the base files and the embedded fonts), measured after embedding. Serialize the JSON (compact, UTF-8); if the page would exceed the budget, apply the contract's truncation rules (drop from the low-priority end of each list, shorten long text fields), record what was dropped in `meta.truncated`, and repeat until it fits.
 4. **Escape for embedding** (done by `system/tools/render.py`, which also does steps 5–6; never substitute by hand). In the serialized JSON replace `<` with `\u003c`, `>` with `\u003e`, `&` with `\u0026`, and U+2028/U+2029 with `\u2028`/`\u2029`. The result is still valid JSON and can never close the script element.
-5. **Theme.** Build the theme CSS (below); the render script removes every `<` from it.
+5. **Theme.** Build the theme CSS (below); the render script removes every `<` and backslash from it, drops `@import`, turns any `url()` that isn't a `data:` URI into `none` and disables `image-set()`, so a theme loads nothing from outside.
 6. Replace `{{ATLAS_DATA}}` with the escaped JSON and `{{ATLAS_THEME_CSS}}` with the theme CSS (or an empty string). Nothing else in the template changes.
 7. Publish: first time in chat (setup), then republish to the URL stored in `user/settings/dashboards.yaml` and set `last_published`.
 
