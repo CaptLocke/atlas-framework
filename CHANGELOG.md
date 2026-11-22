@@ -7,6 +7,11 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
+## Unreleased
+
+### What's new
+- Atlas's weekly look for blind spots now flags a serious risk nobody owns or has a plan for as soon as a deadline it threatens is within four weeks, not only once it has sat untouched for three.
+
 ## 3.4.0 (2026-11-21)
 
 ### What's new
