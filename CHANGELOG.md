@@ -11,7 +11,7 @@ Each release's "What's new" section is shown to users in the Guide and their nex
 
 ### What's new
 - Atlas's weekly look for blind spots now flags a serious risk nobody owns or has a plan for as soon as a deadline it threatens is within four weeks, not only once it has sat untouched for three.
-- With no calendar connected, the Daily Brief's Today line no longer gives hours between meetings it can't see.
+- With no calendar connected, the Daily Brief and the Today page no longer give hours between meetings they can't see.
 
 ### Under the hood
 - A declined suggestion from before 3.4.0 is logged with no kind, so it can't add up with others into a kind Atlas stops suggesting.
