@@ -44,7 +44,7 @@ Per routine and job, from run reports for the month:
 Signals for "used vs ignored":
 - Drafts: drafts later seen as sent (`mail.list_sent` evidence) vs left untouched or deleted by the user.
 - Insights: `acted`/`dismissed`/`expired` counts by kind (`insights.md` and that month's `user/inbox/archive/<YYYY-MM>-insights.md`); trend vs last month.
-- Approvals, **by kind** (`system/rules/governance.md` §Proposals the user keeps turning down): approved/rejected/expired for each, with chat yeses and noes to offered actions counted from the month's `proposal_accepted` and `proposal_declined` lines (`approvals.md` and the month's archive file). Counts only: stopping a kind is asked by governance's own rule, never suggested here.
+- Approvals, **by kind** (`system/rules/governance.md` §Proposals the user keeps turning down): approved/rejected/expired for each, with chat yeses and noes to offered actions counted from the month's `proposal_accepted` and `proposal_declined` lines (`approvals.md` and the month's archive file). With each kind's acceptance rate (`indicators.md`: `proposals`); stopping a kind is asked by governance's own rule, never suggested here.
 - Prep notes and status drafts: referenced or edited in chat, sent status updates.
 - Briefs: the user's chat activity on brief days (no tracking beyond the repo).
 Suggestions (each a one-line proposal with reason): turn off or reduce something ignored; change a schedule to when the user actually works; switch profile if runs are long/heavy for the plan or if the user wants fresher information; fix a recurring failure. Queue each in `approvals.md` as a `behavior_settings` proposal (or `questions.md` when it's a choice), never applied by this skill.

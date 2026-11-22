@@ -1582,6 +1582,7 @@ def check_user(c):
             elif not f.startswith("."):
                 rep.warn(os.path.join(fpath, f), "non-markdown file in a knowledge folder")
     check_goal_ranks(c)
+    check_project_health(c)
     check_last_contact(c)
     check_hot(c)
     tdir = c.p("user", "work", "templates")
@@ -1623,6 +1624,7 @@ INBOX_STATUSES = {
 }
 INBOX_OPEN = {"pending", "approved", "new", "seen", "open"}
 ENTRY_RE = re.compile(r"^## ([AIQ]-\d{4}-\d{2}-\d{2}-\d+) · ([a-z_]+)", re.M)
+KIND_RE = re.compile(r"^- \*\*Proposal kind:\*\* \S+ · \S", re.M)
 
 
 def check_inbox(c, path):
@@ -1646,6 +1648,12 @@ def check_inbox(c, path):
         actual[status] += 1
         if m and status in INBOX_OPEN:
             rep.error(path, "%s is still %s; only resolved entries belong in the archive" % (eid, status))
+    if name == "approvals.md" and not m:
+        for block in re.split(r"(?m)^(?=## [AIQ]-)", body or ""):
+            e = ENTRY_RE.match(block)
+            if e and e.group(2) in ("pending", "approved") and not KIND_RE.search(block):
+                rep.warn(path, "%s has no `Proposal kind:` line, so a no or a yes to it can't be counted "
+                               "(formats.md §3, governance.md §Proposals the user keeps turning down)" % e.group(1))
     counts = fm.get("counts")
     if counts is None:
         rep.warn(path, "no counts block (formats.md §3); maintenance adds it")
@@ -1658,7 +1666,10 @@ def check_inbox(c, path):
 
 
 def local_today(c):
-    """The user's date (YYYY-MM-DD) in atlas.yaml's timezone, as index.py computes it; the machine's date if unset."""
+    """The user's date (YYYY-MM-DD) in atlas.yaml's timezone, as index.py computes it; the machine's date if unset.
+    --today overrides it, for a fixed world such as the judgment set's."""
+    if getattr(c, "today", None):
+        return c.today
     try:
         with open(c.p("user", "settings", "atlas.yaml"), encoding="utf-8") as f:
             tz = (yaml.safe_load(f) or {}).get("timezone")
@@ -1779,6 +1790,41 @@ def check_goal_ranks(c):
                 c.rep.error(p, "rank %d is shared by %d active goals; ranks must be unique" % (rk, len(paths)))
 
 
+def check_project_health(c):
+    """Warn where an active project says on_track while its own fields say otherwise (ATL-132): its target has
+    passed, or a high-impact risk linked either way is active. Maintenance's refresh reconciles them."""
+    kdir = c.p("user", "knowledge")
+    quiet = Report(c.root)
+
+    def load(folder):
+        out = {}
+        for f in listdir(os.path.join(kdir, folder)):
+            if f.endswith(".md"):
+                path = os.path.join(kdir, folder, f)
+                fm, _ = read_frontmatter(path, quiet)
+                if isinstance(fm, dict) and fm.get("archived") is not True and not fm.get("superseded_by"):
+                    out["%s/%s" % (folder, f[:-3])] = (path, fm)
+        return out
+    projects, risks = load("projects"), load("risks")
+    hot = {r for r, (_, fm) in risks.items() if fm.get("status") == "active" and fm.get("impact") == "high"}
+    linked = {}
+    for r in hot:
+        for t in wiki_links(risks[r][1]):
+            linked.setdefault(t.strip().strip("/"), set()).add(r)
+    today = local_today(c)
+    for pid, (path, fm) in sorted(projects.items()):
+        if fm.get("status") != "active" or fm.get("health") != "on_track":
+            continue
+        target = str(fm.get("target") or "")
+        if re.match(r"^\d{4}-\d{2}-\d{2}$", target) and target < today:
+            c.rep.warn(path, "health on_track but its target %s has passed; maintenance's refresh reconciles it "
+                             "(atlas-capture reference/refresh.md §3)" % target)
+        risky = sorted(linked.get(pid, set()) | {t.strip().strip("/") for t in wiki_links(fm)} & hot)
+        if risky:
+            c.rep.warn(path, "health on_track but %s is active with impact high; maintenance's refresh reconciles it "
+                             "(atlas-capture reference/refresh.md §3)" % ", ".join(risky))
+
+
 # ================================================================ dispatch
 def check_path(c, path):
     rel = c.rep.rel(os.path.abspath(path))
@@ -1834,12 +1880,18 @@ def main(argv=None):
     ap.add_argument("--root", default=os.path.abspath(os.path.join(HERE, "..", "..")),
                     help="repository root (default: the repo containing this script)")
     ap.add_argument("--quiet", action="store_true", help="print errors only")
+    ap.add_argument("--today", help="YYYY-MM-DD for date checks (default: today in atlas.yaml's time zone)")
     ap.add_argument("paths", nargs="*", help="specific files to validate")
     args = ap.parse_args(argv)
 
     root = os.path.abspath(args.root)
     rep = Report(root)
     c = Ctx(root, rep)
+    if args.today:
+        if not re.match(r"^\d{4}-\d{2}-\d{2}$", args.today):
+            print("--today must be YYYY-MM-DD", file=sys.stderr)
+            return 2
+        c.today = args.today
     scope = []
     if args.paths:
         for p in args.paths:
