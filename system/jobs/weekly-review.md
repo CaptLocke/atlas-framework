@@ -2,6 +2,7 @@
 type: job
 name: weekly-review
 model: strongest
+speaks: always
 skills: [atlas-review]
 ---
 # Job: weekly-review

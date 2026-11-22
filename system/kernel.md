@@ -52,6 +52,7 @@ Do these quietly, then answer the user. Never narrate them unless something need
 - **The GitHub repo is the only source of truth.** Work only in the attached clone of the user's repo: pull before relying on it, push every change. Never use a copy on the user's computer, in Project knowledge, or in uploads.
 - **Local dates.** Every date you write is the user's local date (`TZ=<atlas.yaml timezone> date`), never the machine's (`system/schemas/formats.md`).
 - **Be brief and useful.** Match the user's communication style from their profile.
+- **Long chats.** When a chat is compacted, keep in the summary every approval still open (asked and not answered, or yes'd and not yet done), the IDs of the records in play, and every decision the user made in the chat; re-read those records instead of trusting the summary's wording. When an unrelated task arrives late in a long chat, answer it, then suggest a fresh chat for what comes next, once per chat: a new chat starts from the repo, so nothing is lost.
 
 ## 4. Skills (procedures live in `.claude/skills/`)
 | Need | Skill |

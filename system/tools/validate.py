@@ -508,6 +508,8 @@ def check_job(c, path, user=False):
         rep.error(path, "frontmatter name %r must equal the file name %r" % (fm.get("name"), stem))
     if fm.get("model") not in ("fast", "strongest"):
         rep.error(path, "frontmatter model must be 'fast' or 'strongest'")
+    if fm.get("speaks") not in ("always", "when_flagged") and (not user or fm.get("speaks") is not None):
+        rep.error(path, "frontmatter speaks must be 'always' or 'when_flagged' (system/jobs/README.md §When a job speaks)")
     skills = fm.get("skills")
     if not isinstance(skills, list):
         rep.error(path, "frontmatter skills must be a list")
@@ -970,6 +972,15 @@ def check_rhythms(c, path, data, template):
                 rep.error(path, "focus.shortest_window must be 15, 30, 45 or 60 minutes (got %r)" % (v,))
     elif focus is not None:
         rep.error(path, "focus must be a mapping (shortest_window)")
+    brief = data.get("brief")
+    if isinstance(brief, dict):
+        for k, v in brief.items():
+            if k != "quiet_days":
+                rep.warn(path, "brief: unknown key %r (known: quiet_days)" % k)
+            elif not isinstance(v, bool):
+                rep.error(path, "brief.quiet_days must be true or false (got %r)" % (v,))
+    elif brief is not None:
+        rep.error(path, "brief must be a mapping (quiet_days)")
     away = data.get("away")
     if away is not None:
         if not isinstance(away, dict):
@@ -1713,6 +1724,16 @@ def check_template(c, path):
             rep.error(path, "link target [[%s]] does not exist" % target)
     if "## Structure" not in (body or ""):
         rep.error(path, "needs a ## Structure section")
+    sched = fm.get("schedule")
+    if sched is not None and not (isinstance(sched, str) and sched.strip()):
+        rep.error(path, "schedule must be the user's words for when it's due (a string), or absent")
+    for k in ("next_due", "drafted_for"):
+        if fm.get(k) is not None and not is_date(fm.get(k)):
+            rep.error(path, "%s must be a YYYY-MM-DD date" % k)
+    if sched and fm.get("status") == "active" and fm.get("next_due") is None:
+        rep.error(path, "a scheduled active template needs next_due")
+    if not sched and (fm.get("next_due") is not None or fm.get("drafted_for") is not None):
+        rep.warn(path, "next_due and drafted_for do nothing without schedule")
 
 
 def check_hot(c):

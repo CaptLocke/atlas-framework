@@ -7,6 +7,23 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
+## 3.4.0 (2026-11-21)
+
+### What's new
+- Turn down the same kind of suggestion three times, like a focus block, and Atlas stops offering it and asks whether to turn it off for good.
+- When too much is due on one day for the free time you have, your Daily Brief leads with it and suggests what to move.
+- Approve several drafts with one yes: Atlas lists each one with its recipient, then sends exactly those.
+- Put a saved template on a schedule ("draft the board update the first Monday of every month") and each edition is drafted and waiting for you, never sent. Pausing your status updates doesn't pause these; remove the schedule to stop one.
+- Ask Atlas to keep your brief to one line on days with nothing new.
+- If you keep asking for the same thing by hand, Atlas offers to do it in a scheduled run instead.
+- If you keep correcting something that's in how Atlas works rather than your settings, Atlas offers to draft a report to its maker.
+- Drafts sound like you without reusing your past wording, and Atlas sometimes offers another way to say a line.
+- The monthly report shows your brief's worst two weeks as well as the month, and your approvals by kind of suggestion.
+
+### Under the hood
+- In a long chat, Atlas keeps your open approvals and the chat's decisions when the conversation is summarized, and suggests a fresh chat when you change topic.
+- Each of Atlas's jobs states whether it always reports or only speaks up when something is worth flagging.
+
 ## 3.3.0 (2026-11-20)
 
 ### What's new

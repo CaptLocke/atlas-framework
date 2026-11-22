@@ -2,6 +2,7 @@
 type: job
 name: ingest
 model: fast
+speaks: when_flagged
 skills: [atlas-capture]
 ---
 # Job: ingest

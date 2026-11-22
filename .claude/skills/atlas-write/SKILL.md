@@ -38,6 +38,7 @@ Output that starts at finished quality: correct, specific, in the user's voice (
 ### 2. Write
 1. Ground every claim in records; never invent facts, figures, quotes, or commitments. Gaps → ask, or leave a clearly marked placeholder ("[confirm date]") and say so.
 2. Apply the voice guide's tone, length, structure, vocabulary, openings/sign-offs, and "Don't" list. Lead with what matters to the reader.
+   The guide's Examples, and earlier pieces to the same person, show how the user sounds; they're not text to reuse. Write this piece's sentences fresh: never lift a sentence from an example, and don't open or close two pieces to the same person the same way in a row unless the guide makes it a rule (a fixed sign-off is fine). In chat, when the user is choosing wording ("how should I say this?") or the piece has a line that matters, offer one alternative phrasing for that line beside the draft, in a few words ("Or: …").
 3. Drafts the user will send contain **no** citations, record IDs, or Atlas jargon. Under the draft in chat, list the sources you used in one line (`system/rules/writing.md`).
 4. **Check, revise, check again.** Check the whole draft against the voice guide (tone, length, structure, the Don't list) and the quality bar (`system/rules/writing.md`): would the user send this as-is? Names, dates, numbers right? If anything fails, revise and check the whole draft again. Finish only when it passes. After three rounds, stop: in chat, show it and say what still falls short; in a job, create the draft anyway and say what falls short in its approvals entry or run-report line.
 
@@ -57,6 +58,7 @@ When the user says "send it" or similar:
    - [ ] This is a chat, not a routine
    ```
    In a routine: never send; leave the draft and an approvals entry. Any other box unticked: go back to step 1 and show it again. After any edit, the earlier yes no longer counts.
+   Several drafts at once ("send all four"): show them as one numbered list, each with its recipients and subject and its body, take one yes for the list, then tick the boxes and send for each in turn (`system/rules/governance.md` §Approval-record procedure, Several at once).
 3. After sending: evidence-close any `i_owe` commitment it fulfills (`atlas-triage` rules), update the recipient's `last_contact`, add an Updates line to related records, mark any related approvals entry `executed`.
 In routines, never send: drafts plus an approvals entry only.
 
@@ -77,12 +79,14 @@ For template-based pieces, the same rule applies to the template. Consistent edi
 2. Note the pattern (shorter, removes greetings, changes sign-off, avoids a word, adds bullets). One instance is noise; act on a consistent pattern (≥3 instances, or the user states a rule).
 3. Propose a voice-guide change as a `questions.md` entry (kind `profile`) with the proposed line in profile-tag format (`[observed · proposed]`) and the evidence. Write it into the guide only after the user confirms, or directly if `profile_update: auto` (then mention it).
 4. A rule the user states ("never use 'circle back'") is `stated`: confirm in one line and record it (`profile_update` per the user's level).
+5. **Phrasings the user keeps.** When the user picks Atlas's alternative phrasing, or keeps a phrase in what they send, that's a signal for it. The same phrasing kept 3 times is offered for the voice guide's Examples, as in step 3 ("You've used 'quick nudge on…' three times. Add it to your examples?"). An example added this way still sets tone, not text (§2 step 2).
 
 ### 7. Templates for recurring deliverables
 1. **Detect.** The same kind of deliverable has been produced 3 or more times in 6 months: same audience or purpose, a similar structure, a regular rhythm. Sources are `kind: deliverable` sources, status-update files, and sent mail that matches earlier Atlas drafts. `atlas-insights` checks this in the intelligence job; this skill checks it whenever it writes.
 2. **Draft.** Write `user/work/templates/<slug>.md` with `status: draft`. Take the shared structure from the examples (the section order and what each section holds), where each section's facts came from (records, sheets, reports), and the voice and format notes. Keep only what most editions share; never copy data values.
 3. **Propose.** Use an `opportunity` insight, or in chat: "You've written the monthly board update 3 times with the same 5 sections. Save it as a template so the next one starts from it?"
 4. **On yes:** set `status: active` (the user may edit it first). On no: `status: retired`, so it's not proposed again. "Make this a template" from the user creates one straight from the piece in front of them.
+5. **On a schedule.** "Draft it the first Monday of every month": set `schedule` to the user's words and `next_due` to the next date they give, say that date back in one line ("The next one will be waiting by Mon Dec 7"), and ask only if the words don't name a date. It's the user's own request, so no approval. The weekly `status-updates` run then drafts each edition up to a week ahead, from the template's Structure and its "Pull from" sources, as a finished deliverable (§5) for a doc, deck or sheet, or a draft in the user's tool for an email or message: saved, never sent or shared. "Stop drafting it" removes `schedule` and `next_due`.
 
 ## Outputs
 - Text in chat; email drafts in the user's mail tool; sent messages only after approval.

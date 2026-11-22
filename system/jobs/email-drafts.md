@@ -2,6 +2,7 @@
 type: job
 name: email-drafts
 model: strongest
+speaks: when_flagged
 skills: [atlas-write]
 ---
 # Job: email-drafts

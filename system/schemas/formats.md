@@ -129,11 +129,12 @@ counts: { pending: 1, approved: 0, rejected: 0, executed: 0, expired: 0 }
 - **Action:** send_communication: send follow-up to Dana Ruiz
 - **Why:** Dana's review is 6 days overdue ([[commitments/dana-contract-review]])
 - **Prepared:** Outlook draft "Contract review — quick check-in" (id AAMk…)
+- **Proposal kind:** send_communication · follow-up
 - **Requested by:** routine:nightly-cycle · 2026-10-12
 - **Expires:** 2026-10-14 17:00
 - **Status history:** pending 2026-10-12
 ```
-Statuses: `pending | approved | rejected | executed | expired` (expires after 14 days, not counting days while away mode is on). Newest first.
+Statuses: `pending | approved | rejected | executed | expired` (expires after 14 days, not counting days while away mode is on). Newest first. `Proposal kind:` names the kind the proposal is counted under when the user turns it down or accepts it (`system/rules/governance.md` §Proposals the user keeps turning down); an entry written before 3.4.0 has none, and isn't counted.
 
 `Expires:` (optional, `YYYY-MM-DD HH:MM` in the user's time zone) is the moment the action stops making sense: the start of a proposed block or hold, the start of a meeting to respond to, the deadline a send is for. Whoever writes an entry tied to a time sets it. Once it has passed, the next `triage` or `maintenance` marks a `pending` or `approved` entry `expired` (`expired <date> (time passed)` in its history) and never acts on it; a chat that finds one says so instead of doing it. Away doesn't extend it.
 
@@ -285,6 +286,9 @@ kind: doc                      # email | message | doc | deck | sheet
 used_for: The update Maya sends the board in the first week of each month
 audience: ["[[people/jordan-lee]]"]   # optional
 cadence: monthly               # optional: weekly | biweekly | monthly | quarterly | ad hoc
+schedule: "first Monday of each month"   # optional: when an edition is due, in the user's words; drafted unattended (below)
+next_due: 2026-12-07           # with schedule: the next edition's due date, worked out from it
+drafted_for: 2026-11-02        # with schedule: the due date of the last edition drafted unattended
 examples: ["[[sources/2026-09-03-board-update]]", "[[sources/2026-10-02-board-update]]"]   # past editions it was learned from
 base_file: null                # optional: the user's own file template (library path or drive link) to build on
 updated: 2026-10-12
@@ -301,6 +305,8 @@ updated: 2026-10-12
 - Last edition's open items are carried into "Follow-ups" (the user asked for this on 2026-10-02).
 ```
 Rules: one file per recurring deliverable; only the user's confirmation makes a `draft` template `active`; edits the user makes to an edition are proposed back into the template with the same learning rule as voice (`atlas-write` §6). Templates never store data values, only where to get them.
+
+**On a schedule.** "Draft the board update the first Monday of every month" sets `schedule` to those words and `next_due` to the next such date (`atlas-write` §7 step 5). Each weekly `status-updates` run drafts every edition of an `active` template due on or before its next run's date (today + 7 days), so an edition due on the routine's own weekday is drafted a week early, never on the day: for each, it sets `drafted_for` to that due date and moves `next_due` to the following date the words give (`system/jobs/status-updates.md` step 6). An edition whose date equals `drafted_for` is never drafted twice. Removing `schedule` stops it; a `retired` template is never drafted.
 
 ## 8. Extensions registry (`user/extensions/registry.yaml`)
 ```yaml

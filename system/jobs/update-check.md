@@ -2,6 +2,7 @@
 type: job
 name: update-check
 model: strongest
+speaks: when_flagged
 skills: [atlas-update]
 ---
 # Job: update-check

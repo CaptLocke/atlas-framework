@@ -15,7 +15,9 @@ Input:
    "priorities": [{"id", "rank", "title", "effort", "due",       # a commitment line, or
                    "commitments": [{"id", "title", "effort", "due", "status"}]}],   # a project line
    "due_today": [{"id", "title", "effort"}],      # other i_owe commitments due that day
-   "now": "10:05"}                                # optional: windows before it are gone
+   "now": "10:05",                                # optional: windows before it are gone
+   "days": [{"date", "free_minutes",              # optional: the coming work days, from the week data
+             "due": [{"id", "effort", "priority"}]}]}   # the i_owe items due that day
 
 A window is a gap inside work hours between meetings and holds, at least
 shortest_window minutes long. Items go in order: priorities by rank, then anything
@@ -25,13 +27,21 @@ hour 60, half_day 240, day 480) and goes into the earliest window with room left
 one that fits nowhere is "Won't fit", with a date to send at the start of the
 day's last window.
 
+Capacity: for each day in "days", the work it needs is the size of every item due
+that day (as above). A day is overloaded when that is more than its free minutes.
+For an overloaded day, "move" lists the items to re-date until the rest fits: lowest
+priority first (low, medium, unset, high), then the largest, then by id.
+
 Output:
   {"day": {"start": "08:00", "end": "18:00", "work_day": true},
    "windows": [{"start": "11:30", "end": "12:30", "minutes": 60, "items": ["commitments/x", ...], "left": 25}],
    "slots": {"<item id>": {"kind": "window", "start": "11:30", "at": "11:30", "minutes": 30, "sized": true}
                         | {"kind": "wont_fit", "date_at": "16:15", "minutes": 240, "sized": true}
                         | {"kind": "none"}},          # a project with no open commitment, or not a work day
-   "open_minutes": 210, "due_today": 3, "due_today_placed": 3}
+   "open_minutes": 210, "due_today": 3, "due_today_placed": 3,
+   "capacity": [{"date": "2026-10-16", "needed": 780, "free": 120, "items": 13,
+                 "move": ["commitments/y", ...]}]}   # overloaded days only, soonest first; [] with no "days"
+   # a bad "days" entry gives "capacity": [] and "capacity_error": "<why>"; windows and slots still come out
 Slots are keyed by the id the input gave: a priority's own id (the project's, for a project line,
 and the commitment it took, too). "start" is the window's start; "at" is where the item begins in it.
 """
@@ -140,6 +150,7 @@ def place(inp):
     if not work_day:
         for it in items:
             out["slots"][it["key"]] = {"kind": "none"}
+        add_capacity(out, inp.get("days"))
         return out
 
     # Busy time inside work hours, merged; the gaps between are the windows.
@@ -182,6 +193,47 @@ def place(inp):
                        "items": w["items"], "left": w["left"]} for w in windows]
     out["open_minutes"] = sum(w["end"] - w["start"] for w in windows)
     out["due_today_placed"] = len([i for i in due_ids if i and out["slots"].get(i, {}).get("kind") == "window"])
+    add_capacity(out, inp.get("days"))
+    return out
+
+
+RANK = {"low": 0, "medium": 1, None: 2, "high": 3}
+
+
+def add_capacity(out, days):
+    """Capacity is optional: a bad "days" entry costs only the capacity, never the slots."""
+    try:
+        out["capacity"] = capacity(days)
+    except (ValueError, TypeError, AttributeError, KeyError) as e:
+        out["capacity"] = []
+        out["capacity_error"] = str(e)
+
+
+def capacity(days):
+    """Overloaded days: the work due that day is more than its free time."""
+    out = []
+    for d in sorted(days or [], key=lambda d: str(d.get("date") or "")):
+        date = str(d.get("date") or "")
+        if not re.match(r"^\d{4}-\d{2}-\d{2}$", date):
+            raise ValueError("days[].date must be YYYY-MM-DD")
+        free = d.get("free_minutes")
+        if isinstance(free, float) and free.is_integer():
+            free = int(free)
+        if not isinstance(free, int) or isinstance(free, bool) or free < 0:
+            raise ValueError("days[].free_minutes must be a whole number of minutes")
+        due = list({c["id"]: c for c in d.get("due") or [] if c.get("id")}.values())
+        size = {c["id"]: SIZE.get(c.get("effort"), DEFAULT_SIZE) for c in due}
+        needed = sum(size.values())
+        if needed <= free:
+            continue
+        order = sorted(due, key=lambda c: (RANK.get(c.get("priority"), 2), -size[c["id"]], c["id"]))
+        move, left = [], needed
+        for c in order:
+            if left <= free:
+                break
+            move.append(c["id"])
+            left -= size[c["id"]]
+        out.append({"date": date, "needed": needed, "free": free, "items": len(due), "move": move})
     return out
 
 

@@ -2,6 +2,7 @@
 type: job
 name: monthly
 model: strongest
+speaks: always
 skills: [atlas-review, atlas-health]
 ---
 # Job: monthly

@@ -2,6 +2,7 @@
 type: job
 name: meeting-prep
 model: strongest
+speaks: when_flagged
 skills: [atlas-prep]
 ---
 # Job: meeting-prep

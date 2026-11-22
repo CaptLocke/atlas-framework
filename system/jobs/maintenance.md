@@ -2,6 +2,7 @@
 type: job
 name: maintenance
 model: strongest
+speaks: when_flagged
 skills: [atlas-health, atlas-capture]
 ---
 # Job: maintenance
