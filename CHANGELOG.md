@@ -7,12 +7,11 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
-## Unreleased
+## 3.5.0 (2026-11-21)
 
 ### What's new
 - Atlas's weekly look for blind spots now flags a serious risk nobody owns or has a plan for as soon as a deadline it threatens is within four weeks, not only once it has sat untouched for three.
 - With no calendar connected, the Daily Brief and the Today page no longer give hours between meetings they can't see.
-
 - Atlas groups your work into topics more reliably: its weekly look across your records now finds themes that recur across separate emails and meetings, and the monthly check tells you if none have formed.
 - A project's target date and health now follow its newest decision and its own risks when Atlas brings the record up to date, and a date it can't settle becomes a question for you.
 - The monthly report shows how many of Atlas's suggestions you accepted, by kind, and how many of its drafts you sent, beside the numbers that say its jobs ran.
@@ -20,6 +19,8 @@ Each release's "What's new" section is shown to users in the Guide and their nex
 ### Under the hood
 - Every suggestion Atlas queues now records its kind, so turning the same kind down three times stops it as 3.4.0 intended.
 - A declined suggestion from before 3.4.0 is logged with no kind, so it can't add up with others into a kind Atlas stops suggesting.
+
+Thanks to the Atlas user whose report after five weeks of daily use found the gaps behind four of these changes.
 
 ## 3.4.0 (2026-11-21)
 
