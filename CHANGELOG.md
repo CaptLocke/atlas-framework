@@ -10,7 +10,7 @@ Each release's "What's new" section is shown to users in the Guide and their nex
 ## 3.5.0 (2026-11-21)
 
 ### What's new
-- Atlas's weekly look for blind spots now flags a serious risk nobody owns or has a plan for as soon as a deadline it threatens is within four weeks, not only once it has sat untouched for three.
+- Atlas's weekly look for blind spots now flags a serious risk nobody owns or has a plan for as soon as a project deadline it threatens is within four weeks or already past, not only once it has sat untouched for three.
 - With no calendar connected, the Daily Brief and the Today page no longer give hours between meetings they can't see.
 - Atlas groups your work into topics more reliably: its weekly look across your records now finds themes that recur across separate emails and meetings, and the monthly check tells you if none have formed.
 - A project's target date and health now follow its newest decision and its own risks when Atlas brings the record up to date, and a date it can't settle becomes a question for you.

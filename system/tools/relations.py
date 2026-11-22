@@ -34,17 +34,20 @@ Five lists, each the top N (default 10):
   done-late commitment counts here only while it is that recent.
 - `unowned`: open risks (`potential` or `active`) with no `owner` or no `mitigation`, kept
   when the risk is quiet (neither it nor a source touching it dated in the last 21 days)
-  or its `impact` is high and a project or goal it links to has a `target` date in the
-  next 28 days, whatever the risk's age. High impact first, then the nearest target,
-  then the longest quiet. A risk can be unowned on purpose; reading decides.
-- `themes`: terms (words of 4+ letters, acronyms, and adjacent pairs of them) from the
-  title, summary and aliases of commitments, decisions, ideas, risks, questions, projects
-  and events that recur in at least 3 of them, touched by at least 2 sources, where no
-  topic's title or aliases already hold the term. Names of people, organizations,
-  projects and goals are left out (a project isn't a theme of its own commitments), as
-  are common work words and, from 20 records up, terms in more than 15% of them. Pairs
-  score half again; a word whose records all carry a listed pair is dropped. Reading
-  decides whether a term is a real theme (`topic.md` §Capture guidance).
+  or its `impact` is high and a project it links to has a `target` date (a goal's counts
+  only when it is a date) already passed or in the next 28 days, whatever the risk's
+  age. High impact first, then the earliest target, then the longest quiet. A risk can
+  be unowned on purpose; reading decides.
+- `themes`: terms (words of 4+ letters, acronyms, and adjacent pairs of them, never
+  across two fields) from the title, aliases and summary of commitments, decisions,
+  ideas, risks, questions, projects and events that recur in at least 3 of them, of at
+  least 2 types, touched by at least 2 sources, where no topic's title or aliases hold
+  the term itself. Names of people, organizations, projects and goals are left out (a
+  project isn't a theme of its own commitments), as are common work words, weekdays,
+  months and cadences, and, from 20 records up, terms in more than 15% of them. A
+  record counts fully when the term is in its title or aliases and half when only in
+  its summary; pairs score half again; a word whose records all carry a listed pair is
+  dropped. Reading decides whether a term is a real theme (`topic.md` §Capture guidance).
 
 Sources flagged `suspicious` are left out entirely, including where a record cites them.
 """
@@ -127,8 +130,8 @@ def load(root, today):
                          "target": index.as_date(fm.get("target")), "impact": str(fm.get("impact") or ""),
                          "missing": [k for k in ("owner", "mitigation") if not fm.get(k)],
                          "self": name == "person" and str(fm.get("relationship") or "") == "self",
-                         "text": " ".join([str(fm.get("title") or ""), str(fm.get("summary") or "")]
-                                          + [str(x) for x in (fm.get("aliases") or []) if x]),
+                         "fields": [str(fm.get("title") or "")] + [str(x) for x in (fm.get("aliases") or []) if x]
+                                   + [str(fm.get("summary") or "")],
                          "names": [str(fm.get("title") or "")] + [str(x) for x in (fm.get("aliases") or []) if x],
                          "links": (graph.front_links(fm) | graph.body_links(path)) - {rid}}
             for sid in _ids(fm.get("sources")):
@@ -264,8 +267,8 @@ def unowned(recs, adj, sources, touches, today, top):
             continue
         last = max(d for d in (info["updated"], seen.get(r)) if d) if (info["updated"] or seen.get(r)) else None
         quiet = (today - last).days if last else None
-        ahead = sorted((recs[o]["target"], o) for o in adj[r]
-                       if recs[o]["type"] in CONTEXT and recs[o]["target"] and recs[o]["target"] >= today)
+        ahead = sorted((recs[o]["target"], o) for o in adj[r]       # a passed target first: the most urgent case
+                       if recs[o]["type"] in CONTEXT and recs[o]["target"])
         near = ahead[0] if ahead else None
         days = (near[0] - today).days if near else None
         high = info["impact"] == "high"
@@ -286,7 +289,9 @@ still such them until via want way week weeks day days today tomorrow yesterday 
 send sent sending ask asked check checking confirm draft drafts follow followup review reviews reviewed update updates
 updated share shared call calls meeting meetings sync email emails message notes note plan plans planning prep make
 made need needs needed work working item items thing things team chat call discuss discussed agree agreed decide
-decided set setting start started finish finished""".split())
+decided set setting start started finish finished expect expects expected report reports status feedback
+daily weekly monthly quarterly yearly annual monday tuesday wednesday thursday friday saturday sunday
+january february march april june july august september october november december""".split())
 CONTENT = {"commitment", "decision", "idea", "risk", "question", "project", "event"}
 THEME_MIN_RECORDS, THEME_MIN_SOURCES, THEME_MAX_SHARE = 3, 2, 0.15
 
@@ -320,19 +325,25 @@ def themes(recs, touches, top):
         for r in rs:
             srcs.setdefault(r, set()).add(sid)
     content = [r for r, i in recs.items() if i["type"] in CONTENT]
-    has = {}
+    has, titled = {}, {}
     for r in content:
-        for t in _terms(recs[r]["text"]):
-            if t not in named and t not in covered and not any(w in covered for w in t.split()):
+        f = recs[r]["fields"]
+        head = set().union(*(_terms(x) for x in f[:-1])) if f[:-1] else set()
+        for t in head | _terms(f[-1]):    # per field, so a pair never spans two of them
+            if t not in named and t not in covered:
                 has.setdefault(t, set()).add(r)
+                if t in head:
+                    titled.setdefault(t, set()).add(r)
     cap = max(THEME_MIN_RECORDS, int(len(content) * THEME_MAX_SHARE)) if len(content) >= 20 else len(content)
     out = []
     for t, rs in has.items():
         src = set().union(*(srcs.get(r, set()) for r in rs))
-        if len(rs) < THEME_MIN_RECORDS or len(src) < THEME_MIN_SOURCES or len(rs) > cap:
+        if (len(rs) < THEME_MIN_RECORDS or len(src) < THEME_MIN_SOURCES or len(rs) > cap
+                or len({recs[r]["type"] for r in rs}) < 2):
             continue
+        weight = len(titled.get(t, ())) + 0.5 * (len(rs) - len(titled.get(t, ())))   # a title counts more than a summary
         out.append({"term": t, "records": sorted(rs)[:8], "count": len(rs), "sources": len(src),
-                    "score": round(len(rs) * math.log(1 + len(src)) * (1.5 if " " in t else 1), 3)})
+                    "score": round(weight * math.log(1 + len(src)) * (1.5 if " " in t else 1), 3)})
     out.sort(key=lambda x: (-x["score"], x["term"]))
     kept = []
     for x in out:   # a word whose records all carry a kept pair says nothing the pair doesn't

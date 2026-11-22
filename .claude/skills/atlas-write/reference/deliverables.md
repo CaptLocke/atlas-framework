@@ -38,7 +38,7 @@ Build output goes to `.atlas-tmp/deliverables/<slug>/` (git-ignored). Binaries a
 - File name: `<Short Title> - <YYYY-MM-DD>.<ext>` (user-friendly, no IDs).
 
 ## 6. Save and deliver
-1. `files.upload` to `atlas.yaml: deliverables_folder` (`connector`, `folder_id`; create the folder with `files.create_folder` only if missing and record the ID through `atlas-settings`). Autonomy: `deliverables_save`. If the level is `propose`, ask in chat; in routines queue an approvals entry.
+1. `files.upload` to `atlas.yaml: deliverables_folder` (`connector`, `folder_id`; create the folder with `files.create_folder` only if missing and record the ID through `atlas-settings`). Autonomy: `deliverables_save`. If the level is `propose`, ask in chat; in routines queue an approvals entry (`Proposal kind: deliverables_save · deliverable`).
 2. Never overwrite: if the name exists, save as `… - v2`.
 3. Send the file to the user in chat as a download (the session's file-delivery tool), with one line: what it is, where it was saved.
 4. Pointer Source via `atlas-capture` (`kind: deliverable`, `file_pointer` = drive link/path or "download only; not saved to a drive"), linked to project/people/commitment.

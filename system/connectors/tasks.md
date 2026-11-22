@@ -53,7 +53,7 @@ Covers task and work-tracking tools (Asana, Jira, Linear, Trello, Microsoft Plan
 | Comment visible to others | `send_communication` 🔒 | A visible comment is communication. Chat only, with approval. |
 | Assigning a task to someone else | `send_communication` 🔒 | It notifies them. |
 | `delete` | `destructive` 🔒 | Never part of any job. |
-Routines never write to task tools; they queue proposals in `approvals.md`.
+Routines never write to task tools; they queue proposals in `approvals.md` (`Proposal kind: shared_records_update · task update`).
 
 ## Risk notes
 - Tag comment, mention, assign, and "notify" tools `send` even if named `update_*`.

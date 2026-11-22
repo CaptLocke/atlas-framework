@@ -8,7 +8,7 @@ Filing appends: every source adds a dated `## Updates` line, and the top of a re
 
 ## 1. Which records
 - Types: project, person, organization, topic, goal. Not archived, status not closed (`schema.yaml: closed_statuses`), not superseded, and never the user's own record (`relationship: self`), which the user's profile describes.
-- **Due** when its `## Updates` has 3 or more lines dated after `refreshed` (after `created` if it was never refreshed).
+- **Due** when its `## Updates` has 3 or more lines dated after `refreshed` (after `created` if it was never refreshed), or, for a project, when `validate.py` warns about its `health` (an active project `on_track` past its `target` or with an active high-impact risk): a quiet project adds no Updates lines, so the warning is what brings it here.
 - At most **25 a run**, the most lines behind first; the rest wait for the next run. The validator warns at more than 8 (`system/tools/validate.py`).
 
 ## 2. Rewriting the top
@@ -32,7 +32,7 @@ While the record is open:
 - **Held events** (`status: held`) with a linked source and empty `outcomes`: fill `outcomes` from the decisions and commitments that cite that source (one short line each, linked), the same rule as filing (`system/rules/knowledge.md` write path step 6). Events are refreshed this way only, never rewritten.
 - **Projects: `target` and `health` agree with the record** (ATL-132). A refresh that leaves the top saying one thing and the fields another gives a chat answer and a dated page different pictures.
   - **`target`:** the newest `made`, non-superseded decision linked to the project that sets or moves its date wins: if it is dated after the last change to `target` and names another date, set `target` to it, with a "was X, now Y" Updates line citing the decision. A different date in the Updates or the old top with no decision behind it doesn't move the field: add one `other` question to `user/inbox/questions.md` ("Orion's target says Dec 11, but the Nov 18 notes say Dec 20. Which holds?", `Proposed change:` the field, `Links:` the project and the source), unless one about it is open, and write the top with the field's date and the open question.
-  - **`health`:** `off_track` when `target` has passed with the project still active, or an `active` linked risk has `impact: high`; `at_risk` when a linked open risk has `impact: high`, the newest estimate in the record or its sources puts the end after `target`, or work the top calls unscoped or unsized stands between now and `target`; otherwise leave it. Change it only on that evidence, with a "was X, now Y" Updates line naming the evidence. The top says the same.
+  - **`health`:** `off_track` when `target` has passed with the project still active, or an `active` linked risk has `impact: high`; `at_risk` when a linked open risk has `impact: high`, the newest estimate in the record or its sources puts the end after `target`, or work the top calls unscoped or unsized stands between now and `target`; `on_track` again when it was `at_risk` or `off_track` for evidence that no longer holds (the risk is resolved, a decision moved the target forward, the work is scoped); otherwise leave it. Change it only on that evidence, with a "was X, now Y" Updates line naming the evidence. The top says the same.
   - Goals keep `target` as text: compare it only by eye, and ask the same way when it plainly disagrees.
 - `last_contact` and `cadence` are set by `normalize.py --derive`, not here.
 

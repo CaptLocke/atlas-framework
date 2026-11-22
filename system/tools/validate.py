@@ -1624,6 +1624,7 @@ INBOX_STATUSES = {
 }
 INBOX_OPEN = {"pending", "approved", "new", "seen", "open"}
 ENTRY_RE = re.compile(r"^## ([AIQ]-\d{4}-\d{2}-\d{2}-\d+) · ([a-z_]+)", re.M)
+KIND_SINCE = "2026-11-21"   # 3.4.0, when Proposal kind began
 KIND_RE = re.compile(r"^- \*\*Proposal kind:\*\* \S+ · \S", re.M)
 
 
@@ -1651,7 +1652,8 @@ def check_inbox(c, path):
     if name == "approvals.md" and not m:
         for block in re.split(r"(?m)^(?=## [AIQ]-)", body or ""):
             e = ENTRY_RE.match(block)
-            if e and e.group(2) in ("pending", "approved") and not KIND_RE.search(block):
+            if (e and e.group(2) in ("pending", "approved") and not KIND_RE.search(block)
+                    and e.group(1)[2:12] >= KIND_SINCE):   # older entries have none and expire (formats.md §3)
                 rep.warn(path, "%s has no `Proposal kind:` line, so a no or a yes to it can't be counted "
                                "(formats.md §3, governance.md §Proposals the user keeps turning down)" % e.group(1))
     counts = fm.get("counts")
@@ -1817,12 +1819,12 @@ def check_project_health(c):
             continue
         target = str(fm.get("target") or "")
         if re.match(r"^\d{4}-\d{2}-\d{2}$", target) and target < today:
-            c.rep.warn(path, "health on_track but its target %s has passed; maintenance's refresh reconciles it "
-                             "(atlas-capture reference/refresh.md §3)" % target)
+            c.rep.warn(path, "health on_track but its target %s has passed; triage and maintenance's refresh "
+                             "reconcile it (atlas-capture reference/refresh.md §3)" % target)
         risky = sorted(linked.get(pid, set()) | {t.strip().strip("/") for t in wiki_links(fm)} & hot)
         if risky:
-            c.rep.warn(path, "health on_track but %s is active with impact high; maintenance's refresh reconciles it "
-                             "(atlas-capture reference/refresh.md §3)" % ", ".join(risky))
+            c.rep.warn(path, "health on_track but %s is active with impact high; triage and maintenance's refresh "
+                             "reconcile it (atlas-capture reference/refresh.md §3)" % ", ".join(risky))
 
 
 # ================================================================ dispatch
