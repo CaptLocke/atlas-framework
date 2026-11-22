@@ -1666,7 +1666,10 @@ def check_inbox(c, path):
 
 
 def local_today(c):
-    """The user's date (YYYY-MM-DD) in atlas.yaml's timezone, as index.py computes it; the machine's date if unset."""
+    """The user's date (YYYY-MM-DD) in atlas.yaml's timezone, as index.py computes it; the machine's date if unset.
+    --today overrides it, for a fixed world such as the judgment set's."""
+    if getattr(c, "today", None):
+        return c.today
     try:
         with open(c.p("user", "settings", "atlas.yaml"), encoding="utf-8") as f:
             tz = (yaml.safe_load(f) or {}).get("timezone")
@@ -1877,12 +1880,18 @@ def main(argv=None):
     ap.add_argument("--root", default=os.path.abspath(os.path.join(HERE, "..", "..")),
                     help="repository root (default: the repo containing this script)")
     ap.add_argument("--quiet", action="store_true", help="print errors only")
+    ap.add_argument("--today", help="YYYY-MM-DD for date checks (default: today in atlas.yaml's time zone)")
     ap.add_argument("paths", nargs="*", help="specific files to validate")
     args = ap.parse_args(argv)
 
     root = os.path.abspath(args.root)
     rep = Report(root)
     c = Ctx(root, rep)
+    if args.today:
+        if not re.match(r"^\d{4}-\d{2}-\d{2}$", args.today):
+            print("--today must be YYYY-MM-DD", file=sys.stderr)
+            return 2
+        c.today = args.today
     scope = []
     if args.paths:
         for p in args.paths:
