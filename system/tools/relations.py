@@ -14,7 +14,7 @@ old closed records left out), plus sources for their dates and what they touch. 
 user's own person record (`relationship: self`) is never a shared neighbour or an entity.
 A source *touches* a record when it links to it or the record lists it in `sources`.
 
-Four lists, each the top N (default 10):
+Five lists, each the top N (default 10):
 
 - `buried`: two projects, goals, ideas, risks, questions or decisions with no link
   between them that share at least 2 neighbours (linked records, or sources both cite),
@@ -37,6 +37,14 @@ Four lists, each the top N (default 10):
   or its `impact` is high and a project or goal it links to has a `target` date in the
   next 28 days, whatever the risk's age. High impact first, then the nearest target,
   then the longest quiet. A risk can be unowned on purpose; reading decides.
+- `themes`: terms (words of 4+ letters, acronyms, and adjacent pairs of them) from the
+  title, summary and aliases of commitments, decisions, ideas, risks, questions, projects
+  and events that recur in at least 3 of them, touched by at least 2 sources, where no
+  topic's title or aliases already hold the term. Names of people, organizations,
+  projects and goals are left out (a project isn't a theme of its own commitments), as
+  are common work words and, from 20 records up, terms in more than 15% of them. Pairs
+  score half again; a word whose records all carry a listed pair is dropped. Reading
+  decides whether a term is a real theme (`topic.md` §Capture guidance).
 
 Sources flagged `suspicious` are left out entirely, including where a record cites them.
 """
@@ -119,6 +127,9 @@ def load(root, today):
                          "target": index.as_date(fm.get("target")), "impact": str(fm.get("impact") or ""),
                          "missing": [k for k in ("owner", "mitigation") if not fm.get(k)],
                          "self": name == "person" and str(fm.get("relationship") or "") == "self",
+                         "text": " ".join([str(fm.get("title") or ""), str(fm.get("summary") or "")]
+                                          + [str(x) for x in (fm.get("aliases") or []) if x]),
+                         "names": [str(fm.get("title") or "")] + [str(x) for x in (fm.get("aliases") or []) if x],
                          "links": (graph.front_links(fm) | graph.body_links(path)) - {rid}}
             for sid in _ids(fm.get("sources")):
                 touches.setdefault(sid, set()).add(rid)
@@ -267,19 +278,86 @@ def unowned(recs, adj, sources, touches, today, top):
     return out[:top]
 
 
+STOP = set("""a an and are as at be been but by can do does done for from get got had has have he her his how i if in
+into is it its let me more most my new no not now of on or our out over own per she so some than that the their them
+then there these they this those to too up us very was we were what when which who why will with would you your
+about after again ago all also any back before being both each few just like many much next only other same should
+still such them until via want way week weeks day days today tomorrow yesterday month months year time
+send sent sending ask asked check checking confirm draft drafts follow followup review reviews reviewed update updates
+updated share shared call calls meeting meetings sync email emails message notes note plan plans planning prep make
+made need needs needed work working item items thing things team chat call discuss discussed agree agreed decide
+decided set setting start started finish finished""".split())
+CONTENT = {"commitment", "decision", "idea", "risk", "question", "project", "event"}
+THEME_MIN_RECORDS, THEME_MIN_SOURCES, THEME_MAX_SHARE = 3, 2, 0.15
+
+
+def _terms(text):
+    """Theme terms in a line of text: words of 4+ letters or acronyms (SSO, DPA), and adjacent pairs of them."""
+    words = []
+    for raw in "".join(ch if ch.isalnum() else " " for ch in text).split():
+        w = raw.lower()
+        if w in STOP or w.isdigit() or not (len(w) >= 4 or (raw.isupper() and len(raw) >= 2)):
+            words.append(None)
+            continue
+        words.append(w)
+    out = {w for w in words if w}
+    out.update("%s %s" % (a, b) for a, b in zip(words, words[1:]) if a and b and a != b)
+    return out
+
+
+def themes(recs, touches, top):
+    """Terms that recur across content records and sources with no topic covering them yet."""
+    named, covered = set(), set()
+    for info in recs.values():
+        if info["type"] in ("person", "organization", "project", "goal"):
+            for n in info["names"]:
+                named.update(_terms(n))
+        if info["type"] == "topic":
+            for n in info["names"]:
+                covered.update(_terms(n))
+    srcs = {}
+    for sid, rs in touches.items():
+        for r in rs:
+            srcs.setdefault(r, set()).add(sid)
+    content = [r for r, i in recs.items() if i["type"] in CONTENT]
+    has = {}
+    for r in content:
+        for t in _terms(recs[r]["text"]):
+            if t not in named and t not in covered and not any(w in covered for w in t.split()):
+                has.setdefault(t, set()).add(r)
+    cap = max(THEME_MIN_RECORDS, int(len(content) * THEME_MAX_SHARE)) if len(content) >= 20 else len(content)
+    out = []
+    for t, rs in has.items():
+        src = set().union(*(srcs.get(r, set()) for r in rs))
+        if len(rs) < THEME_MIN_RECORDS or len(src) < THEME_MIN_SOURCES or len(rs) > cap:
+            continue
+        out.append({"term": t, "records": sorted(rs)[:8], "count": len(rs), "sources": len(src),
+                    "score": round(len(rs) * math.log(1 + len(src)) * (1.5 if " " in t else 1), 3)})
+    out.sort(key=lambda x: (-x["score"], x["term"]))
+    kept = []
+    for x in out:   # a word whose records all carry a kept pair says nothing the pair doesn't
+        if " " not in x["term"] and any(x["term"] in k["term"].split() and k["count"] >= x["count"] for k in kept):
+            continue
+        kept.append(x)
+    return kept[:top]
+
+
 def build(root, today, top=TOP):
     recs, sources, touches = load(root, today)
     adj = adjacency(recs, touches)
     data = {"buried": buried(recs, adj, touches, top),
             "together": together(recs, adj, sources, touches, today, top),
             "follows": follows(recs, adj, sources, touches, today, top),
-            "unowned": unowned(recs, adj, sources, touches, today, top)}
+            "unowned": unowned(recs, adj, sources, touches, today, top),
+            "themes": themes(recs, touches, top)}
     named = set()
     for x in data["buried"] + data["together"]:
         named.update([x["a"], x["b"]])
     for x in data["follows"]:
         named.add(x["entity"])
         named.update(t["record"] for i in x["instances"] for t in i["then"])
+    for x in data["themes"]:
+        named.update(x["records"])
     for x in data["unowned"]:
         named.add(x["risk"])
         if x["target"]:

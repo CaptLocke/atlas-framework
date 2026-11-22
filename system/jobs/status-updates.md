@@ -35,7 +35,7 @@ For status updates (steps 1–5); scheduled templates (step 6) need only an `act
 1. For each audience, skip if a status draft for this ISO week exists and nothing relevant changed since.
 2. Invoke `atlas-status-update` for that audience: what moved, decisions, risks and asks, next week; finished and ready to send, no citations in the draft; list sources separately in the file.
 3. Write `user/work/status/YYYY-MM-DD-<audience-slug>.md` (`type: status`, `date`, `sources`).
-4. If a mail connector with `mail.create_draft` is available and `drafts_create` is `auto`, also create an email draft to that audience and add a pending `send_communication` entry to `user/inbox/approvals.md` pointing to it.
+4. If a mail connector with `mail.create_draft` is available and `drafts_create` is `auto`, also create an email draft to that audience and add a pending `send_communication` entry to `user/inbox/approvals.md` pointing to it (`Proposal kind: send_communication · status update`).
 5. Commit.
 6. **Scheduled templates.** For each `active` template in `user/work/templates/` with a `schedule`, while its `next_due` is on or before the next weekly run's date (today + 7 days), one edition at a time:
    1. If `drafted_for` equals `next_due`, or an edition for that date is already in the deliverables folder or `user/work/deliverables/` (a run that stopped before its commit), don't draft it again: go to step 4.

@@ -86,7 +86,7 @@ smoke_test: { last_run: 2026-10-01, results: { repo_push: pass, connectors: pass
 routine_availability:              # evidence from routine runs; applied to connectors.yaml in the next chat (N6)
   outlook: { available: true, observed: 2026-10-12, run: nightly-cycle-20261012-2007 }
 insight_engagement: { period: 2026-09, by_kind: { risk: { acted: 3, dismissed: 1, expired: 0 }, pattern: { acted: 1, dismissed: 4, expired: 2 } } }   # written by monthly
-indicators: { period: 2026-09, time_to_first_brief_hours: 14, auto_commitments: 41, manual_commitments: 6, automation_success_rate: 0.97, user_action_issues: 1, corrections: 3, active_weeks: 4, work_days: 21, brief_days: 18, brief_acted_days: 11, late_captures: 0, slips: { unwarned: 0, wrong_close: 0, user: 2 }, hand_fixes: 0, repeat_corrections: 0 }
+indicators: { period: 2026-09, time_to_first_brief_hours: 14, auto_commitments: 41, manual_commitments: 6, automation_success_rate: 0.97, user_action_issues: 1, corrections: 3, active_weeks: 4, work_days: 21, brief_days: 18, brief_acted_days: 11, late_captures: 0, slips: { unwarned: 0, wrong_close: 0, user: 2 }, hand_fixes: 0, repeat_corrections: 0, proposals: { accepted: 5, declined: 3, expired: 1, by_kind: { "send_communication · follow-up": [4, 1, 1] } }, proposal_acceptance_rate: 0.56, drafts_sent_rate: 0.7 }
 ```
 
 ## 2. Transient (`.atlas-tmp/`, git-ignored)
@@ -134,7 +134,7 @@ counts: { pending: 1, approved: 0, rejected: 0, executed: 0, expired: 0 }
 - **Expires:** 2026-10-14 17:00
 - **Status history:** pending 2026-10-12
 ```
-Statuses: `pending | approved | rejected | executed | expired` (expires after 14 days, not counting days while away mode is on). Newest first. `Proposal kind:` names the kind the proposal is counted under when the user turns it down or accepts it (`system/rules/governance.md` §Proposals the user keeps turning down); an entry written before 3.4.0 has none, and isn't counted.
+Statuses: `pending | approved | rejected | executed | expired` (expires after 14 days, not counting days while away mode is on). Newest first. `Proposal kind:` names the kind the proposal is counted under when the user turns it down or accepts it (`system/rules/governance.md` §Proposals the user keeps turning down). **Every new entry has one**, whatever writes it; `validate.py` warns on an open entry without one. Use the kind already used for the same thing; the usual ones are `send_communication · follow-up` (email-drafts, triage), `send_communication · status update` (status-updates, `atlas-status-update`), `own_calendar_manage · focus block` (`focus-time.md`), `updates_major · update` / `updates_minor · update` (update-check, `atlas-update`) and `behavior_settings · <setting>` (monthly). An entry written before 3.4.0 has none, and isn't counted.
 
 `Expires:` (optional, `YYYY-MM-DD HH:MM` in the user's time zone) is the moment the action stops making sense: the start of a proposed block or hold, the start of a meeting to respond to, the deadline a send is for. Whoever writes an entry tied to a time sets it. Once it has passed, the next `triage` or `maintenance` marks a `pending` or `approved` entry `expired` (`expired <date> (time passed)` in its history) and never acts on it; a chat that finds one says so instead of doing it. Away doesn't extend it.
 

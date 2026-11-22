@@ -33,7 +33,7 @@ Period check above. If `maintenance` hasn't succeeded in the last 8 days, run it
 3. **System Health Check** (`atlas-health`, system mode): routine run failures, connector auth, hooks present, schema validity (`system/tools/validate.py`), system files unmodified, extension compatibility, repo size. Update `health.yaml` (`last_user_check`, `last_system_check`, `known_issues`).
 4. **Automation Review** (`atlas-review`): what each job did last month (from run reports), what was used or ignored (insight and draft engagement), cost signals (items and duration), suggested schedule or profile changes. Then the **learning pass** (`.claude/skills/atlas-triage/reference/learning.md` §2): turn consistent feedback into at most 3 rule proposals. Compute the success indicators into `health.yaml: indicators` (`period: <P−1>`).
 5. Write `user/work/reports/<P−1>.md` (`type: report`, `date`, `sources`) with one section per moment run.
-6. Queue questions (profile proposals, ambiguous merges, records to archive, suggested routine changes) in `user/inbox/questions.md`; proposed settings changes go to `user/inbox/approvals.md` as `behavior_settings`.
+6. Queue questions (profile proposals, ambiguous merges, records to archive, suggested routine changes) in `user/inbox/questions.md`; proposed settings changes go to `user/inbox/approvals.md` as `behavior_settings`, each with `Proposal kind: behavior_settings · <the setting's name>` (`formats.md` §3).
 7. Republish every dashboard whose contract (`system/dashboards/*.contract.md`) lists `monthly` in `republished_by`. Set `jobs.yaml: monthly.period_done` to P. Commit.
 
 ## Outputs
