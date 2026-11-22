@@ -26,7 +26,7 @@ If `ingest` has not succeeded in the last 24 hours and is not earlier in this ro
 - Active goals, open risks, open questions, active projects (indexes first, then records as needed per `system/rules/retrieval.md`).
 - `user/inbox/insights.md` (to avoid repeats) and engagement signals in `user/.state/health.yaml` (acted/dismissed by kind).
 - `rhythms.yaml: insights` (`brief_max`, `engagement`, `suppressed_kinds`).
-- `jobs.yaml: intelligence.last_sweep`. On a sweep run: the indexes of every active goal and project, open risk and question, and `proposed` or `made` decision, changed or not; calendar events and dated records in the next 28 days; and `python3 -I system/tools/relations.py --out .atlas-tmp/relations.json` (candidate relationships from links and source dates, open risks no one owns or plans for, and recurring themes no topic covers yet).
+- `jobs.yaml: intelligence.last_sweep`. On a sweep run: the indexes of every active goal and project, open risk and question, and `proposed` or `made` decision, changed or not; calendar events and dated records in the next 28 days; and `python3 -I system/tools/relations.py --today <today> --out .atlas-tmp/relations.json`, with today's date in the user's time zone (`system/schemas/formats.md` §Dates), (candidate relationships from links and source dates, open risks no one owns or plans for, and recurring themes no topic covers yet).
 
 ## Steps
 1. Gather the change set, and check whether the sweep is due. If the change set is empty and no sweep is due, exit early.
@@ -52,4 +52,4 @@ No records or sources changed since the last successful run and no sweep due →
 - Frugal: the sweep reads indexes and `relations.py`'s output first, and opens a record only for a candidate it is weighing.
 
 ## Run report
-Row: `intelligence | <status> | <N> new insights, <r> records, <t> topics[, sweep] | <top score>`.
+Row: `intelligence | <status> | <N> new insights, <r> records, <t> topics[, sweep] | <top score>`. On a sweep run, add one line under the row for each of `relations.json`'s top 3 `themes` that made no topic, saying why in a few words ("admin console: one project's component, covered by the project"), so a theme passed over is visible.
