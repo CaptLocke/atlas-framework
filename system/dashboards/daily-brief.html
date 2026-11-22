@@ -367,7 +367,7 @@
     var hoursIn = meetings.reduce(function (n, m) { return n + (m.en - m.s); }, 0) / 60;
     left.appendChild(h("section", { class: "day-sec", id: "schedule", "aria-labelledby": "schedule-h" },
       h("div", { class: "kicker-row" }, h("h2", { class: "atl-listcard__title", id: "schedule-h" }, "Your day"),
-        h("span", { class: "meta" }, dd ? hrs((dd.open_minutes || 0) / 60) + " between meetings" + (dd.due_today ? " · " + (dd.due_today_placed === dd.due_today ? (dd.due_today === 1 ? "the one" : "all " + dd.due_today) + " due today " + (dd.due_today === 1 ? "is" : "are") + " placed" : dd.due_today_placed + " of " + dd.due_today + " due today placed") : "")
+        h("span", { class: "meta" }, dd ? (d.week ? hrs((dd.open_minutes || 0) / 60) + " between meetings" : "No calendar connected, so meetings aren't counted") + (dd.due_today ? " · " + (dd.due_today_placed === dd.due_today ? (dd.due_today === 1 ? "the one" : "all " + dd.due_today) + " due today " + (dd.due_today === 1 ? "is" : "are") + " placed" : dd.due_today_placed + " of " + dd.due_today + " due today placed") : "")
           : meetings.length ? meetings.length + (meetings.length === 1 ? " meeting · " : " meetings · ") + hrs(hoursIn) : "No meetings")),
       allDay.length ? h("div", { class: "allday" }, allDay.map(function (e) {
         return N.badge((e.kind === "deadline" ? "Deadline · " : e.kind === "milestone" ? "Milestone · " : "All day · ") + e.title, e.kind === "deadline" ? "bad" : e.kind === "milestone" ? "info" : null, e.kind === "milestone" ? "milestone" : null);
