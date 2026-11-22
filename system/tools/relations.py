@@ -14,7 +14,7 @@ old closed records left out), plus sources for their dates and what they touch. 
 user's own person record (`relationship: self`) is never a shared neighbour or an entity.
 A source *touches* a record when it links to it or the record lists it in `sources`.
 
-Three lists, each the top N (default 10) by score:
+Four lists, each the top N (default 10):
 
 - `buried`: two projects, goals, ideas, risks, questions or decisions with no link
   between them that share at least 2 neighbours (linked records, or sources both cite),
@@ -32,6 +32,11 @@ Three lists, each the top N (default 10) by score:
   least half the entity's sources were followed by one. This is a sequence, never a cause.
   Closed records last updated more than 90 days ago aren't read (as in `graph.py`), so a
   done-late commitment counts here only while it is that recent.
+- `unowned`: open risks (`potential` or `active`) with no `owner` or no `mitigation`, kept
+  when the risk is quiet (neither it nor a source touching it dated in the last 21 days)
+  or its `impact` is high and a project or goal it links to has a `target` date in the
+  next 28 days, whatever the risk's age. High impact first, then the nearest target,
+  then the longest quiet. A risk can be unowned on purpose; reading decides.
 
 Sources flagged `suspicious` are left out entirely, including where a record cites them.
 """
@@ -52,6 +57,7 @@ WORK = {"project", "goal", "idea", "risk", "question", "decision"}
 CONTEXT = {"project", "goal"}
 ENTITY = {"topic", "organization", "person"}
 TOGETHER_DAYS, FOLLOWS_DAYS, AFTER_DAYS = 60, 180, 14
+QUIET_DAYS, AHEAD_DAYS = 21, 28
 TOP = 10
 
 
@@ -110,6 +116,8 @@ def load(root, today):
             recs[rid] = {"type": name, "title": index.clean(fm.get("title")) or rid, "status": st,
                          "health": str(fm.get("health") or fm.get("assessment") or ""),
                          "due": index.as_date(fm.get("due")), "done": index.as_date(fm.get("completed_on")), "updated": updated,
+                         "target": index.as_date(fm.get("target")), "impact": str(fm.get("impact") or ""),
+                         "missing": [k for k in ("owner", "mitigation") if not fm.get(k)],
                          "self": name == "person" and str(fm.get("relationship") or "") == "self",
                          "links": (graph.front_links(fm) | graph.body_links(path)) - {rid}}
             for sid in _ids(fm.get("sources")):
@@ -232,18 +240,50 @@ def follows(recs, adj, sources, touches, today, top):
     return out[:top]
 
 
+def unowned(recs, adj, sources, touches, today, top):
+    """Open risks with no owner or no mitigation that are quiet, or high impact with a target close."""
+    seen = {}
+    for sid, rs in touches.items():
+        for r in rs:
+            if sid in sources:
+                seen[r] = max(seen.get(r, sources[sid]), sources[sid])
+    out = []
+    for r, info in recs.items():
+        if info["type"] != "risk" or info["status"] not in ("potential", "active") or not info["missing"]:
+            continue
+        last = max(d for d in (info["updated"], seen.get(r)) if d) if (info["updated"] or seen.get(r)) else None
+        quiet = (today - last).days if last else None
+        ahead = sorted((recs[o]["target"], o) for o in adj[r]
+                       if recs[o]["type"] in CONTEXT and recs[o]["target"] and recs[o]["target"] >= today)
+        near = ahead[0] if ahead else None
+        days = (near[0] - today).days if near else None
+        high = info["impact"] == "high"
+        if not ((quiet is not None and quiet >= QUIET_DAYS) or (high and days is not None and days <= AHEAD_DAYS)):
+            continue
+        out.append({"risk": r, "missing": info["missing"], "impact": info["impact"] or None, "quiet_days": quiet,
+                    "target": {"record": near[1], "date": near[0].isoformat(), "days": days} if near else None})
+    out.sort(key=lambda x: (x["impact"] != "high", x["target"]["days"] if x["target"] else 10 ** 6,
+                            -(x["quiet_days"] or 0), x["risk"]))
+    return out[:top]
+
+
 def build(root, today, top=TOP):
     recs, sources, touches = load(root, today)
     adj = adjacency(recs, touches)
     data = {"buried": buried(recs, adj, touches, top),
             "together": together(recs, adj, sources, touches, today, top),
-            "follows": follows(recs, adj, sources, touches, today, top)}
+            "follows": follows(recs, adj, sources, touches, today, top),
+            "unowned": unowned(recs, adj, sources, touches, today, top)}
     named = set()
     for x in data["buried"] + data["together"]:
         named.update([x["a"], x["b"]])
     for x in data["follows"]:
         named.add(x["entity"])
         named.update(t["record"] for i in x["instances"] for t in i["then"])
+    for x in data["unowned"]:
+        named.add(x["risk"])
+        if x["target"]:
+            named.add(x["target"]["record"])
     data["titles"] = {r: recs[r]["title"] for r in sorted(named)}
     return data
 
