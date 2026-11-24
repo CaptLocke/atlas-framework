@@ -1024,6 +1024,8 @@ def check_routines(c, path, data, template):
         rep.warn(path, "no routines are set up yet (atlas-setup step 10 chooses a profile)")
     elif prof is None and not template or prof is not None and prof not in PROFILES:
         rep.error(path, "profile must be one of %s" % ", ".join(PROFILES))
+    if data.get("zoned") is not None and not isinstance(data.get("zoned"), bool):
+        rep.error(path, "zoned must be true or false (got %r)" % (data.get("zoned"),))
     off = data.get("utc_offset")
     if off is not None and not (isinstance(off, str) and UTC_OFFSET_RE.match(off)):
         rep.error(path, "utc_offset must be like -0700 or +0530 (as `date +%%z` prints it), or null (got %r)" % (off,))

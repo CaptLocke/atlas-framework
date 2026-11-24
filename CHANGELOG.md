@@ -7,6 +7,11 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
+## Unreleased
+
+### What's new
+- Your automations now follow your time zone on their own, so the clocks changing no longer moves them or raises a false alarm. If one does appear, saying "re-time my automations" checks and fixes it without moving anything that's already right.
+
 ## 3.5.0 (2026-11-24)
 
 ### What's new

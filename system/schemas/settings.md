@@ -220,7 +220,8 @@ Events the user organizes (`response: organizer`) and accepted events are always
 ## routines.yaml
 ```yaml
 profile: lean                           # lean | standard | full | custom (custom = user-edited)
-utc_offset: "-0700"                     # offset the platform schedules were converted at (`date +%z` form); null until routines exist
+zoned: true                             # the platform holds CRON_TZ=<timezone> <schedule> and follows the clocks (ATL-125); absent or false = UTC conversion below
+utc_offset: "-0700"                     # offset the platform schedules were converted at (`date +%z` form); null until routines exist or when zoned
 routines:
   - name: nightly-cycle
     schedule: "7 20 * * *"              # cron in atlas.yaml timezone; one schedule per routine
@@ -237,7 +238,7 @@ routines:
       - quarterly
       - { job: daily-brief, target: tomorrow }
 ```
-**Schedules and UTC.** `schedule` is the truth and stays in the user's time zone: dashboards, the guide and every job read it. The platform reads a routine's cron as UTC, so what goes on the platform is `utc_schedule`, converted by `system/tools/cron_utc.py` at the zone's offset that day and recorded in `utc_offset`. A local schedule whose hours cross midnight UTC needs more than one cron, and so one platform routine per cron, all running the same routine name; `routine_id` is then a list in the same order. Schedules use day of week only (day of month and month are `*`), since that is all `cron_utc.py` converts; jobs with monthly or quarterly logic check their own dates. When the clocks change, `utc_offset` no longer matches, and the next routine run raises `routine-schedules-shifted` (`system/jobs/README.md` §Running a routine); re-timing is `.claude/skills/atlas-setup/reference/automations.md` §8. Missing `utc_offset` and `utc_schedule` (routines created before 2.0.1) mean the platform was never checked against UTC.
+**Schedules and UTC.** `schedule` is the truth and stays in the user's time zone: dashboards, the guide and every job read it. Since ATL-125 the platform is given `CRON_TZ=<atlas.yaml timezone> <schedule>` and follows the clocks, and `zoned: true` records that: `utc_offset` and `utc_schedule` are then unused and the routine run's clock check is skipped. Without `zoned`, the platform holds UTC: what goes on it is `utc_schedule`, converted by `system/tools/cron_utc.py` at the zone's offset that day and recorded in `utc_offset`. A local schedule whose hours cross midnight UTC needs more than one cron, and so one platform routine per cron, all running the same routine name; `routine_id` is then a list in the same order. Schedules use day of week only (day of month and month are `*`), since that is all `cron_utc.py` converts; jobs with monthly or quarterly logic check their own dates. When the clocks change, `utc_offset` no longer matches, and the next routine run raises `routine-schedules-shifted` (`system/jobs/README.md` §Running a routine); re-timing is `.claude/skills/atlas-setup/reference/automations.md` §8. Missing `utc_offset` and `utc_schedule` (routines created before 2.0.1) mean the platform was never checked against UTC.
 
 Job entries are a job name or `{ job, when, target, mode }`. Modifiers: `when` (always | weekdays | weekends | sundays), `target` (today | tomorrow), `mode` (full | light; light = new items only, no re-prioritization). Job names are system jobs or registered user jobs.
 
