@@ -38,3 +38,4 @@ Deliverables (docx, pptx, xlsx, pdf) are saved to the deliverables folder and of
 ## Checks
 - Every claim about the user's work in an answer has a citation or an explicit "I don't have that recorded."
 - Drafts contain no citations, internal IDs, or Atlas jargon.
+- Figures in a deliverable or status update are checked against what they cite by `system/tools/figures.py`, not by rereading (`atlas-write` §5 step 3).

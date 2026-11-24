@@ -31,6 +31,7 @@ During away (run date within `away`), exit with `skipped_away`. No drafts pile u
 - Related records via `atlas-recall` (L3) so drafts are grounded.
 
 ## Steps
+0. **Outcomes of earlier drafts:** each entry in `user/.state/drafts.yaml` made 14 or more days ago, still there, is `discarded` (`atlas-write` `reference/email-drafts.md` §Draft outcomes): log it and remove it.
 1. Build the candidate list. Skip threads that already have an Atlas draft (recorded on the thread's Source `## Updates` as "reply draft created") or that the user already answered (`mail.list_sent`).
 2. Skip candidates excluded by `preferences.md` standing instructions or data rules; list those in the brief as "needs your reply" instead.
 3. For each candidate, invoke `atlas-write` (email draft mode): pick the voice per `system/rules/writing.md`, ground the content in records, keep it ready to send with minimal edits, no citations or Atlas jargon in the draft.

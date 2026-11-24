@@ -17,6 +17,7 @@ Whenever one of these happens, write one activity-log line (`system/schemas/form
 | `priority_up` / `priority_down` | The user changes a priority Atlas set, or says something matters more or less | `atlas-triage` |
 | `noise` | The user says to stop filing or flagging something ("ignore these vendor newsletters", "that's not worth tracking") | any skill |
 | `cut_list` | The user answers a cut list: the dimension is `yes`, `part` or `no` (`reference/cut-list.md` §3) | `atlas-triage` |
+| `draft_outcome` | A mail draft Atlas made is sent unchanged, lightly or heavily edited, or never sent: the dimension is `unchanged`, `light_edit`, `heavy_edit` or `discarded` (`atlas-write` `reference/email-drafts.md` §Draft outcomes) | ingest, `email-drafts` |
 | `insight_useful` / `insight_noise` | The user says an insight helped, or that it was wrong or not useful (not "not now") | `atlas-insights` |
 | `proposal_declined` / `proposal_accepted` | The user rejects or approves an approvals entry, or says no or yes in chat to an action Atlas offered at `propose` or `approve`; the dimension is the proposal's kind, copied from its `Proposal kind:` line (`system/rules/governance.md` §Proposals the user keeps turning down). An entry with no such line (written before 3.4.0) is logged with no dimension: `proposal_declined · A-2026-10-12-02`, nothing after the entry ID. Not for an entry that expired, or an offer at `auto` | any skill that proposes, `atlas-settings` |
 

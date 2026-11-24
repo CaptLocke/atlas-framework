@@ -10,12 +10,14 @@ Each release's "What's new" section is shown to users in the Guide and their nex
 ## Unreleased
 
 ### What's new
+- Your automations now follow your time zone on their own, so the clocks changing no longer moves them or raises a false alarm. If one does appear, saying "re-time my automations" checks and fixes it without moving anything that's already right.
+- When five or more things you owe have slipped, Atlas proposes one list, at most weekly: keep, hand off to someone already on it, re-date, or drop each. One yes, in a chat or on the Guide page, applies it all, and any notes to other people wait for your OK.
 - Guide and Today show when a time-bound approval expires, such as a proposed focus block, so you can answer before it lapses.
+- The monthly report shows what you did with Atlas's email drafts: sent as written, lightly or heavily edited, or never sent. Only that count is kept, never your wording.
+- Before Atlas hands you a document, deck, sheet or status update, a separate check traces every figure and date to the records it came from, and names any it couldn't trace.
 
 ### Under the hood
 - Topic themes count only sources whose content Atlas keeps, as the topic rule always said.
-- Your automations now follow your time zone on their own, so the clocks changing no longer moves them or raises a false alarm. If one does appear, saying "re-time my automations" checks and fixes it without moving anything that's already right.
-- When five or more things you owe have slipped, Atlas proposes one list, at most weekly: keep, hand off to someone already on it, re-date, or drop each. One yes, in a chat or on the Guide page, applies it all, and any notes to other people wait for your OK.
 
 ## 3.5.0 (2026-11-24)
 

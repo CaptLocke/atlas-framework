@@ -32,8 +32,14 @@ For each draft created (`system/jobs/email-drafts.md`):
 - List the draft in the run report (recipient and subject only, no content), e.g. `- Dana Ruiz · "MSA redlines: quick check-in" · follow-up · [[commitments/dana-msa-redlines]]`.
 - `atlas-brief` reads drafts from run reports (and chat activity) since the last brief for "Drafts ready to review".
 
+## Draft outcomes (ATL-136)
+Mail drafts only; a message draft is left out until its connector lists sent items.
+- **When a draft is made:** write its text to `.atlas-tmp/draft.txt` (git-ignored, gone with the session), run `python3 -I system/tools/drafts.py fingerprint .atlas-tmp/draft.txt`, and add it to `user/.state/drafts.yaml` under the draft's id with `made`, `job` (or `chat`), `thread` (the Source) and the tool's `words` and `runs` (`system/schemas/formats.md` §1). The draft's text is never stored.
+- **When it's sent** (below, during ingest): write the sent text to `.atlas-tmp/sent.txt`, write the entry's `words` and `runs` to `.atlas-tmp/draft-fp.json`, run `drafts.py compare .atlas-tmp/draft-fp.json .atlas-tmp/sent.txt`, log `feedback · draft_outcome · <draft id> · <outcome>` (`atlas-triage` `reference/learning.md` §1), and remove the entry.
+- **Never sent:** an entry made 14 or more days ago is `discarded`: log it the same way and remove it (`system/jobs/email-drafts.md` step 0). A draft the user deleted is the same.
+
 ## Voice learning from sent mail
-During ingest, when a sent message matches an Atlas draft (same thread, similar content):
+During ingest, when a sent message matches an Atlas draft (same thread, similar content), log its outcome first (§Draft outcomes), then:
 - Compare draft and sent text: length change, removed/added greeting or sign-off, words replaced, structure changes.
 - Record the observation as an Updates line on the thread's Source: `- 2026-10-12: Sent version differs from Atlas draft: ~50% shorter, greeting removed.` (no message text). Later runs count these lines by text search.
 - When a pattern is clear (≥3 similar observations in 60 days, and no open or dismissed proposal for the same change), propose it in `user/inbox/questions.md`:
