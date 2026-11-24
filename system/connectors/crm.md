@@ -49,7 +49,7 @@ Apply `user/settings/data-rules.yaml`; when unsure, summarize.
 ## Write operations and autonomy
 | Operation | Autonomy class | Notes |
 |---|---|---|
-| `update_item` (fields, notes, next steps, log activity) | `shared_records_update` (propose) | The CRM is a shared system of record; teammates and managers see changes. Routines queue proposals in `approvals.md`. |
+| `update_item` (fields, notes, next steps, log activity) | `shared_records_update` (propose) | The CRM is a shared system of record; teammates and managers see changes. Routines queue proposals in `approvals.md` (`Proposal kind: shared_records_update · crm update`). |
 | Logging an email or meeting to the CRM | `shared_records_update` (propose) | Same rule. |
 | Creating records (new contact, new deal) | `shared_records_update` (propose) | Map to `update_item` notes in `connectors.yaml`. |
 | `delete` | `destructive` 🔒 | Never part of any job. |
