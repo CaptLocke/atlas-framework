@@ -3,8 +3,8 @@
 
     python3 -I system/tools/cutlist.py [--root DIR] [--today YYYY-MM-DD] [--out FILE]
 
-Standard library plus the vendored YAML parser; reads only the repo's frontmatter and the
-questions inbox, never a body's text. Prints JSON (or writes it to --out: in a routine, a
+Standard library plus the vendored YAML parser; reads the repo's frontmatter, the dates of
+commitments' Updates lines, and the questions inbox, never a body's text beyond those dates. Prints JSON (or writes it to --out: in a routine, a
 file under .atlas-tmp/, which the guard allows). `atlas-triage` reads it and writes the
 question in the user's words; the tool decides which items and which action, so the same
 records always give the same list.
@@ -14,7 +14,8 @@ user (`relationship: self`), not archived or superseded.
 
 Due (`due: true`) when there are at least 5 slipped items, no cut list is open, and either
 none was asked in the last 7 days or at least 3 more items are slipped than the newest one
-listed. A cut list is a questions-inbox entry (live or archived) with a `- **Cut list:**`
+listed. After a dismissed list (unanswered for a week, or a no) it waits 14 days from that
+list's `Asked:` date, and 28 after two dismissed in a row, whatever has slipped since. A cut list is a questions-inbox entry (live or archived) with a `- **Cut list:**`
 line ("6 items"); its `Asked:` date and count are read from there.
 
 Each item gets one action, in this order of rules:
@@ -22,13 +23,14 @@ Each item gets one action, in this order of rules:
   outside the company (relationship customer, prospect, vendor, partner, external, board).
 - `hand_off`: not kept, and a person already on the item (in its `links.people`, not the user
   and not the counterparty) is a report, peer or stakeholder: `to` names them, reports first.
-- `drop`: priority low and nothing has touched it for 14 days (its `updated` and the dates of
-  sources it cites). `notify` is true when it was owed to the manager or outside the company,
+- `drop`: priority low and nothing has touched it for 14 days: the newest of its `created`, the
+  dates of Updates lines that cite a source or say the user's word, and the sources it cites.
+  Not `updated`, which Atlas's own edits (an insight, a next step) move every run (review H2). `notify` is true when it was owed to the manager or outside the company,
   so the list offers a "letting you know" draft.
 - `redate`: everything else.
-`keep` and `redate` items get a `date`: the next 5 work days (`rhythms.yaml: work_hours.days`,
-default Monday to Friday) from tomorrow, at most 2 items a day, kept items first, then by
-days late. Items are listed keep, hand_off, redate, drop, then by days late.
+`keep` and `redate` items get a `date`: work days (`rhythms.yaml: work_hours.days`, default
+Monday to Friday) from tomorrow, at most 2 items a day, as many days as that takes (at least
+5), kept items first, then by days late. Items are listed keep, hand_off, redate, drop, then by days late.
 """
 import argparse
 import json
@@ -43,6 +45,9 @@ sys.path.insert(0, HERE)
 import index  # noqa: E402
 
 MIN_SLIPPED, MORE_SINCE, WEEK, QUIET_DAYS, DAYS_AHEAD, PER_DAY = 5, 3, 7, 14, 5, 2
+AFTER_DISMISSED, AFTER_TWO_DISMISSED = 14, 28
+UPDATE_RE = re.compile(r"^- (\d{4}-\d{2}-\d{2}):(.*)$", re.M)
+TOUCH_RE = re.compile(r"\[\[sources/|the user|user said|user's word|\(chat\)", re.I)
 OUTSIDE = {"customer", "prospect", "vendor", "partner", "external", "board"}
 COLLEAGUE_ORDER = ["report", "peer", "stakeholder"]
 DAY_NAMES = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
@@ -62,7 +67,18 @@ def _folder(root, name):
     return os.path.join(root, "user", "knowledge", t[0] if t else name + "s")
 
 
-def _records(root, name):
+def _touch_dates(path):
+    """Dates of Updates lines that cite a source or record the user's word."""
+    try:
+        with open(path, encoding="utf-8") as f:
+            text = f.read()
+    except OSError:
+        return []
+    _, _, updates = text.partition("\n## Updates")
+    return [index.as_date(d) for d, rest in UPDATE_RE.findall(updates) if TOUCH_RE.search(rest)]
+
+
+def _records(root, name, paths=None):
     d = _folder(root, name)
     out = {}
     if not os.path.isdir(d):
@@ -71,7 +87,10 @@ def _records(root, name):
         if f.endswith(".md"):
             fm = index.read_frontmatter(os.path.join(d, f))
             if fm and fm.get("archived") is not True and not fm.get("superseded_by"):
-                out[str(fm.get("id") or "%s/%s" % (os.path.basename(d), f[:-3]))] = fm
+                rid = str(fm.get("id") or "%s/%s" % (os.path.basename(d), f[:-3]))
+                out[rid] = fm
+                if paths is not None:
+                    paths[rid] = os.path.join(d, f)
     return out
 
 
@@ -115,8 +134,8 @@ def build(root, today):
     me = next((p for p, fm in people.items() if str(fm.get("relationship") or "") == "self"), None)
     rel = {p: str(fm.get("relationship") or "") for p, fm in people.items()}
     sdates = _source_dates(root)
-    slipped = []
-    for cid, fm in _records(root, "commitment").items():
+    slipped, paths = [], {}
+    for cid, fm in _records(root, "commitment", paths).items():
         if fm.get("direction") != "i_owe" or fm.get("status") != "slipped":
             continue
         if me and _id(fm.get("owner")) != me:
@@ -125,13 +144,21 @@ def build(root, today):
 
     lists = _cut_lists(root)
     open_now = any(st == "open" for _, _, st in lists)
-    dated = sorted((d, n) for d, n, _ in lists if d)
+    dated = sorted((d, n, st) for d, n, st in lists if d)
     last = dated[-1] if dated else None
+    trailing = 0
+    for _, _, st in reversed(dated):
+        if st != "dismissed":
+            break
+        trailing += 1
+    wait = AFTER_TWO_DISMISSED if trailing >= 2 else AFTER_DISMISSED if trailing == 1 else None
     n = len(slipped)
     if n < MIN_SLIPPED:
         due, why = False, "fewer than %d slipped" % MIN_SLIPPED
     elif open_now:
         due, why = False, "a cut list is open"
+    elif wait and (today - last[0]).days < wait:
+        due, why = False, "the last cut list was dismissed; waiting %d days from %s" % (wait, last[0])
     elif last and (today - last[0]).days < WEEK and n < last[1] + MORE_SINCE:
         due, why = False, "one was asked on %s and fewer than %d more have slipped" % (last[0], MORE_SINCE)
     else:
@@ -145,7 +172,7 @@ def build(root, today):
         important = cp_rel == "manager" or cp_rel in OUTSIDE
         due_day = index.as_date(fm.get("due"))
         late = (today - due_day).days if due_day else 0
-        touched = [index.as_date(fm.get("updated")) or index.as_date(fm.get("created"))]
+        touched = [index.as_date(fm.get("created"))] + _touch_dates(paths.get(cid, ""))
         touched += [sdates[s] for s in (_id(x) for x in (fm.get("sources") or [])) if s in sdates]
         quiet = min((today - d).days for d in touched if d) if any(touched) else None
         links = fm.get("links") or {}
@@ -165,15 +192,16 @@ def build(root, today):
     items.sort(key=lambda x: (ORDER[x["action"]], -x["days_late"], x["id"]))
 
     work = _work_days(root)
+    need = max(DAYS_AHEAD, -(-sum(1 for i in items if i["action"] in ("keep", "redate")) // PER_DAY))
     slots, day = [], today
-    while len(slots) < DAYS_AHEAD:
+    while len(slots) < need:
         day += timedelta(days=1)
         if day.weekday() in work:
             slots.append(day)
     k = 0
     for it in items:
         if it["action"] in ("keep", "redate"):
-            it["date"] = slots[min(k // PER_DAY, len(slots) - 1)].isoformat()
+            it["date"] = slots[k // PER_DAY].isoformat()
             k += 1
     return {"slipped": n, "due": due, "why": why, "items": items if due else []}
 

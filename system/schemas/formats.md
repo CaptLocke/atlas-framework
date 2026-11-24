@@ -76,10 +76,10 @@ previous: []                     # ids of earlier imports, so undo can still fin
 A completed or undone import is never reopened; a new one replaces this file with a new `id` and adds the old `id` to `previous`.
 
 ### drafts.yaml
-Mail drafts Atlas made that haven't had an outcome yet (`atlas-write` `reference/email-drafts.md` §Draft outcomes, ATL-136). Hashes only, never text; an entry leaves once its outcome is logged.
+Mail drafts Atlas made that haven't had an outcome yet (`atlas-write` `reference/email-drafts.md` §Draft outcomes, ATL-136). No text: the word and run counts and a sample of 32 short hashes of 3-word runs, from which the wording can't be rebuilt, though a guessed phrase could be confirmed. Quoted replies and signatures are left out first. An entry leaves once its outcome is logged, but stays in git history.
 ```yaml
 drafts:
-  AAMkAD-123: { made: 2026-11-24, job: email-drafts, thread: sources/2026-11-23-dana-msa-thread, words: 36, runs: "02c394b2 30f91d97 …" }
+  AAMkAD-123: { made: 2026-11-24, job: email-drafts, thread: sources/2026-11-23-dana-msa-thread, words: 36, runs: 34, sample: "02c394 30f91d …" }
 ```
 
 ### health.yaml
@@ -177,7 +177,7 @@ counts: { open: 1, answered: 0, dismissed: 0 }
 - **Proposed change:** voice-personal.md: "Keep emails under ~120 words" [observed · proposed]
 - **Asked:** 2026-10-12
 ```
-Kinds: `profile | migration | relationship | commitment | setup | action | other`. Statuses: `open | answered | dismissed`. An entry about particular records carries `- **Links:** [[…]]` naming them. A `commitment` entry asking whether something was done (not whether it was promised) carries `- **Evidence:** <what was seen, where, when>`; the brief shows those as Looks done, and a yes closes the commitment citing that evidence. A **cut list** (`atlas-triage` `reference/cut-list.md`) carries `- **Cut list:** <n> items`, and its `Proposed change` is one numbered line per item ("1. Keep: … · 2. Hand off: …"); a yes applies every line.
+Kinds: `profile | migration | relationship | commitment | setup | action | other`. Statuses: `open | answered | dismissed`. An entry about particular records carries `- **Links:** [[…]]` naming them. A `commitment` entry asking whether something was done (not whether it was promised) carries `- **Evidence:** <what was seen, where, when>`; the brief shows those as Looks done, and a yes closes the commitment citing that evidence. A **cut list** (`atlas-triage` `reference/cut-list.md`) carries `- **Cut list:** <n> items`, and its `Proposed change` numbers one item per commitment, joined by " · " ("1. Keep: … · 2. Hand off: …"); a yes applies every item, and a no dismisses the entry.
 
 **Action entries** (`kind: action`) are things only the user can do, queued by `atlas-update` from a release's `### Action needed` list or a higher `bootstrap_version`, and by the chat boot check (kernel §2 step 0):
 ```markdown

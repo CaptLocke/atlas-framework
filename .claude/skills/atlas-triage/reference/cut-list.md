@@ -10,7 +10,7 @@ When the user owes too much that has already slipped, asking about each item one
 Run `python3 -I system/tools/cutlist.py --today <today> --out .atlas-tmp/cutlist.json` (full mode only; not during away). The tool decides, so the same records always give the same answer.
 - It's due when 5 or more of the user's own `i_owe` items are `slipped`, no cut list is open, and none was asked in the last 7 days, or 3 or more have slipped since the last one was asked.
 - `due: false` → nothing to do. Say nothing about it.
-- An open cut list asked 7 or more days ago with no answer is dismissed (`dismissed <date>: no answer in a week`) before the tool runs. Its items go back to the per-item "slipped and quiet" questions, and a new list can be asked next week.
+- An open cut list asked 7 or more days ago with no answer is dismissed (`dismissed <date>: no answer in a week`) before the tool runs. Its items go back to the per-item "slipped and quiet" questions. The tool waits 14 days from a dismissed list before asking again, and 28 after two dismissed in a row, so an ignored or refused list doesn't come back every week.
 
 ## 2. The question
 One entry in `user/inbox/questions.md`, kind `commitment` (`system/schemas/formats.md` §questions):
@@ -24,7 +24,7 @@ One entry in `user/inbox/questions.md`, kind `commitment` (`system/schemas/forma
 - **Asked:** 2026-11-24
 ```
 
-- **One line per item, in the tool's order and with the tool's action.** Each line gets a reason in a few words, taken from the record, and the tool's `date` for keep and re-date. A line says "with a note to send" for a hand-off, and "with a note to <name>" for a drop with `notify: true`.
+- **One numbered item per slipped commitment, in the tool's order and with the tool's action,** joined by " · " on the `Proposed change` line as above. Each line gets a reason in a few words, taken from the record, and the tool's `date` for keep and re-date. A line says "with a note to send" for a hand-off, and "with a note to <name>" for a drop with `notify: true`.
 - **Never change an action the tool chose.** If the records argue for a different one (say, the person to hand to has left), say so in that line's reason and leave it for the user.
 - **Links name every item, so a page answer is limited to them.**
 - **While the entry is open,** step 8's per-item "slipped and quiet" question isn't asked for any item it links, and none already open for them is repeated.
@@ -32,8 +32,8 @@ One entry in `user/inbox/questions.md`, kind `commitment` (`system/schemas/forma
 ## 3. Applying an answer
 - **Yes** (in a chat, or Yes on the Guide page, `atlas-dashboards` `reference/live.md`) applies every line.
 - **Part of it** ("drop 1 and 3, keep the rest", "hand 2 to Sam instead") is chat only. Apply what was said, and leave unnamed lines as they are.
-- **No** leaves every item as it is.
-- In every case, mark the entry `answered` with the user's words.
+- **No** leaves every item as it is, and marks the entry `dismissed` with the user's words, so the tool's back-off (§1) applies.
+- A yes or part: mark the entry `answered` with the user's words.
 
 Per line:
 - **Keep, re-date:** set `due` to the line's date and status back to `open`, with a "was X, now Y" Updates line ("cut list <date>").
