@@ -243,7 +243,7 @@ details.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
     });
     asks.forEach(function (a) {
       oks.push(okRow(/send|reply|forward/i.test(a.action) ? "mail" : "pending", a.action,
-        [a.prepared ? "Prepared: " + a.prepared : null, byWhom(a.requested_by), a.requested_on ? "Asked " + N.date(a.requested_on) : null].filter(Boolean).join(" · "),
+        [a.prepared ? "Prepared: " + a.prepared : null, byWhom(a.requested_by), a.requested_on ? "Asked " + N.date(a.requested_on) : null, a.expires ? "Expires " + N.date(a.expires) + (N.time(a.expires) ? ", " + N.time(a.expires) : "") : null].filter(Boolean).join(" · "),
         a.why ? h("p", null, N.rich(a.why)) : null,
         [N.request("Approve", N.withId("Approve " + N.quote(a.action), a.id), "primary", true, { kind: "approve", target: a.id, quoted: a.action }),
           N.request("Decline", N.withId("Decline " + N.quote(a.action), a.id), "secondary", false, { kind: "decline", target: a.id, quoted: a.action })]));

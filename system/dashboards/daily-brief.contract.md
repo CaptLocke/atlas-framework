@@ -48,7 +48,7 @@ Envelope: `meta` as in `system/dashboards/README.md`; `meta.title` = `"Today"`; 
   "drafts": [ { "title": "Contract review: quick check-in", "to": "Dana Ruiz", "where": "Outlook drafts", "why": "…",
                 "ref": { "id": "commitments/dana-msa-review", "title": "…" },
                 "approval": { "id": "A-2026-10-12-01", "action": "Send follow-up to Dana Ruiz" } } ],
-  "approvals": [ { "id": "A-2026-10-12-01", "action": "Send follow-up to Dana Ruiz", "why": "…", "requested_on": "2026-10-12" } ],
+  "approvals": [ { "id": "A-2026-10-12-01", "action": "Send follow-up to Dana Ruiz", "why": "…", "requested_on": "2026-10-12", "expires": null } ],
   "questions": [ { "id": "Q-2026-10-12-02", "kind": "profile", "text": "…" } ],
   "week": {
     "range": { "start": "2026-10-13", "end": "2026-10-19" },
@@ -100,7 +100,7 @@ Envelope: `meta` as in `system/dashboards/README.md`; `meta.title` = `"Today"`; 
 | `counts` | Open commitments in both directions (`commitments/`): `overdue` = slipped or past `due`; `due_today` = `due` on the target date, not slipped |
 | `insights[]` | `user/inbox/insights.md`, status `new`, highest `score` first, max `rhythms.yaml: insights.brief_max` (default 3): heading ID, Insight, Why it matters, Suggested action, Links |
 | `drafts[]` | Drafts created since the previous brief, from run reports and the activity log (`email-drafts`, `status-updates`, triage follow-ups), the same list the brief file shows first (the brief's Still unsent lines stay in the brief file): titles, recipients, reasons, where each draft is; `approval` from `user/inbox/approvals.md`, the `pending` entry whose action sends it |
-| `approvals[]` | `user/inbox/approvals.md`, status `pending` |
+| `approvals[]` | `user/inbox/approvals.md`, status `pending`; `expires` as on Guide (`control-center.contract.md`), shown as "Expires Oct 14, 5:00 PM" (ATL-124) |
 | `actions[]` | `user/inbox/questions.md`, kind `action`, status `open`, oldest first: heading ID, Question, How, whether Copy text exists |
 | `questions[]` | `user/inbox/questions.md`, status `open`, kind not `action`, in the brief's order (`atlas-brief` §A step 4.9): Looks done entries (those with an `Evidence:` line) first, then those raised since the previous brief, then the oldest |
 | `week.days[].meetings`, `meeting_hours` | Event records with `start` that day, `status: scheduled`, `kind` not `deadline` or `milestone`, shown by the meeting filter |
