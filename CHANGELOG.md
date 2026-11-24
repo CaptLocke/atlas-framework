@@ -11,6 +11,7 @@ Each release's "What's new" section is shown to users in the Guide and their nex
 
 ### What's new
 - Your automations now follow your time zone on their own, so the clocks changing no longer moves them or raises a false alarm. If one does appear, saying "re-time my automations" checks and fixes it without moving anything that's already right.
+- When five or more things you owe have slipped, Atlas proposes one list, at most weekly: keep, hand off to someone already on it, re-date, or drop each. One yes, in a chat or on the Guide page, applies it all, and any notes to other people wait for your OK.
 
 ## 3.5.0 (2026-11-24)
 

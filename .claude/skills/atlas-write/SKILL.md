@@ -46,6 +46,7 @@ Output that starts at finished quality: correct, specific, in the user's voice (
 1. Create the draft in the user's mail tool with `mail.create_draft` (reply in the original thread when there is one; `mail.update_draft` for revisions). `drafts_create` is normally `auto`; drafts are never sent by this step.
 2. In chat, show the draft text and where it is ("in your Outlook drafts"). In jobs, record it (`reference/email-drafts.md` § Recording drafts) so the brief lists it and no duplicate is made.
 3. No mail connector → show the text for the user to copy; in jobs, put it in the approvals entry.
+4. **Hand-off and drop notes** (a cut list, `atlas-triage` `reference/cut-list.md`): short, in the user's voice, on the person's usual channel. A hand-off asks the person to take the item on, says what it is, who it's for and when it's due, and links what they need. A drop note tells the counterparty plainly that it won't happen, with a better date or alternative if the records offer one. Queue each with `Proposal kind: send_communication · hand-off` or `· drop note`, the hand-off with its `On send:` line (`system/schemas/formats.md` §3).
 
 ### 4. Sending (chat only, locked)
 When the user says "send it" or similar:
@@ -59,7 +60,7 @@ When the user says "send it" or similar:
    ```
    In a routine: never send; leave the draft and an approvals entry. Any other box unticked: go back to step 1 and show it again. After any edit, the earlier yes no longer counts.
    Several drafts at once ("send all four"): show them as one numbered list, each with its recipients and subject and its body, take one yes for the list, then tick the boxes and send for each in turn (`system/rules/governance.md` §Approval-record procedure, Several at once).
-3. After sending: evidence-close any `i_owe` commitment it fulfills (`atlas-triage` rules), update the recipient's `last_contact`, add an Updates line to related records, mark any related approvals entry `executed`.
+3. After sending: evidence-close any `i_owe` commitment it fulfills (`atlas-triage` rules), update the recipient's `last_contact`, add an Updates line to related records, mark any related approvals entry `executed`, and make its `On send:` change if it has one.
 In routines, never send: drafts plus an approvals entry only.
 
 ### 5. Finished deliverables (docx, pptx, xlsx, pdf)
