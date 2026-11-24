@@ -7,6 +7,12 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
+## Unreleased
+
+### What's new
+- The monthly report shows what you did with Atlas's email drafts: sent as written, lightly or heavily edited, or never sent. Only that count is kept, never your wording.
+- Before Atlas hands you a document, deck, sheet or status update, a separate check traces every figure and date to the records it came from, and names any it couldn't trace.
+
 ## 3.5.0 (2026-11-24)
 
 ### What's new

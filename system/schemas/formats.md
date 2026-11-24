@@ -75,6 +75,13 @@ previous: []                     # ids of earlier imports, so undo can still fin
 ```
 A completed or undone import is never reopened; a new one replaces this file with a new `id` and adds the old `id` to `previous`.
 
+### drafts.yaml
+Mail drafts Atlas made that haven't had an outcome yet (`atlas-write` `reference/email-drafts.md` §Draft outcomes, ATL-136). Hashes only, never text; an entry leaves once its outcome is logged.
+```yaml
+drafts:
+  AAMkAD-123: { made: 2026-11-24, job: email-drafts, thread: sources/2026-11-23-dana-msa-thread, words: 36, runs: "02c394b2 30f91d97 …" }
+```
+
 ### health.yaml
 ```yaml
 last_user_check: 2026-10-01

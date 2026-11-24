@@ -44,7 +44,7 @@ Output that starts at finished quality: correct, specific, in the user's voice (
 
 ### 3. Email drafts
 1. Create the draft in the user's mail tool with `mail.create_draft` (reply in the original thread when there is one; `mail.update_draft` for revisions). `drafts_create` is normally `auto`; drafts are never sent by this step.
-2. In chat, show the draft text and where it is ("in your Outlook drafts"). In jobs, record it (`reference/email-drafts.md` § Recording drafts) so the brief lists it and no duplicate is made.
+2. In chat, show the draft text and where it is ("in your Outlook drafts"). In jobs, record it (`reference/email-drafts.md` § Recording drafts) so the brief lists it and no duplicate is made. Either way, fingerprint it for its outcome (same reference, §Draft outcomes): never the text, only the hashes `system/tools/drafts.py` prints.
 3. No mail connector → show the text for the user to copy; in jobs, put it in the approvals entry.
 
 ### 4. Sending (chat only, locked)
@@ -66,7 +66,7 @@ In routines, never send: drafts plus an approvals entry only.
 Full procedure: `reference/deliverables.md`. In short:
 1. Working files (outline, content markdown, data CSV/JSON, build script) go in `user/work/deliverables/<YYYY-MM-DD-slug>/`; the binary is built in `.atlas-tmp/deliverables/` (never committed).
 2. Build with the Claude skill for that format when one is available in the session (docx, pptx, xlsx, pdf skills); otherwise with Python libraries (python-docx, python-pptx, openpyxl, reportlab or HTML→PDF). Apply the design system (colors, fonts with fallbacks, logo, layout, chart palette, number formats).
-3. Check the output: open/convert it and look at every page or slide for overflow, broken layout, wrong numbers, placeholder text.
+3. Check the output: open/convert it and look at every page or slide for overflow, broken layout, wrong numbers, placeholder text. **Check the figures** (ATL-136): run `python3 -I system/tools/figures.py <the content markdown> --record <each record it draws on>`, which lists every number, percentage, amount and date the cited records don't contain. Look only at those: correct one a source settles; otherwise keep it and name it in the handover ("2 figures I couldn't trace: the 120 sign-ups, the Nov 30 date"). Nothing is held back for it.
 4. **Save** to the deliverables folder with `files.upload` (`deliverables_save`, normally `auto`) using `atlas.yaml: deliverables_folder`; never overwrite an existing file (new name with `-v2`; editing an existing file is `docs_edit`, propose).
 5. **Offer a direct download:** send the file to the user in chat with the session's file-delivery tool.
 6. **Pointer:** create a Source `kind: deliverable` with `file_pointer` (via `atlas-capture`, `reference/files.md` in that skill), linked to the project, people, and any commitment it fulfills.

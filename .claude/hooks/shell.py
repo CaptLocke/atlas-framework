@@ -334,7 +334,8 @@ PYTHON_RE = re.compile(r"^python(3(\.\d+)?)?$")
 PYTHON_FLAGS = {"-I", "-B", "-u", "-E", "-s"}
 # Atlas's own tools (system/tools/), the only scripts routines may run.
 ATLAS_TOOLS = ("validate.py", "normalize.py", "render.py", "release_check.py", "redact_check.py", "index.py",
-               "cron_utc.py", "sections.py", "placement.py", "graph.py", "relations.py")
+               "cron_utc.py", "sections.py", "placement.py", "graph.py", "relations.py",
+               "drafts.py", "figures.py")
 
 
 def python_parts(argv):
@@ -358,7 +359,7 @@ def python_parts(argv):
 def python_writes(argv, cwd):
     """Files Atlas's tools write: render.py's output, sections.py's out-dir, graph.py and relations.py --out,
     normalize.py --fix (its files, or its --root), index.py (the index folder,
-    unless --check), and `python3 -m zipfile -e <zip> <dir>`. placement.py only prints."""
+    unless --check), and `python3 -m zipfile -e <zip> <dir>`. placement.py, drafts.py and figures.py only print."""
     _, script, module, args = python_parts(argv)
     tool = os.path.basename(script) if script else ""
     if tool == "render.py" and len(args) >= 4:
