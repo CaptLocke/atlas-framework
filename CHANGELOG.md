@@ -7,6 +7,14 @@ All notable changes to Atlas. Atlas follows semantic versioning:
 
 Each release's "What's new" section is shown to users in the Guide and their next Daily Brief. "Action needed" lists what only the user can do; each line becomes an "Action needed" item at the top of the next Daily Brief that stays until it's done. Maintainer notes for each release and the release checklist are kept in the maintainer's private repo.
 
+## Unreleased
+
+### What's new
+- Guide and Today show when a time-bound approval expires, such as a proposed focus block, so you can answer before it lapses.
+
+### Under the hood
+- Topic themes count only sources whose content Atlas keeps, as the topic rule always said.
+
 ## 3.5.0 (2026-11-24)
 
 ### What's new

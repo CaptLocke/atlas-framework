@@ -41,7 +41,8 @@ Five lists, each the top N (default 10):
 - `themes`: terms (words of 4+ letters, acronyms, and adjacent pairs of them, never
   across two fields) from the title, aliases and summary of commitments, decisions,
   ideas, risks, questions, projects and events that recur in at least 3 of them, of at
-  least 2 types, touched by at least 2 sources, where no topic's title or aliases hold
+  least 2 types, touched by at least 2 sources whose content may be stored (not
+  `retention: pointer`), where no topic's title or aliases hold
   the term itself. Names of people, organizations, projects and goals are left out (a
   project isn't a theme of its own commitments), as are common work words, weekdays,
   months and cadences, and, from 20 records up, terms in more than 15% of them. A
@@ -82,9 +83,10 @@ def _ids(value):
 
 
 def load(root, today):
-    """(records {id: info}, sources {id: date}, touches {source id: set of record ids})."""
+    """(records {id: info}, sources {id: date}, touches {source id: set of record ids},
+    pointer-only source ids)."""
     tmap = index.types(root)
-    recs, sources, touches, flagged = {}, {}, {}, set()
+    recs, sources, touches, flagged, pointer = {}, {}, {}, set(), set()
     src_folder = (tmap.get("source") or ("sources", set()))[0]
     d = os.path.join(root, "user", "knowledge", src_folder)
     if os.path.isdir(d):
@@ -96,6 +98,8 @@ def load(root, today):
             if fm is None:
                 continue
             sid = str(fm.get("id") or "%s/%s" % (src_folder, f[:-3]))
+            if str(fm.get("retention") or "") == "pointer":
+                pointer.add(sid)
             if "suspicious" in (fm.get("flags") or []):
                 flagged.add(sid)
                 continue
@@ -138,7 +142,7 @@ def load(root, today):
                 touches.setdefault(sid, set()).add(rid)
     touches = {sid: {r for r in rs if r in recs and not recs[r]["self"]}
                for sid, rs in touches.items() if sid not in flagged}
-    return recs, sources, touches
+    return recs, sources, touches, pointer
 
 
 def adjacency(recs, touches):
@@ -310,7 +314,7 @@ def _terms(text):
     return out
 
 
-def themes(recs, touches, top):
+def themes(recs, touches, top, pointer=frozenset()):
     """Terms that recur across content records and sources with no topic covering them yet."""
     named, covered = set(), set()
     for info in recs.values():
@@ -322,6 +326,8 @@ def themes(recs, touches, top):
                 covered.update(_terms(n))
     srcs = {}
     for sid, rs in touches.items():
+        if sid in pointer:   # topic.md counts only content that may be stored (ATL-138)
+            continue
         for r in rs:
             srcs.setdefault(r, set()).add(sid)
     content = [r for r, i in recs.items() if i["type"] in CONTENT]
@@ -354,13 +360,13 @@ def themes(recs, touches, top):
 
 
 def build(root, today, top=TOP):
-    recs, sources, touches = load(root, today)
+    recs, sources, touches, pointer = load(root, today)
     adj = adjacency(recs, touches)
     data = {"buried": buried(recs, adj, touches, top),
             "together": together(recs, adj, sources, touches, today, top),
             "follows": follows(recs, adj, sources, touches, today, top),
             "unowned": unowned(recs, adj, sources, touches, today, top),
-            "themes": themes(recs, touches, top)}
+            "themes": themes(recs, touches, top, pointer)}
     named = set()
     for x in data["buried"] + data["together"]:
         named.update([x["a"], x["b"]])
