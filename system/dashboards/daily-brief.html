@@ -395,7 +395,7 @@
         [N.request("I've done this", N.withId("I've done this: " + N.quote(a.text), a.id), "primary", true, { kind: "mark_done", target: a.id, quoted: a.text })]));
     });
     asks.forEach(function (a) {
-      needs.push(need("pending", ["Your OK", "warn"], a.action, a.requested_on ? "Asked " + N.date(a.requested_on) : null, a.why,
+      needs.push(need("pending", ["Your OK", "warn"], a.action, [a.requested_on ? "Asked " + N.date(a.requested_on) : null, a.expires ? "Expires " + N.date(a.expires) + (N.time(a.expires) ? ", " + N.time(a.expires) : "") : null].filter(Boolean).join(" · ") || null, a.why,
         [N.request("Approve", N.withId("Approve " + N.quote(a.action), a.id), "primary", true, { kind: "approve", target: a.id, quoted: a.action }),
           N.request("Decline", N.withId("Decline " + N.quote(a.action), a.id), "secondary", false, { kind: "decline", target: a.id, quoted: a.action })]));
     });
