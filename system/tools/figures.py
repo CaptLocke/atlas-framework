@@ -13,7 +13,10 @@ searched. Nothing outside `user/knowledge/` is read.
 What counts as a figure: money ($1,200, €3.5M), percentages (34%, 12.5 percent), numbers
 with a decimal point or of 10 and over (2,400; 3.75), and dates (2026-11-24, Nov 24,
 24 November, 11/24). Years on their own, and numbers inside a [[link]], are skipped.
-Matching is on a normal form: digits without separators, money with its unit and multiplier
+A slash date is month/day when it can be, else day/month (24/11); a fraction such as 3/4 reads
+as a date. A bare number in the records also matches the same number as a percentage or amount.
+Link IDs with ".." are refused, so nothing outside `user/knowledge/` is read. Matching is on a
+normal form: digits without separators, money with its unit and multiplier
 (3.5M = 3500000), dates as month and day. A figure is matched when the same normal form
 appears anywhere in the cited text. The tool doesn't judge whether a figure is right in
 context; `atlas-write` looks at the unmatched ones and decides.
@@ -63,9 +66,13 @@ def figures(text):
                 if g[0].isdigit() and len(g[0]) == 4:
                     norm = "%02d-%02d" % (int(g[1]), int(g[2]))
                 elif g[0].isdigit() and g[1].isdigit():
-                    if not (1 <= int(g[0]) <= 12 and 1 <= int(g[1]) <= 31):
+                    a, b = int(g[0]), int(g[1])
+                    if 1 <= a <= 12 and 1 <= b <= 31:
+                        norm = "%02d-%02d" % (a, b)          # month/day
+                    elif 13 <= a <= 31 and 1 <= b <= 12:
+                        norm = "%02d-%02d" % (b, a)          # day/month, unambiguous (24/11)
+                    else:
                         continue
-                    norm = "%02d-%02d" % (int(g[0]), int(g[1]))
                 elif g[0].isdigit():
                     norm = "%02d-%02d" % (MONTHS[g[1][:3].lower()], int(g[0]))
                 else:
@@ -97,7 +104,7 @@ def cited_text(root, draft, extra):
     hop = {i: 0 for i in ids}
     while queue:
         rid = queue.pop(0)
-        if rid in seen or "/" not in rid:
+        if rid in seen or "/" not in rid or ".." in rid or rid.startswith("/") or "\\" in rid:
             continue
         seen.add(rid)
         path = os.path.join(root, "user", "knowledge", *rid.split("/")) + ".md"

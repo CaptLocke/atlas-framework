@@ -33,7 +33,7 @@ Silent signals count too, but only where the evidence is clear. The learning pas
 
 ## 2. The learning pass (monthly, and on demand)
 Runs in the monthly automation review (`atlas-review`, `reference/monthly.md` §What Atlas learned). It also runs in chat when the user asks "what have you learned about how I work?".
-1. Gather `feedback` lines from the last 60 days of activity logs, plus the silent signals above. Leave out `proposal_declined` and `proposal_accepted`: they're acted on as they happen (`system/rules/governance.md` §Proposals the user keeps turning down), and only counted here for §4.
+1. Gather `feedback` lines from the last 60 days of activity logs, plus the silent signals above. Leave out `proposal_declined` and `proposal_accepted`: they're acted on as they happen (`system/rules/governance.md` §Proposals the user keeps turning down), and only counted here for §4. Leave out `cut_list` and `draft_outcome` too: they measure an answer or a draft, not a correction, and are read by the monthly indicators and voice learning (`atlas-write` `reference/email-drafts.md`), never turned into rules here.
 2. Group them by signal and dimension. A **pattern** is ≥ 3 signals with the same signal and dimension in 60 days, none contradicting it, and no open or dismissed proposal for the same rule in that time.
 3. For each pattern, write one proposal in `user/inbox/questions.md` (kind `profile`) with the evidence count and the exact rule line to add. Cap it at 3 proposals a month, strongest first. For example:
 ```markdown
